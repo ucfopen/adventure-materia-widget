@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:ScrollableSizableImage xmlns:mx="http://www.adobe.com/2006/mxml"
+                                   xmlns:components="materia.components.*"
+                                   repositionDone="onRepositionDone(event)"
+		>
+	<mx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			public override function set source(imageData:*):void
+			{
+				allowScrollingAndSizing = false;
+				//_sourceImageBytes = null;// so it actually re-sets the size of it
+				if(_sourceImageBytes == imageData)
+				{
+					resetImage();
+				}
+				else
+				{
+					if(imageData is String) {_sourceImageBytes = imageData; }
+					else { displayedImage.source = imageData; }
+				}
+			}
+			protected function onUpdateImage(e:Event):void
+			{
+				displayedImage.removeEventListener(FlexEvent.UPDATE_COMPLETE, onUpdateImage);
+				imageLoaded();
+			}
+			protected override function imageLoaded():void
+			{
+				super.imageLoaded();
+				_allowDragging = false;
+			}
+			protected function onRepositionDone(event:Event):void
+			{
+				allowScrollingAndSizing = false;
+				scaleToFit();
+			}
+			public function centerImage():void
+			{
+				// vertically / horizontally center the image
+				if(displayedImage && displayedImage.content)
+				{
+					displayedImage.x = (this.width - displayedImage.content.width) / 2.0;
+					displayedImage.y = (this.height - displayedImage.content.height) / 2.0;
+				}
+			}
+			public function scaleToFit():void
+			{
+				if(displayedImage == null || displayedImage.content == null) return;
+				var imageWidth:Number = displayedImage.content.width;
+				var imageHeight:Number = displayedImage.content.height;
+				var containerWidth:Number = this.width - SQUARE_SIZE * 2;
+				var containerHeight:Number = this.height - SQUARE_SIZE * 2;
+				var newScale:Number = Math.min(containerWidth / imageWidth, containerHeight / imageHeight);
+				displayedImage.content.width = imageWidth * newScale;
+				displayedImage.content.height = imageHeight * newScale;
+				centerImage();
+				imageScale = displayedImage.content.width / _originalImageWidth;
+			}
+//			public function scaleToFit():void
+//			{
+//				if(displayedImage == null || displayedImage.content == null) return;
+//
+//				var imageWidth:Number = displayedImage.content.width;
+//				var imageHeight:Number = displayedImage.content.height;
+//				var containerWidth:Number = this.width - SQUARE_SIZE * 2;
+//				var containerHeight:Number = this.height - SQUARE_SIZE * 2;
+//
+//				var newScale:Number = Math.min(containerWidth / imageWidth, containerHeight / imageHeight);
+//
+//				displayedImage.content.width = imageWidth * newScale;
+//				displayedImage.content.height = imageHeight * newScale;
+//
+//				centerImage();
+//
+//				imageScale = newScale;
+//			}
+		]]>
+	</mx:Script>
+</components:ScrollableSizableImage>

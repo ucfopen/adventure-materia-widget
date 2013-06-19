@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screens:PopupMc
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:components="components.*"
+	title="Edit Short Answer Question"
+	layout="absolute" width="950" height="620"
+	xmlns:screens="screens.*"
+	>
+	<mx:Script>
+		<![CDATA[
+			import components.MultipleChoiceRow;
+			
+			import mx.events.FlexEvent;
+			
+			import nm.ui.ToolTip;
+			
+			import tree.Node;
+			private static const DEFAULT_CHOICE_TEXT:String = "All Other Answers\nUsed when a response doesn't match any answers";
+			private static const DEFAULT_CHOICE_ANS:String = "[All Other Answers]";
+			protected var _defaultChoice:MultipleChoiceRow;
+			protected var _modifiedRow:MultipleChoiceRow;
+			protected override function onCreationComplete():void
+			{
+				super.onCreationComplete();
+				answerVBox.removeChild(randomizeBox);
+				answerVBox.addChildAt(answerInstructions, 0);
+				answerInstructions.text = "Enter Possible Answers Separated By Commas:";
+			}
+			private function get defaultAnswerExists():Boolean
+			{
+				return _node.data.answers.length && _node.data.answers[0].options.isDefault;
+			}
+			protected override function fixImportedData(node:Node):void
+			{
+				super.fixImportedData(node);
+				/* merge answers with equal scores */
+				for(var i:int = 0; i < node.data.answers.length; i++)
+				{
+					for(var j:int = i+1; j < node.data.answers.length; j++)
+					{
+						if(node.data.answers[i].value == node.data.answers[j].value)
+						{
+							node.data.answers[i].text += " , " + node.data.answers[j].text;
+							node.data.answers.splice(j, 1);
+							_tree.attemptDeleteNode(_tree.getNodeFromId(node.data.answers[j].options.link));
+							j--;
+						}
+					}
+				}
+				// create the missing node
+				_defaultChoice.destination = _tree.addNode(node, null).node;
+				node.data.addAnswer("", "0");
+				onMissingNodeAdded(node);
+			}
+			protected override function beginEdit(node:Node):void
+			{
+				_node = node;
+				_tree = node.displayNode.displayTree;
+				/* create default answer */
+				_defaultChoice = new MultipleChoiceRow();
+				_defaultChoice.isDefault = true;
+				_defaultChoice.node = _node;
+				_defaultChoice.rowIndex = -1;
+				answerVBox.addChildAt(_defaultChoice, 1);
+				_defaultChoice.popupInstance = this;
+				_defaultChoice.setStyle("borderStyle", "solid");
+				_defaultChoice.setStyle("backgroundColor", "#ffffff");
+				_defaultChoice.answerField.text = DEFAULT_CHOICE_TEXT;
+				_defaultChoice.answerField.enabled = false;
+				_defaultChoice.answerField.selectable = false;
+				_defaultChoice.answerField.editable = false;
+				_defaultChoice.width = answerVBox.width - 16;
+				_defaultChoice.missingNodeCallback = onMissingNodeAdded;
+				// Add default answer to new nodes
+				if(node.isNew && !node.imported)
+				{
+					var newDefault:Node = addNode(node);
+					_newNodes.push(newDefault);
+					node.data.addAnswer(DEFAULT_CHOICE_ANS, "0", {link:newDefault.id, isDefault:true});
+					if(node.children.length > 1)
+					{
+						var index:int = node.getChildIndex(newDefault);
+						node.children[index - 1].rightSibling = null;
+						newDefault.leftSibling = null;
+						newDefault.rightSibling = node.children[0];
+						node.children[0].leftSibling = newDefault;
+						node.children.splice(index, 1);
+						node.children.splice(0, 0, newDefault);
+					}
+					else
+					{
+						_newNodes.push(addNode(node));
+					}
+					node.data.addAnswer("", "0", {link:node.children[1].id});
+//					var newNode:Node
+//					if(node.children.length == 0) newNode = addNode(node);
+//					else if(node.data.answers.length == 0) newNode = node.children[0];
+//					else return;
+//					_newNodes.push(newNode);
+//					node.data.addAnswer("- All Other Answers -", "0", {link:newNode.id, isDefault:true});
+					trace("Added New (SA Default)");
+				}
+				updateRowOffset();
+				super.beginEdit(node);
+				// Customize window for Short answer
+				this.title = "Edit Short Answer - " + nodeID;
+				addAnswerButton.label = "Add Answer";
+				_node.data.addOption("type", AdventureOptions.TYPE_SHORT_ANSWER);
+				// Update Default Choice Row
+				if(!_node.data.answers.length && _node.children.length)
+				{
+					_defaultChoice.destination = _node.children[0];
+				}
+				else if(!_node.data.answers.length || !_node.data.answers[0].options.isDefault)
+				{
+					_defaultChoice.destination = null;
+				}
+				this.addEventListener(FlexEvent.UPDATE_COMPLETE, onUpdateComplete, false, 0, true);
+			}
+			protected override function onWindowClosed():void
+			{
+				super.onWindowClosed();
+				_defaultChoice.parent.removeChild(_defaultChoice);
+				_defaultChoice.destroy();
+				_defaultChoice = null;
+			}
+			protected function onUpdateComplete(e:Event):void
+			{
+				this.removeEventListener(FlexEvent.UPDATE_COMPLETE, onUpdateComplete);
+				updateAddAnswerButton();
+			}
+			protected override function loadAnswers():void
+			{
+				/* Load all normal answers their boxes */
+				super.loadAnswers();
+				/* Load default answer into its box */
+				_defaultChoice.node = _node;
+//				_defaultChoice.letter = getNextLetter();
+				if(defaultAnswerExists)
+				{
+					var defaultAns:Object = _node.data.answers[0];
+					var defaultNode:Node = _node.children[0];
+					_defaultChoice.destination = _node.children[0];
+					_defaultChoice.feedback = defaultAns.options.feedback;
+				}
+			}
+			protected override function saveAnswers():void
+			{
+				/* save regular answers */
+				super.saveAnswers();
+				/* save data for default node */
+				if(rowOffset != 0)
+				{
+					var defaultAns:* = _node.data.answers[0];
+					defaultAns.text = DEFAULT_CHOICE_ANS;
+					defaultAns.options.link =  _defaultChoice.destination.id;
+					defaultAns.options.feedback = _defaultChoice.feedback;
+				}
+			}
+			protected override function onAddAnswer(e:Event = null):void
+			{
+				// Add new answer
+				super.onAddAnswer(e);
+			}
+			private function updateRowOffset():void
+			{
+				if(defaultAnswerExists)
+				{
+					rowOffset = 1;
+				}
+				else
+				{
+					rowOffset = 0;
+				}
+			}
+			/**
+			 * Called after the defaultChoice row adds a node that wasn't there
+			 */
+			private function onMissingNodeAdded(parentNode:Node):void
+			{
+				var answer:Object = parentNode.data.answers[parentNode.data.answers.length - 1];
+				if(answer.options == null) answer.options = new Object();
+				answer.options.isDefault = true;
+				// Missing node is automatically added to the end. We want to
+				// move it to the beginning. So we begin the moving process.
+				// Swap the answers in the qset (to keep move default answer to the front)
+				var defaultAns:Object = _node.data.answers.splice(_node.data.answers.length - 1, 1)[0];
+				_node.data.answers.splice(0, 0, defaultAns);
+				// Also move the node to the front
+				var defaultNode:Node = _node.children.splice(_node.children.length - 1, 1)[0];
+				_node.children.splice(0, 0, defaultNode);
+				_node.children[0].leftSibling = null;
+				_node.children[_node.children.length - 1].rightSibling = null;
+				if(_node.children.length > 1)
+				{
+					_node.children[0].rightSibling = _node.children[1];
+					_node.children[1].leftSibling = _node.children[1];
+				}
+				updateRowOffset();
+				_node.checkForErrors();
+				_node.displayNode.redraw();
+			}
+			public override function onDoneEditingLink():void
+			{
+				super.onDoneEditingLink();
+				if(defaultAnswerExists) _defaultChoice.destination = _node.children[0];
+			}
+
+			public override function hide():void
+			{
+				if (!visible) return;
+				onWindowClosed();
+			}
+		]]>
+	</mx:Script>
+</screens:PopupMc>

@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<screens:AdventurePopupBase
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:components="components.*"
+	xmlns:screens="screens.*"
+	title="Edit Hotspot Question"
+	layout="absolute" width="950" height="670"
+	>
+	<mx:Script>
+		<![CDATA[
+		import materia.CreatorBase;
+		import materia.CreatorConfig;
+		import materia.components.ScrollableSizableImage;
+
+		import mx.core.UITextField;
+
+		import tree.DisplayNode;
+		import tree.Node;
+		import nm.ui.ToolTip;
+
+		import flash.external.ExternalInterface;
+
+			use namespace mx_internal;
+			private static const DEFAULT_TEXT:String = "Enter instructions here.";
+			private var _layout:int;
+			private var _scaleBeforeChange:Number = -1;
+			private var _scaleAfterChange:Number;
+			private var _changingImage:Boolean = false;
+			private var refNode:Node;
+
+			protected override function onCreationComplete():void
+			{
+				super.onCreationComplete();
+				nodeImg.addEventListener(HotspotImage.EVENT_CHANGE_IMAGE, onChangeImageButton, false, 0, true);
+				this.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
+				/* Update Layout */
+				layoutsPanel.filters = [new GlowFilter(0, .4, 6, 6, 1)];
+				_sidePanel.addChild(sidePanelContents);
+			}
+			protected override function beginEdit(node:Node):void
+			{
+				super.beginEdit(node);
+				/* Load Node Data (setLayout() loads image and hotspots) */
+				this.title = "Edit Hotspot - " + DisplayNode.idToLabel(node.id);
+//				this.nodeLabel.text = "Dest. " + DisplayNode.idToLabel(node.id) + ":";
+				this.nodeBox.setTargetNode(node, DestinationBox.RADIUS_DEFAULT, false);
+				if(node.data.options.layout != null) setLayout(node.data.options.layout);
+				else setLayout(AdventureOptions.LAYOUT_VERT_TEXT);
+				/* Load Question Text */
+				qField.text = node.data.question;
+				if(!qField.text.length) qField.text = DEFAULT_TEXT;
+				updateQuestionColor();
+				/* Set this node to the appropriate type */
+				_node.data.addOption("type", AdventureOptions.TYPE_HOTSPOT);
+				/* Set default visibility */
+				if(_node.data.options.visibility == null) _node.data.options.visibility = AdventureOptions.VISIBILITY_HOVER;
+
+				// update reference node so answer validation can access it
+				refNode = node;
+			}
+			protected override function onWindowClosed():void
+			{
+				super.onWindowClosed();
+				/* Reset the image */
+				removeImage();
+				/* Store modified data to node */
+				if(qField.text != DEFAULT_TEXT) _node.data.question = qField.text;
+				_node.data.options.layout = _layout;
+				/* Update the display tree */
+				_tree.redraw()
+			}
+			protected override function onEditLink(e:Event):void
+			{
+				this.visible = false;
+				nodeImg.hideTools();
+			}
+			public override function onDoneEditingLink():void
+			{
+				this.visible = true;
+				nodeImg.showTools();
+			}
+			public override function destroy():void
+			{
+				super.destroy();
+				if(nodeImg != null) nodeImg.removeEventListener(HotspotImage.EVENT_CHANGE_IMAGE, onChangeImageButton);
+				this.removeEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink);
+			}
+			private function removeImage():void
+			{
+				_changingImage = false;
+				nodeImg.removeEventListener(ScrollableSizableImage.EVENT_IMAGE_LOAD_COMPLETE, onLoadImageComplete);
+				nodeImg.source = "";
+				nodeImg.hideTools();
+				nodeImg.endRedrawHotspotMode(false);
+				nodeImg.removeHotspots();
+			}
+			private function updateQuestionColor():void
+			{
+				qField.setStyle("color", qField.text == DEFAULT_TEXT ? "#a5a5a5" : "#505050");
+			}
+			/**
+			 * Sets the visual layout and updates the appearance of the layout buttons.
+			 * Use one of the LAYOUT_* constants from AdventureOptions as a parameter.
+			 */
+			private function setLayout(layout:int):void
+			{
+				if(_layout == layout && nodeImg.source != "") return;
+				switch(layout)
+				{
+					case AdventureOptions.LAYOUT_VERT_TEXT:
+						layout1Button.setStyle('borderStyle', 'solid');
+						layout2Button.setStyle('borderStyle', 'none');
+						layout1ButtonOverlay.visible = true;
+						layout2ButtonOverlay.visible = false;
+						mainVBox.addChildAt(fieldCanvas, 0);
+						break;
+					case AdventureOptions.LAYOUT_IMAGE_ONLY:
+						layout1Button.setStyle('borderStyle', 'none');
+						layout2Button.setStyle('borderStyle', 'solid');
+						layout1ButtonOverlay.visible = false;
+						layout2ButtonOverlay.visible = true;
+						if(fieldCanvas.parent == mainVBox) mainVBox.removeChild(fieldCanvas);
+						break;
+				}
+				_layout = layout;
+				/* reset the image and load appropriate hotspots */
+				removeImage();
+				updateImage();
+			}
+			public function selectImage():void
+			{
+				CreatorBase.openMediaScreen(onMediaLoaded);
+			}
+			protected function onMediaLoaded(assetArr:Array):void
+			{
+				if(assetArr.length > 0)
+				{
+					// Delete all hotspots
+//					_node.displayNode.displayTree.resetHotspotNode(_node);
+					// Keep track of old image's scale
+					_scaleBeforeChange = nodeImg.imageScale;
+					// Load Image
+					_node.data.options.assetId = assetArr[0].id;
+					updateImage();
+				}
+				else
+				{
+					_changingImage = false;
+				}
+				stage.focus = this;
+			}
+			private function onChangeImageButton(e:Event):void
+			{
+				_changingImage = true;
+				selectImage();
+			}
+			private function updateImage():void
+			{
+				/* Remove hotspots left over from last loaded image */
+				if(!_changingImage) nodeImg.removeHotspots();
+				/* If the node has an image assigned to it, place that image */
+				if(_node.data.options.assetId && _node.data.options.assetId != "")
+				{
+					trace("adding");
+					/* Wait until this image is loaded and adjust the scale or reposition */
+					nodeImg.addEventListener(ScrollableSizableImage.EVENT_IMAGE_LOAD_COMPLETE, onLoadImageComplete, false, 0, true);
+					/* Load the image */
+					nodeImg.source = CreatorConfig.getKogneatoAssetLink(_node.data.options.assetId);
+					/* Hide the placeholder, show the image */
+					placeholderImg.visible = false;
+					nodeImg.visible = true;
+				}
+				/* If no image is stored, show the placeholder */
+				else
+				{
+					placeholderImg.visible = true;
+					nodeImg.visible = false;
+					nodeImg.source = null;
+				}
+			}
+			private function onLoadImageComplete(event:Event):void
+			{
+				trace("received");
+				// Remove the event listener
+				nodeImg.removeEventListener(ScrollableSizableImage.EVENT_IMAGE_LOAD_COMPLETE, onLoadImageComplete);
+				// Auto-fit
+				nodeImg.scaleToFit();
+				// If image was changed, update the scales of all the hotspots
+				if(_changingImage) nodeImg.updateHotspotScales(_scaleBeforeChange, nodeImg.imageScale);
+				// Show the toolbar
+				nodeImg.hideTools();
+				nodeImg.showTools();
+				// Load any stored hotspots
+				if(!_changingImage) nodeImg.loadHotspots();
+				// Reset the Changing Image Flag
+				_changingImage = false;
+				_scaleBeforeChange = -1;
+			}
+			private function addNode(parentNode:Node):Node
+			{
+				trace("PopupHotspot::addNode");
+				var result:Node = parentNode.displayNode.displayTree.addNode(parentNode, null).node;
+				_newNodes.push(result);
+				return result;
+			}
+
+			public override function hide():void
+			{
+				if (!visible) return;
+				onWindowClosed();
+			}
+			/*
+			private function validateAnswerScoreSelections():Boolean
+			{
+				for (var i:int = 0; i < refNode.data.answers.length; i++)
+				{
+					var opts:Object = refNode.data.answers[i].options;
+					if ((opts.validScore != undefined && !opts.validScore == true)
+					|| (opts.validScoreModification != undefined && !opts.validScoreModification == true))
+					{
+						doneButton.addEventListener(MouseEvent.MOUSE_OVER, clearDoneToolTip);
+						return false;
+					}
+				}
+
+				return true;
+			}
+
+			private function clearDoneToolTip(e:Event):void
+			{
+				ToolTip.remove(doneButton);
+				doneButton.removeEventListener(MouseEvent.MOUSE_OVER, clearDoneToolTip);
+			}
+			*/
+
+		]]>
+	</mx:Script>
+	<mx:VBox id="sidePanelContents" width="100%" height="100%" horizontalAlign="center" verticalGap="{PADDING_V}" ><!-- Relocated to Sidepanel on creationComplete -->
+		<!-- Layouts Panel -->
+		<mx:Canvas id="layoutsPanel" backgroundColor="0x7299b5" width="80" height="134">
+			<mx:Label fontFamily="Arial MT Bold" fontSize="12" color="0xffffff" text="Layouts:" top="1" horizontalCenter="0" />
+			<mx:VBox backgroundColor="0xffffff" width="78" height="113" left="1" top="20" horizontalAlign="center" verticalAlign="middle">
+				<mx:Canvas id="layout1Button" borderColor="0x7299b5" click="{setLayout(AdventureOptions.LAYOUT_VERT_TEXT);}">
+					<mx:Image source="@Embed(source='../assets/hotspotLayout1.png')" verticalCenter="0" horizontalCenter="0" />
+					<mx:Container id="layout1ButtonOverlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+				</mx:Canvas>
+				<mx:Canvas id="layout2Button" borderColor="0x7299b5" click="{setLayout(AdventureOptions.LAYOUT_IMAGE_ONLY);}">
+					<mx:Image source="@Embed(source='../assets/hotspotLayout2.png')" verticalCenter="0" horizontalCenter="0" />
+					<mx:Container id="layout2ButtonOverlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+				</mx:Canvas>
+			</mx:VBox>
+		</mx:Canvas>
+	</mx:VBox>
+	<mx:VBox id="mainVBox" top="{PADDING_V}" bottom="{PADDING_V + 50}" left="{LEFT_BOUNDARY + PADDING_H}" right="{PADDING_H}" verticalGap="{PADDING_V}">
+			<!-- Title, Text, Button -->
+			<mx:Canvas id="fieldCanvas" styleName="fieldCanvas" width="100%">
+			 	<!-- Contains the Icon and Question -->
+				<mx:Label styleName="stickyNote" id="questionSticky"  top="0" left="105" text="INSTRUCTIONS:"
+						  initialize="{
+						  (questionSticky.mx_internal::getTextField() as UITextField).background = true;
+						  (questionSticky.mx_internal::getTextField() as UITextField).backgroundColor = 0xfef6b1
+						  }"
+						  />
+				<mx:HBox top="30" bottom="20" left="10" right="20" horizontalGap="20">
+					<components:DestinationBox id="nodeBox" minWidth="75" height="75"/>
+					<mx:TextArea borderSkin="assets.DottedBorder" styleName="smallerField" id="qField" text="{DEFAULT_TEXT}" width="100%" height="100%"
+								 focusIn="{
+									 if(qField.text == DEFAULT_TEXT || !qField.text.length) {
+										 qField.text = '';
+										 updateQuestionColor();
+									 }
+								 }"
+								 focusOut="{
+									 if(!qField.text.length) {
+										 qField.text = DEFAULT_TEXT;
+										 updateQuestionColor();
+									 }
+								 }"
+								 />
+				</mx:HBox>
+			</mx:Canvas>
+		<mx:Canvas id="imageContainer" borderStyle="solid" borderColor="0xbfbfbf" backgroundColor="0xffffff" height="100%" width="100%">
+			<mx:Image id="placeholderImg" click="{selectImage();}" source="@Embed(source='../assets/image_icon.png')" verticalCenter="0" horizontalCenter="0" />
+			<components:HotspotImage id="nodeImg" node="{_node}" visible="false" addNodeFunction="addNode" click="{nodeImg.showTools();}" verticalCenter="0" horizontalCenter="0" top="5" right="5" bottom="5" left="5"/>
+		</mx:Canvas>
+	</mx:VBox>
+	<components:AdventureButton id="doneButton" bottom="20" right="20" label="Done" click="{hide();}" />
+</screens:AdventurePopupBase>

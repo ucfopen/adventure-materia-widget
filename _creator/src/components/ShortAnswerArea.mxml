@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   creationComplete="{onCreationComplete()}"
+		   implements="mx.managers.IFocusManagerComponent"
+		   mouseEnabled="true"
+		   tabEnabled="true"
+		   >
+<mx:Script> <![CDATA[
+	import com.adobe.utils.StringUtil;
+	import mx.events.ResizeEvent;
+	//--------------------------------------------------------------------------
+	//
+	//  Static Variables
+	//
+	//--------------------------------------------------------------------------
+	[Bindable]
+	private var PADDING:Number = 2;
+	[Bindable]
+	private var SCROLL_WIDTH:Number = 18;
+	private var INPUT_WIDTH_MIN:Number = 80;
+	private var LINE_HEIGHT:Number = 24;
+	private var MAX_CHARS:int = 50;
+	private var H_SPACING:Number = 5;
+	private var TEXTFORMAT_DEFAULT:TextFormat = new TextFormat("Arial", 14, 0);
+	private var TEXTFORMAT_DELETE:TextFormat = new TextFormat("Arial", 14, 0xffffff, true, null, null, null, null, "center");
+	private var ESCAPED_CHARS:String = ",";
+	//--------------------------------------------------------------------------
+	//
+	//  Instance Variables
+	//
+	//--------------------------------------------------------------------------
+	private var _creationComplete:Boolean = false;
+	private var _listenersEnabled:Boolean = false;
+	private var _parseString:String = "";
+	private var _tokenStrings:Array;
+	private var _currX:Number = 0;
+	private var _currY:Number = 0;
+	private var _revertPending:Boolean = false;
+	private var _revertText:String = "";
+	private var _scrollCheckPending:Boolean;
+	private var _stage:EventDispatcher;
+	private var _stageListenerActive:Boolean;
+	//----------------------------------
+	//  Components
+	//----------------------------------
+	private var _tokenFields:Array = new Array();
+	private var _inputField:TextField;
+	private var _deleteButton:TextField;
+	//--------------------------------------------------------------------------
+	//
+	//  Initializers
+	//
+	//--------------------------------------------------------------------------
+	private function onCreationComplete():void
+	{
+		/* only call this function once */
+		if(_creationComplete) return;
+		/* create the input field that will receive keystrokes */
+		_inputField.maxChars = MAX_CHARS;
+		_inputField.defaultTextFormat = TEXTFORMAT_DEFAULT;
+		_inputField.type = TextFieldType.INPUT;
+		_inputField.border = false;
+		_inputField.width = INPUT_WIDTH_MIN;
+		_inputField.height = LINE_HEIGHT;
+		_inputField.visible = this.enabled;
+		flashPanel.visible = false;
+		flashPanel.addChild(_inputField);
+		/* create delete button */
+		_deleteButton = new TextField();
+		_deleteButton.defaultTextFormat = TEXTFORMAT_DELETE;
+		_deleteButton.text = "X";
+		_deleteButton.autoSize = TextFieldAutoSize.LEFT;
+		_deleteButton.background = true;
+		_deleteButton.mouseEnabled = false;
+		_deleteButton.backgroundColor = 0x880000;
+		/* build the token fields */
+//		_parseString = "hello, goodbye, cows are great!, the quick brown fox jumps over the lazy dog";
+		build();
+		/* set creation complete flag */
+		_creationComplete = true;
+		/* set delay to visibility so user doesn't see re-arrangement */
+		setTimeout(function t():void { flashPanel.visible = true; }, 50);
+		/* add listeners */
+		setListenersEnabled(this.enabled);
+	}
+	//--------------------------------------------------------------------------
+	//
+	//  Override Functions
+	//
+	//--------------------------------------------------------------------------
+	public override function set enabled(val:Boolean):void
+	{
+		if(val != super.enabled)
+		{
+			setListenersEnabled(val);
+			if(_inputField != null) _inputField.visible = val;
+		}
+		super.enabled = val;
+	}
+	protected override function createChildren():void
+	{
+		super.createChildren();
+		_inputField = new TextField();
+		_deleteButton = new TextField();
+	}
+	//--------------------------------------------------------------------------
+	//
+	//  Instance Functions
+	//
+	//--------------------------------------------------------------------------
+	//----------------------------------
+	//  Getter/Setter Functions
+	//----------------------------------
+	/**
+	 * The comma-separated values attributed to this answer
+	 */
+	public function get text():String { return _parseString; }
+	public function set text(val:String):void
+	{
+		_parseString = val;
+		if(_creationComplete) build();
+	}
+	/**
+	 * Indicates the set of characters that a user can enter into the text field.
+	 * If the value of the restrict property is null, you can enter any character.
+	 * If the value of the restrict property is an empty string,
+	 * you cannot enter any character.
+	 */
+	public function get restrict():String { return _inputField.restrict; }
+	public function set restrict(val:String):void { _inputField.restrict = val; }
+	//----------------------------------
+	//  Public Functions
+	//----------------------------------
+	/**
+	 * Removes event listeners to clear memory and prepare for garbage collection
+	 */
+	public function destroy():void
+	{
+		setListenersEnabled(false);
+		clean();
+	}
+	//----------------------------------
+	//  Private Functions
+	//----------------------------------
+	/**
+	 * Draws an invisible background on the flashpanel to catch mouse events
+	 */
+	private function redraw():void
+	{
+		trace("ShortanswerArea::redraw()");
+		/* place input field at appropriate position */
+		resetCursor();
+		/* update height */
+		flashPanel.height = Math.max(scrollContainer.height, _currY + LINE_HEIGHT);
+		/* draw invisible background to catch mouse events */
+		flashPanel.graphics.clear();
+		flashPanel.graphics.beginFill(0, 0);
+		flashPanel.graphics.drawRect(0, 0, flashPanel.width, flashPanel.height);
+		flashPanel.graphics.endFill();
+	}
+	private function reposition():void
+	{
+		trace("ShortanswerArea::reposition()");
+		/* reset current x/y position */
+		_currX = 0;
+		_currY = 0;
+		/* for each token field */
+		for(var i:int = 0; i < _tokenFields.length; i++)
+		{
+			/* reset x position and move down if necessary */
+			if(_currX + _tokenFields[i].width > flashPanel.width)
+			{
+				_currX = 0;
+				_currY += LINE_HEIGHT;
+			}
+			/* set new position */
+			_tokenFields[i].x = _currX;
+			_tokenFields[i].y = _currY;
+			/* update position for next token field */
+			_currX += _tokenFields[i].width + H_SPACING;
+		}
+		redraw();
+	}
+	private function resetCursor():void
+	{
+		trace("ShortanswerArea::resetCursor()");
+		/* determine width of input field */
+		var inputWidth:Number = Math.max(INPUT_WIDTH_MIN, _inputField.textWidth);
+		/* reset x position and move down if necessary */
+		if(_currX != 0 && _currX + inputWidth > flashPanel.width)
+		{
+			_currX = 0;
+			_currY += LINE_HEIGHT;
+		}
+		/* set position for input field */
+		_inputField.x = _currX;
+		_inputField.y = _currY;
+		/* update width of input field */
+		_inputField.width = flashPanel.width - _inputField.x;
+	}
+	private function checkScrollDown():void
+	{
+		if(scrollContainer.verticalScrollBar != null && scrollContainer.verticalScrollPosition != scrollContainer.verticalScrollBar.maxScrollPosition)
+		{
+			scrollContainer.verticalScrollPosition = scrollContainer.verticalScrollBar.maxScrollPosition;
+		}
+	}
+	private function recalculateCurrentPosition():void
+	{
+		trace("ShortanswerArea::recalculateCurrentPosition()");
+		if(_tokenFields.length)
+		{
+			var targetField:TextField = _tokenFields[_tokenFields.length - 1];
+			_currX = targetField.x + targetField.width + H_SPACING;
+			_currY = targetField.y;
+		}
+		else
+		{
+			_currX = 0;
+			_currY = 0;
+		}
+	}
+	private function commitInput():void
+	{
+		trace("ShortanswerArea::commitInput()");
+		addToken(_inputField.text);
+		_inputField.text = "";
+	}
+	private function saveTokens():void
+	{
+		trace("ShortAnswerArea::saveTokens()");
+		for(var i:int = 0; i < _tokenStrings.length; i++)
+		{
+			_tokenStrings[i] = escapeChars(_tokenStrings[i]);
+		}
+		_parseString = _tokenStrings.join(", ");
+		dispatchEvent(new Event(Event.CHANGE));
+	}
+	private function build():void
+	{
+		trace("ShortanswerArea::build()");
+		clean();
+		/* get the tokens from the parse string */
+		if(_parseString.length)
+		{
+			_tokenStrings = splitCommas(_parseString);
+		}
+		else
+		{
+			_tokenStrings = new Array();
+		}
+		redraw();
+		/* for each token string */
+		for(var i:int = 0; i < _tokenStrings.length; i++)
+		{
+			/* trim whitespace */
+			_tokenStrings[i] = StringUtil.trim(_tokenStrings[i]);
+			/* format commas */
+			_tokenStrings[i] = parseEscaped(_tokenStrings[i]);
+			/* create a token field */
+			_tokenFields.push(createTokenField(_tokenStrings[i]));
+		}
+		redraw();
+	}
+	private function clean():void
+	{
+		trace("ShortanswerArea::clean()");
+		/* clean token strings */
+		_tokenStrings = null;
+		/* remove all token fields */
+		var tokenField:TextField;
+		while((tokenField = _tokenFields.pop()) != null)
+		{
+			removeTokenField(tokenField);
+		}
+		/* reset x/y position of input field */
+		_currY = 0;
+		_currX = 0;
+		/* redraw */
+		redraw();
+	}
+	private function addToken(input:String):void
+	{
+		trace("ShortanswerArea::addToken()");
+		/* get token from input */
+		var token:String = StringUtil.ltrim(input);
+		token = splitCommas(token)[0];
+		token = parseEscaped(token);
+		token = StringUtil.trim(token);
+		/* ignore tokens that are all whitespace */
+		if(!token.length) return;
+		/* save to parse string */
+		_parseString += ", " + token;
+		/* add to list of tokens */
+		_tokenStrings.push(token);
+		/* save token to parse string */
+		saveTokens();
+		/* creat token field */
+		recalculateCurrentPosition();
+		_tokenFields.push(createTokenField(token));
+		/* redraw */
+		redraw();
+		callLater(checkScrollDown);
+	}
+	private function createTokenField(val:String):TextField
+	{
+		trace("ShortanswerArea::createTokenField()");
+		/* create the token field */
+		var tokenField:TextField = new TextField;
+		tokenField.selectable = false;
+		tokenField.defaultTextFormat = TEXTFORMAT_DEFAULT;
+		tokenField.border = true;
+		tokenField.borderColor = 0x555555;
+		tokenField.background = true;
+		tokenField.backgroundColor = 0xddddff;
+		tokenField.autoSize = TextFieldAutoSize.LEFT;
+		tokenField.addEventListener(MouseEvent.ROLL_OVER, onTokenFieldRollOver, false, 0, true);
+		tokenField.addEventListener(MouseEvent.ROLL_OUT, onTokenFieldRollOut, false, 0, true);
+		tokenField.addEventListener(MouseEvent.CLICK, onTokenFieldClick, false, 0, true);
+		tokenField.text = val;
+		/* set its position */
+		if(_currX + tokenField.width > flashPanel.width)
+		{
+			_currX = 0;
+			_currY += LINE_HEIGHT;
+		}
+		tokenField.x = _currX;
+		tokenField.y = _currY;
+		_currX += tokenField.width + H_SPACING;
+		/* add to flash panel */
+		flashPanel.addChild(tokenField);
+		/* return the result */
+		return tokenField;
+	}
+	private function removeTokenField(tokenField:TextField):void
+	{
+		trace("ShortanswerArea::removeTokenField()");
+		flashPanel.removeChild(tokenField);
+		tokenField.removeEventListener(MouseEvent.ROLL_OVER, onTokenFieldRollOver);
+		tokenField.removeEventListener(MouseEvent.ROLL_OUT, onTokenFieldRollOut);
+		tokenField.removeEventListener(MouseEvent.CLICK, onTokenFieldClick);
+	}
+	/**
+	 * Adds or removes the listeners needed for functionality
+	 */
+	private function setListenersEnabled(val:Boolean):void
+	{
+		trace("ShortanswerArea::setListenersEnabled()");
+		/* avoid adding double listeners */
+		if(val == _listenersEnabled) return;
+		/* enable listeners */
+		if(val)
+		{
+			/* can only proceed if added to stage */
+			if(!_creationComplete) return;
+			this.addEventListener(FocusEvent.FOCUS_IN, onFocusIn, false, 0, true);
+			this.addEventListener(FocusEvent.FOCUS_OUT, onFocusOut, false, 0, true);
+			this.addEventListener(MouseEvent.CLICK, onClick, false, 0, true);
+			flashPanel.addEventListener(MouseEvent.ROLL_OVER, onRollOver, false, 0, true);
+			flashPanel.addEventListener(MouseEvent.ROLL_OUT, onRollOut, false, 0, true);
+			flashPanel.addEventListener(ResizeEvent.RESIZE, onResize, false, 0, true);
+			_inputField.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 0, true);
+			_inputField.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false, 0, true);
+			_inputField.addEventListener(Event.CHANGE, onInputChange, false, 0, true);
+			_listenersEnabled = true;
+			setStageListener(true);
+		}
+		/* remove listeners */
+		else
+		{
+			_listenersEnabled = false;
+			this.removeEventListener(FocusEvent.FOCUS_IN, onFocusIn);
+			this.removeEventListener(FocusEvent.FOCUS_OUT, onFocusOut);
+			this.removeEventListener(MouseEvent.CLICK, onClick);
+			if(flashPanel)
+			{
+				flashPanel.removeEventListener(MouseEvent.ROLL_OVER, onRollOver);
+				flashPanel.removeEventListener(MouseEvent.ROLL_OUT, onRollOut);
+				flashPanel.removeEventListener(ResizeEvent.RESIZE, onResize);
+			}
+			if(_inputField)
+			{
+				_inputField.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+				_inputField.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+				_inputField.removeEventListener(Event.CHANGE, onInputChange);
+			}
+			setStageListener(false);
+		}
+	}
+	private function setStageListener(val:Boolean):void
+	{
+		if(!stage && !_stage || val == _stageListenerActive) return;
+		if(!_stage) _stage = stage;
+		if(val) _stage.addEventListener(MouseEvent.CLICK, onStageClick, false, 0, true);
+		else _stage.removeEventListener(MouseEvent.CLICK, onStageClick);
+		_stageListenerActive = val;
+	}
+	private function splitCommas(target:String):Array
+	{
+		return target.split(new RegExp("(?<!\\\\),"));
+	}
+	private function parseEscaped(target:String):String
+	{
+		var result:String = target;
+		// escape the the desired characters
+		for(var i:int = 0; i < ESCAPED_CHARS.length; i++)
+		{
+			var regex:RegExp = new RegExp("\\\\" + ESCAPED_CHARS.charAt(i), '\g');
+			result = result.replace(regex, ESCAPED_CHARS.charAt(i));
+		}
+		return result;
+	}
+	private function escapeChars(target:String):String
+	{
+		var result:String = target;
+		// escape the the desired characters
+		for(var i:int = 0; i < ESCAPED_CHARS.length; i++)
+		{
+			var regex:RegExp = new RegExp(ESCAPED_CHARS.charAt(i), '\g');
+			result = result.replace(regex, "\\" + ESCAPED_CHARS.charAt(i));
+		}
+		return result;
+	}
+	private function revert():void
+	{
+		if(_revertPending) return;
+		_revertPending = true;
+		_revertText = _inputField.text;
+	}
+	private function deleteToken(tokenField:TextField):void
+	{
+		/* find this token in token array */
+		for(var i:int = 0; i < _tokenFields.length; i++)
+		{
+			if(_tokenFields[i] == tokenField)
+			{
+				/* delete this token and save */
+				removeTokenField(tokenField);
+				if(_deleteButton.parent != null) flashPanel.removeChild(_deleteButton);
+				_tokenFields.splice(i, 1);
+				_tokenStrings.splice(i, 1);
+				saveTokens();
+				reposition();
+				break;
+			}
+		}
+	}
+	//----------------------------------
+	//  Listeners
+	//----------------------------------
+	private function onFocusIn(e:Event):void
+	{
+		// trace("ShortAnswerArea::onFocusIn()");
+		stage.focus = _inputField;
+		setStageListener(true);
+	}
+	private function onFocusOut(e:Event):void
+	{
+		commitInput();
+		setStageListener(false);
+	}
+	private function onClick(e:MouseEvent):void
+	{
+		trace("ShortAnswerArea::onClick()");
+		stage.focus = _inputField;
+		if(_inputField.mouseX > _inputField.width && _inputField.mouseY > 0 || _inputField.mouseY > _inputField.height)
+		{
+			_inputField.setSelection(_inputField.text.length, _inputField.text.length);
+		}
+		else if(_inputField.mouseY < _inputField.height && _inputField.mouseX < 0  || _inputField.mouseY < 0)
+		{
+			_inputField.setSelection(0, 0);
+		}
+	}
+	private function onStageClick(e:MouseEvent):void
+	{
+		var target:DisplayObject = DisplayObject(e.target);
+		while(target != null)
+		{
+			if(target == this) return;
+			target = target.parent;
+		}
+		onFocusOut(e);
+	}
+	private function onRollOver(e:Event):void
+	{
+		// trace("ShortanswerArea::onRollOver()");
+		Mouse.cursor = MouseCursor.IBEAM;
+	}
+	private function onRollOut(e:Event):void
+	{
+		// trace("ShortanswerArea::onRollOut()");
+		Mouse.cursor = MouseCursor.AUTO;
+	}
+	private function onTokenFieldRollOver(e:Event):void
+	{
+		// trace("ShortanswerArea::onTokenFieldRollOver()");
+		Mouse.cursor = MouseCursor.BUTTON;
+		_deleteButton.x = e.target.x + e.target.width - _deleteButton.width;
+		_deleteButton.y = e.target.y;
+		if(_deleteButton.parent == null) flashPanel.addChild(_deleteButton);
+	}
+	private function onTokenFieldRollOut(e:Event):void
+	{
+		// trace("ShortanswerArea::onTokenFieldRollOut()");
+		Mouse.cursor = MouseCursor.IBEAM;
+		if(_deleteButton.parent != null) flashPanel.removeChild(_deleteButton);
+	}
+	private function onTokenFieldClick(e:MouseEvent):void
+	{
+		var tokenField:TextField = TextField(e.target);
+		/* if we clicked on delete area */
+		if(e.localX > tokenField.width - _deleteButton.width)
+		{
+			deleteToken(tokenField);
+		}
+		Mouse.cursor = MouseCursor.IBEAM;
+	}
+	private function onResize(e:Event):void
+	{
+		trace("ShortanswerArea::onResize()");
+		reposition(); // includes redraw
+		callLater(checkScrollDown);
+	}
+	private function onInputChange(e:Event):void
+	{
+		if(_revertPending)
+		{
+			_inputField.text = _revertText;
+			_revertPending = false;
+		}
+		if(_inputField.x != 0 && _inputField.textWidth > _inputField.width)
+		{
+			redraw();
+		}
+	}
+	private function onKeyDown(e:KeyboardEvent):void
+	{
+		switch(e.keyCode)
+		{
+			/* comma */
+			case 188:
+				/* if empty */
+				if(!_inputField.text.length)
+				{
+					/* disallow commas */
+					revert();
+				}
+				/* if last character was a comma */
+				else if(_inputField.text.charAt(_inputField.selectionBeginIndex - 1) == ',')
+				{
+					/* disallow double commas */
+					revert();
+				}
+				break;
+			/* space */
+			case Keyboard.SPACE:
+				/* if empty */
+				if(!_inputField.text.length)
+				{
+					/* disallow leading spaces */
+					revert();
+				}
+				/* if last character was a space */
+				else if(_inputField.text.charAt(_inputField.selectionBeginIndex - 1) == ' ')
+				{
+					/* disallow spaces */
+					revert();
+				}
+				break;
+			/* backspace */
+			case Keyboard.BACKSPACE:
+				if(!_tokenStrings.length || _inputField.length) break;
+				_tokenStrings.pop();
+				removeTokenField(_tokenFields.pop());
+				recalculateCurrentPosition();
+				redraw();
+				saveTokens();
+				break;
+		}
+	}
+	private function onKeyUp(e:KeyboardEvent):void
+	{
+		// trace("ShortAnswerArea::onKeyUp()");
+		// trace("e.keyCode = " + e.keyCode);
+		switch(e.keyCode)
+		{
+			/* comma */
+			case 188:
+				trace("detected comma");
+				/* if we escaped the comma */
+				if(_inputField.selectionBeginIndex > 0 && _inputField.text.charAt(_inputField.selectionBeginIndex - 2) == '\\')
+				{
+					/* do nothing */
+					trace("comma was escaped");
+				}
+				/* otherwise */
+				else
+				{
+					/* add the token */
+					commitInput();
+				}
+				break;
+			/* comma */
+			case Keyboard.ENTER:
+				/* add the token */
+				commitInput();
+				break;
+		}
+	}
+]]>
+</mx:Script>
+	<mx:Canvas id="scrollContainer"  top="{PADDING}" bottom="{PADDING}" left="{PADDING}" right="{PADDING}" horizontalScrollPolicy="off">
+		<mx:UIComponent id="flashPanel" left="0" right="{SCROLL_WIDTH}" height="100%"/>
+	</mx:Canvas>
+	<mx:Metadata>
+		[Event(name="change", type="flash.events.Event")]
+	</mx:Metadata>
+</mx:Canvas>

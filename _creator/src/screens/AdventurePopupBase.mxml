@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow
+	styleName="adventurePopup"
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	layout="absolute"
+	showCloseButton="true"
+	initialize="drawBg()"
+	creationComplete="onCreationComplete();"
+	width="400" height="300"
+	mouseDownOutside="onMouseDownOutside();"
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
+	>
+	<mx:Style source="/assets/adventure.css"/>
+<mx:Script> <![CDATA[
+	import com.adobe.serialization.json.JSON;
+	import com.adobe.serialization.json.JSONEncoder;
+	import Creator;
+	import materia.CreatorBase;
+	import materia.Dialog;
+	import tree.DisplayTree;
+	import tree.Node;
+	import mx.containers.Canvas;
+	import mx.core.UIComponent;
+	import mx.core.IFlexDisplayObject;
+	import mx.events.FlexEvent;
+	import materia.questionStorage.Question;
+	protected static const SIDEPANEL_WIDTH:Number = 100;
+	protected static const PADDING_H:Number = 20;
+	protected static const PADDING_V:Number = 20;
+	protected static const LEFT_BOUNDARY:Number = SIDEPANEL_WIDTH + PADDING_H;
+	public var tileBg:Boolean = true;
+	[Bindable]
+	protected var _node:Node;
+	protected var _tree:DisplayTree;
+	protected var _creator:Creator;
+	protected var _bg:UIComponent;
+	protected var _sidePanel:Canvas;
+	
+	/**
+	 * Tooltip consts related to score validation
+	 */
+	protected static const NONE_SELECTED_ERR:String = "One or more questions do not have a score selected!";
+	protected static const TOOLTIP_OPTIONS:Object = { direction:"up", htmlText:true };
+	protected static const TOOLTIP_STYLE:Object = { htmlText:true };
+	
+	/**
+	 * Keeps track of nodes that were added in this window session
+	 */
+	protected var _newNodes:Vector.<Node> = new Vector.<Node>();
+	private var _initialized:Boolean = false;
+	private var _added:Boolean = false;
+	private var _originalData:Question;
+	/**
+	 * Disable the ability to drag this window
+	 */
+	protected override function startDragging(event:MouseEvent):void
+	{
+	}
+	protected function _originalStartDragging(event:MouseEvent):void
+	{
+		super.startDragging(event)
+	}
+	public function show(parentStage:*, node:Node):void
+	{
+		/* Add this popup to the screen */
+		if (!_added)
+		{
+			_added = true;
+			_creator = Creator(parentStage);
+		}
+		else if(visible)
+		{
+			return;
+		}
+		PopUpManager.addPopUp(this, parentStage, true, true);
+		this.setFocus();
+		/* Load information into the popup */
+		if (_initialized)
+		{
+			beginEdit(node);
+			visible = true;
+		}
+		else
+		{
+			addEventListener(FlexEvent.CREATION_COMPLETE, function onComplete(e:Event):void
+			{
+				init();
+				beginEdit(node);
+			}, false, 0, true);
+		}
+		stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false, 0, true);
+		_creator.addEventListener(Event.RESIZE, creatorResize, false, 0, true);
+		
+		creatorResize();
+	}
+	public function destroy():void
+	{
+		removeEventListener(Event.CLOSE, onCloseButtonClicked);
+		PopUpManager.removePopUp(this);
+		trace("destroyed " + this.name);
+	}
+	/**
+	 * Called when the 'X' button in the top left is pressed
+	 */
+	public function hide():void
+	{
+		if (!visible) return;
+		onWindowClosed();
+	}
+	protected function onWindowClosed():void
+	{
+		visible = false;
+		stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+		PopUpManager.removePopUp(this);
+		if (_node != null)
+		{
+			// Add visual flags to new nodes and clear new nodes vector
+			var newNodes:Array = new Array();
+			while (_newNodes.length) newNodes.push(_newNodes.pop());
+			_node.displayNode.displayTree.showNodesAsNew(newNodes);
+			// mark the node as not new
+			_node.isNew = false;
+			_node.displayNode.markedAsNew = false;
+			// see if we should clear up any errors
+			_node.checkForErrors();
+			// compare old and new data; reset ids and ids where needed
+			var jsonOriginal:String;
+			var jsonCurrent:String;
+			if (_node.data.id != 0)
+			{
+				jsonOriginal = JSON.encode(_originalData);
+				jsonCurrent = JSON.encode(_node.data);
+				if (jsonOriginal != jsonCurrent) _node.data.id = 0;
+			}
+			if (_originalData.answers != null && _node.data.answers != null)
+			{
+				for (var i:int = 0; i < _node.data.answers.length; i++)
+				{
+					if (_node.data.answers[i].id == 0) continue;
+					jsonCurrent = JSON.encode(_node.data.answers[i]);
+					for (var j:int = 0; j < _originalData.answers.length; j++)
+					{
+						if (_node.data.answers[i].id != _originalData.answers[j].id) continue;
+						jsonOriginal = JSON.encode(_originalData.answers[j]);
+						if (jsonOriginal == jsonCurrent)
+						{
+							_node.data.answers[i].id = 0;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * Called when the data belonging to a node is imported.
+	 * Any screen managing a type should override this method and fix this
+	 * imported data appropriately for that type
+	 */
+	protected function fixImportedData(node:Node):void
+	{
+		/* create empty answer array if null */
+		if (node.data.answers == null)
+		{
+			node.data.answers = new Array();
+		}
+		/* create empty options object if null */
+		if (node.data.options == null)
+		{
+			node.data.options = new Object();
+		}
+		/* create empty option objects in answers if null */
+		for (var i:int = 0; i < node.data.answers.length; i++)
+		{
+			if (node.data.answers[i].options == null)
+			{
+				node.data.answers[i].options = new Object();
+			}
+		}
+	}
+	protected function beginEdit(node:Node):void
+	{
+		_node = node;
+		_originalData = _node.data.clone();
+		if (node != null) _tree = node.displayNode.displayTree;
+		if (node.imported) fixImportedData(node);
+	}
+	protected function init():void
+	{
+		_initialized = true;
+		addEventListener(Event.CLOSE, onCloseButtonClicked, false, 0, true); // listen for close through the "X" button
+	}
+	protected function onCreationComplete():void
+	{
+		init();
+		// Create Sidepanel
+		_sidePanel = new Canvas();
+		_sidePanel.setStyle("top", PADDING_V);
+		_sidePanel.setStyle("left", PADDING_H);
+		_sidePanel.width = SIDEPANEL_WIDTH;
+		_sidePanel.setStyle("bottom", PADDING_V);
+		addChild(_sidePanel);
+	}
+	public function onDoneEditingLink():void
+	{
+	}
+	protected function onEditLink(e:Event):void
+	{
+	}
+	protected function attemptDeleteNode():void
+	{
+		if (_node.children.length <= 1) Dialog.show(Dialog.YESNO, "Delete Destination", "Are you sure you want to delete this destination?", confirmDeleteNode);
+		else Dialog.show(Dialog.OK, "Delete Destination", "A destination leading to more than one other destination cannot be deleted.");
+	}
+	/**
+	 * Deletes the node and links parent to child
+	 */
+	private function confirmDeleteNode():void
+	{
+		hide();
+		_tree.attemptDeleteNode(_node);
+		_tree.redraw();
+		_node = null;
+	}
+	private function onKeyUp(e:KeyboardEvent):void
+	{
+		// TODO: delete this
+//		if (!this.visible) return;
+//		if (e.keyCode == Keyboard.ESCAPE)
+//		{
+//			stage.dispatchEvent(new MouseEvent(MouseEvent.CLICK, true, false, 0, 0));
+//			hide();
+//		}
+	}
+	protected function onMouseDownOutside():void
+	{
+		hide();
+	}
+	private function drawBg():void
+	{
+		_bg = new UIComponent();
+		_bg.width = width - getStyle("borderThicknessLeft") - getStyle("borderThicknessRight");
+		_bg.height = height - getStyle("headerHeight") - getStyle("borderThicknessBottom");
+		this.addChildAt(_bg, 0);
+		var size:int = 30;
+		var dotSpacing:int = 2;
+		// create tile
+		var bitmapData:BitmapData = new BitmapData(size, size, false, 0xffffff);
+		if (tileBg)
+		{
+			for (var i:int = 0; i <= Math.ceil(size / dotSpacing); i++)
+			{
+				bitmapData.setPixel(i * dotSpacing, 0, 0xDDDDDD);
+				bitmapData.setPixel(0, i * dotSpacing, 0xDDDDDD);
+			}
+		}
+		// draw background
+		_bg.graphics.beginBitmapFill(bitmapData);
+		_bg.graphics.drawRect(0, getStyle("borderThicknessTop"), _bg.width, _bg.height);
+		_bg.graphics.endFill();
+	}
+	private function onCloseButtonClicked(e:Event):void
+	{
+		hide();
+	}
+
+	private function creatorResize(e:Event=null):void
+	{
+		if (_creator.height - 24 < this.height)
+		{
+			this.height = _creator.height - 24;
+		}
+		this.centerPopUp(this);
+	}
+
+	private function centerPopUp(popUp:IFlexDisplayObject):void
+	{
+		popUp.x = _creator.width/2 - this.width/2;
+		popUp.y = _creator.height/2 - this.height/2;
+	}
+
+	]]>
+</mx:Script>
+</mx:TitleWindow>

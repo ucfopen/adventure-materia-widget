@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas styleName="typeChoice" xmlns:mx="http://www.adobe.com/2006/mxml"
+		width="100%" height="100%"
+		rollOver="{ if(mouseEnabled) { this.filters = this.selected ? FILTERSET_SELECTED_HOVER : FILTERSET_NORMAL_HOVER; }}"
+		rollOut="{if(mouseEnabled) { this.filters = this.selected ? FILTERSET_SELECTED : FILTERSET_NORMAL;} }"
+		mouseDown="{if(mouseEnabled) { this.filters = this.selected ? FILTERSET_SELECTED_CLICK : FILTERSET_NORMAL_CLICK;}}"
+		>
+	<mx:String id="title" />
+	<mx:String id="description" />
+	<mx:Number id="scootLeft">0</mx:Number>
+	<mx:Number id="scootRight">0</mx:Number>
+	<mx:VBox verticalAlign="top" paddingTop="10" horizontalAlign="center" width="100%" height="100%" mouseEnabled="false" mouseChildren="false">
+		<mx:Image verticalCenter="0" source="{image}" />
+		<mx:Label styleName="title" text="{title}" />
+		<mx:Text styleName="description" width="100%" height="100%" text="{description}" paddingLeft="{10 + scootLeft}" paddingRight="{10 + scootRight}"/>
+	</mx:VBox>
+	<mx:Script>
+		<![CDATA[
+			private static const FILTERSET_NORMAL:Array         = [];
+			private static const FILTERSET_NORMAL_HOVER:Array   = [new GlowFilter(0, .6, 6, 6, 2, 1)];
+			private static const FILTERSET_NORMAL_CLICK:Array   = [new GlowFilter(0, .5, 4, 4, 2, 1)];
+			private static const FILTERSET_SELECTED:Array       = [new GlowFilter(0x000066, .7, 7, 7, 2, 1)];
+			private static const FILTERSET_SELECTED_HOVER:Array = [new GlowFilter(0x000066, .6, 6, 6, 2, 1)];
+			private static const FILTERSET_SELECTED_CLICK:Array = [new GlowFilter(0, .5, 4, 4, 2, 1)];
+			[Bindable]
+			public var image:*; // Couldn't make this an MXML component because Flex parser *sometimes* erroneously reported a compile error
+			private var _selected:Boolean;
+			public function set selected(val:Boolean):void
+			{
+				_selected = val;
+				this.filters = this.selected ? FILTERSET_SELECTED : FILTERSET_NORMAL;
+			}
+			public function get selected():Boolean
+			{
+				return _selected;
+			}
+		]]>
+	</mx:Script>
+</mx:Canvas>
