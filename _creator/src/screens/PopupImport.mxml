@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml"
+				xmlns:screens="screens.*"
+				layout="absolute"
+				width="405" height="300"
+				showCloseButton="true"
+				backgroundColor="0xffffff"
+				horizontalScrollPolicy="off"
+				title="Import Questions"
+				creationComplete="{onCreationComplete()}"
+				>
+	<mx:VBox id="scrollContainer"
+			 top="{PADDING}" bottom="{PADDING}"
+			 left="{PADDING}" right="{PADDING}"
+			 horizontalScrollPolicy="off"
+			 >
+		<mx:Text textAlign="center"
+				 width="100%"
+				 text="Click and drag the squares to an empty &#13; destination on the tree."
+				 selectable="false">
+		</mx:Text>
+		<mx:UIComponent id="nodeContainer"
+						width="100%"
+						/>
+	</mx:VBox>
+<mx:Script> <![CDATA[
+	import Creator;
+	import components.ImportDisplayNode;
+	import tree.DisplayNode;
+	import tree.Node;
+	import mx.collections.ArrayCollection;
+	import mx.core.UIComponent;
+	import nm.ui.ToolTip;
+	import materia.questionStorage.Question;
+	//--------------------------------------------------------------------------
+	//
+	//  Constants
+	//
+	//--------------------------------------------------------------------------
+	public static const EVENT_ALL_IMPORTS_PROCESSED:String = "importsProcessed";
+	private static const PADDING:int = 10;
+	private static const SPACING:int = 10;
+	//--------------------------------------------------------------------------
+	//
+	//  Instance Variables
+	//
+	//--------------------------------------------------------------------------
+	private var _parent:DisplayObjectContainer;
+	private var _newQuestions:Array = new Array();
+	private var _nodes:Array = new Array();
+	private var _tiles:ArrayCollection = new ArrayCollection();
+	private var _showPending:Boolean = false;
+	private var _creationComplete:Boolean = false;
+	private var _lastDragged:ImportDisplayNode;
+	private var _currX:Number = 0;
+	private var _currY:Number = 0;
+	private var _currentHeight:Number = 0;
+	//--------------------------------------------------------------------------
+	//
+	//  Instance Functions
+	//
+	//--------------------------------------------------------------------------
+	public function destroy():void
+	{
+		this.hide();
+		for each(var node:DisplayNode in _nodes)
+		{
+			// node.destroy();
+			ToolTip.remove(node);
+		}
+	}
+	public function show(parent:Creator):void
+	{
+		/* add to the popup manager */
+		if (_parent == null)
+		{
+			_parent = parent;
+			PopUpManager.addPopUp(this, parent, false, true);
+			addEventListener(Event.CLOSE, onCloseButtonClicked, false, 0, true);
+		}
+		/* update the arrangement of nodes */
+		if (_creationComplete) updateNodes();
+		else _showPending = true;
+		/* show the window */
+		this.visible = true;
+	}
+	public function hide():void
+	{
+		this.visible = false;
+		removeEventListener(Event.CLOSE, onCloseButtonClicked);
+		PopUpManager.removePopUp(this);
+		_parent = null;
+	}
+	public function updateNodes():void
+	{
+		var nodeSize:Number = DisplayNode.RADIUS_STANDARD * 2;
+		while (_newQuestions.length)
+		{
+			var q:Question = _newQuestions.pop();
+			/* wrap if necessary */
+			if (_currX + nodeSize > nodeContainer.width)
+			{
+				_currX = 0;
+				_currY += nodeSize + SPACING;
+			}
+			/* create the display node */
+			var node:Node = new Node(5);
+			node.data = q;
+			var dNode:ImportDisplayNode = new ImportDisplayNode(node);
+			dNode.allowFlags = false;
+			dNode.redraw();
+			ToolTip.add(dNode, q.question, {showDelay:0, hideDelay:0, fadeTime:0});
+			_nodes.push(dNode);
+			/* set the display node's position */
+			dNode.x = _currX;
+			dNode.y = _currY;
+			_currX += nodeSize + SPACING;
+			/* add it to the container */
+			nodeContainer.addChild(dNode);
+			/* update height */
+			_currentHeight = Math.max(_currentHeight, _currY + nodeSize);
+			nodeContainer.height = _currentHeight;
+		}
+	}
+	public function addQuestion(question:Question):void
+	{
+		if (question != null)
+		{
+			_newQuestions.push(question);
+		}
+	}
+	public function acceptImport():void
+	{
+		if (_lastDragged == null) return;
+		for (var i:int = 0; i < _nodes.length; i++)
+		{
+			if (_nodes[i] == _lastDragged)
+			{
+				_nodes.splice(i, 1);
+				nodeContainer.removeChild(_lastDragged);
+				_lastDragged = null;
+				break;
+			}
+		}
+		reOrganize();
+	}
+	private function reOrganize():void
+	{
+		_currX = 0;
+		_currY = 0;
+		var nodeSize:Number = DisplayNode.RADIUS_STANDARD * 2;
+		if (_nodes.length == 0)
+		{
+			dispatchEvent(new Event(EVENT_ALL_IMPORTS_PROCESSED));
+		}
+		for each(var node:ImportDisplayNode in _nodes)
+		{
+			/* wrap if necessary */
+			if (_currX + nodeSize > nodeContainer.width)
+			{
+				_currX = 0;
+				_currY += nodeSize + SPACING;
+			}
+			/* set the display node's position */
+			node.x = _currX;
+			node.y = _currY;
+			_currX += nodeSize + SPACING;
+		}
+	}
+	private function onCreationComplete():void
+	{
+		_creationComplete = true;
+		nodeContainer.addEventListener(ImportDisplayNode.EVENT_DRAG_BEGIN, onNodeDragBegin, false, 0, true);
+		if (_showPending)
+		{
+			updateNodes();
+			_showPending = false;
+		}
+	}
+	//----------------------------------
+	//  Listeners
+	//----------------------------------
+	private function onNodeDragBegin(e:Event):void
+	{
+		_lastDragged = ImportDisplayNode(e.target);
+	}
+	private function onCloseButtonClicked(e:Event):void
+	{
+		hide();
+	}
+	]]>
+</mx:Script>
+</mx:TitleWindow>

@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="{DEFAULT_WIDTH}" height="{DEFAULT_HEIGHT}" creationComplete="{onCreationComplete();}">
+	<mx:UIComponent id="clip" width="100%" height="100%">
+	<mx:Script>
+	<![CDATA[
+	// import AdventureOptions.*;
+
+	import nm.ui.ToolTip;
+
+	import tree.Node;
+	//--------------------------------------------------------------------------
+	//
+	//  Class constants
+	//
+	//--------------------------------------------------------------------------
+	//----------------------------------
+	//  Dimensions
+	//----------------------------------
+	public static const DEFAULT_WIDTH:Number = 95;
+	public static const DEFAULT_HEIGHT:Number = 55;
+	//----------------------------------
+	//  Icons
+	//----------------------------------
+	[Embed (source="../assets/walker.png")]
+	public static const ICON_WALKER:Class;
+	[Embed (source="../assets/check.png")]
+	public static const ICON_CHECK:Class;
+	[Embed (source="../assets/x-mark.png")]
+	public static const ICON_XMARK:Class;
+	[Embed (source="../assets/plus.png")]
+	public static const ICON_PLUS:Class;
+	[Embed (source="../assets/minus.png")]
+	public static const ICON_MINUS:Class;
+	//----------------------------------
+	//  Filter Sets
+	//----------------------------------
+	// private static const FILTERSET_GRAYSCALE:Array = [new ColorMatrixFilter([0.49, 0.695, 0.11, 0, 0,0.49, 0.695, 0.11, 0, 0,0.49, 0.695, 0.11, 0, 0,0,    0,    0,    1, 0])];
+	private static const FILTERSET_NORMAL:Array = [];
+	private static const FILTERSET_HOVER:Array  = [new GlowFilter(0x0, 0.40, 6, 6, 1, 3)];
+	private static const FILTERSET_CLICK:Array  = [new GlowFilter(0x0, 0.65, 3, 3, 2, 3)];
+	//----------------------------------
+	//  Types
+	//----------------------------------
+	private static const ALL:int = -1;
+	private static const GOOD:int = 0;
+	private static const BAD:int = 1;
+	private static const NEUTRAL:int = 2;
+	//----------------------------------
+	//  Strings
+	//----------------------------------
+	private static const DESC_CHECK:String = "This answer will be marked as <b>correct</b>";
+	private static const DESC_XMARK:String = "This answer will be marked as <b/>incorrect</b>";
+	private static const DESC_WALKER:String = "This answer <b>will not affect</b> the score at all";
+	private static const DESC_PLUS:String = "This answer will <b>increase</b> the final score by a percentage";
+	private static const DESC_MINUS:String = "This answer will <b>decrease</b> the final score by a percentage";
+	private static const DESC_WALKER2:String = "This answer <b>will not affect</b> the final score";
+	private static const DESC_RETURN:String = "Click to choose another scoring option";
+	private static const LABEL_CHECK:String = "Correct";
+	private static const LABEL_CHOOSE:String = "Choose";
+	private static const LABEL_XMARK:String = "Not\nCorrect";
+	private static const LABEL_WALKER:String = "No\nChange";
+	//----------------------------------
+	//  Score Constraints
+	//----------------------------------
+	private static const MAX_VALUE:int = 100;
+	private static const MIN_VALUE:int = 0;
+	private static const MAX_MOD:int = 300;
+	private static const DEFAULT_MOD:int = 10;
+	//----------------------------------
+	//  Text Formats
+	//----------------------------------
+	private static const TEXTFORMAT_DEFAULT:TextFormat = new TextFormat("Arial", 14, '0', true, null, null, null, null, "left");
+	private static const TEXTFORMAT_QUEST:TextFormat = new TextFormat("Arial", 20, '0', true, null, null, null, null, "left");
+	//----------------------------------
+	//  Other
+	//----------------------------------
+	private static const COLOR_GRAY:Number = 0x777777;
+	private static const COLOR_BLACK:Number = 0x0;
+	private static const PADDING:int = 5;
+	private static const SPACING:int = 2;
+	private static const TOOLTIP_OPTIONS:Object = { direction:"up", htmlText:true };
+	private static const TOOLTIP_STYLE:Object = { htmlText:true };
+	//--------------------------------------------------------------------------
+	//
+	//  Instance Variables
+	//
+	//--------------------------------------------------------------------------
+	public var hostNode:Node; // the node hosting the question this score box belongs to
+	public var targetAnswer:int; // index referring to the answer in the hostNode this scorebox belongs to
+	public var scoreStyle:int = AdventureOptions.SCORESTYLE_QUIZ;
+	public var value:Number = 100;
+	public var scoreModification:Number = 10;
+	public var validScore:Boolean = false;
+	private var _icons:Array = new Array(3);
+	private var _label:TextField;
+	private var _input:PercentField;
+	private var _selectedIcon:int = ALL;
+	private var _oldSelectedIcon:int = ALL;
+	private var _inputFocused:Boolean = false;
+	private var _reverting:Boolean = false;
+	//--------------------------------------------------------------------------
+	//
+	//  Semi-Constructor
+	//
+	//--------------------------------------------------------------------------
+	private function onCreationComplete():void
+	{
+		if(!targetIsValid()) return;
+		/* Read Current Score Settings */
+		if(scoreStyle == AdventureOptions.SCORESTYLE_QUIZ)
+		{
+			value = hostNode.data.answers[targetAnswer].value;
+			validScore = hostNode.data.answers[targetAnswer].options.validScore;
+			if(!validScore) _selectedIcon = ALL;
+			else if(value > 0) _selectedIcon = GOOD;
+			else if(value == 0) _selectedIcon = BAD;
+			else if(value == -1) _selectedIcon = NEUTRAL;
+		}
+		else if(scoreStyle == AdventureOptions.SCORESTYLE_QUEST)
+		{
+			scoreModification = hostNode.data.answers[targetAnswer].options.scoreModification;
+			validScore = hostNode.data.answers[targetAnswer].options.validScoreModification;
+			if(!validScore) _selectedIcon = ALL;
+			else if(scoreModification > 0) _selectedIcon = GOOD;
+			else if(scoreModification < 0) _selectedIcon = BAD;
+			else _selectedIcon = NEUTRAL;
+		}
+		else
+		{
+			return;
+		}
+		/* Initialize Container Sprites for Icons */
+		var numIcons:int = 3;
+		for(var i:int = 0; i < numIcons; i++)
+		{
+			_icons[i] = new Sprite();
+			_icons[i].addEventListener(MouseEvent.MOUSE_OVER, onIconOver, false, 0, true);
+			_icons[i].addEventListener(MouseEvent.MOUSE_OUT, onIconOut, false, 0, true);
+			_icons[i].addEventListener(MouseEvent.MOUSE_DOWN, onIconMouseDown, false, 0, true);
+			_icons[i].addEventListener(MouseEvent.MOUSE_UP, onIconClick, false, 0, true);
+			_icons[i].buttonMode = true;
+			clip.addChild(_icons[i]);
+		}
+		/* Initialize Icons to be Used */
+		if(scoreStyle == AdventureOptions.SCORESTYLE_QUIZ)
+		{
+			_icons[0].addChild(new ICON_CHECK);
+			_icons[1].addChild(new ICON_XMARK);
+			_icons[2].addChild(new ICON_WALKER);
+		}
+		else if(scoreStyle == AdventureOptions.SCORESTYLE_QUEST)
+		{
+			_icons[0].addChild(new ICON_PLUS);
+			_icons[1].addChild(new ICON_MINUS);
+			_icons[2].addChild(new ICON_WALKER);
+		}
+		/* Draw Invisible Backgrounds on Icons for Easier Mouse-Over */
+		var colWidth:Number = clip.width / numIcons;
+		var icon:DisplayObject;
+		for each(var current:Sprite in _icons)
+		{
+			icon = current.getChildAt(0);
+			current.graphics.beginFill(0, 0);
+			current.graphics.drawRect(0, 0, colWidth, clip.height / 2);
+			icon.x = current.width / 2 - icon.width / 2;
+			icon.y = current.height / 2 - icon.height / 2;
+		}
+		/* Initialize the Label */
+		_label = new TextField();
+		_label.defaultTextFormat = TEXTFORMAT_DEFAULT;
+		_label.autoSize = TextFieldAutoSize.LEFT;
+		_label.selectable = false;
+		_label.visible = false;
+		clip.addChild(_label);
+		/* Initialize the Input Field */
+		var max:int = (scoreStyle == AdventureOptions.SCORESTYLE_QUIZ ? MAX_VALUE : MAX_MOD);
+		var min:int = (scoreStyle == AdventureOptions.SCORESTYLE_QUIZ ? MIN_VALUE : 0);
+		_input = new PercentField(min, max);
+		_input.addEventListener(PercentField.EVENT_COMMIT, onInputCommit, false, 0, true);
+		_input.visible = false;
+		clip.addChild(_input);
+		/* Create Tooltips */
+		addDefaultTooltips();
+		/* Show the Icons */
+		updateDisplay();
+	}
+	//--------------------------------------------------------------------------
+	//
+	//  Instance Functions
+	//
+	//--------------------------------------------------------------------------
+	//----------------------------------
+	//  Public Functions
+	//----------------------------------
+	public function destroy():void
+	{
+		for each(var icon:Sprite in _icons);
+		{
+			if(icon != null)
+			{
+				/* remove listeners & tooltips for all the icons */
+				icon.removeEventListener(MouseEvent.MOUSE_OVER, onIconOver);
+				icon.removeEventListener(MouseEvent.MOUSE_OUT, onIconOut);
+				icon.removeEventListener(MouseEvent.MOUSE_DOWN, onIconMouseDown);
+				icon.removeEventListener(MouseEvent.CLICK, onIconClick);
+				ToolTip.remove(icon, true);
+			}
+		}
+		if(_input != null) _input.destroy();
+	}
+	//----------------------------------
+	//  Update Functions
+	//----------------------------------
+	private function setSelected(val:Number):void
+	{
+		_selectedIcon = val;
+		if(scoreStyle == AdventureOptions.SCORESTYLE_QUIZ)
+		{
+			validScore = true;
+			switch(val)
+			{
+				case ALL:
+					validScore = false;
+					break;
+				case GOOD:
+					value = 100;
+					break;
+				case BAD:
+					value = 0;
+					break;
+				case NEUTRAL:
+					value = -1;
+					break;
+			}
+			hostNode.data.answers[targetAnswer].value = value;
+			hostNode.data.answers[targetAnswer].options.validScore = validScore;
+		}
+		else if(scoreStyle == AdventureOptions.SCORESTYLE_QUEST)
+		{
+			validScore = true;
+			switch(val)
+			{
+				case ALL:
+					validScore = false;
+					break;
+				case GOOD:
+					scoreModification = DEFAULT_MOD;
+					break;
+				case BAD:
+					scoreModification = -DEFAULT_MOD;
+					break;
+				case NEUTRAL:
+					scoreModification = 0;
+					break;
+			}
+			hostNode.data.answers[targetAnswer].options.scoreModification = scoreModification;
+			hostNode.data.answers[targetAnswer].options.validScoreModification = validScore;
+		}
+	}
+	private function updateValue():void
+	{
+		/* get value from percent field */
+		var inputValue:int = _input.getNumberValue();
+		/* set to incorrect if value was 0% */
+		if(inputValue == 0)
+		{
+			setSelected(scoreStyle == AdventureOptions.SCORESTYLE_QUIZ ? BAD : NEUTRAL);
+			updateDisplay();
+			return;
+		}
+		/* update qset for quiz-style */
+		if(scoreStyle == AdventureOptions.SCORESTYLE_QUIZ)
+		{
+			value = inputValue;
+			hostNode.data.answers[targetAnswer].value = value;
+		}
+		/* update qset for quest-style */
+		else if(scoreStyle == AdventureOptions.SCORESTYLE_QUEST)
+		{
+			scoreModification = inputValue;
+			var mult:int = _selectedIcon == GOOD ? 1 : -1;
+			hostNode.data.answers[targetAnswer].options.scoreModification = scoreModification * mult;
+		}
+	}
+	private function updateDisplay():void
+	{
+		if(_icons[0] == null) return;
+		var i:int, current:int;
+		var numCols:int = _icons.length;
+		var colWidth:Number = clip.width / numCols;
+		var colorTransform:ColorTransform;
+		_label.visible = false;
+		switch(_selectedIcon) {
+			// ---------------------------------------------------------
+			case ALL:
+				for(i = 0; i < _icons.length; i++)
+				{
+					/* update icons */
+					_icons[i].x = colWidth * i + colWidth / 2 - _icons[i].width / 2;
+					_icons[i].y = clip.height / 2 - _icons[i].height / 2 + 10;
+					_icons[i].filters = FILTERSET_NORMAL;
+					setObjectColor(_icons[i], COLOR_GRAY);
+					_icons[i].visible = true;
+				}
+				/* update label */
+				setObjectColor(_label, COLOR_GRAY);
+				_label.text = LABEL_CHOOSE;
+				_label.visible = true;
+				_label.x = clip.width / 2 - _label.textWidth / 2;
+				_label.y = 0;
+				/* update input */
+				_input.visible = false;
+				break;
+			// ---------------------------------------------------------
+			case GOOD:
+				current = 0;
+				/* update icon */
+				setObjectColor(_label, NaN);
+				_icons[current].x = colWidth / 2 - _icons[current].width / 2;
+				_icons[current].y = clip.height / 2 - _icons[current].height / 2;
+				_icons[current].filters = FILTERSET_NORMAL;
+				_icons[current].visible = true;
+				setObjectColor(_icons[current], NaN);
+				/* hide other icons */
+				for(i = 0; i < _icons.length; i++)
+				{
+					if(i == current) continue;
+					_icons[i].visible = false;
+				}
+				/* interface for quiz-style */
+				if(scoreStyle == AdventureOptions.SCORESTYLE_QUIZ)
+				{
+					/* update label */
+					_label.text = LABEL_CHECK;
+					_label.visible = true;
+					/* update input field */
+					_input.setValue(value);
+					_input.setTextFormat(TEXTFORMAT_DEFAULT);
+					_input.visible = true;
+					_input.autoSize = TextFieldAutoSize.LEFT;
+					/* set positions for label and input */
+					_label.x = colWidth + (colWidth * (numCols - 1)) / 2 - _label.width / 2;
+					_label.y = clip.height / 2 - (_label.textHeight + _input.textHeight + SPACING) / 2 - 2;
+					_input.x = _label.x + _label.width / - _input.width / 2;
+					_input.y = _label.y + _label.textHeight + SPACING;
+				}
+				/* interface for quest-style */
+				else if(scoreStyle == AdventureOptions.SCORESTYLE_QUEST)
+				{
+					/* update input field */
+					_input.setValue(scoreModification);
+					_input.setTextFormat(TEXTFORMAT_QUEST);
+					_input.visible = true;
+					_input.autoSize = TextFieldAutoSize.CENTER;
+					_input.x = colWidth + (clip.width - colWidth) / 2 - _input.width / 2;
+					_input.y = clip.height / 2 - _input.height / 2;
+				}
+				break;
+			// ---------------------------------------------------------
+			case BAD:
+				current = 1;
+				/* update icon */
+				setObjectColor(_label, NaN);
+				_icons[current].x = colWidth / 2 - _icons[current].width / 2;
+				_icons[current].y = clip.height / 2 - _icons[current].height / 2;
+				_icons[current].filters = FILTERSET_NORMAL;
+				setObjectColor(_icons[current], NaN);
+				_icons[current].visible = true;
+				/* hide other icons */
+				for(i = 0; i < _icons.length; i++)
+				{
+					if(i == current) continue;
+					_icons[i].visible = false;
+				}
+				/* interface for quiz-style */
+				if(scoreStyle == AdventureOptions.SCORESTYLE_QUIZ)
+				{
+					/* update label */
+					_label.text = LABEL_XMARK;
+					_label.visible = true;
+					_label.x = colWidth + (colWidth * (numCols - 1)) / 2 - _label.width / 2;
+					_label.y = clip.height / 2 - _label.textHeight / 2 - 2;
+					/* update input */
+					_input.visible = false;
+				}
+					/* interface for quest-style */
+				else if(scoreStyle == AdventureOptions.SCORESTYLE_QUEST)
+				{
+					/* update input field */
+					_input.setValue(Math.abs(scoreModification));
+					_input.setTextFormat(TEXTFORMAT_QUEST);
+					_input.visible = true;
+					_input.autoSize = TextFieldAutoSize.CENTER;
+					_input.x = colWidth + (clip.width - colWidth) / 2 - _input.width / 2;
+					_input.y = clip.height / 2 - _input.height / 2;
+				}
+				break;
+			// ---------------------------------------------------------
+			case NEUTRAL:
+				current = 2;
+				/* update icons */
+				setObjectColor(_label, NaN);
+				_icons[current].x = colWidth / 2 - _icons[current].width / 2;
+				_icons[current].y = clip.height / 2 - _icons[current].height / 2;
+				_icons[current].filters = FILTERSET_NORMAL;
+				setObjectColor(_icons[current], NaN);
+				_icons[current].visible = true;
+				/* hide other icons */
+				for(i = 0; i < _icons.length; i++)
+				{
+					if(i == current) continue;
+					_icons[i].visible = false;
+				}
+				/* update label */
+				_label.text = LABEL_WALKER;
+				_label.visible = true;
+				_label.x = colWidth + (colWidth * (numCols - 1)) / 2 - _label.width / 2;
+				_label.y = clip.height / 2 - _label.textHeight / 2 - 2;
+				break;
+			// ---------------------------------------------------------
+		}
+		/* Update Tooltips */
+		if(_selectedIcon != _oldSelectedIcon)
+		{
+			/* switched to chooser */
+			if(_selectedIcon == ALL)
+			{
+				addDefaultTooltips();
+				return;
+			}
+			/* selected to an option */
+			ToolTip.remove(_icons[_selectedIcon]), true;
+			ToolTip.add(_icons[_selectedIcon], DESC_RETURN, TOOLTIP_OPTIONS, TOOLTIP_STYLE);
+			_oldSelectedIcon = _selectedIcon;
+		}
+	}
+	//----------------------------------
+	//  Helper Functions
+	//----------------------------------
+	private function addDefaultTooltips():void
+	{
+		/* Remove the tooltips */
+		for(var i:int = 0; i < _icons.length; i++)
+		{
+			ToolTip.remove(_icons[i], false);
+		}
+		/* Add the default tooltips */
+		if(scoreStyle == AdventureOptions.SCORESTYLE_QUIZ)
+		{
+			ToolTip.add(_icons[0], DESC_CHECK, TOOLTIP_OPTIONS, TOOLTIP_STYLE);
+			ToolTip.add(_icons[1], DESC_XMARK, TOOLTIP_OPTIONS, TOOLTIP_STYLE);
+			ToolTip.add(_icons[2], DESC_WALKER, TOOLTIP_OPTIONS, TOOLTIP_STYLE);
+		}
+		else
+		{
+			ToolTip.add(_icons[0], DESC_PLUS, TOOLTIP_OPTIONS, TOOLTIP_STYLE);
+			ToolTip.add(_icons[1], DESC_MINUS, TOOLTIP_OPTIONS, TOOLTIP_STYLE);
+			ToolTip.add(_icons[2], DESC_WALKER2, TOOLTIP_OPTIONS, TOOLTIP_STYLE);
+		}
+	}
+	private function setObjectColor(target:DisplayObject, color:Number = NaN):void
+	{
+		if(isNaN(color))
+		{
+			target.transform.colorTransform = new ColorTransform();
+			return;
+		}
+		var colorTransform:ColorTransform = target.transform.colorTransform;
+		colorTransform.color = color;
+		target.transform.colorTransform = colorTransform;
+	}
+	private function targetIsValid():Boolean
+	{
+		return hostNode != null && hostNode.data.answers != null && hostNode.data.answers[targetAnswer] != null;
+	}
+	//--------------------------------------------------------------------------
+	//
+	//  Event Listeners
+	//
+	//--------------------------------------------------------------------------
+	//----------------------------------
+	//  Icons
+	//----------------------------------
+	private function onIconOver(e:MouseEvent):void
+	{
+		var target:DisplayObject = DisplayObject(e.target);
+		target.filters = FILTERSET_HOVER;
+		if(_selectedIcon == ALL) setObjectColor(target, NaN);
+	}
+	private function onIconOut(e:MouseEvent):void
+	{
+		var target:DisplayObject = DisplayObject(e.target);
+		target.filters = FILTERSET_NORMAL;
+		if(_selectedIcon == ALL) setObjectColor(target, COLOR_GRAY);
+	}
+	private function onIconMouseDown(e:MouseEvent):void
+	{
+		DisplayObject(e.target).filters = FILTERSET_CLICK;
+	}
+	private function onIconClick(e:MouseEvent):void
+	{
+		var target:DisplayObject = DisplayObject(e.target);
+		target.filters = FILTERSET_NORMAL;
+		if(_selectedIcon == ALL)
+		{
+			/* search for the icon in the icons array */
+			for(var i:int = 0; i < _icons.length; i++)
+			{
+				if(_icons[i] == target)
+				{
+					setSelected(i);
+					updateDisplay();
+					break;
+				}
+			}
+		}
+		else
+		{
+			setSelected(ALL);
+			updateDisplay();
+		}
+	}
+	//----------------------------------
+	//  Input Field
+	//----------------------------------
+	private function onInputCommit(e:Event):void
+	{
+		updateValue();
+	}
+	]]>
+	</mx:Script>
+	</mx:UIComponent>
+</mx:Canvas>
