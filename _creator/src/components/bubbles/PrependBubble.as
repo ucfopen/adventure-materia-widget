@@ -1,8 +1,8 @@
 package components.bubbles {
-import tree.DisplayNode;
-import tree.Node;
+import flash.display.Bitmap;
 import flash.display.CapsStyle;
 import flash.display.JointStyle;
+import flash.display.PixelSnapping;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -11,25 +11,48 @@ import flash.geom.Point;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
+
 import nm.ui.ToolTip;
+
+import tree.DisplayNode;
+import tree.Node;
+
 public class PrependBubble extends Sprite
 {
-	public static const RADIUS:int = 12;
-	public static const SPACING:int = 10;
+	public static const RADIUS:int = 20;
+	public static const SPACING:int = 30;
 	private static const FILTERSET_NORMAL:Array = [];
 	private static const FILTERSET_HIGHLIGHT:Array = [new DropShadowFilter(2, 45, 0)];
+	
+	[Embed (source="../../assets/new_node.png")]
+	public static const NEW_NODE:Class;
+	
+	
 	public var targetNode:Node;
+	private var _image:Sprite;
 	public function PrependBubble()
 	{
-		this.graphics.beginFill(0xf0f0f0);
-		this.graphics.lineStyle(2, 0x666666);
-		this.graphics.drawCircle(0, 0, RADIUS);
-		this.graphics.endFill();
-		this.graphics.lineStyle(4, 0x888888, 1, false, "normal", CapsStyle.NONE, JointStyle.ROUND);
-		this.graphics.moveTo(0, -RADIUS);
-		this.graphics.lineTo(0, RADIUS);
-		this.graphics.moveTo(-RADIUS, 0);
-		this.graphics.lineTo(RADIUS, 0);
+		_image = new Sprite();
+		_image.mouseEnabled = false;
+		
+		var bitmap:Bitmap = new NEW_NODE;
+		bitmap.pixelSnapping = PixelSnapping.NEVER;
+		bitmap.smoothing = true;
+		
+		bitmap.x = -bitmap.width / 2;
+		bitmap.y = -bitmap.height / 2;
+		
+		_image.addChild(bitmap);
+		this.addChildAt(_image, 0);
+//		this.graphics.beginFill(0xf0f0f0);
+//		this.graphics.lineStyle(2, 0x666666);
+//		this.graphics.drawCircle(0, 0, RADIUS);
+//		this.graphics.endFill();
+//		this.graphics.lineStyle(4, 0x888888, 1, false, "normal", CapsStyle.NONE, JointStyle.ROUND);
+//		this.graphics.moveTo(0, -RADIUS);
+//		this.graphics.lineTo(0, RADIUS);
+//		this.graphics.moveTo(-RADIUS, 0);
+//		this.graphics.lineTo(RADIUS, 0);
 		this.visible = false;
 		this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver, false, 0, true);
 		this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut, false, 0, true);

@@ -179,7 +179,7 @@ public class AdventureBubble extends UIComponent
 		_titleContainer = new Sprite();
 		var tf:TextField = new TextField();
 		tf.selectable = false;
-		tf.defaultTextFormat = new TextFormat(null, null, 0x0, true);
+		tf.defaultTextFormat = new TextFormat("Arial", null, 0x0, true);
 		tf.text = title;
 		tf.autoSize = TextFieldAutoSize.LEFT;
 		_titleContainer.addChild(tf);
