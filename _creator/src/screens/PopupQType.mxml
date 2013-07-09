@@ -3,7 +3,7 @@
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:components="components.*"
 	layout="absolute"
-	width="750" height="580"
+	width="750" height="660"
 	tileBg="false"
 	title="Choose a Type" xmlns:screens="screens.*"
 	>
@@ -65,9 +65,9 @@
 		}
 		]]>
 	</mx:Script>
-	<mx:VBox top="10" bottom="50" horizontalCenter="0" horizontalAlign="center">
-		<mx:Text styleName="editTypePopupText" selectable="false" text="What type of interaction do you want for this destination?"  textAlign="center" paddingTop="20" paddingBottom="20"/>
-		<mx:Grid width="100%" height="100%" horizontalGap="20" verticalGap="20">
+	<mx:VBox top="10" bottom="35" horizontalCenter="0" horizontalAlign="center" verticalGap="15">
+		<mx:Text styleName="editTypePopupText" selectable="false" text="What type of interaction do you want for this destination?"  textAlign="center" paddingTop="20" paddingBottom="5"/>
+		<mx:Grid width="100%" height="100%" horizontalGap="20" verticalGap="15">
 			<mx:GridRow width="100%" height="100%">
 				<mx:GridItem width="100%" height="100%">
 					<components:AdventureTypeOption image="{DisplayNode.IMAGE_MC}" title="Multiple Choice" description="Provides two or more text-based choices that the student will make." click="{_node.type = AdventureOptions.TYPE_MULTIPLE_CHOICE; onEditNodeComplete();}"/>
@@ -85,8 +85,22 @@
 				</mx:GridItem>
 			</mx:GridRow>
 		</mx:Grid>
+		<mx:Canvas id="endPoint" width="86%" height="90" styleName="typeChoice" rollOver="{endPoint.filters = [new GlowFilter(0, .6, 6, 6, 2, 1)]}"
+			   rollOut="{endPoint.filters = []}"
+			   mouseDown="{endPoint.filters = [new GlowFilter(0, .5, 4, 4, 2, 1)]}"
+			   mouseUp="{endPoint.filters = [new GlowFilter(0, .8, 6, 6, 2, 1)]}"
+			   click="{_node.type = AdventureOptions.TYPE_END; onEditNodeComplete();}"
+			   >
+			<mx:HBox paddingLeft="10" horizontalAlign="center" verticalAlign="middle" width="100%" height="100%" mouseEnabled="false" mouseChildren="false">
+				<mx:Image source="{IMAGE_END}" verticalAlign="middle"/>
+				<mx:VBox verticalAlign="middle" horizontalAlign="left" width="100%" height="100%" mouseEnabled="false" mouseChildren="false" paddingTop="12">
+					<mx:Label styleName="title" text="End Point"/>
+					<mx:Text styleName="description" width="100%" height="100%" text="Provides text or media that concludes the students' journey."/>
+				</mx:VBox>
+			</mx:HBox>
+		</mx:Canvas>
 	</mx:VBox>
-	<mx:Canvas id="endPoint" verticalCenter="35" horizontalCenter="0"
+	<!-- <mx:Canvas id="endPoint" verticalCenter="35" horizontalCenter="0"
 			   rollOver="{endPoint.filters = [new GlowFilter(0, .6, 6, 6, 2, 1)]}"
 			   rollOut="{endPoint.filters = []}"
 			   mouseDown="{endPoint.filters = [new GlowFilter(0, .5, 4, 4, 2, 1)]}"
@@ -95,5 +109,5 @@
 			   >
 		<mx:Image source="{IMAGE_END}" />
 		<mx:Text verticalCenter="0" horizontalCenter="0" styleName="title" selectable="false" text="End&#13;Point"  textAlign="center"/>
-	</mx:Canvas>
+	</mx:Canvas> -->
 </screens:AdventurePopupBase>

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   creationComplete="{onCreationComplete()}"
+		   implements="mx.managers.IFocusManagerComponent"
+		   mouseEnabled="true"
+		   tabEnabled="true"
+		   >
+<mx:Script> <![CDATA[
+	import com.adobe.utils.StringUtil;
+	import mx.events.ResizeEvent;
+	//--------------------------------------------------------------------------
+	//
+	//  Static Variables
+	//
+	//--------------------------------------------------------------------------
+	[Bindable]
+	private var PADDING:Number = 2;
+	[Bindable]
+	private var INPUT_PADDING:Number = 5;
+	private var LINE_HEIGHT:Number = 24;
+	private var H_SPACING:Number = 5;
+	private var TEXTFORMAT_DEFAULT:TextFormat = new TextFormat("Arial", 18, 0);
+	private var LINE_LENGTH:Number = 74;
+	[Bindable]
+	private var SCROLL_WIDTH:Number = 18;
+	//--------------------------------------------------------------------------
+	//
+	//  Instance Variables
+	//
+	//--------------------------------------------------------------------------
+	private var _creationComplete:Boolean = false;
+	private var _listenersEnabled:Boolean = false;
+
+	protected var answerTokenListBox:ShortAnswerTokenList;
+
+	private var answerStrings:Array;
+	private var condensedAnswersString:String = "";
+
+	private var tokenFields:Array = new Array();
+
+	private var answerTokensX:Number = 0;
+	private var answerTokensY:Number = 0;
+
+	//--------------------------------------------------------------------------
+	//
+	//  Initializers
+	//
+	//--------------------------------------------------------------------------
+	private function onCreationComplete():void
+	{
+		// only call this function once
+		if(_creationComplete) return;
+
+		// set creation complete flag
+		_creationComplete = true;
+
+		answerStrings = new Array();
+
+		if (answerTokenListBox == null)
+		{
+			answerTokenListBox = new ShortAnswerTokenList();
+		}
+
+		updateAnswerString(answerTokenListBox.DEFAULT_TEXT);
+
+		redraw();
+
+		/* add listeners */
+		setListenersEnabled(this.enabled);
+	}
+	//--------------------------------------------------------------------------
+	//
+	//  Override Functions
+	//
+	//--------------------------------------------------------------------------
+	public override function set enabled(val:Boolean):void
+	{
+		if(val != super.enabled)
+		{
+			// setListenersEnabled(val);
+		}
+		super.enabled = val;
+	}
+	// what in all the fucks does this do?
+	/*
+	protected override function createChildren():void
+	{
+		super.createChildren();
+		_inputField = new TextField();
+		_deleteButton = new TextField();
+	}
+	*/
+
+	//----------------------------------
+	//  Getter/Setter Functions
+	//----------------------------------
+	/**
+	 * The comma-separated values attributed to this answer
+	 */
+	public function get text():String { return condensedAnswersString; }
+	public function set text(val:String):void
+	{
+		// trace("calling populateList from text setter");
+		trace("text val: " + val);
+		condensedAnswersString= val;
+		if (_creationComplete) populateList();
+	}
+
+	//----------------------------------
+	//  Public Functions
+	//----------------------------------
+	/**
+	 * Removes event listeners to clear memory and prepare for garbage collection
+	 */
+	public function destroy():void
+	{
+		trace("ShortanswerArea::destroy()");
+		setListenersEnabled(false);
+		//clean();
+
+		// list box should never be null..
+		if (answerTokenListBox)
+		{
+			this.text = answerTokenListBox.answers;
+
+			trace("text: " + this.text);
+
+			if(answerTokenListBox.parent != null) answerTokenListBox.destroy();
+			answerTokenListBox = null;
+		}
+	}
+
+	private function populateList():void
+	{
+		trace("ShortanswerArea::populateList()");
+		answerTokenListBox.answers = condensedAnswersString;
+		updateAnswerString(condensedAnswersString);
+	}
+
+	/**
+	 * Draws an invisible background on the answerTokensBox to catch mouse events
+	 */
+	private function redraw():void
+	{
+		trace("ShortanswerArea::redraw()");
+
+		// draw invisible background to catch mouse events
+		answerTokensBox.graphics.clear();
+		answerTokensBox.graphics.beginFill(0, 0);
+		answerTokensBox.graphics.drawRect(0, 0, 700, this.height);
+		answerTokensBox.graphics.endFill();
+	}
+
+	private function updateAnswerString(answers:String):void
+	{
+		trace("ShortanswerArea::updateAnswerString()");
+
+		var stringField:TextField = new TextField;
+		stringField.selectable = false;
+		stringField.autoSize = TextFieldAutoSize.LEFT;
+
+		if (answers == answerTokenListBox.DEFAULT_TEXT)
+		{
+			TEXTFORMAT_DEFAULT.color = 0xCCCCCC;
+		}
+		else
+		{
+			TEXTFORMAT_DEFAULT.color = 0x000000;
+		}
+
+		stringField.defaultTextFormat = TEXTFORMAT_DEFAULT;
+
+		stringField.text = answers;
+
+		// if the answers string will exceed the width of the box, spill onto the second line
+		if (stringField.text.length > LINE_LENGTH)
+		{
+			var firstSection:String = stringField.text.substr(0,LINE_LENGTH);
+			var lastIndex:Number = firstSection.lastIndexOf(' ');
+
+			firstSection = stringField.text.substr(0, lastIndex);
+			var lastSection:String = stringField.text.substr(lastIndex);
+
+			// if the second line is too long too, start to lop off the end and add ellipses
+			if (lastSection.length > LINE_LENGTH)
+			{
+				lastSection = lastSection.substr(0, LINE_LENGTH - 3) + "...";
+			}
+
+			stringField.text = firstSection + "\n" + lastSection;
+		}
+
+		stringField.x = 0;
+		stringField.y = 0;
+
+		for (var i:int = 0; i<answerTokensBox.numChildren; i++)
+		{
+			answerTokensBox.removeChildAt(i);
+		}
+
+		answerTokensBox.addChild(stringField);
+	}
+
+	private function setListenersEnabled(val:Boolean):void
+	{
+		trace("ShortanswerArea::setListenersEnabled()");
+		// avoid adding double listeners
+		if(val == _listenersEnabled) return;
+		// enable listeners
+		if(val)
+		{
+			// can only proceed if added to stage
+			if(!_creationComplete) return;
+
+			answerTokensBox.addEventListener(MouseEvent.CLICK, onClick, false, 0, true);
+			answerTokenListBox.addEventListener(Event.CHANGE, onListBoxUpdate);
+			_listenersEnabled = true;
+			// setStageListener(true);
+		}
+		// remove listeners
+		else
+		{
+			_listenersEnabled = false;
+			answerTokensBox.removeEventListener(MouseEvent.CLICK, onClick);
+			answerTokenListBox.removeEventListener(Event.CHANGE, onListBoxUpdate);
+			// setStageListener(false);
+		}
+	}
+
+	//----------------------------------
+	//  Listeners
+	//----------------------------------
+	private function onListBoxUpdate(e:Event):void
+	{
+		condensedAnswersString = answerTokenListBox.answers;
+		updateAnswerString(condensedAnswersString);
+	}
+	/*
+	private function onFocusIn(e:Event):void
+	{
+	}
+	private function onFocusOut(e:Event):void
+	{
+	}
+	*/
+	private function onClick(e:MouseEvent):void
+	{
+		trace("ShortAnswerArea::onClick()");
+
+		if (!answerTokenListBox.visible)
+		{
+			PopUpManager.addPopUp(answerTokenListBox, this);
+			answerTokenListBox.visible = true;
+			answerTokenListBox.toggleListeners(true);
+		}
+
+		var tokenBoxPosition:Point = answerTokenListBox.parent.globalToLocal(this.localToGlobal(new Point(10,-5)));
+		answerTokenListBox.referencePoint = tokenBoxPosition;
+	}
+
+]]>
+</mx:Script>
+	<mx:Canvas id="answersContainer" top="{PADDING}" left="{PADDING}" right="{PADDING}" bottom="{PADDING}" width="100%">
+		<mx:UIComponent id="answerTokensBox" left="0" right="{SCROLL_WIDTH}" height="100%"/>
+	</mx:Canvas>
+</mx:Canvas>

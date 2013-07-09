@@ -10,13 +10,13 @@
 		<![CDATA[
 			import components.FloatButton;
 			import components.ScoreBox;
-			
+
 			import materia.CreatorBase;
 			import materia.CreatorConfig;
 			import materia.components.ScrollableSizableImage;
-			
+
 			import mx.events.FlexEvent;
-			
+
 			import nm.ui.ToolTip;
 			use namespace mx_internal;
 			import components.MultipleChoiceRow;
@@ -39,7 +39,7 @@
 			private var _deleteTarget:MultipleChoiceRow;
 			private var _scrollDownPending:Boolean = false;
 			private var _scrollUpdatePending:Boolean = false;
-			
+
 			protected override function onCreationComplete():void
 			{
 				super.onCreationComplete();
@@ -95,7 +95,8 @@
 				addAnswerButton.addEventListener(MouseEvent.CLICK, onAddAnswer,false, 0, true);
 				addAnswerButton.visible = false;
 				PopUpManager.addPopUp(addAnswerButton, this);
-				updateAddAnswerButton();
+				updateAddAnswerButton(node.isNew);
+				trace("Add answer button being updated from: beginEdit (PopupMc)");
 				addAnswerButton.visible = true;
 				// Create Delete Button
 				PopUpManager.addPopUp(deleteButton, this);
@@ -162,6 +163,8 @@
 					row.popupInstance = this;
 					row.node = _node;
 //					row.letter = getNextLetter();
+					trace("loading answer text: " + ans.text);
+
 					row.text = ans.text;
 					row.destination = _node.children[i];
 					row.feedback = ans.options.feedback;
@@ -187,6 +190,7 @@
 				for(var i:int = 0; i < mcList.numChildren; i++)
 				{
 					row = MultipleChoiceRow(mcList.getChildAt(i))
+					trace("saving row text: " + row.text);
 					_node.data.answers[i + rowOffset].text = row.text;
 					// TODO: add scoring option
 					// _node.data.answers[i].value = MultipleChoiceRow(mcList.getChildAt(i)).value;
@@ -214,13 +218,17 @@
 			 * It should be aligned to the left and below the lowest row entry,
 			 * but no lower than the bottom of the answers container.
 			 */
-			protected function updateAddAnswerButton():void
+			protected function updateAddAnswerButton(isNew:Boolean = false):void
 			{
 				if(addAnswerButton == null) return;
-				var targetPoint:Point = addAnswerButton.parent.globalToLocal(scrollCanvas.localToGlobal(new Point(0, 0)));
-				trace(targetPoint);
+				var targetPoint:Point = addAnswerButton.parent.globalToLocal(answerVBox.localToGlobal(new Point(0, 0)));
+
+				// There's something screwy that happens when targetPoint references ScrollCanvas, so instead we use answerVBox as the anchor
+				// and manually drop the button to where it should be.
+				var targetPointCorrection:Number = 58;
+
 				addAnswerButton.x = targetPoint.x + addAnswerButton.padding;
-				addAnswerButton.y = targetPoint.y + Math.min(mcList.numChildren * (mcList.getStyle("verticalGap") + MultipleChoiceRow.rowHeight), scrollCanvas.height) + addAnswerButton.padding + 1;
+				addAnswerButton.y = targetPoint.y + Math.min(( mcList.numChildren * (mcList.getStyle("verticalGap") + MultipleChoiceRow.rowHeight)), scrollCanvas.height) + addAnswerButton.padding + 1 + targetPointCorrection;
 			}
 			public override function destroy():void
 			{
@@ -409,6 +417,7 @@
 					trace("deleteY: " + (deleteButton.y - targetPoint.y));
 				}
 				// Put the add answer button where it needs to go
+				trace("Add answer button being updated from: onScrollCanvasUpdate (PopupMc)");
 				updateAddAnswerButton();
 				// Reset the flag allowing more listeners to be added
 				_scrollUpdatePending = false;
@@ -518,7 +527,8 @@
 	<components:AdventureButton id="deleteImageButton" visible="false" anchored="true" label="Remove" click="{setLayout(AdventureOptions.LAYOUT_TEXT_ONLY);}" />
 	<components:AdventureButton id="changeImageButton" visible="false" anchored="true" label="Change Image" click="{loadImage(event);}" />
 	<mx:VBox top="20" bottom="{20 + 40}" left="20" right="20">
-		<mx:HBox id="contentHBox" width="100%" height="100%">
+		<!-- <mx:VBox top="20" left="20" right="20"> -->
+		<mx:HBox id="contentHBox" width="100%" height="40%">
 			<mx:Canvas id="fieldCanvas" styleName="fieldCanvas" width="100%" height="100%"> <!-- Contains the Icon and Question -->
 				<mx:Label styleName="stickyNote" id="questionSticky"  top="0" left="115" text="QUESTION:"
 						  initialize="{
@@ -577,7 +587,7 @@
 			<components:AdventureButton id="addImageButton" usePlus="true" label="Add&#13;Image"
 					   width="90" height="60" click="{setLayout(AdventureOptions.LAYOUT_HORIZ_TEXT)}"/>
 		</mx:HBox> <!-- #contentHBox -->
-		<mx:VBox id="answerVBox" width="100%" height="100%">
+		<mx:VBox id="answerVBox" width="100%" height="60%">
 			<mx:Label id="answerInstructions" text="Enter Possible Answers Below" styleName="heading" />
 			<mx:CheckBox id="randomizeBox" label="Randomize Order" selected="true" />
 			<mx:Canvas id="headings" width="100%">
@@ -585,7 +595,7 @@
 				<mx:Label id="destinationHeaderLabel" color="0x222222" text="Destination:" />
 				<mx:Label id="scoreHeaderLabel" right="44" color="0x222222" text="Score" />
 			</mx:Canvas>
-			<mx:VBox width="100%" height="100%" verticalGap="0">
+			<mx:VBox id="scrollCanvasContainer" width="100%" height="100%" verticalGap="0">
 				<mx:Canvas id="scrollCanvas" width="100%" height="100%" verticalScrollPolicy="on" scroll="listenForScrollUpdate()">
 					<mx:VBox id="mcList" styleName="mcList" width="100%" height="100%"/> <!-- Multiple Choice List -->
 				</mx:Canvas>
