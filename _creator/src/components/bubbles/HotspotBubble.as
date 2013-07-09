@@ -362,7 +362,7 @@ package components.bubbles {
 		{
 			var result:TextField = new TextField();
 			result.selectable = false;
-			result.defaultTextFormat = new TextFormat(null, 14, 0x0, true);
+			result.defaultTextFormat = new TextFormat("Arial", 14, 0x0, true);
 			result.text = text;
 			result.autoSize = TextFieldAutoSize.LEFT;
 			return result;
@@ -375,7 +375,7 @@ package components.bubbles {
 			result.backgroundColor = 0xffffff;
 			result.border = true;
 			result.borderColor = 0xcccccc;
-			result.defaultTextFormat = new TextFormat(null, 14, 0x0, true);
+			result.defaultTextFormat = new TextFormat("Arial", 14, 0x0, true);
 			return result;
 		}
 		private function createButton(text:String):Button
