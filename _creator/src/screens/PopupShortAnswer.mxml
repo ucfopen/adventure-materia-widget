@@ -3,7 +3,7 @@
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:components="components.*"
 	title="Edit Short Answer Question"
-	layout="absolute" width="950" height="620"
+	layout="absolute" width="950" height="670"
 	xmlns:screens="screens.*"
 	>
 	<mx:Script>
@@ -15,16 +15,20 @@
 			import nm.ui.ToolTip;
 			
 			import tree.Node;
-			private static const DEFAULT_CHOICE_TEXT:String = "All Other Answers\nUsed when a response doesn't match any answers";
+			private static const DEFAULT_CHOICE_TEXT:String = "Unmatched Answers\nUsed when a response doesn't match any of the above answers";
 			private static const DEFAULT_CHOICE_ANS:String = "[All Other Answers]";
 			protected var _defaultChoice:MultipleChoiceRow;
 			protected var _modifiedRow:MultipleChoiceRow;
+			private var targetNode:Node;
+
 			protected override function onCreationComplete():void
 			{
 				super.onCreationComplete();
 				answerVBox.removeChild(randomizeBox);
 				answerVBox.addChildAt(answerInstructions, 0);
-				answerInstructions.text = "Enter Possible Answers Separated By Commas:";
+				answerInstructions.text = "Click a row to add possible answers to match:";
+
+				// answerVBox.setStyle("verticalGap", 20);
 			}
 			private function get defaultAnswerExists():Boolean
 			{
@@ -56,21 +60,24 @@
 			{
 				_node = node;
 				_tree = node.displayNode.displayTree;
-				/* create default answer */
+				// create default answer
 				_defaultChoice = new MultipleChoiceRow();
 				_defaultChoice.isDefault = true;
 				_defaultChoice.node = _node;
 				_defaultChoice.rowIndex = -1;
-				answerVBox.addChildAt(_defaultChoice, 1);
+				answerVBox.addChildAt(_defaultChoice, answerVBox.numChildren);
 				_defaultChoice.popupInstance = this;
 				_defaultChoice.setStyle("borderStyle", "solid");
-				_defaultChoice.setStyle("backgroundColor", "#ffffff");
+				_defaultChoice.setStyle("backgroundColor", "#a7a7a7");
+				_defaultChoice.answerField.setStyle("disabledColor", "#535353");
+				_defaultChoice.answerField.setStyle("fontWeight", "bold");
 				_defaultChoice.answerField.text = DEFAULT_CHOICE_TEXT;
 				_defaultChoice.answerField.enabled = false;
 				_defaultChoice.answerField.selectable = false;
 				_defaultChoice.answerField.editable = false;
 				_defaultChoice.width = answerVBox.width - 16;
 				_defaultChoice.missingNodeCallback = onMissingNodeAdded;
+
 				// Add default answer to new nodes
 				if(node.isNew && !node.imported)
 				{
@@ -89,22 +96,17 @@
 					}
 					else
 					{
+						// trace("node children length is greater than 1...");
 						_newNodes.push(addNode(node));
 					}
 					node.data.addAnswer("", "0", {link:node.children[1].id});
-//					var newNode:Node
-//					if(node.children.length == 0) newNode = addNode(node);
-//					else if(node.data.answers.length == 0) newNode = node.children[0];
-//					else return;
-//					_newNodes.push(newNode);
-//					node.data.addAnswer("- All Other Answers -", "0", {link:newNode.id, isDefault:true});
 					trace("Added New (SA Default)");
 				}
 				updateRowOffset();
 				super.beginEdit(node);
 				// Customize window for Short answer
 				this.title = "Edit Short Answer - " + nodeID;
-				addAnswerButton.label = "Add Answer";
+				addAnswerButton.label = "Add Answer Set";
 				_node.data.addOption("type", AdventureOptions.TYPE_SHORT_ANSWER);
 				// Update Default Choice Row
 				if(!_node.data.answers.length && _node.children.length)
@@ -127,6 +129,8 @@
 			protected function onUpdateComplete(e:Event):void
 			{
 				this.removeEventListener(FlexEvent.UPDATE_COMPLETE, onUpdateComplete);
+				// This originally updated the addAnswerButton position, but doesn't seem to be necessary.
+				// Disabling the call is one of two fixes to the mysterious addAnswerButton positioning bug.
 				updateAddAnswerButton();
 			}
 			protected override function loadAnswers():void

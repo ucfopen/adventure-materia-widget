@@ -112,7 +112,7 @@
 				updateDestinationBox();
 				updateAnswerFields();
 				answerField.restrict = "^\u0001-\u0008\u000B-\u001F";
-				shortAnswerField.restrict = "^\u0001-\u0008\u000B-\u001F";
+				//shortAnswerField.restrict = "^\u0001-\u0008\u000B-\u001F";
 				_creationIsComplete = true;
 				initFeedback();
 
@@ -214,6 +214,7 @@
 			private function expandFeedback(focus:Boolean = false):void
 			{
 				feedbackCanvas.width = 280;
+				feedbackCanvasContainer.width = 350;
 				//feedbackStack.selectedChild = feedbackFieldContainer;
 				_feedbackField = new TextArea();
 				_feedbackField.id = "_feedbackField";
@@ -240,6 +241,7 @@
 			{
 				if(_feedbackField == null) return;
 				feedbackCanvas.width = 160;
+				feedbackCanvasContainer.width = 230;
 				_feedbackField.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 				_feedbackField.removeEventListener(FocusEvent.FOCUS_OUT, onFeedbackFocusOut);
 				feedbackCanvas.removeChild(_feedbackField);
@@ -254,21 +256,23 @@
 	<mx:HBox id="mainHBox" borderStyle="solid" borderSides="bottom" borderThickness="1" borderColor="#CCCCCC" width="100%" height="100%" horizontalGap="0">
 		<!-- Answer -->
 		<mx:TextArea id="answerField" borderSkin="assets.DottedBorder" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)"/>
-		<components:ShortAnswerArea id="shortAnswerField" borderSkin="assets.DottedBorder" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)"/>
+		<components:ShortAnswerAreaNew id="shortAnswerField" borderSkin="assets.DottedBorder" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)"/>
 		<!-- Feedback -->
-		<mx:Canvas borderSkin="assets.DottedBorder" borderSides="left"
-				   id="feedbackCanvas" width="160" height="100%">
-			<components:AdventureButton id="feedbackButton" label="Add&#13;Feedback"
-					   width="112" height="40" usePlus="true"
-					   x="{(feedbackCanvas.width-feedbackButton.width)/2}"
-					   y="{(feedbackCanvas.height-feedbackButton.height)/2}"
-					   click="expandFeedback(true);"/>
-		</mx:Canvas>
-		<!-- Destination Node -->
-		<components:DestinationBox id="destCanvas"
-								   styleName="miniBox"
-								   width="70" height="100%"
-								   borderSkin="assets.DottedBorder"
-								   borderSides="left" />
+		<mx:HBox id="feedbackCanvasContainer" width="230" height="100%" horizontalGap="0" backgroundColor="#ffffff">
+			<mx:Canvas borderSkin="assets.DottedBorder" borderSides="left"
+					   id="feedbackCanvas" width="160" height="100%">
+				<components:AdventureButton id="feedbackButton" label="Add&#13;Feedback"
+						   width="112" height="40" usePlus="true"
+						   x="{(feedbackCanvas.width-feedbackButton.width)/2}"
+						   y="{(feedbackCanvas.height-feedbackButton.height)/2}"
+						   click="expandFeedback(true);"/>
+			</mx:Canvas>
+			<!-- Destination Node -->
+			<components:DestinationBox id="destCanvas"
+									   styleName="miniBox"
+									   width="70" height="100%"
+									   borderSkin="assets.DottedBorder"
+									   borderSides="left" />
+		</mx:HBox>
 	</mx:HBox>
 </mx:Canvas>
