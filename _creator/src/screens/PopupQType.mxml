@@ -21,6 +21,9 @@
 			super.beginEdit(node);
 			/* hide end option for start node */
 			endPoint.visible = node.parent != null;
+			endPoint.includeInLayout = endPoint.visible;
+			this.height = endPoint.visible ? 660 : 580;
+
 			if (node.imported)
 			{
 				hotspotGridItem.alpha = 0.4;
@@ -100,14 +103,4 @@
 			</mx:HBox>
 		</mx:Canvas>
 	</mx:VBox>
-	<!-- <mx:Canvas id="endPoint" verticalCenter="35" horizontalCenter="0"
-			   rollOver="{endPoint.filters = [new GlowFilter(0, .6, 6, 6, 2, 1)]}"
-			   rollOut="{endPoint.filters = []}"
-			   mouseDown="{endPoint.filters = [new GlowFilter(0, .5, 4, 4, 2, 1)]}"
-			   mouseUp="{endPoint.filters = [new GlowFilter(0, .8, 6, 6, 2, 1)]}"
-			   click="{_node.type = AdventureOptions.TYPE_END; onEditNodeComplete();}"
-			   >
-		<mx:Image source="{IMAGE_END}" />
-		<mx:Text verticalCenter="0" horizontalCenter="0" styleName="title" selectable="false" text="End&#13;Point"  textAlign="center"/>
-	</mx:Canvas> -->
 </screens:AdventurePopupBase>
