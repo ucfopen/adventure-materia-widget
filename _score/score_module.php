@@ -80,7 +80,11 @@ class Score_Modules_Adventure extends Score_Module
 	{
 		$details  = [];
 		$title 		= 'Responses:';
-		$header   = ['Question Score', 'The Question', 'Your Response', 'Correct Answer'];
+		$header   = ['Question Score', 'The Question', 'Your Response'];
+
+		$destination_title = 'Where did you end up?';
+		$destination_header = [];
+		$destination_table = [];
 
 		foreach ($this->logs as $log)
 		{
@@ -91,12 +95,11 @@ class Score_Modules_Adventure extends Score_Module
 					{
 						$feedback;
 						$question_text = $q->questions[0]['text'];
-						$correct_answers = 'N/A';
 
 						$score       = $this->check_answer($log);
 						$user_answer = $this->get_score_page_answer($log);
 						$feedback    = $this->get_feedback($log, $q->answers);
-						$details[]   = ['data'          => [$question_text, $user_answer, $correct_answers],
+						$details[]   = ['data'          => [$question_text, $user_answer],
 													  'data_style'    => ['question', 'response', 'answer'],
 													  'score'         => $score,
 													  'feedback'      => $feedback,
@@ -112,23 +115,32 @@ class Score_Modules_Adventure extends Score_Module
 				case Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT:
 					$score          = $this->check_answer($log);
 					$user_answer    = $this->get_score_page_answer($log);
-					$details[]      = ['data' => [$user_answer],
+					$destination_table[]      = ['data' => [$user_answer],
 									'data_style'    => ['node_text'],
 									'score'         => $score,
 									'type'          => $log->type,
 									'style'         => 'single_column',
 									'tag'           => 'p',
 									'symbol'        => '%',
-									'graphic'       => 'final',
-									'display_score' => true];
+									'graphic'       => 'none',
+									'display_score' => false];
 					break;
 			}
 		}
 
 		// return an array of tables
-		return [['title'    => $title,
-						 'header'   => $header,
-						 'table'    => $details]];
+		return [
+			[
+				'title'	=> $destination_title,
+				'header' => $destination_header,
+				'table'		=> $destination_table
+			],
+			[
+				'title'    => $title,
+				 'header'   => $header,
+				 'table'    => $details
+			]
+		];
 	}
 
 	/**

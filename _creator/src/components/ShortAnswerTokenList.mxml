@@ -90,6 +90,11 @@
 			var overflow:Number = 0;
 			var yThreshold:Number = parent.height - DEFAULT_HEIGHT - 6;
 
+			trace("refPoint: " + refPoint.y);
+			trace("height: " + this.height);
+			trace("bottomPt: " + bottomPt);
+			trace("yThreshold: " + yThreshold);
+
 			if (bottomPt >= yThreshold) // if the bottom of the list exceeds the bottom of the creator window
 			{
 				overflow = bottomPt - yThreshold;
