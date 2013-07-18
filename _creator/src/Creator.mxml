@@ -12,6 +12,7 @@
 	<mx:Script> <![CDATA[
 		import mx.controls.Alert;
 		import components.ImportDisplayNode;
+		import components.bubbles.HelperBubble;
 
 		import materia.questionStorage.*;
 
@@ -24,6 +25,8 @@
 		import screens.PopupQType;
 		import screens.PopupScoreType;
 		import screens.PopupShortAnswer;
+
+		import HelperBubbleManager;
 
 		import tree.DisplayNode;
 		import tree.DisplayTree;
@@ -59,6 +62,8 @@
 		[Bindable]
 		private var _undoDeleteButtonY:Number;
 		private var _stage:EventDispatcher;
+
+		public var helperManager:HelperBubbleManager;
 		// private var _initialScore:int = 100;
 		// [Bindable]
 		// private var _scoreStyleLabel:String = "None Selected";
@@ -111,6 +116,11 @@
 			super.init();
 			// Keep track of time
 			time = (new Date()).getTime();
+
+			// initialize the helper bubble manager
+			helperManager = new HelperBubbleManager();
+			helperManager.initializeHelpers(this);
+
 			// Create tree and editor popups
 			createInterface();
 			// update on resize
@@ -127,10 +137,12 @@
 			_selectedNode = addNode(null);
 
 			instanceTitle = DEFAULT_TITLE;
-//			if(_adventureTree.stage != null)
-//			{
-//				_adventureTree.redraw();
-//			}
+
+			trace("Creator::initNewWidget()");
+
+			// Add the intro helper bubble
+			helperManager.addHelper(helperManager.introBubble);
+
 			// _scoreStyleScreen.show(this, _adventureTree.getNodeFromId(0));
 		}
 		/**
@@ -287,6 +299,8 @@
 			_narrativeScreen.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
 			_hotSpotScreen.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
 			_endScreen.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
+
+			trace("Creator::createInterface()");
 		}
 		private function onEditLink(e:DataEvent):void
 		{

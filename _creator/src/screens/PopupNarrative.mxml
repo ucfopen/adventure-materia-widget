@@ -175,6 +175,11 @@
 				if(_node.data.answers.length) _node.data.answers[0].text = _proceedText;
 				/* Update position if necessary */
 				_tree.redraw();
+
+				if (!_creator.helperManager.endSuggestionBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.endSuggestionBubble);
+				}
 			}
 			private function addNode(parentNode:Node):Node
 			{

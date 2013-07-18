@@ -68,6 +68,11 @@
 				_node.data.options.layout = _layout;
 				/* Update the display tree */
 				_tree.redraw()
+
+				if (!_creator.helperManager.endSuggestionBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.endSuggestionBubble);
+				}
 			}
 			protected override function onEditLink(e:Event):void
 			{

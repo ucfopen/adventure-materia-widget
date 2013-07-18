@@ -33,6 +33,8 @@ import mx.core.Container;
 import mx.core.UIComponent;
 import mx.events.FlexEvent;
 
+import HelperBubbleManager;
+
 import nm.ui.Button;
 public class DisplayTree extends Sprite
 {
@@ -85,6 +87,7 @@ public class DisplayTree extends Sprite
 	private var _displayArea:UIComponent;
 	private var _overlay:DisplayObjectContainer;
 	private var _nodesMarkedAsNew:Array;
+	private var helperManager:HelperBubbleManager;
 	//----------------------------------
 	//  UI Components
 	//----------------------------------
@@ -121,6 +124,7 @@ public class DisplayTree extends Sprite
 		// Store useful references
 		_creator = creatorInterface;
 		_overlay = _creator.flashOverlay;
+		helperManager = _creator.helperManager;
 		// Create container sprites
 		_bg = new Sprite();
 		_lineLayer = new Sprite();
