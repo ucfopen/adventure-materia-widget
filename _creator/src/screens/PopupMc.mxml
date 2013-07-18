@@ -48,6 +48,17 @@
 				_sidePanel.visible = false;
 				removeChild(deleteButton);
 				deleteButton.rotation = -90;
+
+				// Add relevant helper bubbles
+				if (!_creator.helperManager.destinationsBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.destinationsBubble);
+				}
+
+				if (!_creator.helperManager.mcBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.mcBubble);
+				}
 			}
 			protected override function fixImportedData(node:Node):void
 			{
@@ -148,6 +159,22 @@
 				nodeImg.source = "";
 				// call super
 				super.onWindowClosed();
+
+				// Remove all the helper bubbles
+				if (_creator.helperManager.destinationsBubble.visible)
+				{
+					_creator.helperManager.destinationsBubble.destroy();
+				}
+
+				if (_creator.helperManager.mcBubble.visible)
+				{
+					_creator.helperManager.mcBubble.destroy();
+				}
+
+				if (!_creator.helperManager.endSuggestionBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.endSuggestionBubble);
+				}
 			}
 			/**
 			 * Load answers from the qset into the multiple choice list

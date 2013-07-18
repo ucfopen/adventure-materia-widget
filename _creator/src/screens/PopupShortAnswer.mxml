@@ -28,6 +28,24 @@
 				answerVBox.addChildAt(answerInstructions, 0);
 				answerInstructions.text = "Click a row to add possible answers to match:";
 
+				// Because SA extends MC, we need to hide the MC Helper bubble
+				if (_creator.helperManager.mcBubble.visible)
+				{
+					_creator.helperManager.mcBubble.destroy();
+					// Manually reset alreadyActivated so the bubble appears for an MC window if it hasn't appeared already
+					_creator.helperManager.mcBubble.alreadyActivated = false;
+				}
+
+				if (!_creator.helperManager.saBubble.alreadyActivated)
+				{
+					trace("Adding SA bubble");
+					_creator.helperManager.addHelper(_creator.helperManager.saBubble);
+				}
+
+				trace("destination bubble state: " + _creator.helperManager.destinationsBubble.alreadyActivated);
+				trace("mc bubble state: " + _creator.helperManager.mcBubble.alreadyActivated);
+				trace("sa bubble state: " + _creator.helperManager.saBubble.alreadyActivated);
+
 				// answerVBox.setStyle("verticalGap", 20);
 			}
 			private function get defaultAnswerExists():Boolean
@@ -125,6 +143,11 @@
 				_defaultChoice.parent.removeChild(_defaultChoice);
 				_defaultChoice.destroy();
 				_defaultChoice = null;
+
+				if (_creator.helperManager.saBubble.visible)
+				{
+					_creator.helperManager.saBubble.destroy();
+				}
 			}
 			protected function onUpdateComplete(e:Event):void
 			{
