@@ -15,9 +15,11 @@
 		   borderThickness="0"
 		   borderColor="#000000"
 		   horizontalScrollPolicy="off"
+		   verticalScrollPolicy="off"
 		   backgroundColor="#729fa9"
 		   width="300"
 		   visible="false"
+		   autoLayout="true"
 		   >
 	<mx:Script> <![CDATA[
 
@@ -101,6 +103,6 @@
 
 	]]>
 	</mx:Script>
-	<mx:Text id="title_text" width="100%" text="{titleText}" fontFamily="Arial" fontSize="16" fontWeight="bold" color="#ffffff" />
-	<mx:Text id="description_text" width="100%" text="{descriptionText}" fontFamily="Arial" fontSize="14" fontWeight="normal" color="#ffffff" />
+	<mx:Text id="title_text" width="100%" text="{titleText}" fontFamily="Arial" fontSize="16" fontWeight="bold" color="#ffffff" selectable="false" />
+	<mx:Text id="description_text" width="100%" text="{descriptionText}" fontFamily="Arial" fontSize="14" fontWeight="normal" color="#ffffff" selectable="false" />
 </mx:VBox>
