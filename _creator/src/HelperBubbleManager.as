@@ -52,8 +52,16 @@ package {
 
 
 			hotspotBubble = new HelperBubble();
+			hotspotBubble.type = HelperBubble.HOTSPOT;
+			hotspotBubble.title = "Creating a Hotspot Node";
+			hotspotBubble.description = "Hotspot nodes allow students to select parts of an image to answer a question. To begin, click the camera graphic to upload an image. Use the media uploader tool to use an image from your current media library, or upload a new image from your computer.";
+			hotspotBubble.description += "\n\nOnce an image is added, use any of the shape tools to draw shapes over the parts of the image you'd like the student to be able to select.";
+			hotspotBubble.description += "\n\nClick a newly created hotspot to set its destination and add optional information.";
 
 			narrativeBubble = new HelperBubble();
+			narrativeBubble.type = HelperBubble.NARRATIVE;
+			narrativeBubble.title = "Creating a Narrative Node";
+			narrativeBubble.description = "A narrative node does not have a question or answers; rather, it provides transitional text or images to move students from one node to the next.";
 
 			endingBubble = new HelperBubble();
 
@@ -87,18 +95,9 @@ package {
 					break;
 
 				case HelperBubble.MULTIPLE_CHOICE:
-					helperPos = new Point(creator.width - helper.width - 10, 100);
-					helper.updatePosition(helperPos);
-
-					if (!destinationsBubble.alreadyActivated)
-					{
-						destHelperPos = new Point(creator.width - helper.width - 10, 100 + helper.measuredHeight + 10);
-						destinationsBubble.updatePosition(destHelperPos);
-					}
-
-					break;
-
 				case HelperBubble.SHORT_ANSWER:
+				case HelperBubble.HOTSPOT:
+				case HelperBubble.NARRATIVE:
 					helperPos = new Point(creator.width - helper.width - 10, 100);
 					helper.updatePosition(helperPos);
 
@@ -109,7 +108,6 @@ package {
 					}
 
 					break;
-
 			}
 
 

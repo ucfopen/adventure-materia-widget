@@ -36,6 +36,16 @@
 				/* Update Layout */
 				layoutsPanel.filters = [new GlowFilter(0, .4, 6, 6, 1)];
 				_sidePanel.addChild(sidePanelContents);
+
+				if (!_creator.helperManager.destinationsBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.destinationsBubble);
+				}
+
+				if (!_creator.helperManager.hotspotBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.hotspotBubble);
+				}
 			}
 			protected override function beginEdit(node:Node):void
 			{
@@ -68,6 +78,16 @@
 				_node.data.options.layout = _layout;
 				/* Update the display tree */
 				_tree.redraw()
+
+				if (_creator.helperManager.destinationsBubble.visible)
+				{
+					_creator.helperManager.destinationsBubble.destroy();
+				}
+
+				if (_creator.helperManager.hotspotBubble.visible)
+				{
+					_creator.helperManager.hotspotBubble.destroy();
+				}
 
 				if (!_creator.helperManager.endSuggestionBubble.alreadyActivated)
 				{

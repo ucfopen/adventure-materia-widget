@@ -165,12 +165,10 @@
 				{
 					_creator.helperManager.destinationsBubble.destroy();
 				}
-
 				if (_creator.helperManager.mcBubble.visible)
 				{
 					_creator.helperManager.mcBubble.destroy();
 				}
-
 				if (!_creator.helperManager.endSuggestionBubble.alreadyActivated)
 				{
 					_creator.helperManager.addHelper(_creator.helperManager.endSuggestionBubble);

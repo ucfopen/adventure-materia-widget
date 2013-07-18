@@ -60,6 +60,17 @@
 				this.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
 				this.addEventListener(DestinationBubble.EVENT_DESTINATION_CHOICE, onDestChange, false, 0, true);
 				_sidePanel.addChild(layoutCol);
+
+				// Add relevant helper bubbles
+				if (!_creator.helperManager.destinationsBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.destinationsBubble);
+				}
+
+				if (!_creator.helperManager.narrativeBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.narrativeBubble);
+				}
 			}
 			protected override function fixImportedData(node:Node):void
 			{
@@ -175,6 +186,22 @@
 				if(_node.data.answers.length) _node.data.answers[0].text = _proceedText;
 				/* Update position if necessary */
 				_tree.redraw();
+
+				if (!_creator.helperManager.endSuggestionBubble.alreadyActivated)
+				{
+					_creator.helperManager.addHelper(_creator.helperManager.endSuggestionBubble);
+				}
+
+				// Remove all the helper bubbles
+				if (_creator.helperManager.destinationsBubble.visible)
+				{
+					_creator.helperManager.destinationsBubble.destroy();
+				}
+
+				if (_creator.helperManager.narrativeBubble.visible)
+				{
+					_creator.helperManager.narrativeBubble.destroy();
+				}
 
 				if (!_creator.helperManager.endSuggestionBubble.alreadyActivated)
 				{
