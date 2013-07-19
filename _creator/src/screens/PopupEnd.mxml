@@ -61,6 +61,12 @@
 		_scoreInput.addEventListener(PercentField.EVENT_COMMIT, updateValue, false, 0, true);
 		_scoreInputContainer.addChild(_scoreInput);
 		_scoreVBox.addChild(_scoreInputContainer);
+
+		// Add relevant helper bubbles
+		if (!_creator.helperManager.endingBubble.alreadyActivated)
+		{
+			_creator.helperManager.addHelper(_creator.helperManager.endingBubble);
+		}
 	}
 	//------------------------------------------------------------------
 	//
@@ -71,6 +77,12 @@
 	{
 		super.destroy();
 		if(_scoreInput != null) _scoreInput.destroy();
+
+		// Remove all the helper bubbles
+		if (_creator.helperManager.endingBubble.visible)
+		{
+			_creator.helperManager.endingBubble.destroy();
+		}
 	}
 	protected override function beginEdit(node:Node):void
 	{

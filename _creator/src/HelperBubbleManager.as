@@ -50,7 +50,6 @@ package {
 			saBubble.title = "Creating a Short Answer Node";
 			saBubble.description = "Short answer nodes are similar to Multiple Choice nodes, with the exception of how students enter their answers.\n\nPossible answers are grouped into answer sets; if a student's response matches an answer, they advance to that answer set's destination."
 
-
 			hotspotBubble = new HelperBubble();
 			hotspotBubble.type = HelperBubble.HOTSPOT;
 			hotspotBubble.title = "Creating a Hotspot Node";
@@ -64,11 +63,17 @@ package {
 			narrativeBubble.description = "A narrative node does not have a question or answers; rather, it provides transitional text or images to move students from one node to the next.";
 
 			endingBubble = new HelperBubble();
+			endingBubble.type = HelperBubble.ENDING;
+			endingBubble.title = "Ending Your Widget";
+			endingBubble.description = "An end node is the final node the student will visit in the Adventure widget. It provides a conclusion to their journey and determines their final score.\n\nUsing multiple end nodes, students may receive different scores depending on where they end up.";
 
 		}
 
 		public function addHelper(helper:HelperBubble):void
 		{
+			// Temporarily disabling helpers
+			return;
+
 			if (helper.visible) return;
 			trace("HelperBubbleManager::addHelper()");
 			PopUpManager.addPopUp(helper, creator);
@@ -106,6 +111,12 @@ package {
 						destHelperPos = new Point(creator.width - helper.width - 10, 100 + helper.measuredHeight + 10);
 						destinationsBubble.updatePosition(destHelperPos);
 					}
+
+					break;
+
+				case HelperBubble.ENDING:
+					helperPos = new Point(creator.width - helper.width - 10, 100);
+					helper.updatePosition(helperPos);
 
 					break;
 			}
