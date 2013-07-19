@@ -174,7 +174,7 @@ Application {
 	 font-size: 24pt;
 }
 /* --------------------------------  Buttons  --------------------------------------*/
-Button, .tinyButton, ComboBox, .DefaultButton {
+Button, .tinyButton, .DefaultButton {
 	backgroundAlpha: 1;
 	color: #333333;
 	textRollOverColor: #333333;
@@ -328,9 +328,6 @@ Button, .tinyButton, ComboBox, .DefaultButton {
 		buttonStyleName: buttonBarButton;
 		fillAlphas: 1, 1, 1, 1;
 	}
-LinkButton
-{
-}
 	.popupButton
 	{
 		padding-top: 0;
@@ -367,9 +364,11 @@ LinkButton
 	fontSize: 12;
 }
 /* --------------------------------  Data Grids  --------------------------------------*/
+/*
 DataGrid {
 	color: #000000;
 }
+*/
 	.draftCellLabel {
 		color: #B8AABB;
 	}
@@ -487,6 +486,7 @@ DataGrid {
 	{
 	}
 /* --------------------------------  Menus and Lists  --------------------------------------*/
+/*
 ComboBox
 {
 	cornerRadius: 4;
@@ -498,6 +498,7 @@ ComboBox
 	fillColors: #3D3D3D, #2C2C2C, #505050, #6A6A6A;
 	themeColor: #B4B4B4;
 }
+*/
 	.comboBoxDropdown
 	{
 		backgroundColor: #CBCBCB;
@@ -513,19 +514,21 @@ ComboBox
 		rollOverColor: #6CB4E2;
 		selectionColor: #ECEDED;
 	}
+/*
 HorizontalList
 {
 	backgroundAlpha: 0;
 	borderStyle: none;
 	textAlign: center;
 }
+*/
 TileList.tileListNewGame
 {
 	rollOverColor: #A8D8F7;
 	selectionColor: #4EB3F3;
 }
 /* --------------------------------  Tab Navigators  --------------------------------------*/
-TabNavigator, .defaultTabNavigator {
+.defaultTabNavigator {
 	fontWeight: bold;
 	tabStyleName: tabNavigatorTab;
 	color: #FFFFFF;
@@ -910,10 +913,12 @@ Accordion {
 	fontFamily: "Arial Rounded MT Bold";
 	fontSize: 14;
 }
+/*
 DateChooser
 {
 	headerStyleName: dateChooserHeader;
 }
+*/
 	.dateChooserHeader
 	{
 		color: #1B1919;
