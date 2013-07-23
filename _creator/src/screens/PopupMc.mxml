@@ -82,6 +82,9 @@
 				else randomizeBox.selected = true;
 				/* Load Question Text */
 				qField.text = node.data.question;
+				// qField.opaqueBackground = 0xfef6b1;
+				// qField.opaqueBackground = 0xfffdef;
+				qField.opaqueBackground = 0xe2edf4;
 				if(!qField.text.length) qField.text = DEFAULT_TEXT;
 				updateQuestionColor();
 				/* Load Answers */
@@ -97,7 +100,6 @@
 					else if(node.data.answers.length == 0) addAnswerForNode(node.children[0]);
 					trace("Added a new node");
 				}
-				qField.setFocus();
 				/* Create the "Add Answer" Button */
 				addAnswerButton = new AdventureButton();
 				addAnswerButton.usePlus = true;
@@ -205,18 +207,12 @@
 			protected function saveAnswers():void
 			{
 				// var scoreMode:int = _node.displayNode.displayTree.scoreStyle;
-			/*
-
-			==================================
-			This method will likely be removed or cleared for destination mode Adventure.
-
-			*/
 				var row:MultipleChoiceRow;
 				for(var i:int = 0; i < mcList.numChildren; i++)
 				{
 					row = MultipleChoiceRow(mcList.getChildAt(i))
 					trace("saving row text: " + row.text);
-					_node.data.answers[i + rowOffset].text = row.text;
+					_node.data.answers[i + rowOffset].text = row.text == MultipleChoiceRow.DEFAULT_ANS_TEXT ? "" : row.text;
 					// TODO: add scoring option
 					// _node.data.answers[i].value = MultipleChoiceRow(mcList.getChildAt(i)).value;
 					_node.data.answers[i + rowOffset].options.link = row.destination.id;
@@ -246,14 +242,10 @@
 			protected function updateAddAnswerButton(isNew:Boolean = false):void
 			{
 				if(addAnswerButton == null) return;
-				var targetPoint:Point = addAnswerButton.parent.globalToLocal(answerVBox.localToGlobal(new Point(0, 0)));
-
-				// There's something screwy that happens when targetPoint references ScrollCanvas, so instead we use answerVBox as the anchor
-				// and manually drop the button to where it should be.
-				var targetPointCorrection:Number = 58;
+				var targetPoint:Point = addAnswerButton.parent.globalToLocal(scrollCanvas.localToGlobal(new Point(0, 0)));
 
 				addAnswerButton.x = targetPoint.x + addAnswerButton.padding;
-				addAnswerButton.y = targetPoint.y + Math.min(( mcList.numChildren * (mcList.getStyle("verticalGap") + MultipleChoiceRow.rowHeight)), scrollCanvas.height) + addAnswerButton.padding + 1 + targetPointCorrection;
+				addAnswerButton.y = targetPoint.y + Math.min(( mcList.numChildren * (mcList.getStyle("verticalGap") + MultipleChoiceRow.rowHeight)), scrollCanvas.height) + addAnswerButton.padding + 1;
 			}
 			public override function destroy():void
 			{
@@ -304,37 +296,53 @@
 				_layout = layout;
 				switch(layout)
 				{
+					case AdventureOptions.LAYOUT_TEXT_ONLY:
+						//if(swapContainer.parent == questionHBox) questionHBox.removeChild(swapContainer);
+						if(imageContainer.parent == questionHBox) questionHBox.removeChild(imageContainer);
+						contentHBox.addChildAt(addImageButton, 1);
+						layoutButton2.setStyle('borderStyle', 'none');
+						layoutButton3.setStyle('borderStyle', 'none');
+						layout2ButtonOverlay.visible = false;
+						layout3ButtonOverlay.visible = false;
+						callLater(updateLayoutsWindowVisibility, [false]);
+						break;
 					case AdventureOptions.LAYOUT_HORIZ_TEXT:
 						if(addImageButton.parent == contentHBox) contentHBox.removeChild(addImageButton);
 						questionHBox.addChildAt(qField, 1);
-						questionHBox.addChildAt(swapContainer, 2);
+						//questionHBox.addChildAt(swapContainer, 2);
 						questionHBox.addChildAt(imageContainer, 3);
 						updateImage(_node.data.options.assetId);
-						callLater(updateDeleteImageButton, [true]);
+						layoutButton2.setStyle('borderStyle', 'solid');
+						layoutButton3.setStyle('borderStyle', 'none');
+						layout2ButtonOverlay.visible = true;
+						layout3ButtonOverlay.visible = false;
+						callLater(updateLayoutsWindowVisibility, [true]);
 						break;
 					case AdventureOptions.LAYOUT_HORIZ_IMAGE:
 						if(addImageButton.parent == contentHBox) contentHBox.removeChild(addImageButton);
 						questionHBox.addChildAt(imageContainer, 1);
-						questionHBox.addChildAt(swapContainer, 2);
+						// questionHBox.addChildAt(swapContainer, 2);
 						questionHBox.addChildAt(qField, 3);
 						updateImage(_node.data.options.assetId);
-						callLater(updateDeleteImageButton, [true]);
-						break;
-					case AdventureOptions.LAYOUT_TEXT_ONLY:
-						if(swapContainer.parent == questionHBox) questionHBox.removeChild(swapContainer);
-						if(imageContainer.parent == questionHBox) questionHBox.removeChild(imageContainer);
-						contentHBox.addChildAt(addImageButton, 1);
-						callLater(updateDeleteImageButton, [false]);
+						layoutButton2.setStyle('borderStyle', 'none');
+						layoutButton3.setStyle('borderStyle', 'solid');
+						layout2ButtonOverlay.visible = false;
+						layout3ButtonOverlay.visible = true;
+						callLater(updateLayoutsWindowVisibility, [true]);
 						break;
 				}
 			}
-			private function updateDeleteImageButton(visible:Boolean):void
+			private function updateLayoutsWindowVisibility(visible:Boolean):void
 			{
+				layoutsWindow.visible = visible;
+				layoutsWindow.includeInLayout = visible;
+				/*
 				deleteImageButton.visible = visible;
 				var point:Point = deleteImageButton.parent.globalToLocal(imageContainer.localToGlobal(new Point(nodeImg.x, nodeImg.y)));
 				deleteImageButton.x = point.x + nodeImg.width - deleteImageButton.width - AdventureButton.ANCHOR_PADDING;
 				deleteImageButton.y = point.y + nodeImg.height - getStyle("headerHeight") + AdventureButton.ANCHOR_PADDING;
 				addChild(deleteImageButton); // bring to front
+				*/
 				updateChangeImageButton();
 			}
 			private function updateChangeImageButton():void
@@ -344,8 +352,8 @@
 				imageContainer.mouseChildren = imageContainer.mouseEnabled;
 				if(changeImageButton.visible)
 				{
-					changeImageButton.y = deleteImageButton.y;
-					changeImageButton.x = deleteImageButton.x - changeImageButton.width - AdventureButton.ANCHOR_PADDING * 2 - 10;
+					// changeImageButton.y = deleteImageButton.y;
+					// changeImageButton.x = deleteImageButton.x - changeImageButton.width - AdventureButton.ANCHOR_PADDING * 2 - 10;
 					addChild(changeImageButton); // bring to front
 				}
 			}
@@ -549,24 +557,17 @@
 			}
 		]]>
 	</mx:Script>
-	<components:AdventureButton id="deleteImageButton" visible="false" anchored="true" label="Remove" click="{setLayout(AdventureOptions.LAYOUT_TEXT_ONLY);}" />
 	<components:AdventureButton id="changeImageButton" visible="false" anchored="true" label="Change Image" click="{loadImage(event);}" />
 	<mx:VBox top="20" bottom="{20 + 40}" left="20" right="20">
 		<!-- <mx:VBox top="20" left="20" right="20"> -->
-		<mx:HBox id="contentHBox" width="100%" height="40%">
+		<mx:HBox id="contentHBox" width="100%" height="45%" paddingBottom="15">
 			<mx:Canvas id="fieldCanvas" styleName="fieldCanvas" width="100%" height="100%"> <!-- Contains the Icon and Question -->
-				<mx:Label styleName="stickyNote" id="questionSticky"  top="0" left="115" text="QUESTION:"
-						  initialize="{
-							  (questionSticky.mx_internal::getTextField() as UITextField).background = true;
-							  (questionSticky.mx_internal::getTextField() as UITextField).backgroundColor = 0xfef6b1
-						  }"
-						  />
 				<mx:HBox id="questionHBox" top="30" bottom="20" left="10" right="20">
 					<mx:VBox height="100%" verticalGap="0" horizontalAlign="center">
 						<components:DestinationBox id="nodeBox" minWidth="75" height="75"/>
 					</mx:VBox>
 					<mx:Spacer width="10" height="100%" />
-					<mx:TextArea borderSkin="assets.DottedBorder" styleName="field" id="qField" text="{DEFAULT_TEXT}" width="100%" height="100%"
+					<mx:TextArea styleName="field" id="qField" text="{DEFAULT_TEXT}" width="100%" height="100%"
 								 focusIn="{
 								 	if(qField.text == DEFAULT_TEXT) {
 								 		qField.text = '';
@@ -580,28 +581,6 @@
 								 	}
 								 }"
 					/>
-					<!-- Swap Icon -->
-					<mx:Canvas id="swapContainer" width="36" height="100%">
-						<mx:Image id="swapButton"
-								  verticalCenter="0"
-								  horizontalCenter="0"
-								  source="@Embed(source='../assets/swap.png')"
-								  click="{if(_layout == AdventureOptions.LAYOUT_HORIZ_TEXT) setLayout(AdventureOptions.LAYOUT_HORIZ_IMAGE) else setLayout(AdventureOptions.LAYOUT_HORIZ_TEXT);}"
-								  mouseOver="{applyShade(1.1);}"
-								  mouseOut="{applyShade(1);}"
-								  mouseDown="{applyShade(0.8);}"
-								  mouseUp="{applyShade(1.1);}"
-								  >
-							<mx:Script>
-								<![CDATA[
-									private function applyShade(val:Number):void
-									{
-										swapButton.transform.colorTransform = new ColorTransform(val,val,val,Math.max(val,1));
-									}
-								]]>
-							</mx:Script>
-						</mx:Image>
-					</mx:Canvas>
 					<!-- Image Container -->
 					<mx:Canvas id="imageContainer" styleName="field" width="100%" height="100%" click="{loadImage(event);}" borderSkin="assets.DottedBorder">
 						<components:AdventureImage id="nodeImg" width="100%" height="100%" />
@@ -611,10 +590,30 @@
 			<!-- Add Image Button -->
 			<components:AdventureButton id="addImageButton" usePlus="true" label="Add&#13;Image"
 					   width="90" height="60" click="{setLayout(AdventureOptions.LAYOUT_HORIZ_TEXT)}"/>
+			<mx:Canvas id="layoutsWindow" backgroundColor="0x7299b5" width="80" height="185">
+				<mx:Label fontFamily="Arial MT Bold" fontSize="12" color="0xffffff" text="Layouts:" top="1" horizontalCenter="0" />
+				<mx:VBox id="layoutButtons" backgroundColor="0xffffff" width="78" height="164" left="1" top="20"
+						 verticalGap="4" horizontalAlign="center" verticalAlign="middle">
+					<mx:Canvas id="layoutButton1" styleName="layoutCanvas" click="setLayout(AdventureOptions.LAYOUT_TEXT_ONLY)">
+						<mx:Image source="@Embed(source='../assets/mcLayout1.png')" verticalCenter="0" horizontalCenter="0" />
+						<mx:Container id="textOnlyOverlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+					</mx:Canvas>
+					<mx:Canvas id="layoutButton2" styleName="layoutCanvas" click="setLayout(AdventureOptions.LAYOUT_HORIZ_TEXT)">
+						<mx:Image source="@Embed(source='../assets/narrativeLayout1.png')" verticalCenter="0" horizontalCenter="0" />
+						<mx:Container id="layout2ButtonOverlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+					</mx:Canvas>
+					<mx:Canvas id="layoutButton3" styleName="layoutCanvas" click="setLayout(AdventureOptions.LAYOUT_HORIZ_IMAGE)">
+						<mx:Image source="@Embed(source='../assets/narrativeLayout2.png')" verticalCenter="0" horizontalCenter="0" />
+						<mx:Container id="layout3ButtonOverlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+					</mx:Canvas>
+				</mx:VBox>
+				<mx:filters>
+					<mx:DropShadowFilter color="#000000" distance="4" angle="90" blurX="8" blurY="6" alpha=".25" />
+				</mx:filters>
+			</mx:Canvas>
 		</mx:HBox> <!-- #contentHBox -->
-		<mx:VBox id="answerVBox" width="100%" height="60%">
+		<mx:VBox id="answerVBox" width="100%" height="55%">
 			<mx:Label id="answerInstructions" text="Enter Possible Answers Below" styleName="heading" />
-			<mx:CheckBox id="randomizeBox" label="Randomize Order" selected="true" />
 			<mx:Canvas id="headings" width="100%">
 				<mx:Label left="0" color="0x222222" text="Possible Answers to Question:" />
 				<mx:Label id="destinationHeaderLabel" color="0x222222" text="Destination:" />
@@ -625,6 +624,7 @@
 					<mx:VBox id="mcList" styleName="mcList" width="100%" height="100%"/> <!-- Multiple Choice List -->
 				</mx:Canvas>
 			</mx:VBox>
+			<mx:CheckBox id="randomizeBox" label="Randomize Order" selected="true" />
 		</mx:VBox>
 	</mx:VBox>
 	<components:AdventureButton id="doneButton" bottom="10" right="20" label="Done" click="{hide();}" />

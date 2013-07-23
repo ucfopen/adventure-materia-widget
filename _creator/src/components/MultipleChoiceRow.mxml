@@ -24,6 +24,8 @@
 			//  Public Fields
 			//
 			//------------------------------------------------------------------
+			public static const DEFAULT_ANS_TEXT:String = "Enter possible answer here.";
+			public static const DEFAULT_FEEDBACK_TEXT:String = "Enter optional feedback here.";
 			private static const NODE_BOX_RADIUS:Number = 22;
 			[Bindable]
 			public static var rowHeight:Number = 56;
@@ -54,7 +56,7 @@
 			 * The node we're going to
 			 */
 			private var _destination:Node;
-			private var _feedbackField:TextArea;
+			// private var _feedbackField:TextArea;
 			private var _feedbackText:String;
 			private var _creationIsComplete:Boolean = false;
 			//------------------------------------------------------------------
@@ -86,7 +88,7 @@
 				_destination = val;
 				updateDestinationBox();
 			}
-			public function get feedback():String { return _feedbackField == null ? null : _feedbackField.text }
+			public function get feedback():String { return _feedbackField.text == DEFAULT_FEEDBACK_TEXT ? null : _feedbackField.text }
 			public function set feedback(value:String):void
 			{
 				_feedbackText = value;
@@ -109,9 +111,12 @@
 			}
 			private function onCreationComplete():void
 			{
+				updateAnswerColor();
 				updateDestinationBox();
 				updateAnswerFields();
 				answerField.restrict = "^\u0001-\u0008\u000B-\u001F";
+				// answerField.opaqueBackground = 0xfffdef;
+				// answerField.opaqueBackground = 0xd6dfe5;
 				//shortAnswerField.restrict = "^\u0001-\u0008\u000B-\u001F";
 				_creationIsComplete = true;
 				initFeedback();
@@ -126,20 +131,16 @@
 					_pendingText = "";
 				}
 			}
+
 			private function initFeedback():void
 			{
 				if(_feedbackText != null && _feedbackText.length)
 				{
-					expandFeedback();
 					_feedbackField.text = _feedbackText;
 				}
-				else if(_feedbackField != null && _feedbackField.parent != null)
-				{
-					feedbackCanvas.width = 160;
-					feedbackCanvas.removeChild(_feedbackField);
-					feedbackCanvas.addChildAt(feedbackButton, 0);
-				}
+				updateFeedbackColor();
 			}
+
 			private function updateDestinationBox():void
 			{
 				if(destCanvas != null) destCanvas.setTargetNode(_destination, NODE_BOX_RADIUS);
@@ -211,63 +212,53 @@
 						break;
 				}
 			}
-			private function expandFeedback(focus:Boolean = false):void
-			{
-				feedbackCanvas.width = 280;
-				feedbackCanvasContainer.width = 350;
-				//feedbackStack.selectedChild = feedbackFieldContainer;
-				_feedbackField = new TextArea();
-				_feedbackField.id = "_feedbackField";
-				_feedbackField.styleName = "darkText";
-				_feedbackField.setStyle("fontSize", 16);
-				_feedbackField.setStyle("borderSides", "");
-				_feedbackField.setStyle("borderSkin", DottedBorder);
-				_feedbackField.width = feedbackCanvas.width;
-				_feedbackField.height = feedbackCanvas.height;
-				_feedbackField.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false, 0, true);
-				_feedbackField.addEventListener(FocusEvent.FOCUS_OUT, onFeedbackFocusOut, false, 0, true);
-				feedbackCanvas.removeChildAt(0);
-				feedbackCanvas.addChild(_feedbackField);
-				if(focus) _feedbackField.setFocus();
-			}
-			private function onFeedbackFocusOut(e:Event):void
-			{
-				if(_feedbackField.text.length == 0)
-				{
-					contractFeedback();
-				}
-			}
-			private function contractFeedback():void
-			{
-				if(_feedbackField == null) return;
-				feedbackCanvas.width = 160;
-				feedbackCanvasContainer.width = 230;
-				_feedbackField.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
-				_feedbackField.removeEventListener(FocusEvent.FOCUS_OUT, onFeedbackFocusOut);
-				feedbackCanvas.removeChild(_feedbackField);
-				feedbackCanvas.addChild(feedbackButton);
-			}
+
 			private function get displayTree():DisplayTree
 			{
 				return node.displayNode.displayTree;
+			}
+
+			private function updateAnswerColor():void
+			{
+				answerField.setStyle("color", answerField.text == DEFAULT_ANS_TEXT ? "#a5a5a5" : "#505050");
+			}
+
+			private function updateFeedbackColor():void
+			{
+				_feedbackField.setStyle("color", _feedbackField.text == DEFAULT_FEEDBACK_TEXT ? "#a5a5a5" : "#505050");
 			}
 		]]>
 	</mx:Script>
 	<mx:HBox id="mainHBox" borderStyle="solid" borderSides="bottom" borderThickness="1" borderColor="#CCCCCC" width="100%" height="100%" horizontalGap="0">
 		<!-- Answer -->
-		<mx:TextArea id="answerField" borderSkin="assets.DottedBorder" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)"/>
+		<mx:TextArea id="answerField" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)" text="{DEFAULT_ANS_TEXT}" focusIn="{
+								 	if(answerField.text == DEFAULT_ANS_TEXT) {
+								 		answerField.text = '';
+								 		updateAnswerColor();
+								 	}
+								 }"
+								 focusOut="{
+								 	if(!answerField.text.length) {
+								 		answerField.text = DEFAULT_ANS_TEXT;
+								 		updateAnswerColor();
+								 	}
+								 }"
+		/>
 		<components:ShortAnswerAreaNew id="shortAnswerField" borderSkin="assets.DottedBorder" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)"/>
 		<!-- Feedback -->
-		<mx:HBox id="feedbackCanvasContainer" width="230" height="100%" horizontalGap="0" backgroundColor="#ffffff">
-			<mx:Canvas borderSkin="assets.DottedBorder" borderSides="left"
-					   id="feedbackCanvas" width="160" height="100%">
-				<components:AdventureButton id="feedbackButton" label="Add&#13;Feedback"
-						   width="112" height="40" usePlus="true"
-						   x="{(feedbackCanvas.width-feedbackButton.width)/2}"
-						   y="{(feedbackCanvas.height-feedbackButton.height)/2}"
-						   click="expandFeedback(true);"/>
-			</mx:Canvas>
-			<!-- Destination Node -->
+		<mx:HBox id="feedbackCanvasContainer" width="350" height="100%" horizontalGap="0" backgroundColor="#ffffff">
+			<mx:TextArea id="_feedbackField" styleName="darkTextLight" width="280" height="100%" fontSize="14" text="{DEFAULT_FEEDBACK_TEXT}" borderSkin="assets.DottedBorder" focusIn="{
+								 	if(_feedbackField.text == DEFAULT_FEEDBACK_TEXT) {
+								 		_feedbackField.text = '';
+								 		updateFeedbackColor();
+								 	}
+								 }"
+								 focusOut="{
+								 	if(!_feedbackField.text.length) {
+								 		_feedbackField.text = DEFAULT_FEEDBACK_TEXT;
+								 		updateFeedbackColor();
+								 	}
+								 }" />
 			<components:DestinationBox id="destCanvas"
 									   styleName="miniBox"
 									   width="70" height="100%"

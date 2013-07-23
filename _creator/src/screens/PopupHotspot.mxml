@@ -280,12 +280,6 @@
 			<!-- Title, Text, Button -->
 			<mx:Canvas id="fieldCanvas" styleName="fieldCanvas" width="100%">
 			 	<!-- Contains the Icon and Question -->
-				<mx:Label styleName="stickyNote" id="questionSticky"  top="0" left="105" text="INSTRUCTIONS:"
-						  initialize="{
-						  (questionSticky.mx_internal::getTextField() as UITextField).background = true;
-						  (questionSticky.mx_internal::getTextField() as UITextField).backgroundColor = 0xfef6b1
-						  }"
-						  />
 				<mx:HBox top="30" bottom="20" left="10" right="20" horizontalGap="20">
 					<components:DestinationBox id="nodeBox" minWidth="75" height="75"/>
 					<mx:TextArea borderSkin="assets.DottedBorder" styleName="smallerField" id="qField" text="{DEFAULT_TEXT}" width="100%" height="100%"
