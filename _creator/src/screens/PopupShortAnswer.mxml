@@ -83,6 +83,7 @@
 				_defaultChoice.setStyle("borderStyle", "solid");
 				_defaultChoice.setStyle("backgroundColor", "#a7a7a7");
 				_defaultChoice.answerField.setStyle("disabledColor", "#535353");
+				_defaultChoice.answerField.setStyle("fontSize", "14");
 				_defaultChoice.answerField.setStyle("fontWeight", "bold");
 				_defaultChoice.answerField.text = DEFAULT_CHOICE_TEXT;
 				_defaultChoice.answerField.enabled = false;

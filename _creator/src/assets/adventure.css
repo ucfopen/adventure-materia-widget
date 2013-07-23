@@ -87,7 +87,22 @@
 	color: #272727;
 	font-family: "Arial MT Bold";
 	gap: 2;
-	borderSides: left;
+	/* borderSides: top, bottom, left, right; */
+	border-style:solid;
+	border-color:#bbd0de;
+	border-thickness:1;
+	corner-radius:2;
+	border-sides: top, bottom, left, right;
+	background-color:#f5f8fa;
+}
+.darkTextLight {
+	color: #272727;
+	font-family: "Arial MT Bold";
+	gap: 2;
+	/* borderSides: top, bottom, left, right; */
+	border-style:solid;
+	corner-radius:2;
+	border-sides: top, bottom, left, right;
 }
 .heading {
 	color: #272727;
@@ -150,9 +165,14 @@
 	color:#a5a5a5;
 	font-size:30;
 	font-family:"Arial MT Bold";
-	border-style:inset;
+	/*border-style:inset;*/
 	gap: 2;
-	borderSides: top, bottom, left, right;
+	border-style:solid;
+	border-color:#bbd0de;
+	border-thickness:1;
+	corner-radius:2;
+	border-sides: top, bottom, left, right;
+	background-color:#f5f8fa;
 }
 .smallerField {
 	color:#a5a5a5;

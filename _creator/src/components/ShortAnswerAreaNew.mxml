@@ -20,7 +20,7 @@
 	private var LINE_HEIGHT:Number = 24;
 	private var H_SPACING:Number = 5;
 	private var TEXTFORMAT_DEFAULT:TextFormat = new TextFormat("Arial", 18, 0);
-	private var LINE_LENGTH:Number = 74;
+	private var LINE_LENGTH:Number = 66;
 	[Bindable]
 	private var SCROLL_WIDTH:Number = 18;
 	//--------------------------------------------------------------------------
@@ -260,7 +260,7 @@
 
 ]]>
 </mx:Script>
-	<mx:Canvas id="answersContainer" top="{PADDING}" left="{PADDING}" right="{PADDING}" bottom="{PADDING}" width="100%">
+	<mx:Canvas id="answersContainer" top="{PADDING}" left="{PADDING}" right="{PADDING}" bottom="{PADDING}" width="100%" borderStyle="solid" borderColor="#bbd0de" backgroundColor="#f5f8fa">
 		<mx:UIComponent id="answerTokensBox" left="0" right="{SCROLL_WIDTH}" height="100%"/>
 	</mx:Canvas>
 </mx:Canvas>
