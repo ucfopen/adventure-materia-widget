@@ -110,6 +110,14 @@
 	font-size: 16;
 	font-weight: bold;
 }
+.headingTab {
+	padding-left:10;
+	padding-right:10;
+	background-color:#e3e3e3;
+	border-style:solid;
+	border-sides:top, left, right;
+	border-color:#d4d4d4;
+}
 .typeChoice {
 	corner-radius: 10;
 	border-color: #e5e5e5;
