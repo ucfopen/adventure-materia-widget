@@ -468,6 +468,7 @@
 			}
 			protected function showDeleteButton(row:MultipleChoiceRow):void
 			{
+				trace("PopupMC::showDeleteButton()");
 				_deleteTarget = row;
 				var position:Point = row.localToGlobal(new Point(0, 0));
 				deleteButton.x = position.x - deleteButton.height;// + row.feedbackCanvas.x - deleteButton.width;
@@ -475,16 +476,25 @@
 				deleteButton.visible = true;
 				/* get reference to the node this answer row is pointing to */
 				var childNode:Node = _node.children[row.rowIndex + rowOffset];
-				/* if this row's target node has children */
-				if(deleteButton.enabled && (!childNode.isEmpty || childNode.children.length))
+
+				/* if this row's target node has children OR the row is the only one remaining */
+				if(deleteButton.enabled && (!childNode.isEmpty || childNode.children.length || (row.rowIndex == 0 && mcList.numChildren == 1)))
 				{
 					/* disable the delete button */
 					deleteButton.enabled = false;
 					deleteButton.transform.colorTransform = new ColorTransform(.7, .7, .7, .5, -0x44);
-					ToolTip.add(deleteButton, "Only new/empty destinations can be deleted here. Please delete from tree view.", {xOffset: -deleteButton.height / 2, yOffset: -deleteButton.height * 2});
+
+					if (!row.rowIndex && mcList.numChildren == 1)
+					{
+						ToolTip.add(deleteButton, "This node requires at least one answer!", {xOffset: -deleteButton.height / 2, yOffset: -deleteButton.height * 2});
+					}
+					else
+					{
+						ToolTip.add(deleteButton, "Only new/empty destinations can be deleted here. Please delete from tree view.", {xOffset: -deleteButton.height / 2, yOffset: -deleteButton.height * 2});
+					}
 				}
 				/* otherwise, this row's target node node is "new" */
-				else if(!deleteButton.enabled && childNode.isEmpty)
+				else if(!deleteButton.enabled && childNode.isEmpty && row.rowIndex != 0)
 				{
 					/* enable the delete button */
 					deleteButton.enabled = true;
