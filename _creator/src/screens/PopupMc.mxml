@@ -44,7 +44,6 @@
 			{
 				super.onCreationComplete();
 				this.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 1, true);
-				answerVBox.removeChild(answerInstructions);
 				_sidePanel.visible = false;
 				removeChild(deleteButton);
 				deleteButton.rotation = -90;
@@ -117,8 +116,8 @@
 				// TODO: Update for participationMode
 
 				// These values are now fixed because of the change to Destination Mode only.
-				scoreHeaderLabel.visible = false;
-				destinationHeaderLabel.setStyle("right", 10);
+				// scoreHeaderLabel.visible = false;
+				// destinationHeaderLabel.setStyle("right", 10);
 
 				// scoreHeaderLabel.visible = true;
 				// destinationHeaderLabel.setStyle("right", 110);
@@ -352,8 +351,9 @@
 				imageContainer.mouseChildren = imageContainer.mouseEnabled;
 				if(changeImageButton.visible)
 				{
-					// changeImageButton.y = deleteImageButton.y;
-					// changeImageButton.x = deleteImageButton.x - changeImageButton.width - AdventureButton.ANCHOR_PADDING * 2 - 10;
+					var point:Point = changeImageButton.parent.globalToLocal(imageContainer.localToGlobal(new Point(nodeImg.x, nodeImg.y)));
+					changeImageButton.x = point.x + nodeImg.width - changeImageButton.width - AdventureButton.ANCHOR_PADDING;
+					changeImageButton.y = point.y + nodeImg.height - getStyle("headerHeight") + AdventureButton.ANCHOR_PADDING;
 					addChild(changeImageButton); // bring to front
 				}
 			}
@@ -442,7 +442,6 @@
 				{
 					// Find correct position for delete button
 					var targetPoint:Point = deleteButton.parent.globalToLocal(scrollCanvas.localToGlobal(new Point(0, 0)));
-	//				deleteButton.y = targetPoint.y - scrollCanvas.verticalScrollPosition + Math.min((_deleteTarget.rowIndex + 1 ) * (mcList.getStyle("verticalGap") + MultipleChoiceRow.rowHeight), scrollCanvas.height) + 1;
 					deleteButton.y = targetPoint.y - scrollCanvas.verticalScrollPosition + (_deleteTarget.rowIndex + 1) * (mcList.getStyle("verticalGap") + MultipleChoiceRow.rowHeight);
 					// Hide delete button if off-screen
 					if(deleteButton.y > targetPoint.y + scrollCanvas.height + MultipleChoiceRow.rowHeight /2 || deleteButton.y < targetPoint.y + MultipleChoiceRow.rowHeight / 2) deleteButton.visible = false;
@@ -450,7 +449,6 @@
 					trace("deleteY: " + (deleteButton.y - targetPoint.y));
 				}
 				// Put the add answer button where it needs to go
-				trace("Add answer button being updated from: onScrollCanvasUpdate (PopupMc)");
 				updateAddAnswerButton();
 				// Reset the flag allowing more listeners to be added
 				_scrollUpdatePending = false;
@@ -622,18 +620,29 @@
 				</mx:filters>
 			</mx:Canvas>
 		</mx:HBox> <!-- #contentHBox -->
-		<mx:VBox id="answerVBox" width="100%" height="55%">
-			<mx:Label id="answerInstructions" text="Enter Possible Answers Below" styleName="heading" />
-			<mx:Canvas id="headings" width="100%">
+		<mx:VBox id="answerVBox" width="100%" height="55%" verticalGap="0">
+			<mx:HBox id="headings" width="100%" bottom="0">
+				<mx:HBox styleName="headingTab">
+					<mx:Label left="0" color="0x222222" text="Possible Answers to Question:" />
+				</mx:HBox>
+				<mx:Spacer width="100%" />
+				<mx:HBox id="destinationHeaderLabel" styleName="headingTab">
+					<mx:Label color="0x222222" text="Destination:" />
+				</mx:HBox>
+			</mx:HBox>
+			<!--
+			<mx:Canvas id="headings" width="100%" styleName="headingsBar">
 				<mx:Label left="0" color="0x222222" text="Possible Answers to Question:" />
 				<mx:Label id="destinationHeaderLabel" color="0x222222" text="Destination:" />
 				<mx:Label id="scoreHeaderLabel" right="44" color="0x222222" text="Score" />
 			</mx:Canvas>
+			-->
 			<mx:VBox id="scrollCanvasContainer" width="100%" height="100%" verticalGap="0">
 				<mx:Canvas id="scrollCanvas" width="100%" height="100%" verticalScrollPolicy="on" scroll="listenForScrollUpdate()">
 					<mx:VBox id="mcList" styleName="mcList" width="100%" height="100%"/> <!-- Multiple Choice List -->
 				</mx:Canvas>
 			</mx:VBox>
+			<mx:Spacer height="10" width="100%" />
 			<mx:CheckBox id="randomizeBox" label="Randomize Order" selected="true" />
 		</mx:VBox>
 	</mx:VBox>
