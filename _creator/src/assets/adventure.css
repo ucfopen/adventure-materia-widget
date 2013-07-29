@@ -188,7 +188,12 @@
 	font-family:"Arial MT Bold";
 	border-style:inset;
 	gap: 2;
-	borderSides: top, bottom, left, right;
+	border-style:solid;
+	border-color:#bbd0de;
+	border-thickness:1;
+	corner-radius:2;
+	border-sides: top, bottom, left, right;
+	background-color:#f5f8fa;
 }
 .stickyNote {
 	color:#575757;
