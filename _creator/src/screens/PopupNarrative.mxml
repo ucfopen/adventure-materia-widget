@@ -525,7 +525,7 @@
 		]]>
 	</mx:Script>
 	<!-- Layout Column - relocated to sidePanel on creationComplete -->
-	<mx:VBox id="layoutCol" verticalGap="{PADDING_V * 2}" width="90" clipContent="false">
+	<mx:VBox id="layoutCol" verticalGap="{PADDING_V * 2}" width="100" clipContent="false">
 		<mx:VBox id="metaVBox" verticalGap="0" width="100%">
 			<components:DestinationBox id="nodeBox" minWidth="75" height="75"/>
 			<mx:Spacer height="10" />
@@ -555,7 +555,7 @@
 				<mx:DropShadowFilter color="#000000" distance="4" angle="90" blurX="8" blurY="6" alpha=".25" />
 			</mx:filters>
 		</mx:Canvas>
-		<mx:VBox id="destHolder" width="90" height="100%" horizontalAlign="center" paddingRight="13">
+		<mx:VBox id="destHolder" width="100" height="100%" horizontalAlign="center" paddingRight="10">
 			<mx:Text styleName="greyText" width="100%" textAlign="center" selectable="false" text="Destination:" />
 			<components:DestinationBox id="destCanvas" minWidth="70" height="75" click="onDestClick()" />
 		</mx:VBox>
