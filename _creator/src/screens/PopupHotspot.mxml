@@ -21,7 +21,7 @@
 		import flash.external.ExternalInterface;
 
 			use namespace mx_internal;
-			private static const DEFAULT_TEXT:String = "Enter instructions here.";
+			private static const DEFAULT_TEXT:String = "Enter optional instructions here.";
 			private static const DEFAULT_NO_TEXT:String = "No instructions provided for this image.";
 			private var _layout:int;
 			private var _scaleBeforeChange:Number = -1;
