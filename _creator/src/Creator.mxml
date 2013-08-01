@@ -390,14 +390,13 @@
 			// Check for a valid items
 			//if (_scoreStyle == AdventureOptions.SCORESTYLE_DESTINATION)
 			//{
-				if (!_adventureTree.validateEndNodes())
+				if (mode == "publish" && !_adventureTree.validateEndNodes())
 				{
 					Alert.show("One or more question branches are missing an end point. With the Destination score style, every possible path must finish with an end point.","Can't publish quite yet...");
 					ExternalInterface.call("__materia_flash_cancelSave");
 					return;
 				}
 			//}
-
 
 			// Build data to save
 			var title:String = instanceTitle.length ? instanceTitle : DEFAULT_TITLE;
