@@ -81,9 +81,6 @@
 				else randomizeBox.selected = true;
 				/* Load Question Text */
 				qField.text = node.data.question;
-				// qField.opaqueBackground = 0xfef6b1;
-				// qField.opaqueBackground = 0xfffdef;
-				qField.opaqueBackground = 0xe2edf4;
 				if(!qField.text.length) qField.text = DEFAULT_TEXT;
 				updateQuestionColor();
 				/* Load Answers */
