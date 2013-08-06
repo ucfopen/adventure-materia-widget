@@ -1136,17 +1136,26 @@ public class DisplayTree extends Sprite
 		_hoverHotspot.x = point.x - r;
 		_hoverHotspot.y = point.y - r;
 		var bufferRoom:int = 10;
-		_hoverHotspot.graphics.beginFill(0, 0);
+		_hoverHotspot.graphics.beginFill(0x000000, 0);
 		_hoverHotspot.graphics.moveTo(0, 0);
 		_hoverHotspot.graphics.lineTo(r - prependWidth / 2, 0);
 		_hoverHotspot.graphics.lineTo(r - prependWidth / 2, -prependHeight);
 		_hoverHotspot.graphics.lineTo(r + prependWidth / 2, -prependHeight);
 		_hoverHotspot.graphics.lineTo(r + prependWidth / 2, 0);
 		_hoverHotspot.graphics.lineTo(r * 2, 0);
-		_hoverHotspot.graphics.lineTo(toolbarPos.x + _nodeToolbar.width - _hoverHotspot.x + bufferRoom, toolbarPos.y +  - _hoverHotspot.y);
-		_hoverHotspot.graphics.lineTo(toolbarPos.x + _nodeToolbar.width - _hoverHotspot.x + bufferRoom, toolbarPos.y +  _nodeToolbar.height - _hoverHotspot.y + bufferRoom);
-		_hoverHotspot.graphics.lineTo(toolbarPos.x - _hoverHotspot.x - bufferRoom, toolbarPos.y +  _nodeToolbar.height - _hoverHotspot.y + bufferRoom);
-		_hoverHotspot.graphics.lineTo(toolbarPos.x - _hoverHotspot.x - bufferRoom, toolbarPos.y - _hoverHotspot.y);
+		// toolbars aren't active in linkEditMode, so draw without them when it's turned on
+		if (!linkEditMode)
+		{
+			_hoverHotspot.graphics.lineTo(toolbarPos.x + _nodeToolbar.width - _hoverHotspot.x + bufferRoom, toolbarPos.y +  - _hoverHotspot.y);
+			_hoverHotspot.graphics.lineTo(toolbarPos.x + _nodeToolbar.width - _hoverHotspot.x + bufferRoom, toolbarPos.y +  _nodeToolbar.height - _hoverHotspot.y + bufferRoom);
+			_hoverHotspot.graphics.lineTo(toolbarPos.x - _hoverHotspot.x - bufferRoom, toolbarPos.y +  _nodeToolbar.height - _hoverHotspot.y + bufferRoom);
+			_hoverHotspot.graphics.lineTo(toolbarPos.x - _hoverHotspot.x - bufferRoom, toolbarPos.y - _hoverHotspot.y);
+		}
+		else
+		{
+			_hoverHotspot.graphics.lineTo(r * 2, prependHeight);
+			_hoverHotspot.graphics.lineTo(0, prependHeight);
+		}
 		_hoverHotspot.graphics.lineTo(0, 0);
 		this.addChild(_hoverHotspot);
 		_stage.addEventListener(MouseEvent.MOUSE_MOVE, onNodeMouseMove, false, 0, true);
