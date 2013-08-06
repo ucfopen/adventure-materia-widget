@@ -620,20 +620,17 @@
 		<mx:VBox id="answerVBox" width="100%" height="55%" verticalGap="0">
 			<mx:HBox id="headings" width="100%" bottom="0">
 				<mx:HBox styleName="headingTab">
-					<mx:Label left="0" color="0x222222" text="Possible Answers to Question:" />
+					<mx:Label left="0" color="0x222222" text="Possible Answers to Question" />
 				</mx:HBox>
 				<mx:Spacer width="100%" />
+				<mx:HBox styleName="headingTab">
+					<mx:Label color="0x222222" text="Feedback"/>
+				</mx:HBox>
+				<mx:Spacer width="167" />
 				<mx:HBox id="destinationHeaderLabel" styleName="headingTab">
-					<mx:Label color="0x222222" text="Destination:" />
+					<mx:Label color="0x222222" text="Destination" />
 				</mx:HBox>
 			</mx:HBox>
-			<!--
-			<mx:Canvas id="headings" width="100%" styleName="headingsBar">
-				<mx:Label left="0" color="0x222222" text="Possible Answers to Question:" />
-				<mx:Label id="destinationHeaderLabel" color="0x222222" text="Destination:" />
-				<mx:Label id="scoreHeaderLabel" right="44" color="0x222222" text="Score" />
-			</mx:Canvas>
-			-->
 			<mx:VBox id="scrollCanvasContainer" width="100%" height="100%" verticalGap="0">
 				<mx:Canvas id="scrollCanvas" width="100%" height="100%" verticalScrollPolicy="on" scroll="listenForScrollUpdate()">
 					<mx:VBox id="mcList" styleName="mcList" width="100%" height="100%"/> <!-- Multiple Choice List -->
