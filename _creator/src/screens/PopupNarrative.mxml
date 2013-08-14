@@ -39,8 +39,10 @@
 			//--------------------------------------------------------------------------
 			[Bindable]
 			protected var _nodeID:String;
+			/*
 			[Bindable]
 			private var _proceedText:String;
+			*/
 			private var _layout:int;
 			[Embed(source="../assets/image_icon.png")]
 			private static var AddImageIcon:Class;
@@ -55,13 +57,17 @@
 			//--------------------------------------------------------------------------
 			protected override function onCreationComplete():void
 			{
-				super.onCreationComplete();
+				super.init();
+				// super.onCreationComplete();
 				updateDestinationBox();
 				this.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
 				this.addEventListener(DestinationBubble.EVENT_DESTINATION_CHOICE, onDestChange, false, 0, true);
-				_sidePanel.addChild(layoutCol);
+
+				// removeChild(deleteImgBtn);
+				// _sidePanel.addChild(layoutCol);
 
 				// Add relevant helper bubbles
+				/*
 				if (!_creator.helperManager.destinationsBubble.alreadyActivated)
 				{
 					_creator.helperManager.addHelper(_creator.helperManager.destinationsBubble);
@@ -71,6 +77,7 @@
 				{
 					_creator.helperManager.addHelper(_creator.helperManager.narrativeBubble);
 				}
+				*/
 			}
 			protected override function fixImportedData(node:Node):void
 			{
@@ -118,22 +125,7 @@
 				qField.text = node.data.question;
 				if(!qField.text.length) qField.text = DEFAULT_TEXT;
 				updateQuestionColor();
-				/* Load Proceed Text */
-				if(node.data.options.proceedText != null && node.data.options.proceedText.length) _proceedText = node.data.options.proceedText;
-				else _proceedText = DEFAULT_PROCEED_TEXT;
-				proceedInput.text = _proceedText;
-				// draw the proceed button's instruction tooltip
-				labelChangeTip.graphics.beginFill(0xFEF6B1);
-				labelChangeTip.graphics.drawRoundRect(0,0,234,33, 5, 5);
-				labelChangeTip.graphics.endFill();
-				labelChangeTip.graphics.beginFill(0xFEF6B1);
-				labelChangeTip.graphics.moveTo(230,0);
-				labelChangeTip.graphics.lineTo(234,0);
-				labelChangeTip.graphics.lineTo(250,17);
-				labelChangeTip.graphics.lineTo(234,33);
-				labelChangeTip.graphics.lineTo(230,33);
-				labelChangeTip.graphics.lineTo(230,0);
-				labelChangeTip.graphics.endFill();
+
 				nodeImg.addEventListener(ScrollableSizableImage.EVENT_IMAGE_LOAD_COMPLETE, onImageLoadComplete, false, 0, true);
 				setLayout(node.data.options.layout);
 				// Set this node to the appropriate type
@@ -181,12 +173,10 @@
 				if(qField.text != DEFAULT_TEXT) _node.data.question = qField.text;
 				else _node.data.question = "";
 				_node.data.options.id = _node.id;
-				if(_proceedText == '') _proceedText = DEFAULT_PROCEED_TEXT;
-				_node.data.options.proceedText = _proceedText;
-				if(_node.data.answers.length) _node.data.answers[0].text = _proceedText;
+
 				/* Update position if necessary */
 				_tree.redraw();
-
+				/*
 				if (!_creator.helperManager.endSuggestionBubble.alreadyActivated)
 				{
 					_creator.helperManager.addHelper(_creator.helperManager.endSuggestionBubble);
@@ -207,6 +197,7 @@
 				{
 					_creator.helperManager.addHelper(_creator.helperManager.endSuggestionBubble);
 				}
+				*/
 			}
 			private function addNode(parentNode:Node):Node
 			{
@@ -220,6 +211,7 @@
 				}
 				setLayout(layout);
 			}
+			// what the fuck does this even DO?!
 			private function setButtonAppearance(t1:Canvas):void
 			{
 				var len:int = layoutButtons.numChildren;
@@ -243,87 +235,110 @@
 				_layout = layout;
 				var textOnly:Boolean = false;
 				var scale:Boolean = true;
+
+				if (layout)
+				{
+					addImageButton.visible = false;
+					addImageButton.includeInLayout = false;
+					layoutsWindow.visible = true;
+					layoutsWindow.includeInLayout = true;
+				}
+
 				switch(layout)
 				{
 					case HORIZONTAL_LEFT_TEXT:
 					{
-						currentState = "horizontal1";
-						setButtonAppearance(H1);
+						mainBox.direction = "horizontal";
+						mainBox.removeChild(imgField);
+						mainBox.removeChild(fieldSpacer);
+						qField.percentWidth=49;
+						qField.percentHeight=100;
+						imgField.percentWidth=49;
+						imgField.percentHeight=100;
+						imgField.visible = true;
+						imgField.includeInLayout = true;
+						fieldSpacer.percentWidth=2;
+						fieldSpacer.percentHeight=100;
+						mainBox.addChildAt(fieldSpacer,1);
+						mainBox.addChildAt(imgField,2);
+						//currentState = "horizontal1";
+						//setButtonAppearance(H1);
 						break;
 					}
 					case HORIZONTAL_RIGHT_TEXT:
 					{
-						currentState = "horizontal2";
-						setButtonAppearance(H2);
+						mainBox.direction = "horizontal";
+						mainBox.removeChild(qField);
+						mainBox.removeChild(fieldSpacer);
+						qField.percentWidth=49;
+						qField.percentHeight=100;
+						imgField.percentWidth=49;
+						imgField.percentHeight=100;
+						imgField.visible = true;
+						imgField.includeInLayout = true;
+						fieldSpacer.percentWidth=2;
+						fieldSpacer.percentHeight=100;
+						mainBox.addChildAt(fieldSpacer,1);
+						mainBox.addChildAt(qField,2);
+						//currentState = "horizontal2";
+						//setButtonAppearance(H2);
 						break;
 					}
 					case VERTICAL_TOP_TEXT:
 					{
-						currentState = "vertical1";
-						setButtonAppearance(V1);
+						mainBox.direction = "vertical";
+						mainBox.removeChild(imgField);
+						mainBox.removeChild(fieldSpacer);
+						qField.percentWidth=100;
+						qField.percentHeight=49;
+						imgField.percentWidth=100;
+						imgField.percentHeight=49;
+						imgField.visible = true;
+						imgField.includeInLayout = true;
+						fieldSpacer.percentWidth=100;
+						fieldSpacer.percentHeight=2;
+						mainBox.addChildAt(fieldSpacer, 1);
+						mainBox.addChildAt(imgField, 2);
+						//currentState = "vertical1";
+						//setButtonAppearance(V1);
 						break;
 					}
 					case VERTICAL_BOTTOM_TEXT:
 					{
-						currentState = "vertical2";
-						setButtonAppearance(V2);
+						mainBox.direction = "vertical";
+						mainBox.removeChild(qField);
+						mainBox.removeChild(fieldSpacer);
+						qField.percentWidth=100;
+						qField.percentHeight=49;
+						imgField.percentWidth=100;
+						imgField.percentHeight=49;
+						imgField.visible = true;
+						imgField.includeInLayout = true;
+						fieldSpacer.percentWidth=100;
+						fieldSpacer.percentHeight=2;
+						mainBox.addChildAt(fieldSpacer, 1);
+						mainBox.addChildAt(qField, 2);
+						//currentState = "vertical2";
+						//setButtonAppearance(V2);
 						break;
 					}
+					case TEXT_ONLY:
 					default:
 					{
-						currentState = "single";
-						textOnly = true;
+						mainBox.direction = "horizontal";
+						addImageButton.visible = true;
+						addImageButton.includeInLayout = true;
+						layoutsWindow.visible = false;
+						layoutsWindow.includeInLayout = false;
+						imgField.visible = false;
+						imgField.includeInLayout = false;
+						qField.percentWidth = 100;
+						qField.percentHeight = 100;
+						fieldSpacer.percentWidth=0;
 						break;
 					}
 				}
-				switch(currentState)
-				{
-					case "horizontal1":
-					{
-						if(vPanel2.parent == null)
-						{
-							vPanel1.parent.addChild(vPanel2);
-						}
-						addDeleteButton(vPanel2, false);
-						break;
-					}
-					case "horizontal2":
-					{
-						if(vPanel1.parent == null)
-						{
-							vPanel2.parent.addChildAt(vPanel1, 0);
-						}
-						addDeleteButton(vPanel1, true);
-						break;
-					}
-					case "vertical1":
-					{
-						if(hPanel2.parent == null)
-						{
-							hPanel1.parent.addChild(hPanel2);
-						}
-						addDeleteButton(hPanel2, false);
-						break;
-					}
-					case "vertical2":
-					{
-						if(hPanel1.parent == null)
-						{
-							hPanel2.parent.addChildAt(hPanel1, 0);
-						}
-						addDeleteButton(hPanel1, false);
-						break;
-					}
-				}
-				//remove the 'add image' button, replace it with the layout selection menu
-				if(layoutsWindow.parent == null && !textOnly)
-				{
-					if(addImageButton.parent)
-					{
-						layoutCol.addChildAt(layoutsWindow,layoutCol.getChildIndex(addImageButton));
-						layoutCol.removeChild(addImageButton);
-					}
-				}
+
 				//if the node has an image assigned to it, place that image
 				if(_node.data.options.assetId)
 				{
@@ -359,50 +374,25 @@
 				{
 					callLater(readjust, [scale]);
 				}
+
 			}
 			private function readjust(scale:Boolean = true):void
 			{
 				if(scale)nodeImg.scaleToFit();
 				else nodeImg.centerImage();
-//				changeImgBtn.reposition(nodeImg.displayedImage);
+				repositionChangeImgButton();
+
+				//changeImgBtn.reposition(nodeImg.displayedImage);
 			}
-			private function ensureState(s:String):void
-			{
-				switch(s)
-				{
-					case "horizontal1":
-					{
-						setLayout(HORIZONTAL_LEFT_TEXT);
-						break;
-					}
-					case "horizontal2":
-					{
-						setLayout(HORIZONTAL_RIGHT_TEXT);
-						break;
-					}
-					case "vertical1":
-					{
-						setLayout(VERTICAL_TOP_TEXT);
-						break;
-					}
-					case "vertical2":
-					{
-						setLayout(VERTICAL_BOTTOM_TEXT);
-						break;
-					}
-					default:
-					{
-						setLayout(1);
-						break;
-					}
-				}
-			}
+
 			private function addDeleteButton(target:*, leftSide:Boolean = false):void
 			{
+				/*
 				addChild(deleteImgBtn);
 				var point:Point = deleteImgBtn.parent.globalToLocal(target.localToGlobal(new Point(0, 0)));
 				deleteImgBtn.x = point.x + AdventureButton.ANCHOR_PADDING;
 				deleteImgBtn.y = point.y + target.height - getStyle("headerHeight") + AdventureButton.ANCHOR_PADDING;
+				*/
 			}
 			private function addChangeImgButton():void
 			{
@@ -413,13 +403,22 @@
 				}
 				changeImgBtn.visible = true;
 				addChild(changeImgBtn);
-				changeImgBtn.x = deleteImgBtn.x + deleteImgBtn.width + AdventureButton.ANCHOR_PADDING * 2 + 10;
-				changeImgBtn.y = deleteImgBtn.y;
+				repositionChangeImgButton();
+				// changeImgBtn.x = deleteImgBtn.x + deleteImgBtn.width + AdventureButton.ANCHOR_PADDING * 2 + 10;
+				// changeImgBtn.y = deleteImgBtn.y;
 				changeImgBtn.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownInside, false, 0, true);
 			}
+
+			private function repositionChangeImgButton():void
+			{
+				var point:Point = changeImgBtn.parent.globalToLocal(imgField.localToGlobal(new Point(0,imgField.height)));
+				changeImgBtn.x = point.x;
+				changeImgBtn.y = point.y - 33;
+			}
+			// is this required?
 			private function removeImageZone():void
 			{
-				removeChild(deleteImgBtn);
+				// removeChild(deleteImgBtn);
 				if(changeImgBtn.visible)
 				{
 					changeImgBtn.visible = false;
@@ -436,37 +435,6 @@
 			protected function onMouseDownInside(e:Event):void
 			{
 				e.stopPropagation();
-			}
-			private function proceedTextInput():void
-			{
-				if(proceedInput.parent == null)
-				{
-					proceedButton.removeChild(proceedLabel);
-					proceedButton.addChild(proceedInput);
-					proceedInput.setFocus();
-					proceedInput.addEventListener(FocusEvent.FOCUS_OUT, preChangeProceedLabel);
-					proceedButton.mouseChildren = true;
-				}
-			}
-			private function preChangeProceedLabel(event:FocusEvent):void
-			{
-				changeProceedLabel();
-			}
-			private function changeProceedLabel():void
-			{
-				if(proceedInput.parent != null)
-				{
-					if(proceedInput.text != "")
-					{
-						if(_node.data.answers.length) _node.data.answers[0].text = proceedInput.text;
-						_node.data.options.proceedText = proceedInput.text;
-						_proceedText = _node.data.options.proceedText;
-					}
-					proceedButton.removeChild(proceedInput);
-					proceedButton.addChild(proceedLabel);
-					proceedButton.mouseChildren = false;
-					proceedInput.removeEventListener(FocusEvent.FOCUS_OUT, preChangeProceedLabel);
-				}
 			}
 			private function giveNodeImage(e:Event = null):void
 			{
@@ -524,77 +492,25 @@
 			}
 		]]>
 	</mx:Script>
-	<!-- Layout Column - relocated to sidePanel on creationComplete -->
-	<mx:VBox id="layoutCol" verticalGap="{PADDING_V * 2}" width="100" clipContent="false">
-		<mx:VBox id="metaVBox" verticalGap="0" width="100%">
-			<components:DestinationBox id="nodeBox" minWidth="75" height="75"/>
-			<mx:Spacer height="10" />
-		</mx:VBox>
-		<mx:Canvas id="layoutsWindow" backgroundColor="0x7299b5" width="80" height="230">
-			<mx:Label fontFamily="Arial MT Bold" fontSize="12" color="0xffffff" text="Layouts:" top="1" horizontalCenter="0" />
-			<mx:VBox id="layoutButtons" backgroundColor="0xffffff" width="78" height="209" left="1" top="20"
-					 verticalGap="4" horizontalAlign="center" verticalAlign="middle">
-				<mx:Canvas id="H1" styleName="layoutCanvas" click="changeLayout(HORIZONTAL_LEFT_TEXT);">
-					<mx:Image source="@Embed(source='../assets/narrativeLayout1.png')" verticalCenter="0" horizontalCenter="0" />
-					<mx:Container id="H1Overlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
-				</mx:Canvas>
-				<mx:Canvas id="H2" styleName="layoutCanvas" click="changeLayout(HORIZONTAL_RIGHT_TEXT);">
-					<mx:Image source="@Embed(source='../assets/narrativeLayout2.png')" verticalCenter="0" horizontalCenter="0" />
-					<mx:Container id="H2Overlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
-				</mx:Canvas>
-				<mx:Canvas id="V1" styleName="layoutCanvas" click="changeLayout(VERTICAL_TOP_TEXT);">
-					<mx:Image source="@Embed(source='../assets/narrativeLayout3.png')" verticalCenter="0" horizontalCenter="0" />
-					<mx:Container id="V1Overlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
-				</mx:Canvas>
-				<mx:Canvas id="V2" styleName="layoutCanvas" click="changeLayout(VERTICAL_BOTTOM_TEXT);">
-					<mx:Image source="@Embed(source='../assets/narrativeLayout4.png')" verticalCenter="0" horizontalCenter="0" />
-					<mx:Container id="V2Overlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
-				</mx:Canvas>
+	<mx:HBox width="100%" height="100%" horizontalGap="0" paddingTop="20">
+		<!-- Layout Column -->
+		<mx:VBox id="layoutCol" verticalGap="{PADDING_V * 2}" width="85" height="100%" paddingLeft="10" clipContent="false">
+			<!-- Node box -->
+			<mx:VBox id="metaVBox" verticalGap="0" width="100%">
+				<components:DestinationBox id="nodeBox" minWidth="75" height="75"/>
+				<mx:Spacer height="10" />
 			</mx:VBox>
-			<mx:filters>
-				<mx:DropShadowFilter color="#000000" distance="4" angle="90" blurX="8" blurY="6" alpha=".25" />
-			</mx:filters>
-		</mx:Canvas>
-		<mx:VBox id="destHolder" width="100" height="100%" horizontalAlign="center" paddingRight="10">
-			<mx:Text styleName="greyText" width="100%" textAlign="center" selectable="false" text="Destination:" />
-			<components:DestinationBox id="destCanvas" minWidth="70" height="75" click="onDestClick()" />
 		</mx:VBox>
-	</mx:VBox> <!-- #layoutCol -->
-	<!-- BEGIN the rest of content -->
-	<mx:VBox paddingLeft="{LEFT_BOUNDARY}" width="100%" height="100%" verticalGap="16">
-		<mx:HBox id="mainHBox" paddingTop="30" paddingLeft="23" width="100%" height="100%">
-		</mx:HBox>
-		<mx:HBox horizontalAlign="center" visible="false" verticalAlign="middle" width="100%" height="100%">
-			<mx:Canvas id="labelChangeTip" width="250" height="33">
-				<mx:Label id="lctipLabel" fontSize="12" text="Click on the button to change its label."
-						  color="#57543C" fontWeight="bold"
-						  x="{(labelChangeTip.width-lctipLabel.width)/2}"
-						  y="{(labelChangeTip.height-lctipLabel.height)/2}"/>
-				<mx:filters>
-					<mx:DropShadowFilter angle="90" distance="1" blurX="0" blurY="0" alpha=".5"/>
-				</mx:filters>
-			</mx:Canvas>
-			<mx:Canvas id="proceedButton" width="180" height="60" backgroundColor="#7299B5"
-					   mouseChildren="false" buttonMode="true" click="proceedTextInput();" horizontalScrollPolicy="off">
-				<mx:Text color="#FFFFFF" fontSize="18" id="proceedLabel" text="{_proceedText}"
-						  x="{(proceedButton.width-proceedLabel.width)/2}"
-						  y="{(proceedButton.height-proceedLabel.height)/2}"/>
-			</mx:Canvas>
-		</mx:HBox>
-	</mx:VBox>
-	<mx:HBox id="hMainContainer" width="810" height="600" horizontalGap="30" move="ensureState(currentState);">
-		<mx:VBox id="vPanel1" width="100%" height="100%" styleName="fieldCanvas"
-				 horizontalAlign="center" verticalAlign="middle" verticalGap="5" />
-		<mx:VBox id="vPanel2" width="100%" height="100%" styleName="fieldCanvas"
-				 horizontalAlign="center" verticalAlign="middle" verticalGap="5" />
-	</mx:HBox>
-	<mx:VBox id="vMainContainer" width="810" height="600" verticalGap="30" move="ensureState(currentState);">
-		<mx:HBox id="hPanel1" width="100%" height="100%" styleName="fieldCanvas"
-				 horizontalAlign="center" verticalAlign="middle" verticalGap="5" />
-		<mx:HBox id="hPanel2" width="100%" height="100%" styleName="fieldCanvas"
-				 horizontalAlign="center" verticalAlign="middle" verticalGap="5" />
-	</mx:VBox>
-	<mx:TextArea borderSides="" styleName="field" id="qField" text="{DEFAULT_TEXT}" width="100%" height="100%"
+		<mx:VBox paddingLeft="10" paddingBottom="60" width="100%" height="100%">
+			<mx:Box id="mainBox" paddingLeft="23" width="100%" height="100%" direction="horizontal">
+				<mx:VBox id="imgField" width="100%" height="100%" styleName="fieldCanvas" horizontalAlign="center" verticalAlign="middle" visible="false" includeInLayout="false">
+					<mx:Canvas id="nodeImgHolder" width="100%" height="100%" verticalCenter="0" horizontalCenter="0">
+						<components:AdventureImage id="nodeImg" width="100%" height="100%"
+												   repositionDone="nodeImg.centerImage();"/>
+					</mx:Canvas>
+				</mx:VBox>
+				<mx:Spacer id="fieldSpacer" width="0%" height="100%" />
+				<mx:TextArea borderSides="top, left, right, bottom" styleName="field" id="qField" text="{DEFAULT_TEXT}" width="100%" height="100%"
 				 focusIn="{
 					 if(qField.text == DEFAULT_TEXT){
 						 qField.text = '';
@@ -607,105 +523,68 @@
 						 updateQuestionColor();
 					 }
 				 }"
-	/>
-	<components:AdventureButton id="deleteImgBtn" anchored="true" label="Remove" click="removeImageZone();" />
+				/>
+			</mx:Box>
+		</mx:VBox>
+		<mx:VBox id="right_side_panel" width="140" height="100%" right="{PADDING_V}" top="{PADDING_H}" paddingBottom="60">
+			<mx:VBox width="100%" paddingLeft="15">
+				<components:AdventureButton id="addImageButton" usePlus="true" label="Add&#13;Image"
+												click="setLayout(HORIZONTAL_LEFT_TEXT);"
+												width="90" height="60"/>
+				<!-- Add image/layouts box -->
+				<mx:Canvas id="layoutsWindow" backgroundColor="0x7299b5" width="80" height="271" horizontalScrollPolicy="off">
+					<mx:Label fontFamily="Arial MT Bold" fontSize="12" color="0xffffff" text="Layouts:" top="1" horizontalCenter="0" />
+					<mx:VBox id="layoutButtons" backgroundColor="0xffffff" width="78" height="249" left="1" top="20"
+							 verticalGap="4" horizontalAlign="center" verticalAlign="middle">
+						<mx:Canvas id="TO" styleName="layoutCanvas" click="changeLayout(TEXT_ONLY);">
+							<mx:Image source="@Embed(source='../assets/mcLayout1.png')" verticalCenter="0" horizontalCenter="0" />
+							<mx:Container id="TOOverlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+						</mx:Canvas>
+						<mx:Canvas id="H1" styleName="layoutCanvas" click="changeLayout(HORIZONTAL_LEFT_TEXT);">
+							<mx:Image source="@Embed(source='../assets/narrativeLayout1.png')" verticalCenter="0" horizontalCenter="0" />
+							<mx:Container id="H1Overlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+						</mx:Canvas>
+						<mx:Canvas id="H2" styleName="layoutCanvas" click="changeLayout(HORIZONTAL_RIGHT_TEXT);">
+							<mx:Image source="@Embed(source='../assets/narrativeLayout2.png')" verticalCenter="0" horizontalCenter="0" />
+							<mx:Container id="H2Overlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+						</mx:Canvas>
+						<mx:Canvas id="V1" styleName="layoutCanvas" click="changeLayout(VERTICAL_TOP_TEXT);">
+							<mx:Image source="@Embed(source='../assets/narrativeLayout3.png')" verticalCenter="0" horizontalCenter="0" />
+							<mx:Container id="V1Overlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+						</mx:Canvas>
+						<mx:Canvas id="V2" styleName="layoutCanvas" click="changeLayout(VERTICAL_BOTTOM_TEXT);">
+							<mx:Image source="@Embed(source='../assets/narrativeLayout4.png')" verticalCenter="0" horizontalCenter="0" />
+							<mx:Container id="V2Overlay" width="100%" height="100%" visible="false" backgroundColor="0x7299b5" alpha="0.09" />
+						</mx:Canvas>
+					</mx:VBox>
+					<mx:filters>
+						<mx:DropShadowFilter color="#000000" distance="4" angle="90" blurX="8" blurY="6" alpha=".25" />
+					</mx:filters>
+				</mx:Canvas>
+			</mx:VBox>
+			<mx:Spacer width="100%" height="100%" />
+			<!-- Destination selection box -->
+			<mx:VBox id="destHolder" width="100" horizontalAlign="center" paddingRight="10" backgroundColor="0xE3E3E3" borderColor="0xD4D4D4" borderStyle="solid" borderSides="top, right, bottom" bottom="{PADDING_V}">
+				<mx:Text styleName="greyText" width="100%" textAlign="center" selectable="false" text="Destination:" />
+				<components:DestinationBox id="destCanvas" minWidth="70" height="75" click="onDestClick()" />
+			</mx:VBox>
+		</mx:VBox>
+	</mx:HBox>
+	<!-- BEGIN the rest of content -->
+	<!--
+	<mx:HBox id="hMainContainer" width="810" height="600" horizontalGap="30" move="ensureState(currentState);">
+		<mx:VBox id="vPanel1" width="100%" height="100%" styleName="fieldCanvas"
+				 horizontalAlign="center" verticalAlign="middle" verticalGap="5" />
+		<mx:VBox id="vPanel2" width="100%" height="100%" styleName="fieldCanvas"
+				 horizontalAlign="center" verticalAlign="middle" verticalGap="5" />
+	</mx:HBox>
+	<mx:VBox id="vMainContainer" width="810" height="600" verticalGap="30" move="ensureState(currentState);">
+		<mx:HBox id="hPanel1" width="100%" height="100%" styleName="fieldCanvas"
+				 horizontalAlign="center" verticalAlign="middle" verticalGap="5" />
+		<mx:HBox id="hPanel2" width="100%" height="100%" styleName="fieldCanvas"
+				 horizontalAlign="center" verticalAlign="middle" verticalGap="5" />
+	</mx:VBox>
+-->
 	<components:AdventureButton id="changeImgBtn" visible="false" anchored="true" label="Change Image" click="giveNodeImage();" />
-	<components:AdventureButton id="addImageButton" usePlus="true" label="Add&#13;Image"
-								click="setLayout(HORIZONTAL_LEFT_TEXT);"
-								width="90" height="60"/>
-	<mx:Canvas id="nodeImgHolder" width="100%" height="100%" verticalCenter="0" horizontalCenter="0">
-		<components:AdventureImage id="nodeImg" width="100%" height="100%"
-								   repositionDone="nodeImg.centerImage();"/>
-	</mx:Canvas>
-	<mx:TextInput id="proceedInput" x="5" y="{proceedLabel.y}"
-				  width="{proceedButton.width-10}" height="{proceedLabel.height}"
-				  enter="changeProceedLabel();" />
-	<screens:states>
-		<mx:State name="single">
-			<mx:RemoveChild target="{vMainContainer}" />
-			<mx:RemoveChild target="{hMainContainer}" />
-			<mx:AddChild relativeTo="{mainHBox}" target="{hMainContainer}"/>
-			<mx:RemoveChild target="{qField}" />
-			<mx:AddChild relativeTo="{vPanel1}" target="{qField}"/>
-			<mx:RemoveChild target="{addImageButton}" />
-			<mx:RemoveChild target="{nodeImgHolder}" />
-			<mx:RemoveChild target="{vPanel1}" />
-			<mx:AddChild relativeTo="{hMainContainer}" target="{vPanel1}"/>
-			<mx:RemoveChild target="{vPanel2}" />
-			<mx:RemoveChild target="{deleteImgBtn}" />
-			<mx:RemoveChild target="{changeImgBtn}" />
-			<mx:RemoveChild target="{proceedInput}" />
-			<mx:AddChild relativeTo="{layoutsWindow}" target="{addImageButton}" position="after"/>
-			<mx:RemoveChild target="{layoutsWindow}" />
-		</mx:State>
-		<mx:State name="horizontal1">
-			<mx:RemoveChild target="{vMainContainer}" />
-			<mx:RemoveChild target="{hMainContainer}" />
-			<mx:AddChild relativeTo="{mainHBox}" target="{hMainContainer}"/>
-			<mx:RemoveChild target="{qField}" />
-			<mx:AddChild relativeTo="{vPanel1}" target="{qField}"/>
-			<mx:RemoveChild target="{addImageButton}" />
-			<mx:RemoveChild target="{nodeImgHolder}" />
-			<mx:AddChild relativeTo="{vPanel2}" target="{nodeImgHolder}"/>
-			<mx:RemoveChild target="{vPanel1}" />
-			<mx:AddChild relativeTo="{hMainContainer}" target="{vPanel1}"/>
-			<mx:RemoveChild target="{vPanel2}" />
-			<mx:AddChild relativeTo="{hMainContainer}" target="{vPanel2}"/>
-			<mx:RemoveChild target="{deleteImgBtn}" />
-			<mx:RemoveChild target="{changeImgBtn}" />
-			<mx:RemoveChild target="{proceedInput}" />
-		</mx:State>
-		<mx:State name="horizontal2">
-			<mx:RemoveChild target="{vMainContainer}" />
-			<mx:RemoveChild target="{hMainContainer}" />
-			<mx:AddChild relativeTo="{mainHBox}" target="{hMainContainer}"/>
-			<mx:RemoveChild target="{qField}" />
-			<mx:AddChild relativeTo="{vPanel2}" target="{qField}"/>
-			<mx:RemoveChild target="{addImageButton}" />
-			<mx:RemoveChild target="{nodeImgHolder}" />
-			<mx:AddChild relativeTo="{vPanel1}" target="{nodeImgHolder}"/>
-			<mx:RemoveChild target="{vPanel1}" />
-			<mx:AddChild relativeTo="{hMainContainer}" target="{vPanel1}"/>
-			<mx:RemoveChild target="{vPanel2}" />
-			<mx:AddChild relativeTo="{hMainContainer}" target="{vPanel2}"/>
-			<mx:RemoveChild target="{deleteImgBtn}" />
-			<mx:RemoveChild target="{changeImgBtn}" />
-			<mx:RemoveChild target="{proceedInput}" />
-		</mx:State>
-		<mx:State name="vertical1">
-			<mx:RemoveChild target="{hMainContainer}" />
-			<mx:RemoveChild target="{vMainContainer}" />
-			<mx:AddChild relativeTo="{mainHBox}" target="{vMainContainer}"/>
-			<mx:RemoveChild target="{qField}" />
-			<mx:AddChild relativeTo="{hPanel1}" target="{qField}"/>
-			<mx:RemoveChild target="{addImageButton}" />
-			<mx:RemoveChild target="{nodeImgHolder}" />
-			<mx:AddChild relativeTo="{hPanel2}" target="{nodeImgHolder}"/>
-			<mx:RemoveChild target="{hPanel1}" />
-			<mx:AddChild relativeTo="{vMainContainer}" target="{hPanel1}"/>
-			<mx:RemoveChild target="{hPanel2}" />
-			<mx:AddChild relativeTo="{vMainContainer}" target="{hPanel2}"/>
-			<mx:RemoveChild target="{deleteImgBtn}" />
-			<mx:RemoveChild target="{changeImgBtn}" />
-			<mx:RemoveChild target="{proceedInput}" />
-		</mx:State>
-		<mx:State name="vertical2">
-			<mx:RemoveChild target="{hMainContainer}" />
-			<mx:RemoveChild target="{vMainContainer}" />
-			<mx:AddChild relativeTo="{mainHBox}" target="{vMainContainer}"/>
-			<mx:RemoveChild target="{qField}" />
-			<mx:AddChild relativeTo="{hPanel2}" target="{qField}"/>
-			<mx:RemoveChild target="{addImageButton}" />
-			<mx:RemoveChild target="{nodeImgHolder}" />
-			<mx:AddChild relativeTo="{hPanel1}" target="{nodeImgHolder}"/>
-			<mx:RemoveChild target="{hPanel1}" />
-			<mx:AddChild relativeTo="{vMainContainer}" target="{hPanel1}"/>
-			<mx:RemoveChild target="{hPanel2}" />
-			<mx:AddChild relativeTo="{vMainContainer}" target="{hPanel2}"/>
-			<mx:RemoveChild target="{deleteImgBtn}" />
-			<mx:RemoveChild target="{changeImgBtn}" />
-			<mx:RemoveChild target="{proceedInput}" />
-		</mx:State>
-	</screens:states>
 	<components:AdventureButton id="doneButton" bottom="20" right="20" label="Done" click="{hide();}" />
 </screens:AdventurePopupBase>
