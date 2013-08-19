@@ -235,17 +235,21 @@
 			}
 			private function setLayout(layout:int):void
 			{
+				var focused:Boolean = false;
+
 				_layout = layout;
 				var textOnly:Boolean = false;
 				var scale:Boolean = true;
 
-				if (layout)
+				if (layout > 1)
 				{
 					addImageButton.visible = false;
 					addImageButton.includeInLayout = false;
 					layoutsWindow.visible = true;
 					layoutsWindow.includeInLayout = true;
 					fieldSpacer.includeInLayout = true;
+					destHolder.setStyle("borderSides","left,top,right,bottom");
+					finalScoreBox.setStyle("borderSides","left,top,right,bottom");
 				}
 
 				switch(layout)
@@ -261,7 +265,7 @@
 						imgField.percentHeight=100;
 						imgField.visible = true;
 						imgField.includeInLayout = true;
-						fieldSpacer.percentWidth=2;
+						fieldSpacer.percentWidth=1;
 						fieldSpacer.percentHeight=100;
 						mainBox.addChildAt(fieldSpacer,1);
 						mainBox.addChildAt(imgField,2);
@@ -278,7 +282,7 @@
 						imgField.percentHeight=100;
 						imgField.visible = true;
 						imgField.includeInLayout = true;
-						fieldSpacer.percentWidth=2;
+						fieldSpacer.percentWidth=1;
 						fieldSpacer.percentHeight=100;
 						mainBox.addChildAt(fieldSpacer,1);
 						mainBox.addChildAt(qField,2);
@@ -289,14 +293,14 @@
 						mainBox.direction = "vertical";
 						mainBox.removeChild(imgField);
 						mainBox.removeChild(fieldSpacer);
-						qField.percentWidth=100;
+						qField.percentWidth=99.25;
 						qField.percentHeight=49;
-						imgField.percentWidth=100;
+						imgField.percentWidth=99.25;
 						imgField.percentHeight=49;
 						imgField.visible = true;
 						imgField.includeInLayout = true;
 						fieldSpacer.percentWidth=100;
-						fieldSpacer.percentHeight=2;
+						fieldSpacer.percentHeight=2
 						mainBox.addChildAt(fieldSpacer, 1);
 						mainBox.addChildAt(imgField, 2);
 						break;
@@ -306,9 +310,9 @@
 						mainBox.direction = "vertical";
 						mainBox.removeChild(qField);
 						mainBox.removeChild(fieldSpacer);
-						qField.percentWidth=100;
+						qField.percentWidth=99.25;
 						qField.percentHeight=49;
-						imgField.percentWidth=100;
+						imgField.percentWidth=99.25;
 						imgField.percentHeight=49;
 						imgField.visible = true;
 						imgField.includeInLayout = true;
@@ -333,8 +337,27 @@
 						fieldSpacer.percentWidth=0;
 						fieldSpacer.percentHeight=0;
 						fieldSpacer.includeInLayout = false;
+						destHolder.setStyle("borderSides","top,right,bottom");
+						finalScoreBox.setStyle("borderSides","top,right,bottom");
 						break;
 					}
+				}
+
+				// Ugly crap to catch the focus of the qField so the border persists across layout transitions
+				var focusTarget:DisplayObjectContainer;
+				try
+				{
+					focusTarget = stage.focus.parent;
+				}
+				catch (e:Error)
+				{
+					focusTarget = null;
+				}
+
+				if (focusTarget == qField)
+				{
+					stage.focus = null;
+					qField.setFocus();
 				}
 
 				//if the node has an image assigned to it, place that image
@@ -480,6 +503,56 @@
 			{
 				if(destCanvas != null) destCanvas.setTargetNode(_destination, NODE_BOX_RADIUS);
 			}
+
+			private function qFieldFocusIn():void
+			{
+				if(qField.text == DEFAULT_TEXT)
+				{
+					qField.text = '';
+					updateQuestionColor();
+				}
+
+				// This is an EXTREMELY hackish bit of code that compensates for the qField's border being occluded by the destination/final score box.
+				if (_layout < 2)
+				{
+					right_side_panel.setStyle("paddingLeft",2);
+					imageButtonContainer.setStyle("paddingLeft",13);
+					if (_node.data.options.type == AdventureOptions.TYPE_NARRATIVE)
+					{
+						destHolder.setStyle("paddingLeft",8);
+						destHolder.width = 118;
+					}
+					else if (_node.data.options.type == AdventureOptions.TYPE_END)
+					{
+						finalScoreBox.setStyle("paddingLeft",8);
+						finalScoreBox.width = 118;
+					}
+				}
+			}
+
+			private function qFieldFocusOut():void
+			{
+				if(!qField.text.length){
+					qField.text = DEFAULT_TEXT;
+					updateQuestionColor();
+				}
+
+				if (_layout < 2)
+				{
+					right_side_panel.setStyle("paddingLeft",0);
+					imageButtonContainer.setStyle("paddingLeft",15);
+					if (_node.data.options.type == AdventureOptions.TYPE_NARRATIVE)
+					{
+						destHolder.setStyle("paddingLeft",10);
+						destHolder.width = 120;
+					}
+					else if (_node.data.options.type == AdventureOptions.TYPE_END)
+					{
+						finalScoreBox.setStyle("paddingLeft",10);
+						finalScoreBox.width = 120;
+					}
+				}
+			}
 		]]>
 	</mx:Script>
 	<mx:HBox width="100%" height="100%" horizontalGap="0" paddingTop="20">
@@ -501,23 +574,13 @@
 				</mx:VBox>
 				<mx:Spacer id="fieldSpacer" width="0%" height="100%" />
 				<mx:TextArea borderSides="top, left, right, bottom" styleName="field" id="qField" text="{DEFAULT_TEXT}" width="100%" height="100%"
-				 focusIn="{
-					 if(qField.text == DEFAULT_TEXT){
-						 qField.text = '';
-						 updateQuestionColor();
-						 }
-					 }"
-				 focusOut="{
-					 if(!qField.text.length){
-						 qField.text = DEFAULT_TEXT;
-						 updateQuestionColor();
-					 }
-				 }"
+				 focusIn="{qFieldFocusIn()}"
+				 focusOut="{qFieldFocusOut()}"
 				/>
 			</mx:Box>
 		</mx:VBox>
 		<mx:VBox id="right_side_panel" width="140" height="100%" right="{PADDING_V}" top="{PADDING_H}" paddingBottom="60">
-			<mx:VBox width="100%" paddingLeft="15">
+			<mx:VBox id="imageButtonContainer" width="100%" paddingLeft="15">
 				<components:AdventureButton id="addImageButton" usePlus="true" label="Add&#13;Image" width="95" height="60" click="{setLayout(HORIZONTAL_LEFT_TEXT)}"/>
 				<!-- Add image/layouts box -->
 				<mx:Canvas id="layoutsWindow" backgroundColor="0x7299b5" width="80" height="280" horizontalScrollPolicy="off">
