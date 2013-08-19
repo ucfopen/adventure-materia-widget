@@ -15,8 +15,8 @@
 	private static const COLOR_GRAY:Number = 0x555555;
 	private static const COLOR_BLACK:Number = 0x0;
 	private static const DEFAULT_SCORE:int = 100;
-	private var _scoreVBox:VBox;
-	private var _scoreInputLabel:Label;
+	// private var _scoreVBox:VBox;
+	// private var _scoreInputLabel:Label;
 	private var _scoreInputContainer:UIComponent;
 	private var _scoreInput:PercentField;
 	private var _reverting:Boolean = false;
@@ -40,33 +40,46 @@
 	protected override function onCreationComplete():void
 	{
 		super.onCreationComplete();
-		/* initialize container for score items */
+		finalScoreBox.visible = true;
+		finalScoreBox.includeInLayout = true;
+		/*
+		// initialize container for score items
 		_scoreVBox = new VBox();
 		_scoreVBox.setStyle("verticalGap", 4);
 		layoutCol.addChild(_scoreVBox);
-		/* initialize label for score input field */
+		// initialize label for score input field
 		_scoreInputLabel = new Label();
 		_scoreInputLabel.styleName = "sidePanelLabel";
 		_scoreInputLabel.text = "Final Score:";
 		_scoreVBox.addChild(_scoreInputLabel);
-		/* initialize score input field */
+		*/
+		// initialize score input field
 		_scoreInputContainer = new UIComponent();
+		_scoreInputContainer.width = 84;
+
 		_scoreInput = new PercentField();
 		_scoreInput.height = 40;
+		_scoreInput.width=84;
 		_scoreInput.defaultTextFormat = TEXTFORMAT_INPUT;
 		_scoreInput.setTextFormat(TEXTFORMAT_INPUT);
 		_scoreInput.setValue(100);
 		_scoreInput.background = true;
 		_scoreInput.backgroundColor = 0xfeffd1;
+		// _scoreInput.setStyle("corner-radius",5);
+
+		// _scoreInput.setInputBorders(true, 0x000000);
+
 		_scoreInput.addEventListener(PercentField.EVENT_COMMIT, updateValue, false, 0, true);
 		_scoreInputContainer.addChild(_scoreInput);
-		_scoreVBox.addChild(_scoreInputContainer);
+		finalScoreBox.addChild(_scoreInputContainer);
 
 		// Add relevant helper bubbles
+		/*
 		if (!_creator.helperManager.endingBubble.alreadyActivated)
 		{
 			_creator.helperManager.addHelper(_creator.helperManager.endingBubble);
 		}
+		*/
 	}
 	//------------------------------------------------------------------
 	//
@@ -79,10 +92,12 @@
 		if(_scoreInput != null) _scoreInput.destroy();
 
 		// Remove all the helper bubbles
+		/*
 		if (_creator.helperManager.endingBubble.visible)
 		{
 			_creator.helperManager.endingBubble.destroy();
 		}
+		*/
 	}
 	protected override function beginEdit(node:Node):void
 	{
@@ -98,7 +113,7 @@
 		/* remove destination box */
 		if(destHolder.parent != null) destHolder.parent.removeChild(destHolder);
 		/* update score box only if in destination mode */
-		_scoreVBox.visible = true;
+		// _scoreVBox.visible = true;
 		if(_node.data.options.finalScore != null)
 		{
 			_scoreInput.setValue(_node.data.options.finalScore);

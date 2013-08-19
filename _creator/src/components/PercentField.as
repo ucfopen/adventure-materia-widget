@@ -26,7 +26,7 @@ public class PercentField extends TextField
 	//--------------------------------------------------------------------------
 	public static const EVENT_COMMIT:String = "value-commit";
 	private static const TEXTFORMAT_DEFAULT:TextFormat = new TextFormat("Arial", 14, '0', true, null, null, null, null, "left");
-	private static const COLOR_GRAY:Number = 0x777777;
+	private static const COLOR_GRAY:Number = 0xc2c2c2;
 	private static const COLOR_BLACK:Number = 0x0;
 	//--------------------------------------------------------------------------
 	//
@@ -56,11 +56,11 @@ public class PercentField extends TextField
 	public function PercentField(minBoundary:Number = 0, maxBoundary:Number = 100)
 	{
 		super();
-		/* field customization */
+		// field customization
 		this.restrict = "0-9%";
 		this.type = TextFieldType.INPUT;
 		this.defaultTextFormat = TEXTFORMAT_DEFAULT;
-		/* listeners for interactivity */
+		// listeners for interactivity
 		this.addEventListener(MouseEvent.MOUSE_OVER, onInputOver, false, 0, true);
 		this.addEventListener(MouseEvent.MOUSE_OUT, onInputOut, false, 0, true);
 		this.addEventListener(FocusEvent.FOCUS_IN, onInputFocusIn, false, 0, true);
@@ -68,11 +68,13 @@ public class PercentField extends TextField
 		this.addEventListener(KeyboardEvent.KEY_DOWN, onInputKeyDown, false, 0, true);
 		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage, false, 0, true);
 		this.addEventListener(Event.CHANGE, onChange, false, 0, true);
-		/* save boundary variables */
+		// save boundary variables
 		this.minBoundary = minBoundary;
 		this.maxBoundary = maxBoundary;
-		/* set initial value */
+		// set initial value
 		setValue(0);
+
+		setInputBorders(true, COLOR_GRAY);
 	}
 	//--------------------------------------------------------------------------
 	//
@@ -156,12 +158,11 @@ public class PercentField extends TextField
 	private function onInputOver(e:MouseEvent):void
 	{
 		if(_inputFocused) return;
-		setInputBorders(true, COLOR_GRAY);
 	}
 	private function onInputOut(e:MouseEvent):void
 	{
 		if(_inputFocused) return;
-		setInputBorders(false);
+		setInputBorders(true)
 	}
 	private function onInputFocusIn(e:FocusEvent):void
 	{
@@ -175,7 +176,7 @@ public class PercentField extends TextField
 	{
 		/* set appearance to not-focused */
 		_inputFocused = false;
-		setInputBorders(false);
+		setInputBorders(true, COLOR_GRAY);
 		/* prepare variables */
 		var inputString:String = getStringValue();
 		var inputValue:int = int(inputString);
