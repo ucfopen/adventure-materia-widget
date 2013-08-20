@@ -80,7 +80,6 @@
 
 		public function updatePosition():void
 		{
-			trace("shortAnswerTokenList::updatePosition()");
 			if (refPoint == null) return
 
 			// x position doesn't change
@@ -89,11 +88,6 @@
 			var bottomPt:Number = refPoint.y + this.height;
 			var overflow:Number = 0;
 			var yThreshold:Number = parent.height - DEFAULT_HEIGHT - 6;
-
-			trace("refPoint: " + refPoint.y);
-			trace("height: " + this.height);
-			trace("bottomPt: " + bottomPt);
-			trace("yThreshold: " + yThreshold);
 
 			if (bottomPt >= yThreshold) // if the bottom of the list exceeds the bottom of the creator window
 			{
@@ -177,8 +171,6 @@
 				inputBox.text = "";
 			}
 
-			trace("new token text: " + newTokenText);
-
 			newTokenText = newTokenText.replace(/^[\r\n]+/,'');
 			newTokenText = StringUtil.trim(newTokenText);
 
@@ -193,7 +185,6 @@
 			newTokenBox.addEventListener(ShortAnswerTokenRow.CLOSE_BUTTON_CLICKED, onTokenClick, false, 0, true);
 
 			this.addChild(newTokenBox);
-			trace("Added new token!");
 
 			// calculateOverflow();
 			updatePosition();
@@ -205,7 +196,6 @@
 
 		private function calculateOverflow():void
 		{
-			trace("calculating overflow..");
 			var bottomPt:Point = parent.globalToLocal(this.localToGlobal(new Point(0,this.height)));
 			var overflow:Number = 0;
 

@@ -94,7 +94,6 @@
 				{
 					if(node.children.length == 0) onAddAnswer(null);
 					else if(node.data.answers.length == 0) addAnswerForNode(node.children[0]);
-					trace("Added a new node");
 				}
 				/* Create the "Add Answer" Button */
 				addAnswerButton = new AdventureButton();
@@ -105,7 +104,6 @@
 				addAnswerButton.visible = false;
 				PopUpManager.addPopUp(addAnswerButton, this);
 				updateAddAnswerButton(node.isNew);
-				trace("Add answer button being updated from: beginEdit (PopupMc)");
 				addAnswerButton.visible = true;
 				// Create Delete Button
 				PopUpManager.addPopUp(deleteButton, this);
@@ -186,7 +184,6 @@
 					row.popupInstance = this;
 					row.node = _node;
 //					row.letter = getNextLetter();
-					trace("loading answer text: " + ans.text);
 
 					row.text = ans.text;
 					row.destination = _node.children[i];
@@ -207,7 +204,6 @@
 				for(var i:int = 0; i < mcList.numChildren; i++)
 				{
 					row = MultipleChoiceRow(mcList.getChildAt(i))
-					trace("saving row text: " + row.text);
 					_node.data.answers[i + rowOffset].text = row.text == MultipleChoiceRow.DEFAULT_ANS_TEXT ? "" : row.text;
 					// TODO: add scoring option
 					// _node.data.answers[i].value = MultipleChoiceRow(mcList.getChildAt(i)).value;
@@ -396,7 +392,6 @@
 				mcList.addChildAt(row, mcList.numChildren);
 				// Scroll Down
 				scrollCanvas.invalidateDisplayList();
-				trace("adding listener");
 				listenForScrollUpdate(true);
 				// Set focus
 				if(e != null) row.answerField.setFocus();
@@ -421,7 +416,6 @@
 			}
 			protected function onScrollCanvasUpdate(e:Event):void
 			{
-				trace("PopupMc::onScrollCanvasUpdate");
 				// Remove the listener that brought us here
 				scrollCanvas.removeEventListener(FlexEvent.UPDATE_COMPLETE, onScrollCanvasUpdate);
 				// Check if we're trying to auto-scroll down
@@ -443,7 +437,6 @@
 					// Hide delete button if off-screen
 					if(deleteButton.y > targetPoint.y + scrollCanvas.height + MultipleChoiceRow.rowHeight /2 || deleteButton.y < targetPoint.y + MultipleChoiceRow.rowHeight / 2) deleteButton.visible = false;
 					else deleteButton.visible = true;
-					trace("deleteY: " + (deleteButton.y - targetPoint.y));
 				}
 				// Put the add answer button where it needs to go
 				updateAddAnswerButton();
@@ -452,18 +445,15 @@
 			}
 			protected function onRowFocusOut(e:Event):void
 			{
-				trace("PopupMc::onRowFocusOut");
 				hideDeleteButton();
 			}
 			protected function onRowFocusIn(e:Event):void
 			{
-				trace("PopupMc::onRowFocusIn");
 				var row:MultipleChoiceRow = MultipleChoiceRow(e.currentTarget);
 				showDeleteButton(row);
 			}
 			protected function showDeleteButton(row:MultipleChoiceRow):void
 			{
-				trace("PopupMC::showDeleteButton()");
 				_deleteTarget = row;
 				var position:Point = row.localToGlobal(new Point(0, 0));
 				deleteButton.x = position.x - deleteButton.height;// + row.feedbackCanvas.x - deleteButton.width;

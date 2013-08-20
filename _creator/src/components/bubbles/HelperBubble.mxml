@@ -64,8 +64,6 @@
 
 		public function destroy():void
 		{
-			trace("HelperBubble::destroy()");
-			trace("Helper bubble of type: " + this.type);
 			this.removeEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
 			this.removeEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
 			this.removeEventListener(MouseEvent.CLICK, onMouseClick);
@@ -85,13 +83,6 @@
 
 		private function onCreationComplete():void
 		{
-			// var parentPos:Point = this.parent.globalToLocal(this.localToGlobal(new Point(10,60)));
-
-			trace("HelperBubble::onCreationComplete()");
-			// trace(parentPos);
-
-			//this.x = parentPos.x;
-			//this.y = parentPos.y;
 		}
 
 		private function onMouseOver(e:MouseEvent):void { this.setStyle("backgroundColor", 0x80b2bd); }

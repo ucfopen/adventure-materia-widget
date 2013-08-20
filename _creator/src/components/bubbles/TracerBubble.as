@@ -76,8 +76,6 @@ public class TracerBubble extends Sprite
 		var tfX:int;
 		// Set Position
 		var targetPoint:Point = this.parent.globalToLocal(target.displayNode.parent.localToGlobal(new Point(target.displayNode.x, target.displayNode.y)));
-		trace(new Point(target.displayNode.x, target.displayNode.y));
-		trace(targetPoint);
 		this.y = targetPoint.y - this.height / 2;
 		if(targetPoint.x < target.displayNode.displayTree.width / 2 && target.parent != null)
 		{
@@ -93,7 +91,6 @@ public class TracerBubble extends Sprite
 			_questionTf.x = tfX + PADDING_H;
 			this.x = targetPoint.x - DisplayNode.radius - this.width - NODE_SPACING_LEFT;
 		}
-		trace("x: " + this.x);
 		// Draw Background
 		this.graphics.beginFill(COLOR_BG);
 		this.graphics.drawRoundRect(tfX, _questionTf.y - PADDING_V, tfW, tfH, CORNER_RADIUS);

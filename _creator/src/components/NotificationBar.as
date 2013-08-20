@@ -60,7 +60,6 @@ public class NotificationBar extends Sprite
 		_button = new ToolButton(80, 26, null, [CURVE_BUTTON, CURVE_BUTTON, CURVE_BUTTON, CURVE_BUTTON], null, false, null, false);
 		_button.addEventListener(MouseEvent.CLICK, onButtonClick, false, 0, false);
 		_button.label = "Button";
-		trace("new notification bar");
 		// hide the ugly focus rect that shows up on focus
 		this.focusRect = false;
 	}

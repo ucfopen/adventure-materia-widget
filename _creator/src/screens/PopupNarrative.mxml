@@ -469,8 +469,6 @@
 			}
 			private function onDestChange(e:DataEvent):void
 			{
-				//trace("onDestChange " + e.data + "  " + int(e.data));
-				trace("onDestChange: " + e.data);
 				var result:int = int(e.data);
 				// If the target node didn't exist (was in warning state), create it first
 				if(_node.children.length == 0)
@@ -482,13 +480,11 @@
 				}
 				switch(result) {
 					case DestinationBubble.NEW_NODE:
-						//trace("New");
 						this.destination = _node.children[0];
 						_node.displayNode.displayTree.setLink(_node.children[0], _node.children[0]);
 						onDoneEditingLink();
 						break;
 					case DestinationBubble.EXISTING_NODE:
-						//trace("Existing");
 						dispatchEvent(new DataEvent(DisplayNode.EVENT_FIND_LINK, true, false, String(_node.children[0].id)));
 						break;
 				}

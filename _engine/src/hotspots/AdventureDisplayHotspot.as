@@ -288,7 +288,6 @@ public class AdventureDisplayHotspot extends Sprite
 	}
 	protected function onAnchorDragEnd(e:Event):void
 	{
-		trace("AdventureDisplayHotspot::onAnchorDragEnd");
 		finalize();
 		updateAnchorPositions();
 		resizing = false;

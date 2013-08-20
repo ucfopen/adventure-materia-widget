@@ -100,8 +100,6 @@
 	public function get text():String { return condensedAnswersString; }
 	public function set text(val:String):void
 	{
-		// trace("calling populateList from text setter");
-		trace("text val: " + val);
 		condensedAnswersString= val;
 		if (_creationComplete) populateList();
 	}
@@ -114,7 +112,6 @@
 	 */
 	public function destroy():void
 	{
-		trace("ShortanswerArea::destroy()");
 		setListenersEnabled(false);
 		//clean();
 
@@ -123,8 +120,6 @@
 		{
 			this.text = answerTokenListBox.answers;
 
-			trace("text: " + this.text);
-
 			if(answerTokenListBox.parent != null) answerTokenListBox.destroy();
 			answerTokenListBox = null;
 		}
@@ -132,7 +127,6 @@
 
 	private function populateList():void
 	{
-		trace("ShortanswerArea::populateList()");
 		answerTokenListBox.answers = condensedAnswersString;
 		updateAnswerString(condensedAnswersString);
 	}
@@ -142,8 +136,6 @@
 	 */
 	private function redraw():void
 	{
-		trace("ShortanswerArea::redraw()");
-
 		// draw invisible background to catch mouse events
 		answerTokensBox.graphics.clear();
 		answerTokensBox.graphics.beginFill(0, 0);
@@ -153,8 +145,6 @@
 
 	private function updateAnswerString(answers:String):void
 	{
-		trace("ShortanswerArea::updateAnswerString()");
-
 		var stringField:TextField = new TextField;
 		stringField.selectable = false;
 		stringField.autoSize = TextFieldAutoSize.LEFT;
@@ -203,7 +193,6 @@
 
 	private function setListenersEnabled(val:Boolean):void
 	{
-		trace("ShortanswerArea::setListenersEnabled()");
 		// avoid adding double listeners
 		if(val == _listenersEnabled) return;
 		// enable listeners
@@ -245,8 +234,6 @@
 	*/
 	private function onClick(e:MouseEvent):void
 	{
-		trace("ShortAnswerArea::onClick()");
-
 		if (!answerTokenListBox.visible)
 		{
 			PopUpManager.addPopUp(answerTokenListBox, this);

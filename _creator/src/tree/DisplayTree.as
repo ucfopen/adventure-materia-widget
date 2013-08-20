@@ -497,7 +497,6 @@ public class DisplayTree extends Sprite
 	public function copyNode(targ:Node, dest:DisplayNode):void
 	{
 		var i:int;
-		trace("Start Copy Node");
 		// clone original node
 		var copy:Node = targ.clone();
 		copy.id = dest.node.id;
@@ -530,14 +529,11 @@ public class DisplayTree extends Sprite
 		}
 		// Hide copy mode instruction
 		_notificationBar.hide();
-		trace("Mid Copy Node");
 		// Show those nodes!
 		redraw();
-		trace("End Copy Node");
 	}
 	public function beginImportMode():void
 	{
-		trace("begin import mode");
 		nodeImportMode = true;
 		redraw();
 	}
@@ -664,7 +660,6 @@ public class DisplayTree extends Sprite
 		var result:int;
 		if(_recoveredIds.length == 0) result = _idIncrement++;
 		else result = _recoveredIds.pop();
-		trace("nextId: " + result);
 		return result;
 	}
 	/**
@@ -933,7 +928,6 @@ public class DisplayTree extends Sprite
 	}
 	private function onAddedToStage(e:Event):void
 	{
-		trace("onAddedToStage");
 		this.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		// Keep strong reference to stage
 		_stage = this.stage;
@@ -948,7 +942,6 @@ public class DisplayTree extends Sprite
 	}
 	private function onResize(e:Event):void
 	{
-		trace("DisplayTree::onResize");
 		DisplayNode.resetStandardRadii();
 		redraw();
 		redrawBg();
@@ -971,7 +964,6 @@ public class DisplayTree extends Sprite
 		_overlay.addChild(_debugField);
 		*/
 		// create the notification toolbar
-		trace("Creating a new notification bar");
 		_notificationBar = new NotificationBar();
 		_notificationBar.x = _overlay.width / 2 - _notificationBar.width / 2;
 		_notificationBar.y = PADDING_V;
@@ -1002,7 +994,6 @@ public class DisplayTree extends Sprite
 //		_root.node = temp;
 		var qgroup:QuestionGroup = generateQGroup("SDLKFJSDKLJ");
 		_creator.testImporting();
-		trace("Debug");
 	}
 	/**
 	 * Adds a node as a child to the node that was clicked
@@ -1093,7 +1084,6 @@ public class DisplayTree extends Sprite
 	}
 	private function onNodeMouseOver(e:Event):void
 	{
-		// trace("onNodeMouseOver");
 		// get reference to target node
 		var node:Node
 		if(e != null) // if event was passed, get node reference from it
@@ -1508,7 +1498,6 @@ public class DisplayTree extends Sprite
 	 */
 	private function drawBranches(e:Event = null):void
 	{
-//		trace("DisplayTree::drawBranches()");
 		_tree.graphics.clear();
 		drawBranchesR(_root);
 		if(linkEditMode) updateLinkTargetPoint();
@@ -1518,7 +1507,6 @@ public class DisplayTree extends Sprite
 	 */
 	private function drawBranchesR(current:DisplayNode):void
 	{
-//		trace("DisplayTree::drawBranchesR()");
 		for(var i:int = 0; i < current.node.children.length; i++)
 		{
 			var childNode:DisplayNode = current.node.children[i].displayNode;

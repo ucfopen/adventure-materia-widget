@@ -33,8 +33,6 @@ class Score_Modules_Adventure extends Score_Module
 	public function check_answer($log)
 	{
 		// $q = $this->questions[$log->item_id];
-		trace('tracing log id...'.$log->item_id);
-		trace('log text: '.$log->text);
 
 		if (strcmp($log->item_id, '0') == 0)
 		{

@@ -19,7 +19,6 @@ package hotspots {
 		protected var anchorSprite:Sprite = new Sprite();
 		public function AdventureHotspotPolygon(targetImage:DisplayObject, draggable:Boolean = true, visibility:int = AdventureOptions.VISIBILITY_ALWAYS)
 		{
-			trace("AdventureHotspotPolygon::constructor");
 			super(targetImage, draggable, visibility);
 			type = AdventureOptions.HOTSPOT_POLYGON;
 			this.addChild(anchorSprite);
@@ -37,8 +36,6 @@ package hotspots {
 		}
 		public function addPoint(e:MouseEvent):void
 		{
-			trace("AdventureHotspotPolygon::addPoint");
-			// Track mouse position
 			lastMouse = this.globalToLocal(new Point(e.stageX, e.stageY));
 			// Check if this point collides with an existing one (finished polygon)
 			for each(var p:Point in points)
@@ -50,7 +47,6 @@ package hotspots {
 				}
 			}
 			// Add point to points array
-			trace("Added: " + lastMouse.toString());
 			points.push(lastMouse);
 			// Draw polygon with connector lines
 			drawPolygon(false);
@@ -93,14 +89,11 @@ package hotspots {
 		}
 		public override function finalize():void
 		{
-			trace("AdventureHotspotPolygon::finalize");
-			trace(points.toString());
 			super.finalize();
 			var topLeft:Point = getTopLeft(points);
 			var startPoint:Point = parent.globalToLocal(this.localToGlobal(new Point(topLeft.x, topLeft.y)));
 			this.x = startPoint.x;
 			this.y = startPoint.y;
-			trace("x:" + this.x + " y:" + this.y);
 			for(var i:int = 0; i < points.length; i++)
 			{
 				points[i].x -= topLeft.x;
@@ -111,7 +104,6 @@ package hotspots {
 		}
 		public override function getPoints():Array
 		{
-			trace("AdventureHotspotPolygon::getPoints");
 			var result:Array = new Array();
 			for(var i:int = 0; i < points.length; i++) {
 				result.push(targetImage.globalToLocal(this.parent.localToGlobal(new Point((this.x + points[i].x), (this.y + points[i].y)))));
@@ -120,12 +112,10 @@ package hotspots {
 		}
 		public override function build(newPoints:Array):void
 		{
-			trace("AdventureHotspotPolygon::build");
 			super.build(newPoints);
 			var i:int;
 			/* Find starting point (top-most y and left-most x from given array) */
 			var topLeft:Point = getTopLeft(newPoints);
-			trace(points.toString());
 			var startPoint:Point = parent.globalToLocal(targetImage.localToGlobal(topLeft));
 			this.x = startPoint.x;
 			this.y = startPoint.y;
@@ -151,8 +141,6 @@ package hotspots {
 				if(points[i].x < minX) minX = points[i].x;
 				if(points[i].y < minY) minY = points[i].y;
 			}
-//			trace("minY: " + minY);
-//			trace("minX: " + minX);
 			// Calculate the area of the potentially irregular polygon
 			for(i = 0; i < points.length; i++)
 			{
@@ -160,14 +148,11 @@ package hotspots {
 				var p2:Point;
 				if(i == points.length - 1) p2 = points[0];
 				else p2 = points[i+1];
-//
-//				trace(p1);
-//				trace(p2);
+
 				var distX:Number = (p2.x + p1.x) / 2 - minX;
 				var distY:Number = (p2.y + p1.y) / 2 - minY;
 				area += distX * distY;
 			}
-//			trace("area: " + area);
 			return area;
 		}
 		protected function mouseColissionCheck(x:Number, y:Number):Boolean

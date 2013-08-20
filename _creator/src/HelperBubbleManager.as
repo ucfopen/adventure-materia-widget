@@ -19,8 +19,6 @@ package {
 
 		public function initializeHelpers(creatorRef:Creator):void
 		{
-			trace("HelperBubbleManager::initializeHelpers()");
-
 			creator = creatorRef;
 
 			introBubble = new HelperBubble();
@@ -75,7 +73,6 @@ package {
 			return;
 
 			if (helper.visible) return;
-			trace("HelperBubbleManager::addHelper()");
 			PopUpManager.addPopUp(helper, creator);
 			helper.visible = true;
 			helper.validateNow();

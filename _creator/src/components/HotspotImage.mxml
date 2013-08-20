@@ -39,7 +39,6 @@
 			protected var _stage:*;
 			public function showTools():void
 			{
-				trace("HotspotImage::showTools");
 				if(_toolsVisible || _isCurrentlyEditing) return;
 				_toolsVisible = true;
 				// Create the toolbar
@@ -61,7 +60,6 @@
 			}
 			public function hideTools():void
 			{
-				trace("HotspotImage::hideTools");
 				if(!_toolsVisible) return;
 				_toolsVisible = false;
 				// Destroy the toolbar
@@ -90,7 +88,6 @@
 			}
 			public function loadHotspots():void
 			{
-				trace("HotspotImage::loadHotspots");
 				// Do nothing if there are no hotspots
 				if(node.data.answers == null) return;
 				// Load the stored color for the hotspots
@@ -110,7 +107,6 @@
 			}
 			public function removeHotspots():void
 			{
-				trace("HotspotImage::removeHotspots");
 				var target:AdventureDisplayHotspot;
 				while(_hotspots.length)
 				{
@@ -122,7 +118,6 @@
 			}
 			public function updateHotspotScales(oldScale:Number, newScale:Number):void
 			{
-				trace("HotspotImage::updateHotspotScales");
 				for each(var hotspot:AdventureDisplayHotspot in _hotspots)
 				{
 //					hotspot.changeTargetScale(oldScale, newScale);
@@ -133,19 +128,16 @@
 			}
 			public override function set allowScrollingAndSizing(allow:Boolean):void
 			{
-				trace("HotspotImage::allowScrollingAndSizing");
 				super.allowScrollingAndSizing = allow;
 				if(allow) hideTools();
 			}
 			protected override function onRepositionDone(event:Event):void
 			{
-				trace("HotspotImage::onRepositionDone");
 				super.onRepositionDone(event);
 				showTools();
 			}
 			protected function showSettings(e:Event):void
 			{
-				trace("HotspotImage::showSettings");
 				e.stopPropagation();
 				/* If another hotspot was already pending, abort it */
 				abortHotspotCreation();
@@ -163,7 +155,6 @@
 			}
 			protected function createHotspot(type:int, isNew:Boolean):AdventureDisplayHotspot
 			{
-				trace("HotspotImage::createHotspot", type, _creatingHotspot);
 				var clickedSameHotspot:Boolean = _creatingHotspot == type;
 				/* If another hotspot was already pending, abort it and start over */
 				abortHotspotCreation();
@@ -176,7 +167,6 @@
 				switch(type)
 				{
 					case AdventureOptions.HOTSPOT_RECT:
-						trace("rect");
 						_currentHotspot = new AdventureHotspotRect(displayedImage.content);
 						if(isNew)
 						{
@@ -185,21 +175,17 @@
 						}
 						break;
 					case AdventureOptions.HOTSPOT_ELLIPSE:
-						trace("ellipse");
 						_currentHotspot = new AdventureHotspotEllipse(displayedImage.content);
 						if(isNew)
 						{
-							trace("adding listener");
 							_creatingHotspot = AdventureOptions.HOTSPOT_ELLIPSE;
 							this.addEventListener(MouseEvent.MOUSE_DOWN, startEllipseHotspot, false, 0, true);
 						}
 						break;
 					case AdventureOptions.HOTSPOT_POLYGON:
-						trace("polygon");
 						_currentHotspot = new AdventureHotspotPolygon(displayedImage.content);
 						if(isNew)
 						{
-							trace("adding listener");
 							_creatingHotspot = AdventureOptions.HOTSPOT_POLYGON;
 							this.addEventListener(MouseEvent.MOUSE_DOWN, startPolygonHotspot, false, 0, true);
 						}
@@ -234,7 +220,6 @@
 			 */
 			protected function hotspotCreationComplete(hotspotIsNew:Boolean = true):void
 			{
-				trace("HotspotImage::hotspotCreationComplete");
 				_settings.creationInProgress = false;
 				/* store reference to current hotspot */
 				var hotspot:AdventureDisplayHotspot = _currentHotspot;
@@ -294,7 +279,6 @@
 			}
 			protected function removeStartHotspotListeners():void
 			{
-				trace("HotspotImage::removeStartHotspotListeners");
 				if(_creatingHotspot == AdventureOptions.HOTSPOT_POLYGON)
 				{
 					removePolygonHotspotListeners();
@@ -306,7 +290,6 @@
 			}
 			protected function removeHotspotInteractionListeners(hotspot:AdventureDisplayHotspot):void
 			{
-				trace("HotspotImage::removeHotspotInteractionListeners");
 				hotspot.removeEventListener(MouseEvent.CLICK, onHotspotClicked);
 				hotspot.removeEventListener(MouseEvent.MOUSE_DOWN, onHotspotMouseDown);
 				hotspot.removeEventListener(AdventureDisplayHotspot.EVENT_DRAG_BEGIN, onHotspotDragged);
@@ -314,28 +297,23 @@
 			}
 			protected function createNewHotspot(e:DataEvent):void
 			{
-				trace("HotspotImage::createNewHotspot"  + e.data);
 				e.stopPropagation();
 				createHotspot(int(e.data), true);
 			}
 			protected function showHotspots(e:Event):void
 			{
-				trace("HotspotImage::showHotspots");
 				e.stopPropagation();
 				for each(var hotspot:AdventureDisplayHotspot in _hotspots)
 				{
 					hotspot.visible = true;
-					trace("\ta");
 				}
 			}
 			protected function hideHotspots(e:Event):void
 			{
-				trace("HotspotImage::hideHotspots");
 				e.stopPropagation();
 				for each(var hotspot:AdventureDisplayHotspot in _hotspots)
 				{
 					hotspot.visible = false;
-					trace("\ta");
 				}
 			}
 			//----------------------------------
@@ -343,8 +321,6 @@
 			//----------------------------------
 			protected function startRectHotspot(e:MouseEvent):void
 			{
-				trace("HotspotImage::startRectHotspot");
-				trace("start hotspot");
 				removeStartHotspotListeners();
 				var hotspot:AdventureHotspotRect = AdventureHotspotRect(_currentHotspot);
 				var focusPoint:Point = drawingClip.globalToLocal(new Point(e.stageX, e.stageY));
@@ -355,7 +331,6 @@
 			}
 			protected function stopRectHotspot(e:Event):void
 			{
-				trace("HotspotImage::stopRectHotspot");
 				/* get a shortcut reference to current hotspot */
 				var hotspot:AdventureHotspotRect = AdventureHotspotRect(_currentHotspot);
 				/* remove listeners */
@@ -377,7 +352,6 @@
 			//----------------------------------
 			protected function startEllipseHotspot(e:MouseEvent):void
 			{
-				trace("HotspotImage::startEllipseHotspot");
 				removeStartHotspotListeners();
 				var hotspot:AdventureHotspotEllipse = AdventureHotspotEllipse(_currentHotspot);
 				var focusPoint:Point = drawingClip.globalToLocal(new Point(e.stageX, e.stageY));
@@ -388,7 +362,6 @@
 			}
 			protected function stopEllipseHotspot(e:Event):void
 			{
-				trace("HotspotImage::stopEllipseHotspot");
 				/* get a shortcut reference to current hotspot */
 				var hotspot:AdventureHotspotEllipse = AdventureHotspotEllipse(_currentHotspot);
 				/* remove listeners */
@@ -411,7 +384,6 @@
 			//----------------------------------
 			protected function startPolygonHotspot(e:MouseEvent):void
 			{
-				trace("HotspotImage::startPolygonHotspot");
 				removeStartHotspotListeners();
 				_creatingHotspot = AdventureOptions.HOTSPOT_POLYGON;
 				var hotspot:AdventureHotspotPolygon = AdventureHotspotPolygon(_currentHotspot);
@@ -426,13 +398,11 @@
 			}
 			protected function continuePolygonHotspot(e:MouseEvent):void
 			{
-				trace("HotspotImage::continuePolygonHotspot");
 				var hotspot:AdventureHotspotPolygon = AdventureHotspotPolygon(_currentHotspot);
 				hotspot.addPoint(e);
 			}
 			protected function endPolygonHotspot(e:Event):void
 			{
-				trace("HotspotImage::endPolygonHotspot");
 				e.stopImmediatePropagation();
 				removePolygonHotspotListeners();
 				_currentHotspot.finalize();
@@ -500,7 +470,6 @@
 			//----------------------------------
 			protected function removePolygonHotspotListeners():void
 			{
-				trace("HotspotImage::removePolygonHotspotListeners");
 				var hotspot:AdventureHotspotPolygon = AdventureHotspotPolygon(_currentHotspot);
 				hotspot.removeEventListener(AdventureHotspotPolygon.CONNECTED, endPolygonHotspot);
 				this.removeEventListener(MouseEvent.MOUSE_MOVE, hotspot.onMouseMoveCreate);
@@ -509,7 +478,6 @@
 			}
 			protected function onCreationComplete():void
 			{
-				trace("HotspotImage::onCreationComplete");
 				_changeButton = new FloatButton();
 				_changeButton.label = "Change Image";
 				this.doubleClickEnabled = true;
@@ -534,18 +502,15 @@
 			}
 			protected function onMouseDownInside(e:Event):void
 			{
-				trace("HotspotImage::onMouseDownInside");
 				_mouseWasInside = true;
 			}
 			protected function onMouseDownApplication(e:Event):void
 			{
-				trace("HotspotImage::onMouseDownApplication");
 //				if(!_mouseWasInside) hideTools();
 				if(_mouseWasInside) _mouseWasInside = false;
 			}
 			protected function onHotspotDragged(e:Event):void
 			{
-				trace("HotspotImage::onHotspotDragged");
 //				hideHotspotBubble(true);
 			}
 			protected function onHotspotMouseDown(e:Event):void
@@ -561,7 +526,6 @@
 			}
 			protected function onHotspotClicked(e:Event):void
 			{
-				trace("HotspotImage::onHotspotClicked | " + e.target.dragging, e.target.resizing);
 				var targetHotspot:AdventureDisplayHotspot = AdventureDisplayHotspot(e.target);
 				if(targetHotspot != _lastClosedBubbleTarget)
 				{
@@ -661,7 +625,6 @@
 			 */
 			protected function showBubbleForHotspot(hotspot:AdventureDisplayHotspot, autoFocus:Boolean = false):void
 			{
-				trace("HotspotImage::showBubbleForHotspot");
 				/* If the bubble already exists, do nothing */
 				if(_hotspotBubble != null && _hotspotBubble.destroyed == false && _hotspotBubble.hotspot == hotspot)
 				{
@@ -704,7 +667,6 @@
 			 */
 			protected function hideHotspotBubble(save:Boolean = false):void
 			{
-				trace("HotspotImage::hideHotspotBubble");
 				/* If the hotspot's bubble is visible, destroy it */
 				if(_hotspotBubble != null && _hotspotBubble.visible)
 				{
@@ -720,7 +682,6 @@
 			}
 			protected function onHotspotDragEnd(e:Event):void
 			{
-				trace("HotspotImage::onHotspotDragEnd");
 				/* Get Refernce to Hotspot */
 				var hotspot:AdventureDisplayHotspot = AdventureDisplayHotspot(e.target);
 				/* Maintain Boundaries So We Don't Lose Hotspot */
@@ -735,7 +696,6 @@
 			}
 			protected function checkBounds(hotspot:AdventureDisplayHotspot):void
 			{
-				trace("HotspotImage::checkBounds " + "x:" + hotspot.x + " y:" + hotspot.y + " w:" + hotspot.width + " h:" + hotspot.height);
 				if(hotspot.width <= this.width) // don't force boundaries if too big to fit in boundaries
 				{
 					if(hotspot.x < 0) hotspot.x = 0;
@@ -749,12 +709,10 @@
 			}
 			protected function saveHotspotToQset(hotspot:AdventureDisplayHotspot):void
 			{
-				trace("HotspotImage::saveHotspotToQset");
 				node.data.answers[hotspot.id + (hasDefault ? 1 : 0)].options.hotspot = AdventureUtils.encodeHotspot(hotspot.getHotspot());
 			}
 			protected function onChangeButtonClick(e:Event):void
 			{
-				trace("HotspotImage::onChangeButtonClick");
 				dispatchEvent(new Event(EVENT_CHANGE_IMAGE));
 			}
 			private function get displayTree():DisplayTree

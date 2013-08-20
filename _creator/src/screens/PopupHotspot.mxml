@@ -31,7 +31,6 @@
 
 			protected override function onCreationComplete():void
 			{
-				trace("PopupHotspot::onCreationComplete()");
 				super.onCreationComplete();
 				nodeImg.addEventListener(HotspotImage.EVENT_CHANGE_IMAGE, onChangeImageButton, false, 0, true);
 				this.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
@@ -164,7 +163,6 @@
 			}
 			private function onChangeImageButton(e:Event):void
 			{
-				trace("PopupHotspot::onChangeImageButton()");
 				_changingImage = true;
 				selectImage();
 			}
@@ -194,7 +192,6 @@
 			}
 			private function onLoadImageComplete(event:Event):void
 			{
-				trace("received");
 				// Remove the event listener
 				nodeImg.removeEventListener(ScrollableSizableImage.EVENT_IMAGE_LOAD_COMPLETE, onLoadImageComplete);
 				// Auto-fit
@@ -212,7 +209,6 @@
 			}
 			private function addNode(parentNode:Node):Node
 			{
-				trace("PopupHotspot::addNode");
 				var result:Node = parentNode.displayNode.displayTree.addNode(parentNode, null).node;
 				_newNodes.push(result);
 				return result;

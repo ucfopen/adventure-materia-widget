@@ -91,7 +91,6 @@ public class AdventureHotspotRect extends AdventureDisplayHotspot
 	{
 		var height:Number = lastMouse.y;
 		var width:Number = lastMouse.x;
-//		trace("area: (" + width + "," + height + ")" + (width * height));
 		return width * height;
 	}
 	//----------------------------------

@@ -415,17 +415,14 @@ class Test_Score_Modules_Adventure extends \Basetest
 		{
 			case 0:
 				$qset = (object) ['version' => 1, 'data' => $this->_get_qset()];
-				trace('qset received for type: '.$qset_type);
 				break;
 
 			case 1:
 				$qset = (object) ['version' => 1, 'data' => $this->_get_quest_qset()];
-				trace('qset received for type: '.$qset_type);
 				break;
 
 			case 2:
 				$qset = (object) ['version' => 1, 'data' => $this->_get_destination_qset()];
-				trace('qset received for type: '.$qset_type);
 				break;
 		}
 
