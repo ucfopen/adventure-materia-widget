@@ -85,7 +85,6 @@ package hotspots {
 		{
 			var radius1:Number = lastMouse.x;
 			var radius2:Number = lastMouse.y;
-//			trace("area: (" + radius1 + "," + radius2 + ")" + (radius1 * radius2));
 			return Math.PI * radius1 * radius2;
 		}
 		//----------------------------------

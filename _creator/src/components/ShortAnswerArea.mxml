@@ -147,7 +147,6 @@
 	 */
 	private function redraw():void
 	{
-		trace("ShortanswerArea::redraw()");
 		/* place input field at appropriate position */
 		resetCursor();
 		/* update height */
@@ -160,7 +159,6 @@
 	}
 	private function reposition():void
 	{
-		trace("ShortanswerArea::reposition()");
 		/* reset current x/y position */
 		_currX = 0;
 		_currY = 0;
@@ -183,7 +181,6 @@
 	}
 	private function resetCursor():void
 	{
-		trace("ShortanswerArea::resetCursor()");
 		/* determine width of input field */
 		var inputWidth:Number = Math.max(INPUT_WIDTH_MIN, _inputField.textWidth);
 		/* reset x position and move down if necessary */
@@ -207,7 +204,6 @@
 	}
 	private function recalculateCurrentPosition():void
 	{
-		trace("ShortanswerArea::recalculateCurrentPosition()");
 		if(_tokenFields.length)
 		{
 			var targetField:TextField = _tokenFields[_tokenFields.length - 1];
@@ -222,13 +218,11 @@
 	}
 	private function commitInput():void
 	{
-		trace("ShortanswerArea::commitInput()");
 		addToken(_inputField.text);
 		_inputField.text = "";
 	}
 	private function saveTokens():void
 	{
-		trace("ShortAnswerArea::saveTokens()");
 		for(var i:int = 0; i < _tokenStrings.length; i++)
 		{
 			_tokenStrings[i] = escapeChars(_tokenStrings[i]);
@@ -238,7 +232,6 @@
 	}
 	private function build():void
 	{
-		trace("ShortanswerArea::build()");
 		clean();
 		/* get the tokens from the parse string */
 		if(_parseString.length)
@@ -264,7 +257,6 @@
 	}
 	private function clean():void
 	{
-		trace("ShortanswerArea::clean()");
 		/* clean token strings */
 		_tokenStrings = null;
 		/* remove all token fields */
@@ -281,7 +273,6 @@
 	}
 	private function addToken(input:String):void
 	{
-		trace("ShortanswerArea::addToken()");
 		/* get token from input */
 		var token:String = StringUtil.ltrim(input);
 		token = splitCommas(token)[0];
@@ -304,7 +295,6 @@
 	}
 	private function createTokenField(val:String):TextField
 	{
-		trace("ShortanswerArea::createTokenField()");
 		/* create the token field */
 		var tokenField:TextField = new TextField;
 		tokenField.selectable = false;
@@ -334,7 +324,6 @@
 	}
 	private function removeTokenField(tokenField:TextField):void
 	{
-		trace("ShortanswerArea::removeTokenField()");
 		flashPanel.removeChild(tokenField);
 		tokenField.removeEventListener(MouseEvent.ROLL_OVER, onTokenFieldRollOver);
 		tokenField.removeEventListener(MouseEvent.ROLL_OUT, onTokenFieldRollOut);
@@ -345,7 +334,6 @@
 	 */
 	private function setListenersEnabled(val:Boolean):void
 	{
-		trace("ShortanswerArea::setListenersEnabled()");
 		/* avoid adding double listeners */
 		if(val == _listenersEnabled) return;
 		/* enable listeners */
@@ -450,7 +438,6 @@
 	//----------------------------------
 	private function onFocusIn(e:Event):void
 	{
-		// trace("ShortAnswerArea::onFocusIn()");
 		stage.focus = _inputField;
 		setStageListener(true);
 	}
@@ -461,7 +448,6 @@
 	}
 	private function onClick(e:MouseEvent):void
 	{
-		trace("ShortAnswerArea::onClick()");
 		stage.focus = _inputField;
 		if(_inputField.mouseX > _inputField.width && _inputField.mouseY > 0 || _inputField.mouseY > _inputField.height)
 		{
@@ -484,17 +470,14 @@
 	}
 	private function onRollOver(e:Event):void
 	{
-		// trace("ShortanswerArea::onRollOver()");
 		Mouse.cursor = MouseCursor.IBEAM;
 	}
 	private function onRollOut(e:Event):void
 	{
-		// trace("ShortanswerArea::onRollOut()");
 		Mouse.cursor = MouseCursor.AUTO;
 	}
 	private function onTokenFieldRollOver(e:Event):void
 	{
-		// trace("ShortanswerArea::onTokenFieldRollOver()");
 		Mouse.cursor = MouseCursor.BUTTON;
 		_deleteButton.x = e.target.x + e.target.width - _deleteButton.width;
 		_deleteButton.y = e.target.y;
@@ -502,7 +485,6 @@
 	}
 	private function onTokenFieldRollOut(e:Event):void
 	{
-		// trace("ShortanswerArea::onTokenFieldRollOut()");
 		Mouse.cursor = MouseCursor.IBEAM;
 		if(_deleteButton.parent != null) flashPanel.removeChild(_deleteButton);
 	}
@@ -518,7 +500,6 @@
 	}
 	private function onResize(e:Event):void
 	{
-		trace("ShortanswerArea::onResize()");
 		reposition(); // includes redraw
 		callLater(checkScrollDown);
 	}
@@ -581,18 +562,14 @@
 	}
 	private function onKeyUp(e:KeyboardEvent):void
 	{
-		// trace("ShortAnswerArea::onKeyUp()");
-		// trace("e.keyCode = " + e.keyCode);
 		switch(e.keyCode)
 		{
 			/* comma */
 			case 188:
-				trace("detected comma");
 				/* if we escaped the comma */
 				if(_inputField.selectionBeginIndex > 0 && _inputField.text.charAt(_inputField.selectionBeginIndex - 2) == '\\')
 				{
 					/* do nothing */
-					trace("comma was escaped");
 				}
 				/* otherwise */
 				else

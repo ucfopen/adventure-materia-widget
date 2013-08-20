@@ -386,20 +386,8 @@ public class DisplayNode extends Sprite
 			tweening = true;
 			dispatchEvent(new Event(TWEEN_START));
 		}
-		trace(DisplayNode.idToLabel(node.id) + " :: " + !node.isValid + " " + !node.isEmpty);
-//		// draw bounding box
-//		trace("bounds: [" + bounds.x + "x" + bounds.y + "] [" + bounds.width + "x" + bounds.height + "]");
-//		graphics.beginFill(_color);
-//		graphics.drawRect(0, 0, bounds.width, bounds.height - 15);
-//		this.x = bounds.x;
-//		this.y = bounds.y;
 	}
-//	protected static function customTween(t:Number, b:Number, c:Number, d:Number):Number
-//	{
-//		  var ts:Number=(t/=d)*t;
-//		  var tc:Number=ts*t;
-//		  return b+c*(33*tc*ts + -106*ts*ts + 126*tc + -67*ts + 15*t);
-//	}
+
 	protected function showNewFlag(val:Boolean):void
 	{
 		if(_newStar == null && val)
@@ -461,7 +449,6 @@ public class DisplayNode extends Sprite
 	}
 	protected function onClick(e:Event):void
 	{
-//		trace("leaves:" + node.numLeaves + "    height:" + node.treeHeight);
 	}
 	protected function onMouseOver(e:Event):void
 	{

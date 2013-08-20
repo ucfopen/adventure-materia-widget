@@ -98,7 +98,6 @@
 	{
 		removeEventListener(Event.CLOSE, onCloseButtonClicked);
 		PopUpManager.removePopUp(this);
-		trace("destroyed " + this.name);
 	}
 	/**
 	 * Called when the 'X' button in the top left is pressed

@@ -88,7 +88,6 @@ public class AdventureBubble extends UIComponent
 	}
 	public function destroy():void
 	{
-		trace("AdventureBubble:destroy");
 		this.visible = false;
 		PopUpManager.removePopUp(this);
 		this.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDownInside);
@@ -97,17 +96,14 @@ public class AdventureBubble extends UIComponent
 	}
 	protected function onMouseDownInside(e:Event):void
 	{
-		trace("AdventureBubble:onMouseDownInside [" + this.name + "]");
 		_mouseWasInside = true;
 	}
 	protected function onMouseUpInside(e:Event):void
 	{
-		trace("AdventureBubble:onMouseDownInside [" + this.name + "]");
 		_mouseWasInside = false;
 	}
 	protected function onClickApplication(e:Event):void
 	{
-		trace("AdventureBubble:onClickApplication [" + this.name + "]");
 		/* Ignore Stage Click if it was propagated through clicking on bubble itself */
 		if(_mouseWasInside)
 		{

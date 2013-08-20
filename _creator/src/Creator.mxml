@@ -138,8 +138,6 @@
 
 			instanceTitle = DEFAULT_TITLE;
 
-			trace("Creator::initNewWidget()");
-
 			// Add the intro helper bubble
 			helperManager.addHelper(helperManager.introBubble);
 
@@ -221,7 +219,6 @@
 		 */
 		public function editNode(node:Node):void
 		{
-			trace((new Date()).getTime() - this.time);
 			_selectedNode = node; // keep reference to selected node
 			/* Load Edit Text Node Interface */
 			switch (node.type)
@@ -299,25 +296,20 @@
 			_narrativeScreen.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
 			_hotSpotScreen.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
 			_endScreen.addEventListener(DisplayNode.EVENT_FIND_LINK, onEditLink, false, 0, true);
-
-			trace("Creator::createInterface()");
 		}
 		private function onEditLink(e:DataEvent):void
 		{
-			trace("Creator::onEditLink()");
 			e.stopPropagation();
 			_currentScreen = AdventurePopupBase(e.currentTarget);
 			_adventureTree.editLink(int(e.data), onDoneEditingLink);
 		}
 		private function onStartDragImport(e:Event):void
 		{
-			trace("DRAGGING STARTED");
 			_adventureTree.beginImportMode();
 			e.stopImmediatePropagation();
 		}
 		private function onReleaseDragImport(e:Event):void
 		{
-			trace("DRAGGING ENDED");
 			var target:ImportDisplayNode = ImportDisplayNode(e.target);
 			_adventureTree.attemptImport(target.node.data, onDragImportAccepted);
 			e.stopImmediatePropagation();

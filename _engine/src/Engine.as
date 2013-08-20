@@ -208,7 +208,6 @@ public class Engine extends EngineCore
 		initUI();
 		loadNode(0);
 
-		trace('**** engine start ****');
 		_scoreSelectedAnswers = new Array();
 		_scoreQIDs = new Array();
 		_scoreSelectedAnswerIds = new Array();
@@ -546,7 +545,6 @@ public class Engine extends EngineCore
 			//----------------------------------
 			case AdventureOptions.TYPE_NARRATIVE:
 			case AdventureOptions.TYPE_END:
-				trace("Narrative");
 				var end:Boolean = entry.options.type == AdventureOptions.TYPE_END;
 				setTypeIcon(null);
 				// get text to be used for proceed button
@@ -597,7 +595,6 @@ public class Engine extends EngineCore
 			//----------------------------------
 			case AdventureOptions.TYPE_MULTIPLE_CHOICE:
 			case AdventureOptions.TYPE_SHORT_ANSWER:
-				trace("Multiple Choice");
 				var qBoxDim:Dimension;
 				var qBoxHeightModifier:Number = 0;
 				if(entry.options.type == AdventureOptions.TYPE_SHORT_ANSWER) qBoxHeightModifier = _stageDim.height / 4;
@@ -690,7 +687,6 @@ public class Engine extends EngineCore
 			//  Hotspot
 			//----------------------------------
 			case AdventureOptions.TYPE_HOTSPOT:
-				trace("Hotspot");
 				// Update the Question Box
 				if(entry.options.layout == AdventureOptions.LAYOUT_VERT_TEXT && entry.questions[0].text)
 				{
@@ -714,7 +710,6 @@ public class Engine extends EngineCore
 			//  Other
 			//----------------------------------
 			default: // Assume this is an end node for now
-				// trace("Invalid or missing node type: " + entry.options.type);
 				// throw new Error("Invalid or missing node type");
 				isEndNode = true;
 				break;
@@ -750,7 +745,6 @@ public class Engine extends EngineCore
 	 */
 	private function applyScore(question:Object, answerIndex:int):void
 	{
-		trace(question);
 		if(question == null) return;
 
 		/* manage end node */
@@ -769,7 +763,6 @@ public class Engine extends EngineCore
 
 		if (question.options.type == AdventureOptions.TYPE_HOTSPOT)
 		{
-			trace('Hotspot identified');
 			_scoreSelectedAnswerIds.push(selectedAnswer.id);
 		}
 		else
@@ -787,8 +780,6 @@ public class Engine extends EngineCore
 		{
 			var selectedAnswer:Object = question.answers[answerIndex];
 			// _scoreQIDs.push(question.id);
-
-			// trace(selectedAnswer);
 
 			switch(_scoreStyle)
 			{
@@ -812,7 +803,6 @@ public class Engine extends EngineCore
 
 			if (question.options.type == AdventureOptions.TYPE_HOTSPOT)
 			{
-				trace('Hotspot identified');
 				_scoreSelectedAnswerIds.push(selectedAnswer.id);
 			}
 			else

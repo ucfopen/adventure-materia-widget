@@ -109,11 +109,9 @@
 					}
 					else
 					{
-						// trace("node children length is greater than 1...");
 						_newNodes.push(addNode(node));
 					}
 					node.data.addAnswer("", "0", {link:node.children[1].id});
-					trace("Added New (SA Default)");
 				}
 				updateRowOffset();
 				super.beginEdit(node);

@@ -37,7 +37,6 @@
 
 		private function onCloseBtnClick(e:Event):void
 		{
-			trace("ShortAnswerTokenRow::onCloseBtnClick()");
 			dispatchEvent(new Event(CLOSE_BUTTON_CLICKED));
 		}
 

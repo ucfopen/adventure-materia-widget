@@ -103,7 +103,6 @@ public class ImportDisplayNode extends DisplayNode
 		{
 			_dragging = true;
 			/* Let listeners know we are dragging */
-			trace("dragging started");
 			dispatchEvent(new Event(EVENT_DRAG_BEGIN, true));
 			/* store original position */
 			_originalParent = this.parent;

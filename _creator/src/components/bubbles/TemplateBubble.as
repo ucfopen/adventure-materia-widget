@@ -14,7 +14,6 @@ package components.bubbles {
 		public override function show(target:Sprite):void
 		{
 			super.show(target);
-			trace("Show");
 		}
 	}
 }

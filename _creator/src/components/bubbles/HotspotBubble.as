@@ -341,15 +341,12 @@ package components.bubbles {
 			var result:int = int(e.data);
 			switch(result) {
 				case DestinationBubble.THIS_NODE:
-					trace("this one");
 					node.displayNode.displayTree.setLink(node.children[hotspot.id + (hasDefault ? 1 : 0)], node);
 					break;
 				case DestinationBubble.NEW_NODE:
-					trace("New");
 					node.displayNode.displayTree.setLink(node.children[hotspot.id + (hasDefault ? 1 : 0)], node.children[hotspot.id + (hasDefault ? 1 : 0)]);
 					break;
 				case DestinationBubble.EXISTING_NODE:
-					trace("Existing");
 					hotspot.dispatchEvent(new DataEvent(DisplayNode.EVENT_FIND_LINK, true, false, String(node.children[hotspot.id + (hasDefault ? 1 : 0)].id)));
 					destroySave();
 					break;
@@ -391,12 +388,10 @@ package components.bubbles {
 		}
 		private function onHotspotDragBegin(e:Event):void
 		{
-			trace("HotspotBubble::onHotspotDragBegin");
 			this.visible = false;
 		}
 		private function onHotspotDragEnd(e:Event):void
 		{
-			trace("HotspotBubble::onHotspotDragEnd");
 			updatePosition(hotspot);
 			save();
 			this.visible = true;

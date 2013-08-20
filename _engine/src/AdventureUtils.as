@@ -32,7 +32,6 @@ public class AdventureUtils
 					var p2:String = s.substring(s.indexOf('=', 2) + 1);
 					pointsFinal.push(new Point(int(p1), int(p2)));
 				}
-				trace(pointsFinal.toString());
 			}
 			else
 			{

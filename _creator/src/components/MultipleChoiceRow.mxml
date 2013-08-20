@@ -101,7 +101,6 @@
 			//------------------------------------------------------------------
 			private function init():void
 			{
-				trace("init");
 				destCanvas.addEventListener(DestinationBubble.EVENT_DESTINATION_CHOICE, onDestChange, false, 0, true);
 			}
 			public function destroy():void
@@ -157,7 +156,6 @@
 			{
 				var mainField:TextArea = event.currentTarget as TextArea;
 				if(mainField == null) return;
-				trace(event.delta, mainField.verticalScrollPosition, mainField.maxVerticalScrollPosition);
 				//If scrolling down
 				if(event.delta < 0)
 				{
@@ -177,7 +175,6 @@
 			}
 			private function onDestChange(e:DataEvent):void
 			{
-				trace("onDestChange " + e.data + "  " + int(e.data));
 				var result:int = int(e.data);
 				// If the target node didn't exist (was in warning state), create it first
 				if(destination == null)
@@ -193,19 +190,16 @@
 				switch(result) {
 					// make target node point back to "this" node
 					case DestinationBubble.THIS_NODE:
-						trace("this one");
 						displayTree.setLink(node.children[targetIndex], node);
 						popupInstance.onDoneEditingLink();
 						break;
 					// make the target node a concrete node (doesn't point anywhere)
 					case DestinationBubble.NEW_NODE:
-						trace("New");
 						displayTree.setLink(node.children[targetIndex], node.children[targetIndex]);
 						popupInstance.onDoneEditingLink();
 						break;
 					// make the target node point to another node (brings up link-editor)
 					case DestinationBubble.EXISTING_NODE:
-						trace("Existing");
 						dispatchEvent(new DataEvent(DisplayNode.EVENT_FIND_LINK, true, false, String(node.children[targetIndex].id)));
 						break;
 				}
