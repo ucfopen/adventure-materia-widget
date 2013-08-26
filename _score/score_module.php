@@ -140,13 +140,4 @@ class Score_Modules_Adventure extends Score_Module
 			]
 		];
 	}
-
-	/**
-	 * NEEDS DOCUMENTATION
-	 */
-	public function validate_scores()
-	{
-		$value = parent::validate_scores();
-		return $value;
-	}
 }
