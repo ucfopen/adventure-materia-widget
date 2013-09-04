@@ -98,30 +98,30 @@ class Score_Modules_Adventure extends Score_Module
 						$user_answer = $this->get_score_page_answer($log);
 						$feedback    = $this->get_feedback($log, $q->answers);
 						$details[]   = ['data'          => [$question_text, $user_answer],
-													  'data_style'    => ['question', 'response', 'answer'],
-													  'score'         => $score,
-													  'feedback'      => $feedback,
-													  'type'          => $log->type,
-													  'style'         => $this->get_detail_style($score),
-													  'tag'           => 'div',
-													  'symbol'        => '%',
-													  'graphic'       => 'score',
-													  'display_score' => false];
+										'data_style'    => ['question', 'response', 'answer'],
+										'score'         => $score,
+										'feedback'      => $feedback,
+										'type'          => $log->type,
+										'style'         => $this->get_detail_style($score),
+										'tag'           => 'div',
+										'symbol'        => '%',
+										'graphic'       => 'score',
+										'display_score' => false];
 					}
 					break;
 
 				case Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT:
 					$score          = $this->check_answer($log);
 					$user_answer    = $this->get_score_page_answer($log);
-					$destination_table[]      = ['data' => [$user_answer],
-									'data_style'    => ['node_text'],
-									'score'         => $score,
-									'type'          => $log->type,
-									'style'         => 'single_column',
-									'tag'           => 'p',
-									'symbol'        => '%',
-									'graphic'       => 'none',
-									'display_score' => false];
+					$destination_table[] = ['data' => [$user_answer],
+											'data_style'    => ['node_text'],
+											'score'         => $score,
+											'type'          => $log->type,
+											'style'         => 'single_column',
+											'tag'           => 'p',
+											'symbol'        => '%',
+											'graphic'       => 'none',
+											'display_score' => false];
 					break;
 			}
 		}
