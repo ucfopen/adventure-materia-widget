@@ -21,7 +21,6 @@ import tree.Node;
 public class PrependBubble extends Sprite
 {
 	public static const RADIUS:int = 20;
-	public static const SPACING:int = 30;
 	private static const FILTERSET_NORMAL:Array = [];
 	private static const FILTERSET_HIGHLIGHT:Array = [new DropShadowFilter(2, 45, 0)];
 	
