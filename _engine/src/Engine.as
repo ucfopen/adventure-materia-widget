@@ -515,7 +515,7 @@ public class Engine extends EngineCore
 	private function loadNode(nodeID:int):void
 	{
 		var i:int;
-		var isEndNode:Boolean = false;
+		var isEmptyNode:Boolean = false;
 		// Submit for scoring if target is score screen
 		if(nodeID == SCORE_SCREEN_ID)
 		{
@@ -711,8 +711,8 @@ public class Engine extends EngineCore
 			//----------------------------------
 			default: // Assume this is an end node for now
 				// throw new Error("Invalid or missing node type");
-				isEndNode = true;
-				break;
+				isEmptyNode = true;
+				// break;
 		}
 		// load the question into the question field
 		_questionField.text = String(entry.questions[0].text);
@@ -724,16 +724,33 @@ public class Engine extends EngineCore
 			_questionField.checkScrollability();
 		}
 
-		// check if it's an end node
-		if(isEndNode)
+		// If the node is empty, determine whether or not the node is at the end of a branch - and proceed or go to score screen.
+		if(isEmptyNode)
 		{
 			bounds = new Rectangle(0, 0, _stageDim.width, _stageDim.height - (_continueButton.height + PADDING_V));
 			// Update layout
 			setTypeIcon(null);
-			updateContinueButton("Visit Score Screen", SCORE_SCREEN_ID);
+
+			try
+			{
+				if (entry.answers[0].options.link)
+				{
+					updateContinueButton("Continue", entry.answers[0].options.link);
+					_questionField.text = String("This node is empty. Click the continue button to advance to the next one.");
+				}
+			}
+			catch (e:Error)
+			{
+				updateContinueButton("Visit Score Screen", SCORE_SCREEN_ID);
+				_questionField.text = String("This node is empty, and is the final node on this branch. Click the button below to proceed to the score screen.");
+
+				_scoreQIDs.push(0);
+				_scoreSelectedAnswers.push("Empty Node");
+				_scoreSelectedAnswerIds.push('');
+				_selectedFinalAnswer = "Empty Node";
+			}
+
 			updateQuestionBox(_vertDim, POSITION_CENTER, bounds);
-			// Set text if none is present
-			_questionField.text = String(DEFAULT_TEXT_END);
 		}
 	}
 	/**
