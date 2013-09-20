@@ -15,6 +15,7 @@ import flash.text.TextFormat;
 import nm.ui.ToolTip;
 
 import tree.DisplayNode;
+import tree.DisplayTree;
 import tree.Node;
 
 public class PrependBubble extends Sprite
@@ -44,15 +45,6 @@ public class PrependBubble extends Sprite
 		
 		_image.addChild(bitmap);
 		this.addChildAt(_image, 0);
-//		this.graphics.beginFill(0xf0f0f0);
-//		this.graphics.lineStyle(2, 0x666666);
-//		this.graphics.drawCircle(0, 0, RADIUS);
-//		this.graphics.endFill();
-//		this.graphics.lineStyle(4, 0x888888, 1, false, "normal", CapsStyle.NONE, JointStyle.ROUND);
-//		this.graphics.moveTo(0, -RADIUS);
-//		this.graphics.lineTo(0, RADIUS);
-//		this.graphics.moveTo(-RADIUS, 0);
-//		this.graphics.lineTo(RADIUS, 0);
 		this.visible = false;
 		this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver, false, 0, true);
 		this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut, false, 0, true);
@@ -62,19 +54,25 @@ public class PrependBubble extends Sprite
 		this.removeEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
 		this.removeEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
 	}
+	
 	public function show(node:Node):void
 	{
+		var fromNode:DisplayNode = node.parent.displayNode;
+		var toNode:DisplayNode = node.displayNode;
+		
 		targetNode = node;
-		var target:DisplayNode = node.displayNode;
-		var targetPoint:Point = parent.globalToLocal(target.localToGlobal(new Point(0, 0)));
-		this.x = targetPoint.x;
-		this.y = targetPoint.y - DisplayNode.radius - RADIUS - SPACING;
+		
+		x = parent.globalToLocal(toNode.localToGlobal(new Point())).x;
+		y = DisplayTree.getMidpointBetweenNodes(fromNode, toNode);
+		
 		var direction:String = this.x > this.parent.width / 2 ? "left" : "right";
 		var targName:String = DisplayNode.idToLabel(node.id);
 		var parentName:String = DisplayNode.idToLabel(node.parent.id);
 		ToolTip.add(this, "Click to add a destination between \"" + parentName + "\" and \"" + targName + "\"", {direction:direction, yOffset:-RADIUS, xOffset:-RADIUS});
-		this.visible = true
+		
+		visible = true;
 	}
+	
 	public function hide():void
 	{
 		ToolTip.remove(this);
