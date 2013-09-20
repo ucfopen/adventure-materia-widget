@@ -279,10 +279,10 @@ public class Engine extends EngineCore
 		// Draw answer box
 		_answerBoxDim = new Dimension(600, 150);
 		_answerBoxContainer = new ScrollClip(_answerBoxDim.width, _answerBoxDim.height, true);
-		_answerBoxContainer.setStyle("bgAlpha", "0")
+		_answerBoxContainer.setStyle("bgFill", COLOR_BOX_BG);
+		_answerBoxContainer.setStyle("bgAlpha", 1);
 		_answerBox = new Sprite();
-		_answerBox.graphics.beginFill(COLOR_BOX_BG, .9);
-		_answerBox.graphics.drawRect(0, 0, _answerBoxDim.width, _answerBoxDim.height);
+		_answerBox.opaqueBackground = COLOR_BOX_BG;
 		_answerBoxContainer.x = _stageDim.width / 2 - _answerBoxDim.width / 2;
 		_answerBoxContainer.y = _stageDim.height * 2 / 3 - _answerBoxDim.height / 2;
 		_answerBoxContainer.clip.addChild(_answerBox);
