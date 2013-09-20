@@ -1463,7 +1463,7 @@ public class DisplayTree extends Sprite
 		var color:Number = highlight ? 0x70c0c0 : 0x909090;
 		sprite.graphics.lineStyle(stroke, color, 1, true, "normal", CapsStyle.NONE);
 		sprite.graphics.moveTo(parent.x, parent.y + DisplayNode.radius);
-		var midpointY:Number = parent.y + parent.bounds.height / 2 + ((child.y - child.bounds.height / 2) - (parent.y + parent.bounds.height / 2)) / 2;
+		var midpointY:Number = getMidpointBetweenNodes(parent, child);
 		sprite.graphics.lineTo(parent.x, midpointY);
 		var direction:int = 0;
 		if(parent.node.children.length > 1 && child.node.leftSibling == null) direction = -1;
@@ -1533,6 +1533,12 @@ public class DisplayTree extends Sprite
 			}
 		}
 		return true;
+	}
+	
+	// Utility function to get the midpoint between two display nodes
+	public static function getMidpointBetweenNodes(fromNode:DisplayNode, toNode:DisplayNode):Number
+	{
+		return fromNode.y + fromNode.bounds.height / 2 + ((toNode.y - toNode.bounds.height / 2) - (fromNode.y + fromNode.bounds.height / 2)) / 2;
 	}
 }
 }
