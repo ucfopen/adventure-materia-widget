@@ -89,6 +89,7 @@ class Score_Modules_Adventure extends Score_Module
 			switch ($log->type)
 			{
 				case Session_Log::TYPE_QUESTION_ANSWERED:
+					if ( ! array_key_exists($log->item_id, $this->questions)) break; 	// contingency for empty nodes (due to previewing)
 					if ($q = $this->questions[$log->item_id])
 					{
 						$feedback;
