@@ -153,7 +153,7 @@
 			// remove assets that are no longer being used
 			if(_node.data.options.layout == AdventureOptions.LAYOUT_TEXT_ONLY)
 			{
-				delete _node.data.options.assetId;
+				delete _node.data.options.asset;
 			}
 		}
 	}
