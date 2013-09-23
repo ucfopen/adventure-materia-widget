@@ -152,7 +152,7 @@
 					// Keep track of old image's scale
 					_scaleBeforeChange = nodeImg.imageScale;
 					// Load Image
-					_node.data.options.asset = { materiaType:'asset,', id:assetArr[0].id };
+					_node.data.options.asset = { materiaType:'asset', id:assetArr[0].id };
 					updateImage();
 				}
 				else
