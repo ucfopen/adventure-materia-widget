@@ -303,7 +303,7 @@
 						questionHBox.addChildAt(qField, 1);
 						//questionHBox.addChildAt(swapContainer, 2);
 						questionHBox.addChildAt(imageContainer, 3);
-						updateImage(_node.data.options.assetId);
+						updateImage(_node.data.options.asset);
 						layoutButton2.setStyle('borderStyle', 'solid');
 						layoutButton3.setStyle('borderStyle', 'none');
 						layout2ButtonOverlay.visible = true;
@@ -315,7 +315,7 @@
 						questionHBox.addChildAt(imageContainer, 1);
 						// questionHBox.addChildAt(swapContainer, 2);
 						questionHBox.addChildAt(qField, 3);
-						updateImage(_node.data.options.assetId);
+						updateImage(_node.data.options.asset);
 						layoutButton2.setStyle('borderStyle', 'none');
 						layoutButton3.setStyle('borderStyle', 'solid');
 						layout2ButtonOverlay.visible = false;
@@ -350,14 +350,14 @@
 					addChild(changeImageButton); // bring to front
 				}
 			}
-			private function updateImage(assetId:* = null):void
+			private function updateImage(asset:* = null):void
 			{
-				if(assetId != null)
+				if(asset && asset.id && asset.id != '')
 				{
-					if(assetId == _assetId) return;
-					_assetId = assetId;
+					if(asset.id == _assetId) return;
+					_assetId = asset.id;
 					nodeImg.addEventListener(ScrollableSizableImage.EVENT_IMAGE_LOAD_COMPLETE, onLoadImageComplete, false, 0, true);
-					nodeImg.source = CreatorConfig.getKogneatoAssetLink(assetId);
+					nodeImg.source = CreatorConfig.getKogneatoAssetLink(asset.id);
 					callLater(updateChangeImageButton);
 				}
 				else
@@ -528,8 +528,8 @@
 			{
 				if(assetArr.length > 0)
 				{
-					_node.data.options.assetId = assetArr[0].id;
-					updateImage(_node.data.options.assetId);
+					_node.data.options.asset = { materiaType:'asset', id:assetArr[0].id };
+					updateImage(_node.data.options.asset);
 				}
 			}
 			private function updateQuestionColor():void
