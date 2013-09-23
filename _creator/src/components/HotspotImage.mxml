@@ -18,8 +18,6 @@
 			
 			import materia.questionStorage.Question;
 			
-			import mx.core.Application;
-			
 			import tree.DisplayTree;
 			import tree.Node;
 			public static const EVENT_CHANGE_IMAGE:String = "ChangeImage";
