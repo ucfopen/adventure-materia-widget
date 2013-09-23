@@ -223,7 +223,7 @@
 	</mx:Script>
 	<mx:HBox id="mainHBox" borderStyle="solid" borderSides="bottom" borderThickness="1" borderColor="#CCCCCC" width="100%" height="100%" horizontalGap="0">
 		<!-- Answer -->
-		<mx:TextArea id="answerField" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)" text="{DEFAULT_ANS_TEXT}" focusIn="{
+		<mx:TextArea maxChars="{Creator.ANSWER_CHAR_LIMIT}" id="answerField" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)" text="{DEFAULT_ANS_TEXT}" focusIn="{
 								 	if(answerField.text == DEFAULT_ANS_TEXT) {
 								 		answerField.text = '';
 								 		updateAnswerColor();
@@ -239,7 +239,7 @@
 		<components:ShortAnswerAreaNew id="shortAnswerField" borderSkin="assets.DottedBorder" styleName="darkText" fontSize="18" width="100%" height="100%" mouseWheel="onMouseWheel(event)"/>
 		<!-- Feedback -->
 		<mx:HBox id="feedbackCanvasContainer" width="350" height="100%" horizontalGap="0" backgroundColor="#ffffff">
-			<mx:TextArea id="_feedbackField" styleName="darkTextLight" width="280" height="100%" fontSize="14" text="{DEFAULT_FEEDBACK_TEXT}" borderSkin="assets.DottedBorder" focusIn="{
+			<mx:TextArea maxChars="{Creator.ANSWER_CHAR_LIMIT}" id="_feedbackField" styleName="darkTextLight" width="280" height="100%" fontSize="14" text="{DEFAULT_FEEDBACK_TEXT}" borderSkin="assets.DottedBorder" focusIn="{
 								 	if(_feedbackField.text == DEFAULT_FEEDBACK_TEXT) {
 								 		_feedbackField.text = '';
 								 		updateFeedbackColor();

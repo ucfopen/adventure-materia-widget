@@ -33,6 +33,8 @@
 		public static const VERSION:String = "Alpha 1.3 Update 4b";
 		public static const LINK_ID_START:int = 10000;
 		public static const DEFAULT_ANSWER:String = "[No Answer]";
+		public static const QUESTION_CHAR_LIMIT:int = 2000;
+		public static const ANSWER_CHAR_LIMIT:int = 500;
 		private static const SCREEN_INTRO:int = 0;
 		private static const SCREEN_TREE:int = 1;
 		private static const DEFAULT_TITLE:String = "New Adventure Widget";
