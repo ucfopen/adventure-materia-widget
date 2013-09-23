@@ -162,14 +162,15 @@
 			protected override function onWindowClosed():void
 			{
 				super.onWindowClosed();
-				if(!_node.data.options.assetId)
+				/*
+				if(!_node.data.options.asset)
 				{
 					_node.data.options.layout = TEXT_ONLY;
 				}
 				else
 				{
 					_node.data.options.layout = _layout;
-				}
+				}*/
 				/* unload assets */
 				nodeImg.source = "";
 				/* Save the Question */
@@ -361,9 +362,9 @@
 				}
 
 				//if the node has an image assigned to it, place that image
-				if(_node.data.options.assetId)
+				if(_node.data.options.asset && _node.data.options.asset.id && _node.data.options.asset.id != "")
 				{
-					nodeImg.source = CreatorConfig.getKogneatoAssetLink(_node.data.options.assetId);
+					nodeImg.source = CreatorConfig.getKogneatoAssetLink(_node.data.options.asset.id);
 					if(nodeImgHolder.parent != null)
 					{
 						if(!nodeImg.loaded)
@@ -439,7 +440,7 @@
 				}
 				changeImgBtn.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDownInside);
 				nodeImgHolder.parent.parent.removeChild(nodeImgHolder.parent);
-				_node.data.options.assetId = null;
+				delete _node.data.options.asset;
 				layoutCol.addChildAt(addImageButton, layoutCol.getChildIndex(layoutsWindow));
 //				layoutCol.removeChild(layoutsWindow);
 				currentState = "single";
@@ -457,7 +458,7 @@
 			{
 				if(assets.length > 0)
 				{
-					_node.data.options.assetId = assets[0].id;
+					_node.data.options.asset = { materiaType:'asset', id:assets[0].id };
 					nodeImg.source = CreatorConfig.getKogneatoAssetLink(assets[0].id);
 					addChangeImgButton();
 				}
@@ -577,7 +578,7 @@
 		</mx:VBox>
 		<mx:VBox id="right_side_panel" width="140" height="100%" right="{PADDING_V}" top="{PADDING_H}" paddingBottom="60">
 			<mx:VBox id="imageButtonContainer" width="100%" paddingLeft="15">
-				<components:AdventureButton id="addImageButton" usePlus="true" label="Add&#13;Image" width="95" height="60" click="{setLayout(HORIZONTAL_LEFT_TEXT)}"/>
+				<components:AdventureButton id="addImageButton" usePlus="true" label="Add&#13;Image" width="95" height="60" click="{changeLayout(HORIZONTAL_LEFT_TEXT)}"/>
 				<!-- Add image/layouts box -->
 				<mx:Canvas id="layoutsWindow" backgroundColor="0x7299b5" width="80" height="280" horizontalScrollPolicy="off">
 					<mx:Label fontFamily="Arial MT Bold" fontSize="12" color="0xffffff" text="Layouts:" top="1" horizontalCenter="0" />

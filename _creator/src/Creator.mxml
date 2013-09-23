@@ -10,12 +10,13 @@
 	<mx:Style source="/assets/materia/styles/style.css" />
 	<mx:Style source="/assets/materia/styles/creatorStyle.css"/>
 	<mx:Script> <![CDATA[
-		import mx.controls.Alert;
 		import components.ImportDisplayNode;
 		import components.bubbles.HelperBubble;
-
+		
 		import materia.questionStorage.*;
-
+		
+		import mx.controls.Alert;
+		
 		import screens.AdventurePopupBase;
 		import screens.PopupEnd;
 		import screens.PopupHotspot;
@@ -25,9 +26,7 @@
 		import screens.PopupQType;
 		import screens.PopupScoreType;
 		import screens.PopupShortAnswer;
-
-		import HelperBubbleManager;
-
+		
 		import tree.DisplayNode;
 		import tree.DisplayTree;
 		import tree.Node;
