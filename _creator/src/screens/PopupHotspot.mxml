@@ -152,7 +152,7 @@
 					// Keep track of old image's scale
 					_scaleBeforeChange = nodeImg.imageScale;
 					// Load Image
-					_node.data.options.assetId = assetArr[0].id;
+					_node.data.options.asset = { materiaType:'asset', id:assetArr[0].id };
 					updateImage();
 				}
 				else
@@ -172,12 +172,12 @@
 				if(!_changingImage) nodeImg.removeHotspots();
 
 				/* If the node has an image assigned to it, place that image */
-				if(_node.data.options.assetId && _node.data.options.assetId != "")
+				if(_node.data.options.asset && _node.data.options.asset.id && _node.data.options.asset.id != "")
 				{
 					/* Wait until this image is loaded and adjust the scale or reposition */
 					nodeImg.addEventListener(ScrollableSizableImage.EVENT_IMAGE_LOAD_COMPLETE, onLoadImageComplete, false, 0, true);
 					/* Load the image */
-					nodeImg.source = CreatorConfig.getKogneatoAssetLink(_node.data.options.assetId);
+					nodeImg.source = CreatorConfig.getKogneatoAssetLink(_node.data.options.asset.id);
 					/* Hide the placeholder, show the image */
 					placeholderImg.visible = false;
 					nodeImg.visible = true;

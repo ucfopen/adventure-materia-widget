@@ -9,6 +9,7 @@ import flash.geom.Point;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
+
 import mx.core.Application;
 import mx.core.UIComponent;
 public class AdventureBubble extends UIComponent
@@ -17,6 +18,7 @@ public class AdventureBubble extends UIComponent
 	public static const DIRECTION_DOWN:int = 1;
 	public static const DIRECTION_LEFT:int = 2;
 	public static const DIRECTION_RIGHT:int = 3;
+	public static const DIRECTION_NONE:int = 4;
 	protected static const PADDING:int = 10;
 	protected static const POINTER_HEIGHT:int = 12;
 	public var initiator:DisplayObject;
@@ -84,6 +86,17 @@ public class AdventureBubble extends UIComponent
 				this.x = targetPoint.x - _width / 2;
 				this.y = targetPoint.y - _height - POINTER_HEIGHT;
 				break;
+		}
+		
+		// reposition the bubble if it doesnt fit on the screen
+		var sw:int = Application.application.stage.stageWidth;
+		var sh:int = Application.application.stage.stageHeight;
+		if(x < 0 || x + _width > sw || y < 0 || y + _height > sh)
+		{
+			x = (sw - _width) / 2;
+			y = (sh - _height) / 2;
+			direction = DIRECTION_NONE;
+			drawBubble();
 		}
 	}
 	public function destroy():void
