@@ -7,13 +7,19 @@
 			import components.bubbles.ColorPicker;
 			import components.bubbles.HotspotBubble;
 			import components.bubbles.HotspotSettingsBubble;
+			
 			import events.HotspotArrangementEvent;
+			
 			import hotspots.AdventureDisplayHotspot;
 			import hotspots.AdventureHotspot;
 			import hotspots.AdventureHotspotEllipse;
 			import hotspots.AdventureHotspotPolygon;
 			import hotspots.AdventureHotspotRect;
+			
 			import materia.questionStorage.Question;
+			
+			import mx.core.Application;
+			
 			import tree.DisplayTree;
 			import tree.Node;
 			public static const EVENT_CHANGE_IMAGE:String = "ChangeImage";
@@ -648,8 +654,14 @@
 				var targetPoint:Point = hotspot.localToGlobal(new Point(hotspot.width / 2, 0));
 				if(targetPoint.y - HotspotBubble.HEIGHT - HotspotBubble.SPACING < 0)
 				{
-					if(targetPoint.x < stage.width / 2) direction = AdventureBubble.DIRECTION_RIGHT;
-					else direction = AdventureBubble.DIRECTION_LEFT;
+					if(targetPoint.x < stage.width / 2)
+					{
+						direction = AdventureBubble.DIRECTION_RIGHT;
+					}
+					else
+					{
+						direction = AdventureBubble.DIRECTION_LEFT;
+					}
 				}
 				/* Create the new bubble */
 				_hotspotBubble = new HotspotBubble(node, hotspot, this);
