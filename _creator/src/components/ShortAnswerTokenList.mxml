@@ -291,7 +291,7 @@
 	</mx:Metadata>
 	<mx:Label text="Enter possible answers:" />
 	<mx:HBox width="100%" horizontalGap="5">
-		<mx:TextArea id="inputBox" width="235" height="{DEFAULT_HEIGHT}" />
+		<mx:TextArea maxChars="{Creator.ANSWER_CHAR_LIMIT}" id="inputBox" width="235" height="{DEFAULT_HEIGHT}" />
 		<mx:Button id="enterInput" width="37" height="30" fillColors="[0x759AB4,0x63839A]" color="0xFFFFFF" icon="@Embed('../assets/continue.png')" click="onTokenSubmit()" />
 	</mx:HBox>
 	<mx:HRule width="95%" strokeColor="0xACACAC" />
