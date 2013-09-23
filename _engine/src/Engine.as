@@ -447,7 +447,7 @@ public class Engine extends EngineCore
 //		_assetBox.y += PADDING_ASSET;
 //		_assetBox.width -= PADDING_ASSET * 2;
 //		_assetBox.height -= PADDING_ASSET * 2;
-		getImageAssetSprite(entry.options.assetId, onAssetLoaded, entry);
+		getImageAssetSprite(entry.options.asset.id, onAssetLoaded, entry);
 	}
 	private function updateBgBox():void
 	{
@@ -703,7 +703,7 @@ public class Engine extends EngineCore
 				_hotspotBoxDim = new Dimension(_stageDim.width - PADDING_H * 2, _stageDim.height - INFO_BAR_HEIGHT - qBoxSize - PADDING_V * 2);
 				repositionComponent(_hotspotBox, _hotspotBoxDim, POSITION_CENTER, new Rectangle(0, qBoxSize, _stageDim.width, _stageDim.height - qBoxSize));
 				// Load the image
-				getImageAssetSprite(entry.options.assetId, onHotspotAssetLoaded, entry);
+				getImageAssetSprite(entry.options.asset.id, onHotspotAssetLoaded, entry);
 				_hotspotBox.visible = true;
 				break;
 			//----------------------------------
