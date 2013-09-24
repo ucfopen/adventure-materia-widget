@@ -470,7 +470,7 @@ public class DisplayTree extends Sprite
 		while(!stack.isEmpty())
 		{
 			var current:Node = Node(stack.pop());
-			if(current.isEmpty)
+			if(current.isEmpty && current.isLeaf)
 			{
 				emptyNodeExists = true;
 				break;
@@ -483,7 +483,7 @@ public class DisplayTree extends Sprite
 		// Abort if there are no empty nodes to copy to
 		if(!emptyNodeExists)
 		{
-			Dialog.show(Dialog.OK, "No Empty Destination to Copy To", "A destination can only be copied to an empty destination. Please create an empty destination first.");
+			Dialog.show(Dialog.OK, "No Empty Destination to Copy To", "A destination can only be copied to an empty destination at the end of the tree. Please create an empty destination first.");
 			return;
 		}
 		// Start Node Copy Mode
@@ -675,7 +675,10 @@ public class DisplayTree extends Sprite
 		{
 			newId = getNextId();
 			parent.children[targetIndex].id = newId;
-			if(parent.data.answers != null) parent.data.answers[targetIndex].options.link = newId;
+			if(parent.data.answers != null && parent.data.answers[targetIndex] != null)
+			{
+				parent.data.answers[targetIndex].options.link = newId;
+			}
 		}
 		else
 		{
