@@ -188,7 +188,7 @@ public class DisplayNode extends Sprite
 		if(displayTree.nodeCopyMode || displayTree.nodeImportMode)
 		{
 			/* Node is Empty */
-			if(node.isEmpty)
+			if(node.isEmpty && node.isLeaf)
 			{
 				this.alpha = ALPHA_NORMAL;
 				if(_highlighted) this.filters = FILTERSET_COPY_HIGHLIGHT;
