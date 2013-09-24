@@ -42,7 +42,7 @@ public class Engine extends EngineCore
 	//  Fonts
 	//----------------------------------
 	// for embedded fonts to work in flex 4.1 framework, add: embedAsCFF="false"
-    [Embed(source="/assets/fonts/ClassicRound.ttf", fontFamily="ClassicRound", unicodeRange='U+0041-U+005A, U+0061-U+007A, U+0021-U+0021, U+003A-U+003A, U+0028-U+0039')]
+    [Embed(source="/assets/fonts/ClassicRound.ttf", fontFamily="ClassicRound")]
 	public static const classicRoundFont:Class;
 	//----------------------------------
 	//  Images
@@ -295,7 +295,7 @@ public class Engine extends EngineCore
 		_shortAnswerButton.x = _shortAnswerDim.width - _shortAnswerButton.width;
 		_shortAnswerButton.addEventListener(MouseEvent.CLICK, onShortAnswerButtonSubmit, false, 0, true);
 		_shortAnswerField = new TextField();
-		_shortAnswerField.restrict = "^\u0001-\u0008\u000B-\u001F";
+		_shortAnswerField.restrict = "A-Za-z0-9_~!@#$%\\^\\-&*()_+{}|[];\'\`,./<>?:\\\\\"=\ ";
 		_shortAnswerField.type = TextFieldType.INPUT;
 		_shortAnswerField.defaultTextFormat = FORMAT_SHORT_ANSWER;
 		_shortAnswerField.width = _shortAnswerDim.width - _shortAnswerButton.width - PADDING_H;
