@@ -162,7 +162,7 @@
 			protected override function onWindowClosed():void
 			{
 				super.onWindowClosed();
-				/*
+
 				if(!_node.data.options.asset)
 				{
 					_node.data.options.layout = TEXT_ONLY;
@@ -170,7 +170,7 @@
 				else
 				{
 					_node.data.options.layout = _layout;
-				}*/
+				}
 				/* unload assets */
 				nodeImg.source = "";
 				/* Save the Question */
