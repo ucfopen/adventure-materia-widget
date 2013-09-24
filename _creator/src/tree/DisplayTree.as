@@ -1377,7 +1377,6 @@ public class DisplayTree extends Sprite
 		result.addEventListener(MouseEvent.CLICK, onNodeClick, false, 0, true);
 		result.addEventListener(MouseEvent.DOUBLE_CLICK, onNodeClick, false, 0, true);
 		result.addEventListener(MouseEvent.MOUSE_OVER, onNodeMouseOver, false, 0, true);
-		//result.addEventListener(MouseEvent.MOUSE_OUT, nodeMouseOut, false, 0, true);
 		result.addEventListener(DisplayNode.TWEEN_START, onNodeTweenStart, false, 0, true);
 		result.addEventListener(DisplayNode.TWEEN_END, onNodeTweenEnd, false, 0, true);
 		// add to the tree
