@@ -179,6 +179,7 @@ public class DisplayTree extends Sprite
 		else result.node.data = data;
 		// If we had a backup, destroy it
 		destroyBackupTree();
+		
 		return result;
 	}
 	public function resetHotspotNode(target:Node):void
@@ -1116,8 +1117,10 @@ public class DisplayTree extends Sprite
 		{
 			_prependBubble.show(node);
 		}
+		
 		// create hover hotspot (so toolbars won't disappear immediately at mouseOut)
 		_hoverHotspot.graphics.clear();
+		_hoverHotspot.graphics.beginFill(0, 0);
 		var r:Number = Math.max(node.displayNode.height, node.displayNode.width) / 2;
 		var point:Point = this.globalToLocal(_tree.localToGlobal(new Point(node.displayNode.x, node.displayNode.y)));
 		var prependWidth:int = _prependBubble.width + 10;
@@ -1125,28 +1128,32 @@ public class DisplayTree extends Sprite
 		var toolbarPos:Point = globalToLocal(new Point(_nodeToolbar.x, _nodeToolbar.y));
 		_hoverHotspot.x = point.x - r;
 		_hoverHotspot.y = point.y - r;
-		var bufferRoom:int = 10;
-		_hoverHotspot.graphics.beginFill(0x000000, 0);
-		_hoverHotspot.graphics.moveTo(0, 0);
-		_hoverHotspot.graphics.lineTo(r - prependWidth / 2, 0);
-		_hoverHotspot.graphics.lineTo(r - prependWidth / 2, -prependHeight);
+		var bufferRoom:int = 25;
+		
+		_hoverHotspot.graphics.moveTo(r - prependWidth / 2, -prependHeight);
 		_hoverHotspot.graphics.lineTo(r + prependWidth / 2, -prependHeight);
-		_hoverHotspot.graphics.lineTo(r + prependWidth / 2, 0);
-		_hoverHotspot.graphics.lineTo(r * 2, 0);
-		// toolbars aren't active in linkEditMode, so draw without them when it's turned on
-		if (!linkEditMode)
+		if(!linkEditMode)
 		{
-			_hoverHotspot.graphics.lineTo(toolbarPos.x + _nodeToolbar.width - _hoverHotspot.x + bufferRoom, toolbarPos.y +  - _hoverHotspot.y);
-			_hoverHotspot.graphics.lineTo(toolbarPos.x + _nodeToolbar.width - _hoverHotspot.x + bufferRoom, toolbarPos.y +  _nodeToolbar.height - _hoverHotspot.y + bufferRoom);
-			_hoverHotspot.graphics.lineTo(toolbarPos.x - _hoverHotspot.x - bufferRoom, toolbarPos.y +  _nodeToolbar.height - _hoverHotspot.y + bufferRoom);
-			_hoverHotspot.graphics.lineTo(toolbarPos.x - _hoverHotspot.x - bufferRoom, toolbarPos.y - _hoverHotspot.y);
+			if(point.y < toolbarPos.y) // If the toolbar is below the display node:
+			{
+				_hoverHotspot.graphics.lineTo(toolbarPos.x + _nodeToolbar.width - _hoverHotspot.x + bufferRoom, toolbarPos.y +  _nodeToolbar.height - _hoverHotspot.y + bufferRoom);
+				_hoverHotspot.graphics.lineTo(toolbarPos.x - _hoverHotspot.x - bufferRoom, toolbarPos.y +  _nodeToolbar.height - _hoverHotspot.y + bufferRoom);
+			}
+			else // toolbar is above the display node
+			{
+				_hoverHotspot.graphics.lineTo(toolbarPos.x + _nodeToolbar.width - _hoverHotspot.x + bufferRoom, toolbarPos.y - _hoverHotspot.y + bufferRoom);
+				_hoverHotspot.graphics.lineTo(r * 2, r * 2);
+				_hoverHotspot.graphics.lineTo(0, r * 2);
+				_hoverHotspot.graphics.lineTo(toolbarPos.x - _hoverHotspot.x - bufferRoom, toolbarPos.y - _hoverHotspot.y + bufferRoom);
+			}
 		}
 		else
 		{
-			_hoverHotspot.graphics.lineTo(r * 2, prependHeight);
-			_hoverHotspot.graphics.lineTo(0, prependHeight);
+			_hoverHotspot.graphics.lineTo(r * 2, r * 2);
+			_hoverHotspot.graphics.lineTo(0, r * 2);
+			_hoverHotspot.graphics.moveTo(r - prependWidth / 2, -prependHeight);
 		}
-		_hoverHotspot.graphics.lineTo(0, 0);
+		
 		this.addChild(_hoverHotspot);
 		_stage.addEventListener(MouseEvent.MOUSE_MOVE, onNodeMouseMove, false, 0, true);
 		if(!node.isRoot && node.parent.type != AdventureOptions.TYPE_NARRATIVE && node.parent.type != AdventureOptions.TYPE_NONE && node.parent.answersMatchChildren)
@@ -1370,6 +1377,7 @@ public class DisplayTree extends Sprite
 		result.addEventListener(MouseEvent.CLICK, onNodeClick, false, 0, true);
 		result.addEventListener(MouseEvent.DOUBLE_CLICK, onNodeClick, false, 0, true);
 		result.addEventListener(MouseEvent.MOUSE_OVER, onNodeMouseOver, false, 0, true);
+		//result.addEventListener(MouseEvent.MOUSE_OUT, nodeMouseOut, false, 0, true);
 		result.addEventListener(DisplayNode.TWEEN_START, onNodeTweenStart, false, 0, true);
 		result.addEventListener(DisplayNode.TWEEN_END, onNodeTweenEnd, false, 0, true);
 		// add to the tree
