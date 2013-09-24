@@ -51,6 +51,7 @@
 		{
 			tokenString = val;
 		}
+
 		public function get referencePoint():Point
 		{
 			return refPoint;
@@ -145,14 +146,29 @@
 			}
 		}
 
+		// Before the commmas can be split, the escaped commas (that are part of answer tokens) must be replaced
+		// And then after the split, the replaced characters turned back into regular, joe shmoe commas.
 		private function splitCommas(target:String):Array
 		{
 			target = target.split("\n").join("");
-			return target.split(new RegExp("(?<!\\\\),"));
+
+			var pattern:RegExp = /\\,/g
+			target = target.replace(pattern, "%%%%%%");
+
+			// Yarr?
+			var tARRget:Array = target.split(",");
+			var tempPattern:RegExp = /%%%%%%/g
+			for (var i:int = 0; i<tARRget.length; i++)
+			{
+				tARRget[i] = tARRget[i].replace(tempPattern, ",");
+			}
+
+			return tARRget;
 		}
 
 		public function destroy():void
 		{
+			saveTokenRows(true);
 			toggleListeners(false);
 			PopUpManager.removePopUp(this);
 			this.visible = false;
@@ -208,6 +224,8 @@
 			this.y -= overflow;
 		}
 
+		private function saveTokenRows(escape:Boolean=false):void
+		{
 		private function saveTokenRows():void
 		{
 			tokenString = tokenStringList.join(", ");
@@ -217,16 +235,23 @@
 			dispatchEvent(new Event(Event.CHANGE));
 		}
 
-		// Not sure which characters this actually escapes
-		private function escapeChars(target:String):String
+		private function escapeCommas(target:String):String
 		{
 			var result:String = target;
-			// escape the the desired characters
-			for(var i:int = 0; i < ESCAPED_CHARS.length; i++)
-			{
-				var regex:RegExp = new RegExp(ESCAPED_CHARS.charAt(i), '\g');
-				result = result.replace(regex, "\\" + ESCAPED_CHARS.charAt(i));
-			}
+
+			var regex:RegExp = /(?<!\\),/g
+			result = result.replace(regex, "\\,");
+
+			return result;
+		}
+
+		private function removeEscaped(target:String):String
+		{
+			var result:String = target;
+
+			var regex:RegExp = /\\,/g
+			result = result.replace(regex, ",");
+
 			return result;
 		}
 
@@ -257,6 +282,8 @@
 
 			for (var i:int = 0; i<tempTokenStringList.length; i++)
 			{
+				// ensure the existing tokens are properly sanitized
+				tempTokenStringList[i] = removeEscaped(tempTokenStringList[i]);
 				if (tempTokenStringList[i].toLowerCase() != e.target.text.toLowerCase())
 				{
 					tokenStringList.push(tempTokenStringList[i]);

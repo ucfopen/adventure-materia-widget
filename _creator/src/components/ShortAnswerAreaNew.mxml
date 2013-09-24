@@ -81,15 +81,6 @@
 		}
 		super.enabled = val;
 	}
-	// what in all the fucks does this do?
-	/*
-	protected override function createChildren():void
-	{
-		super.createChildren();
-		_inputField = new TextField();
-		_deleteButton = new TextField();
-	}
-	*/
 
 	//----------------------------------
 	//  Getter/Setter Functions
@@ -100,7 +91,7 @@
 	public function get text():String { return condensedAnswersString; }
 	public function set text(val:String):void
 	{
-		condensedAnswersString= val;
+		condensedAnswersString = val;
 		if (_creationComplete) populateList();
 	}
 
@@ -113,7 +104,6 @@
 	public function destroy():void
 	{
 		setListenersEnabled(false);
-		//clean();
 
 		// list box should never be null..
 		if (answerTokenListBox)
@@ -160,7 +150,8 @@
 
 		stringField.defaultTextFormat = TEXTFORMAT_DEFAULT;
 
-		stringField.text = answers;
+		// Before the text is added to the string field, it must be sanitized of escaped commas
+		stringField.text = stripCommasFromAnswerString(answers);
 
 		// if the answers string will exceed the width of the box, spill onto the second line
 		if (stringField.text.length > LINE_LENGTH)
@@ -189,6 +180,14 @@
 		}
 
 		answerTokensBox.addChild(stringField);
+	}
+
+	// Escapes commas that are part of the answer, and not delineations of the token string
+	private function stripCommasFromAnswerString(str:String):String
+	{
+		var pattern:RegExp = /\\,/g
+		var stripped:String = str.replace(pattern, ',');
+		return stripped;
 	}
 
 	private function setListenersEnabled(val:Boolean):void
@@ -224,14 +223,7 @@
 		condensedAnswersString = answerTokenListBox.answers;
 		updateAnswerString(condensedAnswersString);
 	}
-	/*
-	private function onFocusIn(e:Event):void
-	{
-	}
-	private function onFocusOut(e:Event):void
-	{
-	}
-	*/
+
 	private function onClick(e:MouseEvent):void
 	{
 		if (!answerTokenListBox.visible)
