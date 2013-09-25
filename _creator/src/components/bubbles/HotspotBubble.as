@@ -231,53 +231,6 @@ package components.bubbles {
 		{
 			super.updatePosition(target);
 			var containerPoint:Point = _container.localToGlobal(new Point(_container.x, _container.y));
-//			var targetPoint:Point = target.localToGlobal(new Point(target.width / 2, 0));
-//			this.x = targetPoint.x - _width / 2;
-//			this.y = targetPoint.y - _height - SPACING;
-			// Check Boundaries
-//			this.x = Math.max(this.x, containerPoint.x - this.width / 2);
-//			this.x = Math.min(this.x, containerPoint.x + _container.width + this.width / 2);
-//			this.y = Math.max(this.y, containerPoint.y - HEIGHT);
-//			this.y = Math.min(this.y, imagePoint.y + _container.height - HEIGHT);
-			// Polygons need special treatment because calculating their centerpoint is tricky
-			if(hotspot is AdventureHotspotPolygon)
-			{
-				var targ:AdventureHotspotPolygon = AdventureHotspotPolygon(hotspot);
-				/* Find topmost, leftmost, rightmost, bottommost points in polygon and put bubble in mean area */
-				var points:Array = targ.getPoints();
-				var top:Number = Number.MAX_VALUE;
-				var bottom:Number = Number.MIN_VALUE;
-				var left:Number = Number.MAX_VALUE;
-				var right:Number = Number.MIN_VALUE;
-				for each(var point:Point in points)
-				{
-					point = this.parent.globalToLocal(targ.targetImage.localToGlobal(point));
-					if(point.y < top) top = point.y;
-					if(point.y > bottom) bottom = point.y;
-					if(point.x < left) left = point.x;
-					if(point.x > right) right = point.x;
-				}
-				switch(direction)
-				{
-					case DIRECTION_DOWN:
-						this.x = (left + right) / 2 - _width / 2;
-						this.y = bottom;
-						break;
-					case DIRECTION_LEFT:
-						this.x = left - _width;
-						this.y = (top + bottom) / 2 - _height / 2;
-						break;
-					case DIRECTION_RIGHT:
-						this.x = right;
-						this.y = (top + bottom) / 2 - _height / 2;
-						break;
-					case DIRECTION_UP:
-					default:
-						this.x = (left + right) / 2 - _width / 2;
-						this.y = top - _height;
-						break;
-				}
-			}
 		}
 		public function save():void
 		{
