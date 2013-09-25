@@ -295,7 +295,7 @@ public class Engine extends EngineCore
 		_shortAnswerButton.x = _shortAnswerDim.width - _shortAnswerButton.width;
 		_shortAnswerButton.addEventListener(MouseEvent.CLICK, onShortAnswerButtonSubmit, false, 0, true);
 		_shortAnswerField = new TextField();
-		_shortAnswerField.restrict = "A-Za-z0-9_~!@#$%\\^\\-&*()_+{}|[];\'\`,./<>?:\\\\\"=\ ";
+		_shortAnswerField.restrict = "^\u0001-\u0008\u000B-\u001F";
 		_shortAnswerField.type = TextFieldType.INPUT;
 		_shortAnswerField.defaultTextFormat = FORMAT_SHORT_ANSWER;
 		_shortAnswerField.width = _shortAnswerDim.width - _shortAnswerButton.width - PADDING_H;
