@@ -127,8 +127,8 @@
 			for (var i:int = 0; i < tokenStringList.length; i++)
 			{
 				tokenStringList[i] = StringUtil.trim(tokenStringList[i]);
-				// Parse escaped characters?
-				addToken(tokenStringList[i]);
+				// Parse escaped commas before re-inserting into token list
+				addToken(removeEscaped(tokenStringList[i]));
 			}
 
 			toggleListeners(true);
@@ -146,29 +146,18 @@
 			}
 		}
 
-		// Before the commmas can be split, the escaped commas (that are part of answer tokens) must be replaced
-		// And then after the split, the replaced characters turned back into regular, joe shmoe commas.
+		// split into an array based on un-escaped commas.
 		private function splitCommas(target:String):Array
 		{
 			target = target.split("\n").join("");
+			var regex:RegExp = /(?<!\\),/g
 
-			var pattern:RegExp = /\\,/g
-			target = target.replace(pattern, "%%%%%%");
-
-			// Yarr?
-			var tARRget:Array = target.split(",");
-			var tempPattern:RegExp = /%%%%%%/g
-			for (var i:int = 0; i<tARRget.length; i++)
-			{
-				tARRget[i] = tARRget[i].replace(tempPattern, ",");
-			}
-
-			return tARRget;
+			return target.split(regex);
 		}
 
 		public function destroy():void
 		{
-			saveTokenRows(true);
+			saveTokenRows();
 			toggleListeners(false);
 			PopUpManager.removePopUp(this);
 			this.visible = false;
@@ -224,10 +213,14 @@
 			this.y -= overflow;
 		}
 
-		private function saveTokenRows(escape:Boolean=false):void
-		{
 		private function saveTokenRows():void
 		{
+			// escape commas in individual answer tokens before joining
+			for (var i:int=0; i<tokenStringList.length; i++)
+			{
+				tokenStringList[i] = escapeCommas(tokenStringList[i]);
+			}
+
 			tokenString = tokenStringList.join(", ");
 
 			if (!tokenStringList.length) tokenString = DEFAULT_TEXT;
