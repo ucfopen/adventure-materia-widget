@@ -1,10 +1,13 @@
 package components{
-import tree.DisplayNode;
-import tree.Node;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.geom.Point;
-import AdventureOptions;
+
+import mx.core.Application;
+
+import tree.DisplayNode;
+import tree.Node;
+
 public class NodeToolbar extends Sprite
 {
 	public static const BUTTON_WIDTH:Number = 48;
@@ -86,6 +89,13 @@ public class NodeToolbar extends Sprite
 			var point:Point = this.parent.globalToLocal(_node.displayNode.parent.localToGlobal(new Point(_node.displayNode.x, _node.displayNode.y)));
 			this.x = point.x - this.width / 2;
 			this.y = point.y + DisplayNode.radius + NODE_SPACING;
+			
+			// Move above node if pushed off the page
+			var sh:int = Application.application.stage.stageHeight;
+			if(y + height > sh)
+			{
+				y = point.y - DisplayNode.radius - NODE_SPACING - height;
+			}
 		}
 	}
 	public function addButtons():void
