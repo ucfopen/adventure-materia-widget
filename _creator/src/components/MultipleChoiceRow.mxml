@@ -113,7 +113,7 @@
 				updateAnswerColor();
 				updateDestinationBox();
 				updateAnswerFields();
-				answerField.restrict = "A-Za-z0-9_~!@#$%\\^\\-&*()_+{}|[];\'\`,./<>?:\\\\\"=\ ";
+				answerField.restrict = "^\u0001-\u0008\u000B-\u001F";
 				_creationIsComplete = true;
 				initFeedback();
 

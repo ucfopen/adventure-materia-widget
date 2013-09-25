@@ -64,8 +64,7 @@
 
 		private function onCreationComplete():void
 		{
-			// Restrict to alphanumerics and a reasonable set of special characters
-			inputBox.restrict = "A-Za-z0-9_~!@#$%\\^\\-&*()_+{}|[];\'\`,./<>?:\\\\\"=\ ";
+			inputBox.restrict = "^\u0001-\u0008\u000B-\u001F";
 
 			tokenList = new Array();
 			tokenStringList = new Array();
@@ -211,12 +210,6 @@
 
 		private function saveTokenRows():void
 		{
-			var r:RegExp = new RegExp(/[^a-zA-Z 0-9\-_\!@#$%\^&*\(\)\+=;,.<>:\\\/\?~`\"\'\ {}\|\[\]]+/g);
-			for (var i:int = 0; i < tokenStringList.length; i++)
-			{
-				tokenStringList[i] = tokenStringList[i].replace(r, '');
-			}
-
 			tokenString = tokenStringList.join(", ");
 
 			if (!tokenStringList.length) tokenString = DEFAULT_TEXT;
