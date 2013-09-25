@@ -23,6 +23,7 @@
 			public static const EVENT_CHANGE_IMAGE:String = "ChangeImage";
 			public var addNodeFunction:Function;
 			private static const MIN_HOTSPOT_AREA:Number = 200;
+			private static const MIN_VALID_CLICK_DISTANCE:Number = 3;
 			public var node:Node;
 			protected var _toolbar:HotspotToolbar;
 			protected var _mouseWasInside:Boolean = false;
@@ -40,6 +41,7 @@
 			protected var _settings:Object;
 			protected var _lastClosedBubbleTarget:AdventureDisplayHotspot;
 			protected var _lastMouseUpShape:Number;
+			protected var _lastClickPoint:Point;
 			protected var _stage:*;
 			public function showTools():void
 			{
@@ -517,7 +519,7 @@
 			{
 //				hideHotspotBubble(true);
 			}
-			protected function onHotspotMouseDown(e:Event):void
+			protected function onHotspotMouseDown(e:MouseEvent):void
 			{
 				if(_hotspotBubble != null && _hotspotBubble.destroyed == false)
 				{
@@ -527,14 +529,24 @@
 				{
 					_lastClosedBubbleTarget = null;
 				}
+				
+				_lastClickPoint = new Point(e.stageX, e.stageY);
 			}
-			protected function onHotspotClicked(e:Event):void
+			protected function onHotspotClicked(e:MouseEvent):void
 			{
 				var targetHotspot:AdventureDisplayHotspot = AdventureDisplayHotspot(e.target);
+				
 				if(targetHotspot != _lastClosedBubbleTarget)
 				{
-					showBubbleForHotspot(targetHotspot);
+					if(clickDistance(_lastClickPoint, new Point(e.stageX, e.stageY)) <= MIN_VALID_CLICK_DISTANCE)
+					{
+						showBubbleForHotspot(targetHotspot);
+					}
 				}
+			}
+			protected function clickDistance(a:Point, b:Point):Number
+			{
+				return Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
 			}
 			protected function onHotspotDelete(e:Event):void
 			{
