@@ -42,7 +42,7 @@ public class Engine extends EngineCore
 	//  Fonts
 	//----------------------------------
 	// for embedded fonts to work in flex 4.1 framework, add: embedAsCFF="false"
-    [Embed(source="/assets/fonts/ClassicRound.ttf", fontFamily="ClassicRound", unicodeRange='U+0041-U+005A, U+0061-U+007A, U+0021-U+0021, U+003A-U+003A, U+0028-U+0039')]
+    [Embed(source="/assets/fonts/ClassicRound.ttf", fontFamily="ClassicRound")]
 	public static const classicRoundFont:Class;
 	//----------------------------------
 	//  Images

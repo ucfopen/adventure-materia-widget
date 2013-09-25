@@ -71,7 +71,6 @@
 			creationComplete = true;
 
 			build();
-			
 			focusManager.setFocus(inputBox);
 		}
 
@@ -211,12 +210,6 @@
 
 		private function saveTokenRows():void
 		{
-			var r:RegExp = new RegExp(/[^a-zA-Z 0-9\-]+/g);
-			for (var i:int = 0; i < tokenStringList.length; i++)
-			{
-				tokenStringList[i] = tokenStringList[i].replace(r, '');
-			}
-
 			tokenString = tokenStringList.join(", ");
 
 			if (!tokenStringList.length) tokenString = DEFAULT_TEXT;
