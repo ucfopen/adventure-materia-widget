@@ -51,6 +51,7 @@
 		{
 			tokenString = val;
 		}
+
 		public function get referencePoint():Point
 		{
 			return refPoint;
@@ -126,8 +127,8 @@
 			for (var i:int = 0; i < tokenStringList.length; i++)
 			{
 				tokenStringList[i] = StringUtil.trim(tokenStringList[i]);
-				// Parse escaped characters?
-				addToken(tokenStringList[i]);
+				// Parse escaped commas before re-inserting into token list
+				addToken(removeEscaped(tokenStringList[i]));
 			}
 
 			toggleListeners(true);
@@ -145,14 +146,18 @@
 			}
 		}
 
+		// split into an array based on un-escaped commas.
 		private function splitCommas(target:String):Array
 		{
 			target = target.split("\n").join("");
-			return target.split(new RegExp("(?<!\\\\),"));
+			var regex:RegExp = /(?<!\\),/g
+
+			return target.split(regex);
 		}
 
 		public function destroy():void
 		{
+			saveTokenRows();
 			toggleListeners(false);
 			PopUpManager.removePopUp(this);
 			this.visible = false;
@@ -210,6 +215,12 @@
 
 		private function saveTokenRows():void
 		{
+			// escape commas in individual answer tokens before joining
+			for (var i:int=0; i<tokenStringList.length; i++)
+			{
+				tokenStringList[i] = escapeCommas(tokenStringList[i]);
+			}
+
 			tokenString = tokenStringList.join(", ");
 
 			if (!tokenStringList.length) tokenString = DEFAULT_TEXT;
@@ -217,16 +228,23 @@
 			dispatchEvent(new Event(Event.CHANGE));
 		}
 
-		// Not sure which characters this actually escapes
-		private function escapeChars(target:String):String
+		private function escapeCommas(target:String):String
 		{
 			var result:String = target;
-			// escape the the desired characters
-			for(var i:int = 0; i < ESCAPED_CHARS.length; i++)
-			{
-				var regex:RegExp = new RegExp(ESCAPED_CHARS.charAt(i), '\g');
-				result = result.replace(regex, "\\" + ESCAPED_CHARS.charAt(i));
-			}
+
+			var regex:RegExp = /(?<!\\),/g
+			result = result.replace(regex, "\\,");
+
+			return result;
+		}
+
+		private function removeEscaped(target:String):String
+		{
+			var result:String = target;
+
+			var regex:RegExp = /\\,/g
+			result = result.replace(regex, ",");
+
 			return result;
 		}
 
@@ -257,6 +275,8 @@
 
 			for (var i:int = 0; i<tempTokenStringList.length; i++)
 			{
+				// ensure the existing tokens are properly sanitized
+				tempTokenStringList[i] = removeEscaped(tempTokenStringList[i]);
 				if (tempTokenStringList[i].toLowerCase() != e.target.text.toLowerCase())
 				{
 					tokenStringList.push(tempTokenStringList[i]);
