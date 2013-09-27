@@ -6,6 +6,7 @@ import flash.events.Event;
 import flash.events.IEventDispatcher;
 import flash.events.MouseEvent;
 import flash.geom.ColorTransform;
+import flash.geom.Point;
 import mx.controls.Button;
 import mx.core.UIComponent;
 import nm.ui.ToolTip;
@@ -24,13 +25,22 @@ public class DestinationBubble extends AdventureBubble
 	private var button2:Button = new Button();
 	private var button3:Button = new Button();
 	private var _listener:IEventDispatcher;
+
+	// The threshold by which tooltips will be occluded by the edge of the stage
+	private const SCREEN_WIDTH_THRESHOLD:Number = 1085;
+	private var _enableSelfNode:Boolean;
+
+	private var _tooltipDirection:String = "left";
+
 	public function DestinationBubble(buttonListener:IEventDispatcher, tooltipDirection:String = "left", enableSelfNode:Boolean = true)
 	{
 		super(WIDTH, HEIGHT, "Change Destination:");
 		_listener = buttonListener ? buttonListener : this;
 		var buttonX:Number = WIDTH / 2 - BUTTON_WIDTH / 2;
 		var currY:Number = _startY;
-		var tooltipOptions:Object = {direction:tooltipDirection, showDelay:0, hideDelay:0, fadeTime:50}
+
+		_tooltipDirection = tooltipDirection;
+
 		button1.label = "This Node";
 		button1.width = BUTTON_WIDTH;
 		button1.height = BUTTON_HEIGHT;
@@ -43,16 +53,9 @@ public class DestinationBubble extends AdventureBubble
 			destroy();
 		}, false, 0, true);
 		currY += BUTTON_HEIGHT + SPACING;
-		if(enableSelfNode)
-		{
-			ToolTip.add(button1, "Choosing this path will bring the student back to this destination", tooltipOptions);
-		}
-		else
-		{
-			button1.enabled = false;
-			button1.transform.colorTransform = new ColorTransform(.7, .7, .7, .8);
-			ToolTip.add(button1, "Disabled because leading back here would cause an infinite cycle", tooltipOptions);
-		}
+
+		_enableSelfNode = enableSelfNode;
+
 		this.addChild(button1);
 		button2.label = "New Node";
 		button2.width = BUTTON_WIDTH;
@@ -66,7 +69,7 @@ public class DestinationBubble extends AdventureBubble
 			destroy();
 		}, false, 0, true);
 		currY += BUTTON_HEIGHT + SPACING;
-		ToolTip.add(button2, "Choosing this path will bring the student to a new destination you will create", tooltipOptions);
+
 		this.addChild(button2);
 		button3.label = "Existing Node ...";
 		button3.width = BUTTON_WIDTH;
@@ -80,11 +83,29 @@ public class DestinationBubble extends AdventureBubble
 			destroy();
 		}, false, 0, true);
 		currY += BUTTON_HEIGHT + SPACING;
-		ToolTip.add(button3, "Choosing this path will bring the student to another (already existing) destination", tooltipOptions);
+
 		this.addChild(button3);
 	}
 	public override function show(target:Sprite, direction:int = DIRECTION_UP, parent:DisplayObject = null):void
 	{
+		var pos:Point = target.localToGlobal(new Point(this.width, 0));
+
+		if (pos.x < SCREEN_WIDTH_THRESHOLD) _tooltipDirection = "left";
+		var tooltipOptions:Object = {direction:_tooltipDirection, showDelay:0, hideDelay:0, fadeTime:50}
+		if(_enableSelfNode)
+		{
+			ToolTip.add(button1, "Choosing this path will bring the student back to this destination", tooltipOptions);
+		}
+		else
+		{
+			button1.enabled = false;
+			button1.transform.colorTransform = new ColorTransform(.7, .7, .7, .8);
+			ToolTip.add(button1, "Disabled because leading back here would cause an infinite cycle", tooltipOptions);
+		}
+
+		ToolTip.add(button2, "Choosing this path will bring the student to a new destination you will create", tooltipOptions);
+		ToolTip.add(button3, "Choosing this path will bring the student to another (already existing) destination", tooltipOptions);
+
 		super.show(target, direction, parent);
 	}
 	public override function destroy():void
