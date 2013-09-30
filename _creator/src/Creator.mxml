@@ -35,6 +35,9 @@
 		public static const DEFAULT_ANSWER:String = "[No Answer]";
 		public static const QUESTION_CHAR_LIMIT:int = 2000;
 		public static const ANSWER_CHAR_LIMIT:int = 500;
+		public static const MAX_NODES:int = 500;
+		public static const MSG_TOO_MANY_NODES:String = 'Your widget has too many destinations. You cannot have more than ' + MAX_NODES + ' destinations.';
+
 		private static const SCREEN_INTRO:int = 0;
 		private static const SCREEN_TREE:int = 1;
 		private static const DEFAULT_TITLE:String = "New Adventure Widget";
@@ -402,9 +405,15 @@
 				qGroup.options.initialScore = _initialScore;
 			}
 			*/
-			qSet.addGroup(qGroup);
-
-			ExternalInterface.call("__materia_flash_save", title, qSet.convertToObject(), questionSetVersion);
+			if(qGroup.items.length > MAX_NODES)
+			{
+				ExternalInterface.call("__materia_flash_cancelSave", MSG_TOO_MANY_NODES);
+			}
+			else
+			{
+				qSet.addGroup(qGroup);
+				ExternalInterface.call("__materia_flash_save", title, qSet.convertToObject(), questionSetVersion);
+			}
 		}
 
 		]]>
