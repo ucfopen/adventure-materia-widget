@@ -1,6 +1,11 @@
 package tree {
+import events.NodeEvent;
+
+import flash.events.EventDispatcher;
+
 import materia.questionStorage.Question;
-public class Node
+
+public class Node extends EventDispatcher
 {
 	//--------------------------------------------------------------------------
 	//
@@ -120,6 +125,9 @@ public class Node
 		children.push(node);
 		// update the new node's parent reference
 		node.parent = this;
+		
+		dispatchEvent(new NodeEvent(NodeEvent.NODES_ADDED));
+		
 		return node;
 	}
 	public function removeChild(node:Node):Boolean
@@ -156,6 +164,9 @@ public class Node
 		}
 		// update the node's parent reference
 		if(node.parent == this) node.parent = null;
+		
+		dispatchEvent(new NodeEvent(NodeEvent.NODES_REMOVED));
+		
 		return true; // the child was successfuly removed
 	}
 	/**
@@ -197,6 +208,9 @@ public class Node
 		// update the nodes' parent references
 		if(oldNode.parent == this) oldNode.parent = null;
 		newNode.parent = this;
+		
+		dispatchEvent(new NodeEvent(NodeEvent.NODES_REPLACED));
+		
 		return true; // the child was successfuly replaced
 	}
 	/**
@@ -230,6 +244,8 @@ public class Node
 		}
 		// update numLeafs
 		node.numLeafs = this.numLeafs;
+		
+		dispatchEvent(new NodeEvent(NodeEvent.NODES_PREPENDED));
 	}
 	//----------------------------------
 	//  Data Management
