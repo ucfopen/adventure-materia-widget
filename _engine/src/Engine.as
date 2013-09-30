@@ -439,7 +439,6 @@ public class Engine extends EngineCore
 	}
 	private function updateAssetBox(newDim:Dimension, entry:Object, position:int, bounds:Rectangle = null):void
 	{
-		_assetBox.visible = true;
 		_assetBoxDim = newDim.clone();
 		_assetBoxDim.width -= PADDING_ASSET * 2;
 		_assetBoxDim.height -= PADDING_ASSET * 2;
@@ -604,14 +603,12 @@ public class Engine extends EngineCore
 				{
 					case AdventureOptions.LAYOUT_HORIZ_TEXT:
 						qBoxDim = new Dimension(_stageDim.width / 2 - PADDING_H * 2, _stageDim.height / 2 - PADDING_V * 2 + qBoxHeightModifier);
-						_assetBox.visible = true;
 						updateQuestionBox(qBoxDim, POSITION_LEFT, bounds.clone());
 						updateAssetBox(qBoxDim.clone(), entry, POSITION_RIGHT, bounds.clone());
 						updateBgBox();
 						break;
 					case AdventureOptions.LAYOUT_HORIZ_IMAGE:
 						qBoxDim = new Dimension(_stageDim.width / 2 - PADDING_H * 2, _stageDim.height / 2 - PADDING_V * 2 + qBoxHeightModifier);
-						_assetBox.visible = true;
 						updateQuestionBox(qBoxDim, POSITION_RIGHT, bounds.clone());
 						updateAssetBox(qBoxDim.clone(), entry, POSITION_LEFT, bounds.clone());
 						updateBgBox();
@@ -851,6 +848,9 @@ public class Engine extends EngineCore
 		image.height -= 2;
 		image.x = (_assetBoxDim.width - image.width) / 2;
 		image.y = (_assetBoxDim.height - image.height) / 2;
+
+		// the visibility of _assetBox is deferred to this function as it's called once the new image is actually loaded.
+		_assetBox.visible = true;
 		// Draw the Border
 		_assetBox.graphics.clear();
 		_assetBox.graphics.beginFill(COLOR_BOX_BORDER);
