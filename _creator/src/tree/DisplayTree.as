@@ -157,7 +157,7 @@ public class DisplayTree extends Sprite
 		nodeMouseOut();
 		if(_notificationBar != null) _notificationBar.destroy();
 	}
-	public function calculateNumNodesInTree():void
+	public function calculateNumNodesInTree():int
 	{
 		var stack:Stack = new Stack();
 		stack.push(_root.node);
@@ -175,6 +175,8 @@ public class DisplayTree extends Sprite
 		}
 		
 		_numNodes = numNodes;
+		
+		return _numNodes;
 	}
 	/**
 	 * Adds a node to the display tree. Doubly links the nodes through parent/child references,

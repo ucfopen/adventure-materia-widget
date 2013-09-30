@@ -405,7 +405,7 @@
 				qGroup.options.initialScore = _initialScore;
 			}
 			*/
-			if(qGroup.items.length > MAX_NODES)
+			if(_adventureTree.calculateNumNodesInTree() > MAX_NODES)
 			{
 				ExternalInterface.call("__materia_flash_cancelSave", MSG_TOO_MANY_NODES);
 			}
