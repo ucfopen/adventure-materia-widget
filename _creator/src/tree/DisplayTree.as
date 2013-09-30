@@ -1,6 +1,4 @@
 package tree {
-import Creator;
-
 import adt.Queue;
 import adt.Stack;
 
@@ -9,6 +7,8 @@ import components.NotificationBar;
 import components.bubbles.NodeBubble;
 import components.bubbles.PrependBubble;
 import components.bubbles.TracerBubble;
+
+import events.NodeEvent;
 
 import flash.display.CapsStyle;
 import flash.display.DisplayObject;
@@ -29,13 +29,13 @@ import materia.Dialog;
 import materia.questionStorage.Question;
 import materia.questionStorage.QuestionGroup;
 
+import mx.controls.Alert;
 import mx.core.Container;
 import mx.core.UIComponent;
 import mx.events.FlexEvent;
 
-import HelperBubbleManager;
-
 import nm.ui.Button;
+
 public class DisplayTree extends Sprite
 {
 	//--------------------------------------------------------------------------
@@ -78,6 +78,7 @@ public class DisplayTree extends Sprite
 	private var _pendingDeletions:Vector.<Sprite> = new Vector.<Sprite>;
 	private var _drawComplete:Boolean = false;
 	private var _lastAddedNode:DisplayNode;
+	private var _numNodes:int = 0; 
 	//----------------------------------
 	//  External References
 	//----------------------------------
@@ -155,6 +156,25 @@ public class DisplayTree extends Sprite
 		_prependBubble.destroy();
 		nodeMouseOut();
 		if(_notificationBar != null) _notificationBar.destroy();
+	}
+	public function calculateNumNodesInTree():void
+	{
+		var stack:Stack = new Stack();
+		stack.push(_root.node);
+		
+		var current:Node;
+		var numNodes:int = 0;
+		while(!stack.isEmpty())
+		{
+			numNodes++;
+			current = Node(stack.pop());
+			for(var i = 0; i < current.children.length; i++)
+			{
+				stack.push(current.children[i]);
+			}
+		}
+		
+		_numNodes = numNodes;
 	}
 	/**
 	 * Adds a node to the display tree. Doubly links the nodes through parent/child references,
@@ -1382,12 +1402,27 @@ public class DisplayTree extends Sprite
 		result.addEventListener(MouseEvent.MOUSE_OVER, onNodeMouseOver, false, 0, true);
 		result.addEventListener(DisplayNode.TWEEN_START, onNodeTweenStart, false, 0, true);
 		result.addEventListener(DisplayNode.TWEEN_END, onNodeTweenEnd, false, 0, true);
+		result.node.addEventListener(NodeEvent.NODES_ADDED, onTreeModified, false, 0, true);
+		result.node.addEventListener(NodeEvent.NODES_PREPENDED, onTreeModified, false, 0, true);
+		result.node.addEventListener(NodeEvent.NODES_REMOVED, onTreeModified, false, 0, true);
+		result.node.addEventListener(NodeEvent.NODES_REPLACED, onTreeModified, false, 0, true);
 		// add to the tree
 		_tree.addChild(result);
 		// Keep track of last added node
 		_lastAddedNode = result;
 		// return reference to new display node
 		return result;
+	}
+	private function onTreeModified(event:NodeEvent):void
+	{
+		calculateNumNodesInTree();
+		
+		// Alert the user that there are too many nodes, but don't keep bugging
+		// them if the are actively deleting nodes to take care of the issue
+		if(event.type != NodeEvent.NODES_REMOVED && _numNodes > Creator.MAX_NODES)
+		{
+			Alert.show(Creator.MSG_TOO_MANY_NODES);
+		}
 	}
 	private function sortRecoveredIds():void
 	{
