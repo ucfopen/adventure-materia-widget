@@ -28,7 +28,6 @@ public class PrependBubble extends Sprite
 	[Embed (source="../../assets/new_node.png")]
 	public static const NEW_NODE:Class;
 
-
 	public var targetNode:Node;
 	private var _image:Sprite;
 	public function PrependBubble()
@@ -66,9 +65,20 @@ public class PrependBubble extends Sprite
 		y = DisplayTree.getMidpointBetweenNodes(fromNode, toNode);
 
 		var direction:String = this.x > this.parent.width / 2 ? "left" : "right";
-		var targName:String = DisplayNode.idToLabel(node.id);
+
 		var parentName:String = DisplayNode.idToLabel(node.parent.id);
-		ToolTip.add(this, "Click to add a destination between \"" + parentName + "\" and \"" + targName + "\"", {direction:direction, yOffset:-RADIUS, xOffset:-RADIUS});
+		var targName:String;
+
+		if (node.isShortcut)
+		{
+			targName = DisplayNode.idToLabel(node.shortcutTarget.id);
+			ToolTip.add(this, "Click to add a destination between \"" + parentName + "\" and the shortcut to \"" + targName + "\"", {direction:direction, yOffset:-RADIUS, xOffset:-RADIUS});
+		}
+		else
+		{
+			targName = DisplayNode.idToLabel(node.id);
+			ToolTip.add(this, "Click to add a destination between \"" + parentName + "\" and \"" + targName + "\"", {direction:direction, yOffset:-RADIUS, xOffset:-RADIUS});
+		}
 
 		visible = true;
 	}
