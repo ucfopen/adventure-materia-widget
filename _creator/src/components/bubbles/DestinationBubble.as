@@ -26,8 +26,8 @@ public class DestinationBubble extends AdventureBubble
 	private var button3:Button = new Button();
 	private var _listener:IEventDispatcher;
 
-	// The threshold by which tooltips will be occluded by the edge of the stage
-	private const SCREEN_WIDTH_THRESHOLD:Number = 1085;
+	// The max width of the tooltip
+	private const TOOLTIP_WIDTH:Number = 224;
 	private var _enableSelfNode:Boolean;
 
 	private var _tooltipDirection:String = "left";
@@ -88,9 +88,12 @@ public class DestinationBubble extends AdventureBubble
 	}
 	public override function show(target:Sprite, direction:int = DIRECTION_UP, parent:DisplayObject = null):void
 	{
-		var pos:Point = target.localToGlobal(new Point(this.width, 0));
+		super.show(target, direction, parent);
 
-		if (pos.x < SCREEN_WIDTH_THRESHOLD) _tooltipDirection = "left";
+		var pos:Point = this.localToGlobal(new Point(this.WIDTH, 0));
+		var threshold:Number = pos.x + TOOLTIP_WIDTH;
+
+		if (target.stage.width < threshold) _tooltipDirection = "left";
 		var tooltipOptions:Object = {direction:_tooltipDirection, showDelay:0, hideDelay:0, fadeTime:50}
 		if(_enableSelfNode)
 		{
@@ -105,8 +108,6 @@ public class DestinationBubble extends AdventureBubble
 
 		ToolTip.add(button2, "Choosing this path will bring the student to a new destination you will create", tooltipOptions);
 		ToolTip.add(button3, "Choosing this path will bring the student to another (already existing) destination", tooltipOptions);
-
-		super.show(target, direction, parent);
 	}
 	public override function destroy():void
 	{
