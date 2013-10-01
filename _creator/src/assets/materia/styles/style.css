@@ -843,9 +843,6 @@ Panel {
 	borderColor: #BEBEBE;
 }
 /* --------------------------------  Misc. Components  --------------------------------------*/
-CheckBox {
-	textRollOverColor: #dedede;
-}
 .gradientBackground1 {
 	/* Radial Background Gradient (Very Faint) */
  	backgroundImage: ClassReference("materia.components.GradientBackground");
