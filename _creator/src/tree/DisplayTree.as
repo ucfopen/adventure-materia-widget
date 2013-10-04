@@ -805,6 +805,7 @@ public class DisplayTree extends Sprite
 		alreadyCreated[0] = true;
 		stack.push(root);
 		// Create the Tree (left oriented depth-first)
+		var errors:int = 0;
 		while(!stack.isEmpty())
 		{
 			// get the node from the stack
@@ -816,6 +817,16 @@ public class DisplayTree extends Sprite
 			{
 				var newNode:Node;
 				var newId:int = int(node.data.answers[i].options.link);
+				
+				// If there is no link value in options then there is a qset problem.
+				// To recover, link to the root node just so it won't infinite loop!
+				if(node.data.answers[i].options.link == null)
+				{
+					errors++;
+					node.data.answers[i].options = { link:0, isShortcut:true };
+					newId = 0;
+				}
+				
 				// If answer path does not lead to a shortcut, create a real node
 				if(node.data.answers[i].options.isShortcut == null || node.data.answers[i].options.isShortcut == false)
 				{
@@ -875,6 +886,11 @@ public class DisplayTree extends Sprite
 		}
 		// draw the tree
 		redraw();
+		
+		if(errors > 0)
+		{
+			Alert.show('There was an error restoring your widget. ' + errors + ' destination(s) that were causing problems now link to the Start destination.');
+		}
 	}
 	public function showNodesAsNew(nodes:Array):void
 	{
