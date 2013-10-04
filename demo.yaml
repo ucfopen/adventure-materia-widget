@@ -23,9 +23,10 @@ qset:
               layout: 2
               type: 1
               proceedText: Continue
+              id: 0
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/1.png"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
@@ -65,6 +66,7 @@ qset:
               layout: 1
               randomize: true
               type: 2
+              id: 1
           - 
             materiaType: question
             id: null
@@ -97,9 +99,10 @@ qset:
               layout: 2
               randomize: true
               type: 2
+              id: 2
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/2.png"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
@@ -117,6 +120,7 @@ qset:
               layout: 1
               type: 1
               proceedText: Continue
+              id: 3
           - 
             materiaType: question
             id: null
@@ -135,6 +139,7 @@ qset:
               layout: 1
               type: 1
               proceedText: Continue
+              id: 4
           - 
             materiaType: question
             id: null
@@ -164,6 +169,7 @@ qset:
               layout: 1
               randomize: true
               type: 2
+              id: 5
           - 
             materiaType: question
             id: null
@@ -196,6 +202,7 @@ qset:
               layout: 1
               randomize: true
               type: 4
+              id: 6
           - 
             materiaType: question
             id: null
@@ -228,6 +235,7 @@ qset:
               layout: 1
               randomize: true
               type: 4
+              id: 7
           - 
             materiaType: question
             id: null
@@ -260,6 +268,7 @@ qset:
               layout: 1
               randomize: true
               type: 4
+              id: 8
           - 
             materiaType: question
             id: null
@@ -295,6 +304,7 @@ qset:
               layout: 1
               randomize: true
               type: 2
+              id: 9
           - 
             materiaType: question
             id: null
@@ -312,9 +322,10 @@ qset:
               layout: 2
               type: 1
               proceedText: Continue
+              id: 10
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/3.png"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
@@ -332,9 +343,10 @@ qset:
               layout: 2
               type: 1
               proceedText: Continue
+              id: 11
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/3.png"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
@@ -370,66 +382,75 @@ qset:
               layout: 1
               randomize: true
               type: 2
+              id: 12
           - 
             materiaType: question
             id: null
             questions:
               - 
                 text: "Great work! You've helped the child recover and successfully diagnosed and treated his dehydration. The mother thanks you earnestly as they leave."
+                options: [ ]
             type: MC
             options:
               proceedText: Continue
+              id: 13
               layout: 2
               type: 5
               finalScore: 90
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/5.JPG"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
             questions:
               - 
                 text: "Excellent work! You've helped the child recover and successfully diagnosed and treated his dehydration. The mother thanks you earnestly as they leave."
+                options: [ ]
             type: MC
             options:
               proceedText: Continue
+              id: 14
               layout: 2
               type: 5
               finalScore: 100
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/5.JPG"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
             questions:
               - 
                 text: "Good job! While flustering the Healthcare Provider and hospital staff with a few mistakes, you've helped the child recover and successfully diagnosed and treated his dehydration. The mother thanks you earnestly as they leave."
+                options: [ ]
             type: MC
             options:
               proceedText: Continue
+              id: 15
               layout: 2
               type: 5
               finalScore: 70
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/5.JPG"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
             questions:
               - 
                 text: "Nice job! Despite some missteps, you've helped the child recover and successfully diagnosed and treated his dehydration. The mother thanks you earnestly as they leave."
+                options: [ ]
             type: MC
             options:
               proceedText: Continue
+              id: 16
               layout: 2
               type: 5
               finalScore: 80
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/5.JPG"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
@@ -462,6 +483,7 @@ qset:
               layout: 1
               randomize: true
               type: 2
+              id: 17
           - 
             materiaType: question
             id: null
@@ -480,9 +502,10 @@ qset:
               layout: 2
               type: 1
               proceedText: Continue
+              id: 19
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/4.png"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
@@ -517,6 +540,7 @@ qset:
               layout: 1
               randomize: true
               type: 2
+              id: 20
           - 
             materiaType: question
             id: null
@@ -534,18 +558,21 @@ qset:
               layout: 1
               type: 1
               proceedText: Continue
+              id: 21
           - 
             materiaType: question
             id: null
             questions:
               - 
                 text: "The Healthcare Provider balks at your decision to go ahead and perform treatment despite their refusal. You're immediately ordered to leave the emergency room and pack your things - time to find a new job!"
+                options: [ ]
             type: MC
             options:
               layout: 1
               type: 5
               proceedText: Continue
               finalScore: 0
+              id: 22
           - 
             materiaType: question
             id: null
@@ -564,21 +591,24 @@ qset:
               layout: 2
               type: 1
               proceedText: Continue
+              id: 24
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/4.png"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
             questions:
               - 
                 text: "The Healthcare Provider denies your recommendation to check the child's blood pressure and respiration again - you clearly don't know what you're doing, they say. You're immediately given the order to pack your things and leave!"
+                options: [ ]
             type: MC
             options:
               layout: 1
               type: 5
               proceedText: Continue
               finalScore: 20
+              id: 25
           - 
             materiaType: question
             id: null
@@ -596,6 +626,7 @@ qset:
                   link: 27
                   hotspot: >
                     220.9,167.15,331.2284308686394,43.82406931492768
+                  feedback:
               - 
                 text: The patient is lethargic
                 value: 100
@@ -603,6 +634,7 @@ qset:
                   link: 28
                   hotspot: >
                     210.7,285.4,283.32770394302077,17.325794845436523
+                  feedback:
               - 
                 text: "The patient cannot urinate and won't take fluids"
                 value: 100
@@ -610,25 +642,29 @@ qset:
                   link: 29
                   hotspot: >
                     2347.05,286.4,321.03678684191203,37.70908289889125
+                  feedback:
             options:
               layout: 4
               type: 3
+              id: 26
               visibility: 0
               asset:
-                materiaType: asset
                 id: <%MEDIA="_assets/6.png"%>
+                materiaType: asset
           - 
             materiaType: question
             id: null
             questions:
               - 
                 text: "The Healthcare Provider notes that the patient's temperature - 37 degrees Celsius, or 98.6 degrees Fahrenheit - is normal! The chart is taken away from you and you're asked to leave the emergency room and collect your things."
+                options: [ ]
             type: MC
             options:
               layout: 1
               type: 5
               finalScore: 10
               proceedText: Continue
+              id: 27
           - 
             materiaType: question
             id: null
@@ -652,15 +688,20 @@ qset:
               layout: 1
               type: 1
               proceedText: Continue
+              id: 28
           - 
             materiaType: question
             id: null
             questions:
               - 
                 text: "The Healthcare Provider calmly informs you that none of these symptoms are related to the flu. You're asked to leave the emergency room and collect your things."
+                options: [ ]
             type: MC
             options:
               layout: 1
               type: 5
               finalScore: 25
               proceedText: Continue
+              id: 29
+        options: [ ]
+    options: [ ]
