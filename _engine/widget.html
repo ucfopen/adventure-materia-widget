@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HTML Widget Engine</title>
+		<meta charset="utf-8" />
+		<style type="text/css"></style>
+		<script type="text/javascript" src="/js/materia.require.js"></script>
+		<link rel="stylesheet/less" type="text/css" href="css/widget.less">
+		<script type="text/javascript">
+			require(['enginecore', 'score', 'underscore', 'less', 'js/raphael-min', 'cs!js/widget'], function(util) {
+				Materia.Engine.start(Adventure.Engine);
+			});
+		</script>
+	</head>
+	<body>
+		<script type="text/template" id="overview-screen-template">
+			<header class="header">
+				<h1><span><%= title %></span></h1>
+			</header>
+		</script>
+		<div id="overview-screen">
+		</div>
+
+		<script type="text/template" id="node-screen-template">
+			<section id="question-text" class="question clearfix">
+				<% if (question.layout != 1) { %>
+					<h2 class="text with-media"><%= question.text %></h2>
+					<figure class="asset"><img src="<%= question.image %>" /></figure>
+				<% } else { %>
+					<h2 class="text"><%= question.text %></h2>
+				<% } %>
+			</section>
+			<section id="answers" class="answers">
+				<% if (type == "mc") { %>
+					<div class="mc">
+						<% for (var i=0; i<answers.length; i++) { %>
+							<a href="#" class="answer" data-id="<%=question.id%>" data-index="<%=answers[i].index%>" data-link="<%= answers[i].link %>"><%= answers[i].text %></a>
+						<% } %>
+					</div>
+				<% } else if (type == "sa") { %>
+					<div class="sa">
+						<input type="text" id="sa-answer" class="short-answer" placeholder="Enter an answer here." />
+					</div>
+				<% } else if (type == "trans") { %>
+					<div class="trans">
+						<input type="button" id="trans-continue" class="trans-button" value="Continue" data-id="<%=question.id%>" data-index="-1" data-link="<%= link %>" />
+					</div>
+				<% } %>
+			</section>
+		</script>
+		<div id="node-screen" class="screen">
+		</div>
+	</body>
+</html>

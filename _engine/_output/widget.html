@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HTML Adventure Engine</title>
+		<meta charset="utf-8" />
+		<style type="text/css"></style>
+		<script type="text/javascript" src="/js/materia.require.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/widget.css">
+		<script type="text/javascript">
+			require(['enginecore', 'score', 'underscore',  'js/raphael-min', 'js/widget'], function(util) {
+				Materia.Engine.start(Adventure.Engine);
+			});
+		</script>
+	</head>
+	<body>
+		<script type="text/template" id="overview-screen-template">
+			<header class="header">
+				<h1><span><%= title %></span></h1>
+			</header>
+		</script>
+		<div id="overview-screen">
+		</div>
+
+		<script type="text/template" id="node-screen-template">
+			<section id="question-text" class="question">
+				<h2 class="text"><%= question.text %></h2>
+			</section>
+		</script>
+		<div id="node-screen" class="screen">
+		</div>
+	</body>
+</html>
