@@ -13,8 +13,8 @@ general:
   api_version: 2
 files:
   creator: swf/adventure-creator.swf
-  player: swf/adventure-engine.swf
-  flash_version: 10
+  player: widget.html
+  flash_version: 0
 score:
   is_scorable: Yes
   score_module: Adventure
