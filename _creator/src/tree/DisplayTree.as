@@ -770,6 +770,10 @@ public class DisplayTree extends Sprite
 					data.answers[j].options.isShortcut = true;
 					data.answers[j].options.link = nodes[i].children[j].shortcut;
 				}
+				else
+				{
+					data.answers[j].options.isShortcut = false;
+				}
 			}
 			// add to qgroup
 			qGroup.addQuestion(data);
