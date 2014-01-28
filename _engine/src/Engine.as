@@ -153,6 +153,7 @@ public class Engine extends EngineCore
 	private var _typeIcon:Bitmap;
 	private var _horizDim:Dimension;
 	private var _vertDim:Dimension;
+	private var _fullDim:Dimension;
 	private var _hotspotDefaultAnswer:Object;
 	// private var _scoreStyle:int;
 	private var _scoreQIDs:Array;
@@ -261,6 +262,7 @@ public class Engine extends EngineCore
 		// Create the background box that goes behind question and asset box
 		_bgBox = new Sprite();
 		this.addChild(_bgBox);
+
 		// Draw Question Box
 		_questionBoxDim = new Dimension(600, 200);
 		_questionBox = new Sprite();
@@ -372,6 +374,7 @@ public class Engine extends EngineCore
 		//------------------------------
 		_horizDim = new Dimension(_stageDim.width / 2 - PADDING_H * 2, _stageDim.height - INFO_BAR_HEIGHT - _continueButton.height - PADDING_V * 3);
 		_vertDim = new Dimension(_stageDim.width - PADDING_H * 8, (_stageDim.height - INFO_BAR_HEIGHT - _continueButton.height - PADDING_V * 3) / 2 - PADDING_V / 2);
+		_fullDim = new Dimension(_stageDim.width - PADDING_H * 8, _stageDim.height - INFO_BAR_HEIGHT - _continueButton.height - PADDING_V * 3);
 	}
 	/**
 	 * Clears all elements specific to last node from the UI to make way for
@@ -562,7 +565,7 @@ public class Engine extends EngineCore
 				switch(entry.options.layout)
 				{
 					case AdventureOptions.LAYOUT_TEXT_ONLY:
-						updateQuestionBox(_vertDim.clone(), POSITION_CENTER, bounds.clone());
+						updateQuestionBox(_fullDim.clone(), POSITION_CENTER, bounds.clone());
 						break;
 					case AdventureOptions.LAYOUT_VERT_TEXT:
 						updateQuestionBox(_vertDim.clone(), POSITION_TOP, bounds.clone());
@@ -747,7 +750,7 @@ public class Engine extends EngineCore
 				_selectedFinalAnswer = "Empty Node";
 			}
 
-			updateQuestionBox(_vertDim, POSITION_CENTER, bounds);
+			updateQuestionBox(_fullDim, POSITION_CENTER, bounds);
 		}
 	}
 	/**
