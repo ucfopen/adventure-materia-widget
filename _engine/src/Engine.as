@@ -716,13 +716,49 @@ public class Engine extends EngineCore
 		}
 		// load the question into the question field
 		_questionField.text = String(entry.questions[0].text);
+
 		// adjust font fize for large question text strings
-		if (_questionField.text.length > 30)
+
+		var finalFontSize:int = 30; // 30 is default
+		// threshold is the minimum character length before scaling takes effect
+		var threshold:int = 0;
+		// scale factor determines how fast font size scales based on char length
+		var scaleFactor:int = 0;
+
+		// set threshold and scale factor based on node type
+		switch (entry.options.type)
 		{
-			_questionField.setStyle('textFormat', new TextFormat("ClassicRound", 22, COLOR_TEXT_MAIN, true));
-			// ensure scrollbar is only enabled if necessary
-			_questionField.checkScrollability();
+			case AdventureOptions.TYPE_NARRATIVE:
+			case AdventureOptions.TYPE_END:
+				threshold = 120;
+				scaleFactor = 100;
+				break;
+
+			case AdventureOptions.TYPE_MULTIPLE_CHOICE:
+			case AdventureOptions.TYPE_SHORT_ANSWER:
+				threshold = 50;
+				scaleFactor = 50;
+				break;
+			case AdventureOptions.TYPE_HOTSPOT:
+				threshold = 30;
+				scaleFactor = 8;
+				break;
 		}
+
+		// Dynamically scale text based on question length, down to a minimum of 14pt.
+		var modReduction:Number = _questionField.text.length - threshold;
+		if (modReduction > 0)
+		{
+			modReduction = int(modReduction / scaleFactor);
+
+			finalFontSize = (25 - modReduction) > 14 ? (25 - modReduction) : 14;
+		}
+
+		// Set font size
+		_questionField.setStyle('textFormat', new TextFormat("ClassicRound", finalFontSize, COLOR_TEXT_MAIN, true));
+
+		// ensure scrollbar is only enabled if necessary
+		_questionField.checkScrollability();
 
 		// If the node is empty, determine whether or not the node is at the end of a branch - and proceed or go to score screen.
 		if(isEmptyNode)
