@@ -730,7 +730,7 @@ public class Engine extends EngineCore
 		{
 			case AdventureOptions.TYPE_NARRATIVE:
 			case AdventureOptions.TYPE_END:
-				threshold = 120;
+				threshold = 100;
 				scaleFactor = 100;
 				break;
 
