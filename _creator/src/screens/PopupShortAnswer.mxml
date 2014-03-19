@@ -24,7 +24,7 @@
 			protected override function onCreationComplete():void
 			{
 				super.onCreationComplete();
-				answerVBox.removeChild(randomizeBox);
+				bottomButtons.removeChild(randomizeBox);
 
 				// Because SA extends MC, we need to hide the MC Helper bubble
 				if (_creator.helperManager.mcBubble.visible)
@@ -80,7 +80,6 @@
 				_defaultChoice.popupInstance = this;
 				_defaultChoice.setStyle("borderStyle", "solid");
 				_defaultChoice.setStyle("backgroundColor", "#a7a7a7");
-				_defaultChoice.setStyle("margin-top", "10");
 				_defaultChoice.answerField.setStyle("disabledColor", "#535353");
 				_defaultChoice.answerField.setStyle("fontSize", "14");
 				_defaultChoice.answerField.setStyle("fontWeight", "bold");
