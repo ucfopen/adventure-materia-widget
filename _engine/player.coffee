@@ -1,6 +1,5 @@
 Namespace('Adventure').Engine = do ->
 	_qset = null
-	_base_url = null
 	LAYOUT_IMAGE_ONLY = 0	# Layout that contains only an image
 	LAYOUT_TEXT_ONLY = 1 	# Layout that contains only text
 	LAYOUT_HORIZ_TEXT = 2 	# Horizontal layout that contains text and then an image
@@ -11,7 +10,6 @@ Namespace('Adventure').Engine = do ->
 	# Called by Materia.Engine when your widget Engine should start the user experience.
 	start = (instance, qset, version = '1') ->
 		_qset = qset
-		_base_url = instance.base_url
 		_init(instance.name)
 
 	_init = (title) ->
@@ -66,7 +64,7 @@ Namespace('Adventure').Engine = do ->
 
 		# check if question has an associated asset (for now, just an image)
 		if question.layout isnt LAYOUT_TEXT_ONLY
-			image_url = Materia.Engine.getImageAssetUrl _base_url, q_data.options.asset.id
+			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			question.image = image_url
 
 		answers = []
@@ -102,7 +100,7 @@ Namespace('Adventure').Engine = do ->
 			id : q_data.options.id
 
 		if question.layout isnt LAYOUT_TEXT_ONLY
-			image_url = Materia.Engine.getImageAssetUrl _base_url, q_data.options.asset.id
+			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			question.image = image_url
 
 		answers = []
@@ -142,7 +140,7 @@ Namespace('Adventure').Engine = do ->
 
 		# Check if question has an associated asset (for now, just an image)
 		if question.layout isnt LAYOUT_TEXT_ONLY
-			image_url = Materia.Engine.getImageAssetUrl _base_url, q_data.options.asset.id
+			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			question.image = image_url
 
 		# Output
@@ -157,11 +155,14 @@ Namespace('Adventure').Engine = do ->
 		_handleShortAnswerInput = (e) ->
 			target = $(e.target)
 
+			console.log 'outer'
 			# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
 			for i in [0..q_data.answers.length-1]
 				raw_response_str = q_data.answers[i].text
 				# NOTE THAT THIS REGEX IS NOT FINAL. IT NEEDS TO PROPERLY HANDLE ESCAPED COMMAS
 				# Javascript doesn't handle negative lookbehind, which is what the Flash engine used
+				console.log(raw_response_str)
+				console.log(raw_response_str.trim())
 				possible_responses = raw_response_str.trim().split(",")
 
 				# Compare the user's response to each possible answer in the answer set
@@ -196,7 +197,7 @@ Namespace('Adventure').Engine = do ->
 
 		# check if question has an associated asset (for now, just an image)
 		if question.layout isnt LAYOUT_TEXT_ONLY
-			image_url = Materia.Engine.getImageAssetUrl _base_url, q_data.options.asset.id
+			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			question.image = image_url
 
 		# Set the link based on the node type - for end screens, the link is -1 (score screen) and submit the final score
