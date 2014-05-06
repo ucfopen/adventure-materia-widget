@@ -20,53 +20,41 @@
 		<!-- <script type="text/javascript" src="/js/materia.storage.table.js"></script> -->
 
 		<!-- YOUR PREREQUISITES -->
-		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.15/angular.min.js"></script>
 
 		<!-- MAIN PLAYER SCRIPT -->
 		<script type="text/javascript" src="player.js"></script>
 	</head>
-	<body>
-		<script type="text/template" id="overview-screen-template">
-			<header class="header">
-				<h1><span><%= title %></span></h1>
-			</header>
-		</script>
+	<body ng-app='AdventureApp' ng-controller='AdventureController'>
+		<header class="header">
+			<h1><span>{{title}}</span></h1>
+		</header>
+
 		<div id="overview-screen">
 		</div>
 
-		<script type="text/template" id="node-screen-template">
-			<section id="question-text" class="question clearfix">
-				<% if (question.layout != 1) { %>
-					<h2 class="text with-media"><%= question.text %></h2>
-					<figure class="asset"><img src="<%= question.image %>" /></figure>
-				<% } else { %>
-					<h2 class="text"><%= question.text %></h2>
-				<% } %>
-			</section>
-			<section id="answers" class="answers">
-				<% if (type == "mc") { %>
-					<div class="mc">
-						<% for (var i=0; i<answers.length; i++) { %>
-							<a href="#" class="answer" data-id="<%=question.id%>" data-index="<%=answers[i].index%>" data-link="<%= answers[i].link %>"><%= answers[i].text %></a>
-						<% } %>
-					</div>
-				<% } else if (type == "sa") { %>
-					<div class="sa">
-						<input type="text" id="sa-answer" class="short-answer" placeholder="Enter an answer here." />
-					</div>
-				<% } else if (type == "trans") { %>
-					<div class="trans">
-						<input type="button" id="trans-continue" class="trans-button" value="Continue" data-id="<%=question.id%>" data-index="-1" data-link="<%= link %>" />
-					</div>
-				<% } %>
-			</section>
-		</script>
+		<section id="question-text" class="question clearfix">
+			<div ng-show='question.layout != 1'>
+				<h2 class="text with-media">{{ question.text }}</h2>
+				<figure class="asset"><img src="{{ question.image }}" /></figure>
+			</div>
+			<div ng-hide='question.layout != 1'>
+				<h2 class="text">{{ question.text }}</h2>
+			</div>
+		</section>
+		<section id="answers" class="answers">
+			<div class="mc" ng-show='type == "mc"'>
+				<a href="#" class="answer" ng-repeat="answer in answers" ng-click="handleAnswerSelection(answer.link, answer.index)" data-index="{{answer.index}}" data-link="{{answer.link}}">{{answer.text}}</a>
+			</div>
+			<div class="sa" ng-show='type == "sa"'>
+				<input type="text" id="sa-answer" class="short-answer" ng-model='response' placeholder="Enter an answer here." ng-enter="handleShortAnswerInput()" />
+			</div>
+			<div class="trans" ng-show='type == "trans"'>
+				<input type="button" id="trans-continue" class="trans-button" value="Continue" ng-click='handleAnswerSelection(link,0)'/>
+			</div>
+		</section>
 		<div id="node-screen" class="screen">
 		</div>
-		<!-- INITIALIZE -->
-		<script type="text/javascript">
-			Materia.Engine.start(Adventure.Engine);
-		</script>
 	</body>
 </html>
 

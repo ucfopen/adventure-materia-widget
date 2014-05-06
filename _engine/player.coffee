@@ -1,5 +1,6 @@
-Namespace('Adventure').Engine = do ->
-	_qset = null
+AdventureApp = angular.module('AdventureApp', [])
+
+AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	LAYOUT_IMAGE_ONLY = 0	# Layout that contains only an image
 	LAYOUT_TEXT_ONLY = 1 	# Layout that contains only text
 	LAYOUT_HORIZ_TEXT = 2 	# Horizontal layout that contains text and then an image
@@ -7,219 +8,132 @@ Namespace('Adventure').Engine = do ->
 	LAYOUT_VERT_TEXT = 4 	# Vertical layout that contains text and then an image
 	LAYOUT_VERT_IMAGE = 5 	# Vertical layout that contains an image and then text
 
-	# Called by Materia.Engine when your widget Engine should start the user experience.
-	start = (instance, qset, version = '1') ->
-		_qset = qset
-		_init(instance.name)
-
-	_init = (title) ->
-		# document.oncontextmenu = -> false                  # Disables right click.
-		# document.addEventListener 'mousedown', (e) ->
-		# 	if e.button is 2 then false else true          # Disables right click.
-
-		# Update screen with basic widget information (title)
-		screen = $('#overview-screen-template').html()
-		data =
-			title : title
-
-		$('#overview-screen').html(_.template(screen, data))
-
-		# Kick off the questions starting with the root node
-		_manageQuestionScreen(_qset.items[0].items[0])
+	$scope.title = ""
+	$scope.qset = null
+	
+	$scope.engine =
+		start: (instance, qset, version = '1') ->
+			$scope.$apply ->
+				$scope.title = instance.name
+				$scope.qset = qset
+				manageQuestionScreen(qset.items[0].items[0])
+		manualResize: true
 
 	# Update the screen depending on the question type (narrative, mc, short answer, hotspot, etc)
-	_manageQuestionScreen = (q_data) ->
+	manageQuestionScreen = (q_data) ->
+		console.log q_data
+
+		$scope.question =
+			text : q_data.questions[0].text,
+			layout : q_data.options.layout,
+			type : q_data.options.type,
+			id : q_data.options.id
+
+		$scope.answers = []
+
+		for i in [0..q_data.answers.length-1]
+			answer =
+				text : q_data.answers[i].text,
+				link : q_data.answers[i].options.link,
+				index : i
+			$scope.answers.push answer
+
+		$scope.q_data = q_data
+
+		# check if question has an associated asset (for now, just an image)
+		if $scope.question.layout isnt LAYOUT_TEXT_ONLY
+			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
+			$scope.question.image = image_url
 
 		switch q_data.options.type
 			when -1 then _end() # technically this shouldn't be called - the end call is made is _handleAnswerSelection
-			when 1, 5 then _handleTransitional(q_data)
-			when 2 then _handleMultipleChoice(q_data)
-			when 3 then _handleHotspot(q_data)
-			when 4 then _handleShortAnswer(q_data)
+			when 1, 5 then handleTransitional(q_data)
+			when 2 then handleMultipleChoice(q_data)
+			when 3 then handleHotspot(q_data)
+			when 4 then handleShortAnswer(q_data)
 			else
-				_handleEmptyNode # Should hopefully only happen on preview, when empty nodes are allowed
+				handleEmptyNode # Should hopefully only happen on preview, when empty nodes are allowed
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
-	_handleAnswerSelection = (e) ->
-		target = $(e.target)
+	$scope.handleAnswerSelection = (link, index) ->
+		if link is -1 then _end() # link to -1 indicates the widget should advance to the score screen
 
-		if parseInt(target.attr('data-link')) is -1 then _end() # link to -1 indicates the widget should advance to the score screen
+		_logProgress($scope.question.id, index) # record the answer
 
-		for i in [0.._qset.items[0].items.length-1]
-			if parseInt(target.attr('data-link')) is _qset.items[0].items[i].options.id
-				_manageQuestionScreen _qset.items[0].items[i]
+		for i in [0..$scope.qset.items[0].items.length-1]
+			if link is $scope.qset.items[0].items[i].options.id
+				manageQuestionScreen $scope.qset.items[0].items[i]
 				break
 
-		_logProgress(target.attr('data-id'), target.attr('data-index')) # record the answer
+	# Do stuff when the user submits something in the SA answer box
+	$scope.handleShortAnswerInput = ->
+		console.log $scope.q_data
+		# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
+		for i in [0...$scope.q_data.answers.length]
+			raw_response_str = $scope.q_data.answers[i].text
 
-	_handleMultipleChoice = (q_data) ->
+			# NOTE THAT THIS REGEX IS NOT FINAL. IT NEEDS TO PROPERLY HANDLE ESCAPED COMMAS
+			# Javascript doesn't handle negative lookbehind, which is what the Flash engine used
+			possible_responses = raw_response_str.trim().split(",")
 
-		node_screen = $('#node-screen-template').html()
+			# Compare the user's response to each possible answer in the answer set
+			for j in [0..possible_responses.length-1]
+				answer = $scope.response.toLowerCase()
 
-		question =
-			text : q_data.questions[0].text,
-			layout : q_data.options.layout,
-			type : q_data.options.type,
-			id : q_data.options.id
+				if (possible_responses[j].toLowerCase().trim() is answer) # ALSO NOT FINAL REGEX (see above)
+					for k in [0...$scope.qset.items[0].items.length]
+						if parseInt($scope.q_data.answers[i].options.link) is $scope.qset.items[0].items[k].options.id
+							if $scope.q_data.answers[i].options and $scope.q_data.answers[i].options.feedback
+								$scope.next = $scope.qset.items[0].items[k]
+								$scope.feedback = $scope.q_data.answers[i].options.feedback
+							manageQuestionScreen $scope.qset.items[0].items[k]
+							_logProgress($scope.question.id, i) # Log the response
+							return
 
-		# check if question has an associated asset (for now, just an image)
-		if question.layout isnt LAYOUT_TEXT_ONLY
-			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
-			question.image = image_url
+		# Fallback in case the user response doesn't match anything. Have to match the link associated with [All Other Answers]
+		for answer in $scope.q_data.answers
+			if answer.options.isDefault
+				link = options.link
 
-		answers = []
+		for n in [0...$scope.qset.items[0].items.length]
+			if link is $scope.qset.items[0].items[n].id
+				manageQuestionScreen $scope.qset.items[0].items[n]
+				_logProgress(question.id, 0) # Log the response
 
-		for i in [0..q_data.answers.length-1]
-			answer =
-				text : q_data.answers[i].text,
-				link : q_data.answers[i].options.link,
-				index : i
-			answers.push answer
+	handleMultipleChoice = (q_data) ->
 
-		data =
-			question : question,
-			answers : answers,
-			type : "mc"
+		$scope.type = "mc"
 
-		# output question data to the page
-		$('#node-screen').html(_.template(node_screen, data))
+	handleHotspot = (q_data) ->
+		$scope.type = "hotspot"
 
-		# add listener for answer selection
-		$('.answer').on 'click', _handleAnswerSelection
-
-	_handleHotspot = (q_data) ->
-
-		########## TEMP CODE ############
-
-		node_screen = $('#node-screen-template').html()
-
-		question =
-			text : "Hi! I should be a hotspot, but instead I'm a multiple choice question! Wait, WHAT'S GOING ON?!",
-			layout : q_data.options.layout,
-			type : q_data.options.type,
-			id : q_data.options.id
-
-		if question.layout isnt LAYOUT_TEXT_ONLY
-			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
-			question.image = image_url
-
-		answers = []
+		$scope.answers = []
 
 		for i in [0..q_data.answers.length-1]
 			answer =
 				text : q_data.answers[i].text,
 				link : q_data.answers[i].options.link,
 				index : i
-			answers.push answer
+			$scope.answers.push answer
 
-		data =
-			question : question,
-			answers : answers,
-			type : "mc"
-
-		$('#node-screen').html(_.template(node_screen, data))
-
-		$('.answer').on 'click', _handleAnswerSelection
-
-		########### END TEMP CODE ####################
-
-	_handleShortAnswer = (q_data) ->
-
-		node_screen = $('#node-screen-template').html()
-
-		question =
-			text : q_data.questions[0].text,
-			layout : q_data.options.layout,
-			type : q_data.options.type,
-			id : q_data.options.id
-
-		# SA doesn't provide answers to the DOM - input is vetted in _handleShortAnswerInput
-		data =
-			question : question,
-			type : "sa"
-
-		# Check if question has an associated asset (for now, just an image)
-		if question.layout isnt LAYOUT_TEXT_ONLY
-			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
-			question.image = image_url
-
-		# Output
-		$('#node-screen').html(_.template(node_screen, data))
-
-		# Listener for the intput box
-		$('#sa-answer').keypress (e) ->
-			if e.which == 10 or e.which == 13
-				_handleShortAnswerInput(e)
-
-		# Do stuff when the user submits something in the SA answer box
-		_handleShortAnswerInput = (e) ->
-			target = $(e.target)
-
-			console.log 'outer'
-			# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
-			for i in [0..q_data.answers.length-1]
-				raw_response_str = q_data.answers[i].text
-				# NOTE THAT THIS REGEX IS NOT FINAL. IT NEEDS TO PROPERLY HANDLE ESCAPED COMMAS
-				# Javascript doesn't handle negative lookbehind, which is what the Flash engine used
-				console.log(raw_response_str)
-				console.log(raw_response_str.trim())
-				possible_responses = raw_response_str.trim().split(",")
-
-				# Compare the user's response to each possible answer in the answer set
-				for j in [0..possible_responses.length-1]
-					answer = target[0].value.toLowerCase()
-
-					if (possible_responses[j].toLowerCase().trim() is answer) # ALSO NOT FINAL REGEX (see above)
-						for k in [0.._qset.items[0].items.length-1]
-							if parseInt(q_data.answers[i].options.link) is _qset.items[0].items[k].options.id
-								_manageQuestionScreen _qset.items[0].items[k]
-								_logProgress(question.id, i) # Log the response
-								return
-
-			# Fallback in case the user response doesn't match anything. Have to match the link associated with [All Other Answers]
-			for n in [0.._qset.items[0].items.length-1]
-				if parseInt(q_data.answers[0].options.link) is _qset.items[0].items[n].id
-					_manageQuestionScreen _qset.items[0].items[n]
-					_logProgress(question.id, 0) # Log the response
-
-			# _manageQuestionScreen _qset.items[0].items[] # should be [All Other Answers]
+	handleShortAnswer = (q_data) ->
+		$scope.type = "sa"
+		$scope.response = ""
 
 	# Transitional questions are the ones that don't require answers - i.e., narrative and end node
-	_handleTransitional = (q_data) ->
-
-		node_screen = $('#node-screen-template').html()
-
-		question =
-			text : q_data.questions[0].text,
-			layout : q_data.options.layout,
-			type : q_data.options.type,
-			id : q_data.options.id
-
-		# check if question has an associated asset (for now, just an image)
-		if question.layout isnt LAYOUT_TEXT_ONLY
-			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
-			question.image = image_url
-
+	handleTransitional = (q_data) ->
 		# Set the link based on the node type - for end screens, the link is -1 (score screen) and submit the final score
 		link = null
-		if question.type is 5
+		if $scope.question.type is 5
 			link = -1
-			Materia.Score.submitFinalScoreFromClient q_data.id, question.text, q_data.options.finalScore
+			Materia.Score.submitFinalScoreFromClient q_data.id, $scope.question.text, q_data.options.finalScore
 		else
 			link = q_data.answers[0].options.link
 
-		data =
-			question : question,
-			type : "trans",
-			link : link
+		$scope.link = link
+		$scope.type = "trans"
 
-		# Output to the screen
-		$('#node-screen').html(_.template(node_screen, data))
-
-		# Set the listener for the continue button
-		$('#trans-continue').on 'click', _handleAnswerSelection
-
-	_handleEmptyNode = ->
+	handleEmptyNode = ->
 
 	# Submit the user's response to the logs
 	_logProgress = (question_id, answer_index) ->
@@ -227,18 +141,26 @@ Namespace('Adventure').Engine = do ->
 		question_id = parseInt(question_id)
 		answer_index = parseInt(answer_index)
 
-		for i in [0.._qset.items[0].items.length-1]
-			if question_id is _qset.items[0].items[i].options.id then break
+		for i in [0..$scope.qset.items[0].items.length-1]
+			if question_id is $scope.qset.items[0].items[i].options.id then break
 
 		answer_text = null
-		if answer_index is -1 then answer_text = "N/A" else answer_text = _qset.items[0].items[i].answers[answer_index].text
+		if answer_index is -1 then answer_text = "N/A" else answer_text = $scope.qset.items[0].items[i].answers[answer_index].text
 
-		Materia.Score.submitQuestionForScoring _qset.items[0].items[i].id, answer_text
+		Materia.Score.submitQuestionForScoring $scope.qset.items[0].items[i].id, answer_text
 
+	_end = -> Materia.Engine.end yes
 
-	_end = ->
-		Materia.Engine.end yes
+	Materia.Engine.start($scope.engine)
+]
 
-	#public
-	manualResize: true
-	start: start
+AdventureApp.directive('ngEnter', ->
+    return (scope, element, attrs) ->
+        element.bind("keydown keypress", (event) ->
+            if(event.which == 13 or event.which == 10)
+                scope.$apply ->
+                    scope.$eval(attrs.ngEnter)
+                event.preventDefault()
+        )
+)
+
