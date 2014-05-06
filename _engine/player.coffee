@@ -56,18 +56,30 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
 	$scope.handleAnswerSelection = (link, index) ->
-		if link is -1 then _end() # link to -1 indicates the widget should advance to the score screen
+		# link to -1 indicates the widget should advance to the score screen
+		if link is -1 then _end()
 
-		_logProgress($scope.question.id, index) # record the answer
+		# record the answer
+		_logProgress($scope.question.id, index)
 
 		for i in [0..$scope.qset.items[0].items.length-1]
 			if link is $scope.qset.items[0].items[i].options.id
-				manageQuestionScreen $scope.qset.items[0].items[i]
+				next = $scope.qset.items[0].items[i]
 				break
+
+		if $scope.q_data.answers[index].options.feedback
+			$scope.feedback = $scope.q_data.answers[index].options.feedback
+			$scope.next = next
+		else
+			manageQuestionScreen next
 
 	# Do stuff when the user submits something in the SA answer box
 	$scope.handleShortAnswerInput = ->
 		console.log $scope.q_data
+
+		answer = $scope.response.toLowerCase()
+		$scope.response = ""
+
 		# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
 		for i in [0...$scope.q_data.answers.length]
 			raw_response_str = $scope.q_data.answers[i].text
@@ -78,43 +90,40 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 			# Compare the user's response to each possible answer in the answer set
 			for j in [0..possible_responses.length-1]
-				answer = $scope.response.toLowerCase()
-
 				if (possible_responses[j].toLowerCase().trim() is answer) # ALSO NOT FINAL REGEX (see above)
 					for k in [0...$scope.qset.items[0].items.length]
 						if parseInt($scope.q_data.answers[i].options.link) is $scope.qset.items[0].items[k].options.id
 							if $scope.q_data.answers[i].options and $scope.q_data.answers[i].options.feedback
-								$scope.next = $scope.qset.items[0].items[k]
 								$scope.feedback = $scope.q_data.answers[i].options.feedback
-							manageQuestionScreen $scope.qset.items[0].items[k]
+								$scope.next = $scope.qset.items[0].items[k]
+							else
+								manageQuestionScreen $scope.qset.items[0].items[k]
 							_logProgress($scope.question.id, i) # Log the response
 							return
 
 		# Fallback in case the user response doesn't match anything. Have to match the link associated with [All Other Answers]
 		for answer in $scope.q_data.answers
 			if answer.options.isDefault
-				link = options.link
-
+				link = answer.options.link
+				$scope.feedback = answer.options.feedback
 		for n in [0...$scope.qset.items[0].items.length]
 			if link is $scope.qset.items[0].items[n].id
-				manageQuestionScreen $scope.qset.items[0].items[n]
+				if $scope.feedback
+					$scope.next = $scope.qset.items[0].items[n]
+				else
+					manageQuestionScreen $scope.qset.items[0].items[n]
+
 				_logProgress(question.id, 0) # Log the response
 
-	handleMultipleChoice = (q_data) ->
+	$scope.closeFeedback = ->
+		$scope.feedback = ""
+		manageQuestionScreen $scope.next
 
+	handleMultipleChoice = (q_data) ->
 		$scope.type = "mc"
 
 	handleHotspot = (q_data) ->
 		$scope.type = "hotspot"
-
-		$scope.answers = []
-
-		for i in [0..q_data.answers.length-1]
-			answer =
-				text : q_data.answers[i].text,
-				link : q_data.answers[i].options.link,
-				index : i
-			$scope.answers.push answer
 
 	handleShortAnswer = (q_data) ->
 		$scope.type = "sa"
@@ -149,7 +158,9 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 		Materia.Score.submitQuestionForScoring $scope.qset.items[0].items[i].id, answer_text
 
-	_end = -> Materia.Engine.end yes
+	_end = ->
+		console.log 'Engine ended.'
+		Materia.Engine.end yes
 
 	Materia.Engine.start($scope.engine)
 ]
