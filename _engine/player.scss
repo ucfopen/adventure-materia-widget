@@ -24,10 +24,6 @@ html, body {
 	font-family: 'CorbelBold', sans-serif;
 	overflow-y: hidden;
 
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
 	user-select: none;
 }
 
@@ -39,16 +35,11 @@ html, body {
 	color:#ffffff;
 }
 
-.screen {
-	width:100%;
-}
-
-.screen .question {
+.question {
 	padding:10px;
-	// height:60%;
 }
 
-.screen .question h2 {
+.question h2 {
 	font-size:16px;
 	color:#363636;
 	&.with-media {
@@ -57,42 +48,42 @@ html, body {
 	}
 }
 
-.screen .question .asset {
+.question .asset {
 	width:45%;
 	float:right;
 	border:dotted 1px #d3d3d3;
 	margin:0px;
 }
 
-.screen .question .asset img {
+.question .asset img {
 	padding:5px;
 	width:80%;
 }
 
-.screen .answers {
+.answers {
 	// height:35%;
 	border:dotted 1px #d3d3d3;
 	margin:10px;
 	padding:10px;
 }
 
-.screen .answers .mc, .screen .answers .sa {
+.answers .mc, .answers .sa {
 	width:100%;
 	height:100%;
 }
 
-.screen .answers .mc .answer {
+.answers .mc .answer {
 	display:block;
 	margin-bottom:10px;
 	color:#000000;
 	text-decoration:none;
 }
 
-.screen .answers .sa, .screen .answers .trans {
+.answers .sa, .answers .trans {
 	text-align:center;
 }
 
-.screen .answers .sa .short-answer {
+.answers .sa .short-answer {
 	width:75%;
 	height:40px;
 	font-size:18px;
@@ -100,7 +91,7 @@ html, body {
 	border-radius:5px;
 }
 
-.screen .answers .trans .trans-button {
+.trans-button {
 	width:300px;
 	height:40px;
 	font-size:16px;
@@ -112,6 +103,20 @@ html, body {
 	&:hover {
 		background:#86b7d9;
 	}
+}
+
+.feedback {
+	width: 500px;
+	height: 300px;
+	border: 5px solid #999;
+	padding: 40px;
+	background: #fff;
+	font-size: 30px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -270px;
+	margin-top: -170px;
 }
 
 .clearfix:before,
@@ -126,3 +131,4 @@ html, body {
 .clearfix {
 	*zoom:1;
 }
+
