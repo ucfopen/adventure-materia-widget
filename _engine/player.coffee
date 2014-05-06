@@ -31,12 +31,14 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 		$scope.answers = []
 
-		for i in [0..q_data.answers.length-1]
-			answer =
-				text : q_data.answers[i].text,
-				link : q_data.answers[i].options.link,
-				index : i
-			$scope.answers.push answer
+		if q_data.answers
+			for i in [0..q_data.answers.length-1]
+				answer =
+					text : q_data.answers[i].text
+					link : q_data.answers[i].options.link
+					index : i
+					options : q_data.answers[i].options
+				$scope.answers.push answer
 
 		$scope.q_data = q_data
 
@@ -57,7 +59,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
 	$scope.handleAnswerSelection = (link, index) ->
 		# link to -1 indicates the widget should advance to the score screen
-		if link is -1 then _end()
+		if link is -1 then return _end()
 
 		# record the answer
 		_logProgress($scope.question.id, index)
@@ -124,6 +126,14 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 	handleHotspot = (q_data) ->
 		$scope.type = "hotspot"
+		$scope.question.layout = 1
+		for answer in $scope.answers
+			answer.type = answer.options.hotspot.substr(0,1)
+			answer.points = answer.options.hotspot.substr(1).split(",")
+			answer.left = answer.points[0] + "px"
+			answer.width = answer.points[2] + "px"
+			answer.top = answer.points[1] + "px"
+			answer.height = answer.points[3] + "px"
 
 	handleShortAnswer = (q_data) ->
 		$scope.type = "sa"
@@ -142,7 +152,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		$scope.link = link
 		$scope.type = "trans"
 
-	handleEmptyNode = ->
+	handleEmptyNode = -> null
 
 	# Submit the user's response to the logs
 	_logProgress = (question_id, answer_index) ->
@@ -150,7 +160,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		question_id = parseInt(question_id)
 		answer_index = parseInt(answer_index)
 
-		for i in [0..$scope.qset.items[0].items.length-1]
+		for i in [0...$scope.qset.items[0].items.length]
 			if question_id is $scope.qset.items[0].items[i].options.id then break
 
 		answer_text = null

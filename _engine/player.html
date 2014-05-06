@@ -51,8 +51,12 @@
 			<div class="sa" ng-show='type == "sa"'>
 				<input type="text" id="sa-answer" class="short-answer" ng-model='response' placeholder="Enter an answer here." ng-enter="handleShortAnswerInput()" />
 			</div>
+			<div class='hotspot' ng-show='type == "hotspot"'>
+				<img src='{{ question.image }}'>
+				<div class='hotarea' ng-repeat='answer in answers' ng-style='{ left: answer.left, top: answer.top, width: answer.width,height: answer.height}' ng-click='handleAnswerSelection(answer.link,answer.index)'></div>
+			</div>
 			<div class="trans" ng-show='type == "trans"'>
-				<input type="button" id="trans-continue" class="trans-button" value="Continue" ng-click='handleAnswerSelection(link,0)'/>
+				<input type="button" id="trans-continue" class="trans-button left" value="Continue" ng-click='handleAnswerSelection(link,0)'/>
 			</div>
 		</section>
 		<div id="node-screen" class="screen">
