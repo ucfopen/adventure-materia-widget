@@ -30,7 +30,9 @@
 			<h1><span>{{title}}</span></h1>
 		</header>
 
-		<div id="overview-screen">
+		<div class='feedback' ng-show='feedback'>
+			{{feedback}}
+			<input class='trans-button' type='button' value='OK' ng-click='closeFeedback()'>
 		</div>
 
 		<section id="question-text" class="question clearfix">
