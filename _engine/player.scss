@@ -48,14 +48,14 @@ html, body {
 	}
 }
 
-.question .asset {
-	width:45%;
+.asset {
+	width:35%;
 	float:right;
 	border:dotted 1px #d3d3d3;
 	margin:0px;
 }
 
-.question .asset img {
+.asset img {
 	padding:5px;
 	width:80%;
 }
@@ -79,10 +79,6 @@ html, body {
 	text-decoration:none;
 }
 
-.answers .sa, .answers .trans {
-	text-align:center;
-}
-
 .answers .sa .short-answer {
 	width:75%;
 	height:40px;
@@ -103,6 +99,9 @@ html, body {
 	&:hover {
 		background:#86b7d9;
 	}
+	&.left {
+		float: left;
+	}
 }
 
 .feedback {
@@ -117,6 +116,14 @@ html, body {
 	left: 50%;
 	margin-left: -270px;
 	margin-top: -170px;
+}
+
+.hotarea {
+	position: absolute;
+	background: rgba(0,0,255,0.5);
+	display: block;
+	margin-top: 180px;
+	margin-left: 30px;
 }
 
 .clearfix:before,
