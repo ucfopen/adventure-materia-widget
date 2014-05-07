@@ -120,6 +120,64 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	$scope.closeFeedback = ->
 		$scope.feedback = ""
 		manageQuestionScreen $scope.next
+	
+	$scope.renderCanvas = (answer) ->
+		setTimeout ->
+			context = document.getElementById('canvas_'+answer.index).getContext('2d')
+			context.fillStyle = '#f00'
+			answer.type = answer.options.hotspot.substr(0,1)
+			if answer.type == '1'
+				answer.points = answer.options.hotspot.substr(1).split("),")
+
+				context.beginPath()
+				initial = true
+				for point in answer.points
+					x = point.split("x=")[1].split(",")[0]
+					y = point.split("y=")[1].split(")")[0]
+					console.log x,y
+					if initial
+						context.moveTo(x,y)
+						initial = false
+					else
+						context.lineTo(x,y)
+				context.closePath()
+				context.fill()
+			if answer.type == '2'
+				# LEFT OFF
+				###
+				var NS="http://www.w3.org/2000/svg";
+				 var svg=document.createElementNS(NS,"svg");
+				 svg.width=w;
+				 
+				 svg.height=h;
+				 return svg;
+				 ###
+
+				answer.points = answer.options.hotspot.substr(1).split(",")
+				answer.left = answer.points[0]
+				answer.width = answer.points[2]
+				answer.top = answer.points[1]
+				answer.height = answer.points[3]
+
+				#NS="http://www.w3.org/2000/svg"
+
+				#SVGObj = document.createElementNS(NS,"rect")
+				#SVGObj.width.baseVal.value=answer.width
+				#SVGObj.height.baseVal.value=answer.height
+				#SVGObj.setAttribute("height",answer.height)
+				#SVGObj.style.fill = "#f00"
+
+				#document.getElementById('answers').appendChild(SVGObj)
+				
+				console.log '2'
+				context.beginPath()
+				console.log(answer.left, answer.top, answer.width, answer.height)
+				context.rect(answer.left, answer.top, answer.width, answer.height)
+				context.closePath()
+				context.fill()
+		,0
+	$scope.handleCanvasClick = (answer) ->
+		console.log(answer)
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = "mc"
@@ -127,13 +185,32 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	handleHotspot = (q_data) ->
 		$scope.type = "hotspot"
 		$scope.question.layout = 1
+
 		for answer in $scope.answers
 			answer.type = answer.options.hotspot.substr(0,1)
-			answer.points = answer.options.hotspot.substr(1).split(",")
-			answer.left = answer.points[0] + "px"
-			answer.width = answer.points[2] + "px"
-			answer.top = answer.points[1] + "px"
-			answer.height = answer.points[3] + "px"
+			console.log answer.type
+			answer.path = "M0,0"
+			if answer.type == '1'
+				answer.points = answer.options.hotspot.substr(1).split("),")
+				answer.path = ""
+
+				initial = true
+				for point in answer.points
+					x = point.split("x=")[1].split(",")[0]
+					y = point.split("y=")[1].split(")")[0]
+					if initial
+						answer.path += "M" + x + "," + y
+						initial = false
+					else
+						answer.path += "L" + x + "," + y
+				console.log answer.path
+			if answer.type == '2'
+				answer.points = answer.options.hotspot.substr(1).split(",")
+				left = +answer.points[0]
+				width = +answer.points[2]
+				top = +answer.points[1]
+				height = +answer.points[3]
+				answer.path = "M" + left + "," + top + "L" + (left + width) + "," + top + "L" + (left + width) + "," + (top + height) + "L" + left + "," + (top + height)
 
 	handleShortAnswer = (q_data) ->
 		$scope.type = "sa"

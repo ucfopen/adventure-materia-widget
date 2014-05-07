@@ -36,11 +36,11 @@ html, body {
 }
 
 .question {
-	padding:10px;
+	padding:30px;
 }
 
 .question h2 {
-	font-size:16px;
+	font-size:18px;
 	color:#363636;
 	&.with-media {
 		width:45%;
@@ -51,7 +51,6 @@ html, body {
 .asset {
 	width:35%;
 	float:right;
-	border:dotted 1px #d3d3d3;
 	margin:0px;
 }
 
@@ -62,7 +61,6 @@ html, body {
 
 .answers {
 	// height:35%;
-	border:dotted 1px #d3d3d3;
 	margin:10px;
 	padding:10px;
 }
@@ -77,14 +75,26 @@ html, body {
 	margin-bottom:10px;
 	color:#000000;
 	text-decoration:none;
+
+	counter-increment: q;
+
+	&:before {
+		content: counter(q, upper-alpha);
+		margin-right: 30px;
+		font-size: 26px;
+	}
 }
 
 .answers .sa .short-answer {
 	width:75%;
 	height:40px;
-	font-size:18px;
+	font-size:20px;
 	border:solid 1px #d3d3d3;
 	border-radius:5px;
+}
+
+.answers .trans {
+	text-align: center;
 }
 
 .trans-button {
@@ -108,22 +118,29 @@ html, body {
 	width: 500px;
 	height: 300px;
 	border: 5px solid #999;
-	padding: 40px;
+	padding: 20px;
 	background: #fff;
-	font-size: 30px;
+	font-size: 24px;
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	margin-left: -270px;
 	margin-top: -170px;
+
+	input {
+		position: absolute;
+		bottom: 5px;
+		left: 50%;
+		width: 120px;
+		margin-left: -60px;
+	}
 }
 
 .hotarea {
 	position: absolute;
-	background: rgba(0,0,255,0.5);
 	display: block;
-	margin-top: 180px;
-	margin-left: 30px;
+	top: 225px;
+	left: 20px;
 }
 
 .clearfix:before,
