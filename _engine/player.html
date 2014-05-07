@@ -52,14 +52,165 @@
 				<input type="text" id="sa-answer" class="short-answer" ng-model='response' placeholder="Enter an answer here." ng-enter="handleShortAnswerInput()" />
 			</div>
 			<div class='hotspot' ng-show='type == "hotspot"'>
-				<img src='{{ question.image }}'>
-				<div class='hotarea' ng-repeat='answer in answers' ng-style='{ left: answer.left, top: answer.top, width: answer.width,height: answer.height}' ng-click='handleAnswerSelection(answer.link,answer.index)'></div>
+				<svg version="1.1" class='hotarea' id="svg2" xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="700px" height="650px" xml:space="preserve">
+				<g id="layer1">
+				<path fill="rgba(0,0,255,0.5)" stroke="#fff" ng-repeat='answer in answers' ng-click='handleAnswerSelection(answer.link,answer.index)' ng-attr-d="{{answer.path}}"></path>
+				</svg>
+				<img src='{{question.image}}'>
+				<!--<canvas class='hotarea' width=600 height=500 id='canvas_{{answer.index}}' ng-repeat='answer in answers' ng-init='renderCanvas(answer)' ng-click='handleCanvasClick(answer)'></canvas>-->
+
 			</div>
 			<div class="trans" ng-show='type == "trans"'>
 				<input type="button" id="trans-continue" class="trans-button left" value="Continue" ng-click='handleAnswerSelection(link,0)'/>
 			</div>
 		</section>
 		<div id="node-screen" class="screen">
+			<script>
+			window.qset = {
+    "name": "New Adventure Widget",
+    "items": [
+      {
+        "rand": false,
+        "items": [
+          {
+            "materiaType": "question",
+            "id": "ae95577813b6eae27f1fc13de67dda89",
+            "type": "MC",
+            "created_at": 1399409955,
+            "questions": [
+              {
+                "text": "sdfadfsfdsfd"
+              }
+            ],
+            "answers": [
+              {
+                "text": "[No Answer]",
+                "options": {
+                  "link": 3,
+                  "isShortcut": false
+                },
+                "value": "0",
+                "id": "e1f89ec0633d54fe79546380bd00d5ea"
+              }
+            ],
+            "options": {
+              "type": 1,
+              "id": 0,
+              "layout": 1,
+              "proceedText": "Continue"
+            },
+            "assets": [
+              
+            ]
+          },
+          {
+            "questions": [
+              {
+                "text": "",
+                "options": [
+                  
+                ],
+                "value": ""
+              }
+            ],
+            "type": "MC",
+            "materiaType": "question",
+            "options": {
+              "id": 1
+            },
+            "answers": [
+              
+            ],
+            "id": 0
+          },
+          {
+            "questions": [
+              {
+                "text": "",
+                "options": [
+                  
+                ],
+                "value": ""
+              }
+            ],
+            "type": "MC",
+            "materiaType": "question",
+            "options": {
+              "id": 2
+            },
+            "answers": [
+              
+            ],
+            "id": 0
+          },
+          {
+            "materiaType": "question",
+            "id": "8d99716545682ce885c9d1aad5af5162",
+            "type": "MC",
+            "created_at": 1399409955,
+            "questions": [
+              {
+                "text": "dsfdfgs"
+              }
+            ],
+            "answers": [
+              {
+                "text": "Hotspot 1",
+                "options": {
+                  "link": 1,
+                  "hotspot": "0323.25,118.05,985.2011776251226,892.9889298892988",
+                  "feedback": "",
+                  "isShortcut": false
+                },
+                "value": "100",
+                "id": "14d7911c5876b6094e9babff3cd7814e"
+              },
+              {
+                "text": "Hotspot 2",
+                "options": {
+                  "link": 2,
+                  "hotspot": "1(x=2463.5, y=450.2),(x=1932.15, y=856.1),(x=2087.1, y=1291.5),(x=1496.7, y=1579.35),(x=2648, y=1616.25),(x=2522.55, y=981.55),(x=2286.35, y=1070.1),(x=2625.85, y=678.95)",
+                  "feedback": "",
+                  "isShortcut": false
+                },
+                "value": "100",
+                "id": "fd673188868f7ac878f362886064e91c"
+              }
+            ],
+            "options": {
+              "type": 3,
+              "asset": {
+                "materiaType": "asset",
+                "id": "K0jYm"
+              },
+              "visibility": 0,
+              "layout": 4,
+              "id": 3
+            },
+            "assets": [
+              
+            ]
+          }
+        ],
+        "assets": [
+          
+        ],
+        "options": [
+          
+        ],
+        "name": "New Adventure Widget"
+      }
+    ],
+    "assets": [
+      
+    ],
+    "options": [
+      
+    ],
+    "rand": false,
+    "id": "8701"
+  }
+			</script>
 		</div>
 	</body>
 </html>
