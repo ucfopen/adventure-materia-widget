@@ -158,8 +158,8 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 					initial = true
 					for point in answer.points
-						x = point.split("x=")[1].split(",")[0] * 1.05
-						y = point.split("y=")[1].split(")")[0] * 1.05
+						x = point.split("x=")[1].split(",")[0] * scale + PADDING_LEFT / 2
+						y = point.split("y=")[1].split(")")[0] * scale + PADDING_TOP / 2
 						if initial
 							answer.path += "M" + x + "," + y
 							initial = false
@@ -168,10 +168,10 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 					console.log answer.path
 				if answer.type == '2'
 					answer.points = answer.options.hotspot.substr(1).split(",")
-					left = +answer.points[0]
-					width = +answer.points[2]
-					top = +answer.points[1]
-					height = +answer.points[3]
+					top = +answer.points[1] * scale + PADDING_TOP / 2
+					left = +answer.points[0] * scale + PADDING_LEFT / 2
+					width = +answer.points[2] * scale
+					height = +answer.points[3] * scale
 					answer.path = "M" + left + "," + top + "L" + (left + width) + "," + top + "L" + (left + width) + "," + (top + height) + "L" + left + "," + (top + height)
 
 			$scope.$apply()
