@@ -163,6 +163,8 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 						x = point.split("x=")[1].split(",")[0] * scale
 						y = point.split("y=")[1].split(")")[0] * scale
 						if initial
+							answer.top = y
+							answer.left = x
 							answer.path += "M" + x + "," + y
 							initial = false
 						else
