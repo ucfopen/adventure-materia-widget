@@ -150,6 +150,8 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 					answer.cy = +answer.points[1] * scale + PADDING_TOP
 					answer.rx = +answer.points[2] * 0.5 * scale
 					answer.ry = +answer.points[3] * 0.5 * scale
+					answer.top = answer.cy
+					answer.left = answer.cx
 
 				if answer.type == '1'
 					answer.points = answer.options.hotspot.substr(1).split("),")
@@ -166,8 +168,8 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 							answer.path += "L" + x + "," + y
 				if answer.type == '2'
 					answer.points = answer.options.hotspot.substr(1).split(",")
-					top = +answer.points[1] * scale
-					left = +answer.points[0] * scale
+					answer.top = top = +answer.points[1] * scale
+					answer.left = left = +answer.points[0] * scale
 					width = +answer.points[2] * scale
 					height = +answer.points[3] * scale
 					answer.path = "M" + left + "," + top + "L" + (left + width) + "," + top + "L" + (left + width) + "," + (top + height) + "L" + left + "," + (top + height)
