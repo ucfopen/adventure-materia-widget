@@ -58,8 +58,8 @@
 				<img src="{{question.image}}">
 				<svg version="1.1" class="hotarea" xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="730px" height="650px" xml:space="preserve">
 				<g ng-repeat="answer in answers">
-				<path ng-show="answer.type != '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{answer.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-d="{{answer.path}}"></path>
-				<ellipse ng-show="answer.type == '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{answer.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-cx="{{answer.cx}}" ng-attr-cy="{{answer.cy}}" ng-attr-rx="{{answer.rx}}" ng-attr-ry="{{answer.ry}}"></ellipse>
+				<path ng-show="answer.type != '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{question.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-d="{{answer.path}}"></path>
+				<ellipse ng-show="answer.type == '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{question.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-cx="{{answer.cx}}" ng-attr-cy="{{answer.cy}}" ng-attr-rx="{{answer.rx}}" ng-attr-ry="{{answer.ry}}"></ellipse>
 				</g>
 				</svg>
 				<div ng-repeat='answer in answers' class='answerbubble' ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-show='answer.hover' style='top:{{answer.top}}px;left:{{answer.left}}px;'>

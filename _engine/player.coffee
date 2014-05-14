@@ -8,7 +8,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	LAYOUT_VERT_TEXT = 4 	# Vertical layout that contains text and then an image
 	LAYOUT_VERT_IMAGE = 5 	# Vertical layout that contains an image and then text
 
-	PADDING_LEFT = 40
+	PADDING_LEFT = 20
 	PADDING_TOP = 15
 	CONTAINER_WIDTH = 730
 	CONTAINER_HEGIHT = 650
@@ -32,6 +32,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 			layout : q_data.options.layout,
 			type : q_data.options.type,
 			id : q_data.options.id
+			options: q_data.options
 
 		$scope.answers = []
 
@@ -131,6 +132,9 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		$scope.type = "hotspot"
 		$scope.question.layout = 1
 
+		$scope.question.options.hotspotColor = 7772386 if not $scope.question.options.hotspotColor
+		$scope.question.options.hotspotColor = '#' + ('000000' + $scope.question.options.hotspotColor.toString(16)).substr(-6)
+
 		img = new Image()
 		img.src = $scope.question.image
 		img.onload = ->
@@ -140,9 +144,6 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 			for answer in $scope.answers
 				answer.type = answer.options.hotspot.substr(0,1)
 				answer.path = "M0,0"
-
-				answer.options.hotspotColor = 7772386 if not answer.options.hotspotColor
-				answer.options.hotspotColor = '#' + ('000000' + answer.options.hotspotColor.toString(16)).substr(-6)
 
 				if answer.type == '0'
 					answer.points = answer.options.hotspot.substr(1).split(",")
