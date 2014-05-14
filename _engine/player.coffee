@@ -8,7 +8,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	LAYOUT_VERT_TEXT = 4 	# Vertical layout that contains text and then an image
 	LAYOUT_VERT_IMAGE = 5 	# Vertical layout that contains an image and then text
 
-	PADDING_LEFT = 0
+	PADDING_LEFT = 40
 	PADDING_TOP = 15
 	CONTAINER_WIDTH = 730
 	CONTAINER_HEGIHT = 650
@@ -154,7 +154,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 					initial = true
 					for point in answer.points
 						x = point.split("x=")[1].split(",")[0] * scale
-						y = point.split("y=")[1].split(")")[0] * scale + PADDING_TOP / 2
+						y = point.split("y=")[1].split(")")[0] * scale
 						if initial
 							answer.path += "M" + x + "," + y
 							initial = false
@@ -163,7 +163,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 				if answer.type == '2'
 					answer.points = answer.options.hotspot.substr(1).split(",")
 					top = +answer.points[1] * scale
-					left = +answer.points[0] * scale + PADDING_LEFT
+					left = +answer.points[0] * scale
 					width = +answer.points[2] * scale
 					height = +answer.points[3] * scale
 					answer.path = "M" + left + "," + top + "L" + (left + width) + "," + top + "L" + (left + width) + "," + (top + height) + "L" + left + "," + (top + height)
@@ -211,12 +211,13 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 ]
 
 AdventureApp.directive('ngEnter', ->
-    return (scope, element, attrs) ->
-        element.bind("keydown keypress", (event) ->
-            if(event.which == 13 or event.which == 10)
-                scope.$apply ->
-                    scope.$eval(attrs.ngEnter)
-                event.preventDefault()
-        )
+	return (scope, element, attrs) ->
+		element.bind("keydown keypress", (event) ->
+			if(event.which == 13 or event.which == 10)
+				event.target.blur()
+				scope.$apply ->
+					scope.$eval(attrs.ngEnter)
+				event.preventDefault()
+		)
 )
 
