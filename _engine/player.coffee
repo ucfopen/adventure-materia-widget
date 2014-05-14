@@ -8,6 +8,11 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	LAYOUT_VERT_TEXT = 4 	# Vertical layout that contains text and then an image
 	LAYOUT_VERT_IMAGE = 5 	# Vertical layout that contains an image and then text
 
+	PADDING_LEFT = 70
+	PADDING_TOP = 15
+	CONTAINER_WIDTH = 700
+	CONTAINER_HEGIHT = 650
+
 	$scope.title = ""
 	$scope.qset = null
 	
@@ -131,38 +136,45 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		$scope.type = "hotspot"
 		$scope.question.layout = 1
 
-		for answer in $scope.answers
-			answer.type = answer.options.hotspot.substr(0,1)
-			console.log answer.type
-			answer.path = "M0,0"
-			if answer.type == '0'
-				answer.points = answer.options.hotspot.substr(1).split(",")
-				answer.cx = +answer.points[0] / 1 + 60
-				answer.cy = +answer.points[1] * 1.05 + 10
-				answer.rx = +answer.points[2] * 0.416
-				answer.ry = +answer.points[3] * 0.416
+		img = new Image()
+		img.src = $scope.question.image
+		img.onload = ->
+			scale = CONTAINER_WIDTH / img.width
 
-			if answer.type == '1'
-				answer.points = answer.options.hotspot.substr(1).split("),")
-				answer.path = ""
+			for answer in $scope.answers
+				answer.type = answer.options.hotspot.substr(0,1)
+				console.log answer.type
+				answer.path = "M0,0"
+				if answer.type == '0'
+					answer.points = answer.options.hotspot.substr(1).split(",")
+					answer.cx = +answer.points[0] * scale + PADDING_LEFT
+					answer.cy = +answer.points[1] * scale + PADDING_TOP
+					answer.rx = +answer.points[2] * 0.5 * scale
+					answer.ry = +answer.points[3] * 0.5 * scale
 
-				initial = true
-				for point in answer.points
-					x = point.split("x=")[1].split(",")[0] * 1.05
-					y = point.split("y=")[1].split(")")[0] * 1.05
-					if initial
-						answer.path += "M" + x + "," + y
-						initial = false
-					else
-						answer.path += "L" + x + "," + y
-				console.log answer.path
-			if answer.type == '2'
-				answer.points = answer.options.hotspot.substr(1).split(",")
-				left = +answer.points[0]
-				width = +answer.points[2]
-				top = +answer.points[1]
-				height = +answer.points[3]
-				answer.path = "M" + left + "," + top + "L" + (left + width) + "," + top + "L" + (left + width) + "," + (top + height) + "L" + left + "," + (top + height)
+				if answer.type == '1'
+					answer.points = answer.options.hotspot.substr(1).split("),")
+					answer.path = ""
+
+					initial = true
+					for point in answer.points
+						x = point.split("x=")[1].split(",")[0] * 1.05
+						y = point.split("y=")[1].split(")")[0] * 1.05
+						if initial
+							answer.path += "M" + x + "," + y
+							initial = false
+						else
+							answer.path += "L" + x + "," + y
+					console.log answer.path
+				if answer.type == '2'
+					answer.points = answer.options.hotspot.substr(1).split(",")
+					left = +answer.points[0]
+					width = +answer.points[2]
+					top = +answer.points[1]
+					height = +answer.points[3]
+					answer.path = "M" + left + "," + top + "L" + (left + width) + "," + top + "L" + (left + width) + "," + (top + height) + "L" + left + "," + (top + height)
+
+			$scope.$apply()
 
 	handleShortAnswer = (q_data) ->
 		$scope.type = "sa"
