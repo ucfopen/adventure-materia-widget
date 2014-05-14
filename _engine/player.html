@@ -32,7 +32,7 @@
 
 		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
 
-		<div class="feedback" ng-show="feedback">
+		<div class="feedback" ng-class="{ show: feedback }">
 			{{feedback}}
 			<input class="trans-button" type="button" value="OK" ng-click="closeFeedback()">
 		</div>
@@ -48,10 +48,11 @@
 		</section>
 		<section class="answers">
 			<div class="mc" ng-show="type == 'mc'">
-				<a href="#" class="answer" ng-repeat="answer in answers" ng-click="handleAnswerSelection(answer.link, answer.index)" data-index="{{answer.index}}" data-link="{{answer.link}}">{{answer.text}}</a>
+				<a href="#" class="answer" ng-repeat="answer in answers" ng-click="handleAnswerSelection(answer.link, answer.index)" data-index="{{answer.index}}" data-link="{{answer.link}}">) {{answer.text}}</a>
 			</div>
 			<div class="sa" ng-show="type == 'sa'">
 				<input type="text" class="short-answer" ng-model="response" placeholder="Enter an answer here." ng-enter="handleShortAnswerInput()" />
+				<input type="button" class="trans-button" value="Submit" ng-click="handleShortAnswerInput()"/>
 			</div>
 			<div class="hotspot" ng-if="type == 'hotspot'">
 				<img src="{{question.image}}">
