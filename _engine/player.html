@@ -59,8 +59,6 @@
 					<ellipse ng-show='answer.type == "0"' fill="rgba(0,0,255,0.5)" stroke="#fff" ng-click='handleAnswerSelection(answer.link,answer.index)' ng-attr-cx="{{answer.cx}}" ng-attr-cy="{{answer.cy}}" ng-attr-rx="{{answer.rx}}" ng-attr-ry="{{answer.ry}}"></ellipse>
 				</g>
 				</svg>
-				<div id="layer1" ng-repeat='answer in answers' style='display: block; width: 100px; height: 100px; left: {{answer.cx}}px; top: {{answer.cy}}px; background:red; position: absolute;'></div>
-				<!--<canvas class='hotarea' width=600 height=500 id='canvas_{{answer.index}}' ng-repeat='answer in answers' ng-init='renderCanvas(answer)' ng-click='handleCanvasClick(answer)'></canvas>-->
 
 			</div>
 			<div class="trans" ng-show='type == "trans"'>
