@@ -52,7 +52,7 @@
 			<div class="sa" ng-show='type == "sa"'>
 				<input type="text" id="sa-answer" class="short-answer" ng-model='response' placeholder="Enter an answer here." ng-enter="handleShortAnswerInput()" />
 			</div>
-			<div class='hotspot' ng-show='type == "hotspot"'>
+			<div class='hotspot' ng-if='type == "hotspot"'>
 				<img src='{{question.image}}'>
 				<svg version="1.1" class='hotarea' id="svg2" xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="730px" height="650px" xml:space="preserve">
 				<g id="layer1" ng-repeat='answer in answers'>
