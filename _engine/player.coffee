@@ -140,6 +140,10 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 			for answer in $scope.answers
 				answer.type = answer.options.hotspot.substr(0,1)
 				answer.path = "M0,0"
+
+				answer.options.hotspotColor = 7772386 if not answer.options.hotspotColor
+				answer.options.hotspotColor = '#' + ('000000' + answer.options.hotspotColor.toString(16)).substr(-6)
+
 				if answer.type == '0'
 					answer.points = answer.options.hotspot.substr(1).split(",")
 					answer.cx = +answer.points[0] * scale + PADDING_LEFT
