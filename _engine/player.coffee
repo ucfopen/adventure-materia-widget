@@ -109,16 +109,16 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		# Fallback in case the user response doesn't match anything. Have to match the link associated with [All Other Answers]
 		for answer in $scope.q_data.answers
 			if answer.options.isDefault
-				link = answer.options.link
+				link = ~~answer.options.link
 				$scope.feedback = answer.options.feedback
 		for n in [0...$scope.qset.items[0].items.length]
-			if link is $scope.qset.items[0].items[n].id
+			if link is $scope.qset.items[0].items[n].options.id
 				if $scope.feedback
 					$scope.next = $scope.qset.items[0].items[n]
 				else
 					manageQuestionScreen $scope.qset.items[0].items[n]
 
-				_logProgress(question.id, 0) # Log the response
+				_logProgress($scope.question.id, 0) # Log the response
 
 	$scope.closeFeedback = ->
 		$scope.feedback = ""
