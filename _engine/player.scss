@@ -31,12 +31,20 @@ html, body {
 	width:100%;
 	text-align:center;
 	background:#7299b5;
-	padding:5px 0px;
+	padding:10px 0px;
 	color:#ffffff;
 }
 
+.section {
+	background: #fff;
+}
+
+h1 {
+	margin: 0px;
+}
+
 .question {
-	padding:30px;
+	padding:10px 30px;
 }
 
 .question h2 {
@@ -114,6 +122,24 @@ html, body {
 	}
 }
 
+.backgroundcover {
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	background: #000;
+	opacity: 0;
+	position: fixed;
+	z-index: -1;
+
+	transition: all 0.5s ease;
+
+	&.show {
+		z-index: 9;
+		opacity: 0.5;
+	}
+}
+
 .feedback {
 	width: 500px;
 	height: 300px;
@@ -127,6 +153,8 @@ html, body {
 	margin-left: -270px;
 	margin-top: -170px;
 
+	z-index: 10;
+
 	input {
 		position: absolute;
 		bottom: 5px;
@@ -139,19 +167,19 @@ html, body {
 .hotarea {
 	position: absolute;
 	display: block;
-	top: 165px;
+	top: 145px;
 	left: 50%;
-	margin-left: -380px;
+	margin-left: -365px;
 }
 
 .hotspot {
 	text-align: center;
 	img {
 		position:absolute;
-		top: 165px;
+		top: 145px;
 		left: 50%;
-		margin-left: -350px;
-		max-width: 700px;
+		margin-left: -365px;
+		max-width: 730px;
 		max-height: 650px;
 	}
 }

@@ -8,9 +8,9 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	LAYOUT_VERT_TEXT = 4 	# Vertical layout that contains text and then an image
 	LAYOUT_VERT_IMAGE = 5 	# Vertical layout that contains an image and then text
 
-	PADDING_LEFT = 70
+	PADDING_LEFT = 0
 	PADDING_TOP = 15
-	CONTAINER_WIDTH = 700
+	CONTAINER_WIDTH = 730
 	CONTAINER_HEGIHT = 650
 
 	$scope.title = ""
@@ -26,7 +26,6 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 	# Update the screen depending on the question type (narrative, mc, short answer, hotspot, etc)
 	manageQuestionScreen = (q_data) ->
-		console.log q_data
 
 		$scope.question =
 			text : q_data.questions[0].text,
@@ -82,7 +81,6 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 	# Do stuff when the user submits something in the SA answer box
 	$scope.handleShortAnswerInput = ->
-		console.log $scope.q_data
 
 		answer = $scope.response.toLowerCase()
 		$scope.response = ""
@@ -126,9 +124,6 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		$scope.feedback = ""
 		manageQuestionScreen $scope.next
 	
-	$scope.handleCanvasClick = (answer) ->
-		console.log(answer)
-
 	handleMultipleChoice = (q_data) ->
 		$scope.type = "mc"
 
@@ -140,10 +135,10 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		img.src = $scope.question.image
 		img.onload = ->
 			scale = CONTAINER_WIDTH / img.width
+			scale = 1 if scale > 1
 
 			for answer in $scope.answers
 				answer.type = answer.options.hotspot.substr(0,1)
-				console.log answer.type
 				answer.path = "M0,0"
 				if answer.type == '0'
 					answer.points = answer.options.hotspot.substr(1).split(",")
@@ -158,18 +153,17 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 					initial = true
 					for point in answer.points
-						x = point.split("x=")[1].split(",")[0] * scale + PADDING_LEFT / 2
+						x = point.split("x=")[1].split(",")[0] * scale
 						y = point.split("y=")[1].split(")")[0] * scale + PADDING_TOP / 2
 						if initial
 							answer.path += "M" + x + "," + y
 							initial = false
 						else
 							answer.path += "L" + x + "," + y
-					console.log answer.path
 				if answer.type == '2'
 					answer.points = answer.options.hotspot.substr(1).split(",")
-					top = +answer.points[1] * scale + PADDING_TOP / 2
-					left = +answer.points[0] * scale + PADDING_LEFT / 2
+					top = +answer.points[1] * scale
+					left = +answer.points[0] * scale + PADDING_LEFT
 					width = +answer.points[2] * scale
 					height = +answer.points[3] * scale
 					answer.path = "M" + left + "," + top + "L" + (left + width) + "," + top + "L" + (left + width) + "," + (top + height) + "L" + left + "," + (top + height)
