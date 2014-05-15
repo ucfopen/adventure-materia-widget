@@ -107,7 +107,9 @@ class Score_Modules_Adventure extends Score_Module
 			switch ($log->type)
 			{
 				case Session_Log::TYPE_QUESTION_ANSWERED:
-					if ( ! array_key_exists($log->item_id, $this->questions)) break; // contingency for empty nodes (due to previewing)
+					if ( ! array_key_exists($log->item_id, $this->questions)){
+					   	break; // contingency for empty nodes (due to previewing)
+					}
 					if (isset($this->questions[$log->item_id]))
 					{
 						$details[] = $this->details_for_question_answered($log);
@@ -116,7 +118,7 @@ class Score_Modules_Adventure extends Score_Module
 
 				case Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT:
 					$destination_table[] = [
-						'data'          => [$this->get_ss_answer($log)],
+						'data'          => [$log->text],
 						'data_style'    => ['node_text'],
 						'score'         => $this->check_answer($log),
 						'type'          => $log->type,
