@@ -46,22 +46,37 @@ h1 {
 	h2 {
 		font-size:22px;
 		color:#363636;
-		&.with-media {
+		&.left {
 			width:45%;
 			display:inline-block;
+		}
+		&.right {
+			width:45%;
+			display:inline-block;
+			position: absolute;
+			top: 60px;
+			right: 20px;
 		}
 	}
 }
 
 .asset {
-	position: absolute;
-	top: 60px;
-	right: -20px;
 	width: 40%;
 
 	img {
-		width: 100%;
+		max-width: 100%;
 		max-height: 500px;
+	}
+
+	&.right {
+		position: absolute;
+		top: 60px;
+		right: -20px;
+	}
+	&.center {
+		width: 90%;
+		margin: auto;
+		text-align: center;
 	}
 }
 
@@ -133,6 +148,11 @@ h1 {
 	}
 	&.left {
 		float: left;
+	}
+	&.right {
+		right: 50px;
+		position:absolute;
+		bottom: 20px;
 	}
 }
 
