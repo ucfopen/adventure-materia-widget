@@ -207,12 +207,13 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		answer_index = parseInt(answer_index)
 
 		for i in [0...$scope.qset.items[0].items.length]
-			if question_id is $scope.qset.items[0].items[i].options.id then break
+			if question_id is $scope.qset.items[0].items[i].options.id
+				question = $scope.qset.items[0].items[i]
 
 		answer_text = null
-		if answer_index is -1 then answer_text = "N/A" else answer_text = $scope.qset.items[0].items[i].answers[answer_index].text
+		if answer_index is -1 then answer_text = "N/A" else answer_text = question.answers[answer_index].text
 
-		Materia.Score.submitQuestionForScoring $scope.qset.items[0].items[i].id, answer_text
+		Materia.Score.submitQuestionForScoring question.id, answer_text
 
 	_end = ->
 		console.log 'Engine ended.'
