@@ -62,7 +62,7 @@
 				<ellipse ng-show="answer.type == '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{question.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-cx="{{answer.cx}}" ng-attr-cy="{{answer.cy}}" ng-attr-rx="{{answer.rx}}" ng-attr-ry="{{answer.ry}}"></ellipse>
 				</g>
 				</svg>
-				<div ng-repeat='answer in answers' class='answerbubble' ng-click="handleAnswerSelection(answer.link,answer.index)" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-show='answer.hover' style='top:{{answer.top}}px;left:{{answer.left}}px;'>
+				<div ng-repeat='answer in answers' class='answerbubble' ng-click="handleAnswerSelection(answer.link,answer.index)" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-show='answer.hover' style='top:{{answer.balloontop}}px;left:{{answer.balloonleft}}px;'>
 					{{answer.text}}
 				</div>
 			</div>

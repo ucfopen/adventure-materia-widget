@@ -171,10 +171,12 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 							answer.path += "L" + x + "," + y
 				if answer.type == '2'
 					answer.points = answer.options.hotspot.substr(1).split(",")
-					answer.top = top = +answer.points[1] * scale
-					answer.left = left = +answer.points[0] * scale
 					width = +answer.points[2] * scale
 					height = +answer.points[3] * scale
+					answer.top = top = +answer.points[1] * scale
+					answer.left = left = +answer.points[0] * scale
+					answer.balloontop = answer.top
+					answer.balloonleft = answer.left + 30
 					answer.path = "M" + left + "," + top + "L" + (left + width) + "," + top + "L" + (left + width) + "," + (top + height) + "L" + left + "," + (top + height)
 
 			$scope.$apply()
@@ -221,12 +223,11 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 AdventureApp.directive('ngEnter', ->
 	return (scope, element, attrs) ->
-		element.bind("keydown keypress", (event) ->
+		element.bind("keypress", (event) ->
 			if(event.which == 13 or event.which == 10)
-				event.target.blur()
+				event.preventDefault()
 				scope.$apply ->
 					scope.$eval(attrs.ngEnter)
-				event.preventDefault()
 		)
 )
 
