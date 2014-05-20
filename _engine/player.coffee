@@ -210,10 +210,11 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 			if question_id is $scope.qset.items[0].items[i].options.id
 				question = $scope.qset.items[0].items[i]
 
-		answer_text = null
 		if answer_index is -1 then answer_text = "N/A" else answer_text = question.answers[answer_index].text
+		answer_text = null if answer_text == "[No Answer]"
 
-		Materia.Score.submitQuestionForScoring question.id, answer_text
+		if answer_text isnt null
+			Materia.Score.submitQuestionForScoring question.id, answer_text
 
 	_end = ->
 		console.log 'Engine ended.'
@@ -226,6 +227,7 @@ AdventureApp.directive('ngEnter', ->
 	return (scope, element, attrs) ->
 		element.bind("keypress", (event) ->
 			if(event.which == 13 or event.which == 10)
+				event.target.blur()
 				event.preventDefault()
 				scope.$apply ->
 					scope.$eval(attrs.ngEnter)
