@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!-- INJECTS IE CLASSES ONTO HTML TAG -->
+<!--[if IE 8 ]>    <html class="IE8"> <![endif]-->
+<!--[if IE 9 ]>    <html class="IE9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class=""> <!--<![endif]-->
+	<head>
+		<title>Adventure Widget Player</title>
+		<meta charset="utf-8" />
+
+		<!-- STYLESHEETS -->
+		<link rel="stylesheet" type="text/css" href="player.css">
+
+		<!-- REQUIRED MATERIA JAVASCRIPT -->
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript" src="materia.enginecore.js"></script>
+		<script type="text/javascript" src="materia.score.js"></script>
+
+		<!-- OPTIONAL MATERIA JAVASCRIPT -->
+		<!-- <script type="text/javascript" src="/js/materia.storage.manager.js"></script> -->
+		<!-- <script type="text/javascript" src="/js/materia.storage.table.js"></script> -->
+
+		<!-- YOUR PREREQUISITES -->
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.15/angular.min.js"></script>
+
+		<!-- MAIN PLAYER SCRIPT -->
+		<script type="text/javascript" src="player.js"></script>
+	</head>
+	<body ng-app="AdventureApp" ng-controller="AdventureController">
+		<header class="header">
+			<h1>{{title}}</h1>
+		</header>
+
+		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
+
+		<div class="feedback" ng-class="{ show: feedback }">
+			{{feedback}}
+			<input class="feedback-button trans-button" type="button" value="OK" ng-click="closeFeedback()">
+		</div>
+
+		<section class="question clearfix" ng-switch="question.layout">
+			<div ng-switch-when='0'>
+				<figure class="asset"><img src="{{ question.image }}" /></figure>
+			</div>
+			<div ng-switch-when='1'>
+				<h2 class="text">{{ question.text }}</h2>
+			</div>
+			<div ng-switch-when='2'>
+				<h2 class="text left">{{ question.text }}</h2>
+				<figure class="asset right"><img src="{{ question.image }}" /></figure>
+			</div>
+			<div ng-switch-when='3'>
+				<figure class="asset left"><img src="{{ question.image }}" /></figure>
+				<h2 class="text right">{{ question.text }}</h2>
+			</div>
+			<div ng-switch-when='4'>
+				<h2 class="text">{{ question.text }}</h2>
+				<figure class="asset center"><img src="{{ question.image }}" /></figure>
+			</div>
+			<div ng-switch-when='5'>
+				<figure class="asset center"><img src="{{ question.image }}" /></figure>
+				<h2 class="text">{{ question.text }}</h2>
+			</div>
+		</section>
+		<section class="answers">
+			<div class="mc" ng-show="type == 'mc'">
+				<a href="#" class="answer" ng-repeat="answer in answers" ng-click="handleAnswerSelection(answer.link, answer.index)" data-index="{{answer.index}}" data-link="{{answer.link}}">) {{answer.text}}</a>
+			</div>
+			<div class="sa" ng-show="type == 'sa'">
+				<input type="text" class="short-answer" ng-model="response" placeholder="Enter an answer here." ng-enter="handleShortAnswerInput()" />
+				<input type="button" class="trans-button" value="Submit" ng-click="handleShortAnswerInput()"/>
+			</div>
+			<div class="hotspot" ng-if="type == 'hotspot'">
+				<img src="{{question.image}}">
+				<svg version="1.1" class="hotarea" xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="730px" height="650px" xml:space="preserve">
+				<g ng-repeat="answer in answers">
+				<path ng-show="answer.type != '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{question.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-d="{{answer.path}}"></path>
+				<ellipse ng-show="answer.type == '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{question.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-cx="{{answer.cx}}" ng-attr-cy="{{answer.cy}}" ng-attr-rx="{{answer.rx}}" ng-attr-ry="{{answer.ry}}"></ellipse>
+				</g>
+				</svg>
+				<div ng-repeat='answer in answers' class='answerbubble' ng-click="handleAnswerSelection(answer.link,answer.index)" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-show='answer.hover' style='top:{{answer.balloontop}}px;left:{{answer.balloonleft}}px;'>
+					{{answer.text}}
+				</div>
+			</div>
+			<div class="trans" ng-if="type == 'trans'">
+				<input type="button" class="trans-button" ng-class='{ left: question.layout == 2, right: question.layout == 3 }' value="Continue" ng-click="handleAnswerSelection(link,0)"/>
+			</div>
+		</section>
+	</body>
+</html>
+
