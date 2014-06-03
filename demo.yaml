@@ -25,7 +25,7 @@ qset:
               proceedText: Continue
               id: 0
               asset:
-                id: <%MEDIA="_assets/1.png"%>
+                id: <%MEDIA="assets/1.png"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -101,7 +101,7 @@ qset:
               type: 2
               id: 2
               asset:
-                id: <%MEDIA="_assets/2.png"%>
+                id: <%MEDIA="assets/2.png"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -324,7 +324,7 @@ qset:
               proceedText: Continue
               id: 10
               asset:
-                id: <%MEDIA="_assets/3.png"%>
+                id: <%MEDIA="assets/3.png"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -345,7 +345,7 @@ qset:
               proceedText: Continue
               id: 11
               asset:
-                id: <%MEDIA="_assets/3.png"%>
+                id: <%MEDIA="assets/3.png"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -398,7 +398,7 @@ qset:
               type: 5
               finalScore: 90
               asset:
-                id: <%MEDIA="_assets/5.JPG"%>
+                id: <%MEDIA="assets/5.JPG"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -415,7 +415,7 @@ qset:
               type: 5
               finalScore: 100
               asset:
-                id: <%MEDIA="_assets/5.JPG"%>
+                id: <%MEDIA="assets/5.JPG"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -432,7 +432,7 @@ qset:
               type: 5
               finalScore: 70
               asset:
-                id: <%MEDIA="_assets/5.JPG"%>
+                id: <%MEDIA="assets/5.JPG"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -449,7 +449,7 @@ qset:
               type: 5
               finalScore: 80
               asset:
-                id: <%MEDIA="_assets/5.JPG"%>
+                id: <%MEDIA="assets/5.JPG"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -504,7 +504,7 @@ qset:
               proceedText: Continue
               id: 19
               asset:
-                id: <%MEDIA="_assets/4.png"%>
+                id: <%MEDIA="assets/4.png"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -593,7 +593,7 @@ qset:
               proceedText: Continue
               id: 24
               asset:
-                id: <%MEDIA="_assets/4.png"%>
+                id: <%MEDIA="assets/4.png"%>
                 materiaType: asset
           - 
             materiaType: question
@@ -649,7 +649,7 @@ qset:
               id: 26
               visibility: 0
               asset:
-                id: <%MEDIA="_assets/6.png"%>
+                id: <%MEDIA="assets/6.png"%>
                 materiaType: asset
           - 
             materiaType: question
