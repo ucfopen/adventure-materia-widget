@@ -38,6 +38,8 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 		if q_data.answers
 			for i in [0..q_data.answers.length-1]
+				continue if not q_data.answers[i]
+
 				answer =
 					text : q_data.answers[i].text
 					link : q_data.answers[i].options.link
@@ -217,7 +219,6 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 			Materia.Score.submitQuestionForScoring question.id, answer_text
 
 	_end = ->
-		console.log 'Engine ended.'
 		Materia.Engine.end yes
 
 	Materia.Engine.start($scope.engine)
