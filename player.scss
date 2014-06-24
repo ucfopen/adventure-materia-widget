@@ -2,23 +2,13 @@
 	outline: 0;
 }
 
-@font-face {
-	font-family: 'CorbelBold';
-	src: url('assets/font/corbelb-webfont.eot');
-	src: url('assets/font/corbelb-webfont.eot?#iefix') format('embedded-opentype'),
-	url('assets/font/corbelb-webfont.woff') format('woff'),
-	url('assets/font/corbelb-webfont.ttf') format('truetype'),
-	url('assets/font/corbelb-webfont.svg#CorbelBold') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
 html, body {
 	cursor: default;
-	background-color: #ffffff;
+	background-color: #fff;
 	padding: 0;
 	margin: 0;
-	font-family: 'CorbelBold', sans-serif;
+	font-family: 'Open Sans', sans-serif;
+
 	overflow-y: hidden;
 
 	user-select: none;
@@ -41,11 +31,19 @@ h1 {
 }
 
 .question {
-	padding:10px 30px;
+	padding: 10px 30px 0px 30px;
+
+	display: block;
+	background: #fff;
+
+	max-height: 430px;
+	overflow-y: auto;
 
 	h2 {
+		font-family: 'Open Sans', sans-serif;
 		font-size:22px;
 		color:#363636;
+
 		&.left {
 			width:45%;
 			display:inline-block;
@@ -81,7 +79,8 @@ h1 {
 }
 
 .answers {
-	margin:30px;
+	padding: 30px;
+	font-family: 'Lora', serif;
 
 	.mc, .answers {
 		.sa {
@@ -179,6 +178,7 @@ h1 {
 	padding: 20px;
 	background: #fff;
 	font-size: 24px;
+	font-weight: bold;
 	position: absolute;
 	top: 50%;
 	left: 50%;
