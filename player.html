@@ -8,7 +8,7 @@
 		<meta charset="utf-8" />
 
 		<!-- STYLESHEETS -->
-		<link href='http://fonts.googleapis.com/css?family=Lora|PT+Sans:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="player.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
@@ -67,7 +67,7 @@
 				<a href="#" class="answer" ng-repeat="answer in answers" ng-click="handleAnswerSelection(answer.link, answer.index)" data-index="{{answer.index}}" data-link="{{answer.link}}">) {{answer.text}}</a>
 			</div>
 			<div class="sa" ng-show="type == 'sa'">
-				<input type="text" class="short-answer" ng-model="response" placeholder="Enter an answer here." ng-enter="handleShortAnswerInput()" />
+				<input type="text" class="short-answer" ng-model="response" ng-enter="handleShortAnswerInput()" />
 				<input type="button" class="trans-button" value="Submit" ng-click="handleShortAnswerInput()"/>
 			</div>
 			<div class="hotspot" ng-if="type == 'hotspot'">
