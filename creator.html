@@ -1,13 +1,34 @@
 <!DOCTYPE html>
+<html ng-app="AdventureCreator">
 	<head>
 		<title>Adventure Widget Player</title>
 		<meta charset="utf-8" />
 
 		<!-- STYLESHEETS -->
-		<link rel="stylesheet" type="text/css" href="player.css">
-	</head>
-	<body ng-app="AdventureApp" ng-controller="AdventureController">
+		<link rel="stylesheet" type="text/css" href="creator.css">
 
+		<!-- REQUIRED MATERIA JAVASCRIPT -->
+		<script src="materia.creatorcore.js"></script>
+
+		<!-- YOUR PREREQUISITES -->
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular.min.js'></script>
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular-animate.min.js'></script>
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular-sanitize.min.js'></script>
+
+		<!-- D3.js -->
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+		<!-- MAIN CREATOR SCRIPT -->
+		<script src="creator.js"></script>
+	</head>
+	<body ng-controller="AdventureCtrl">
+		<div id="backgroundcover" ng-click="hideCover()" ng-class="{ show: showTitleDialog || showIntroDialog }"></div>
+		<tree-visualization data="treeData" on-click="nodeSelected(data)"></tree-visualization>
+		<p>
+			<button type="button" ng-click="addNode(BLANK)">Add a Blank Node</button>
+			<button type="button" ng-click="addNode(MC)">Add a Multiple Choice Node</button>
+			<button type="button" ng-click="addNode(SHORTANS)">Add a Short Answer Node</button>
+		</p>
 	</body>
 </html>
 
