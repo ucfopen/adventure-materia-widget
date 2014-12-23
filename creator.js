@@ -1,0 +1,1 @@
+Adventure = angular.module 'AdventureCreator', ['ngAnimate', 'ngSanitize']

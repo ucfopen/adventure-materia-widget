@@ -1,0 +1,69 @@
+/* Choose Your Own Adventure Creator SCSS file */
+
+$background: #fefefe;
+
+html, body {
+	background-color: $background;
+}
+
+#backgroundcover {
+	position: fixed;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+	background: #000;
+	z-index: -1;
+	opacity: 0;
+	transition: all 0.5s ease;
+	&.show {
+		z-index: 2000;
+		opacity: 0.5;
+		transition: opacity 0.5s ease;
+	}
+}
+
+g.node {
+	font-family: Verdana, Helvetica;
+	font-size: 12px;
+	font-weight: bold;
+
+	circle.node-dot {
+		stroke-width: 1px;
+	}
+
+	&.blank circle.node-dot {
+		fill: #DDDDDD;
+		stroke: #ADADAD;
+	}
+
+	&.mc circle.node-dot {
+		fill: #FF6666;
+		stroke: #FF0000;
+	}
+
+	&.shortanswer circle.node-dot {
+		fill: #66FF66;
+		stroke: #00FF00;
+	}
+}
+
+// circle.node-dot {
+// 	fill: #FF6666;
+// 	stroke: #FF0000;
+// 	stroke-width: 1px;
+
+// 	&.blank {
+// 		fill: #DDDDDD;
+// 		stroke: #ADADAD;
+// 	}
+// }
+
+path.link {
+	fill: none;
+	stroke: gray;
+}
+
+p {
+	margin: 0px;
+}
