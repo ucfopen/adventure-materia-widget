@@ -3,16 +3,21 @@ Adventure = angular.module "AdventureCreator", ["ngAnimate", "ngSanitize"]
 
 Adventure.service "treeSrv", ($rootScope) ->
 
+	# TreeData is being initialized in -two- places right now.
+	# This one may or may not be required.
+	# TODO: Find out if it's required.
 	treeData =
 		name: "Start"
 		type: "blank"
 		id: 0
+		parentId: -1
 		contents: []
 
 	set = (data) ->
 		treeData = data
-		$rootScope.$broadcast "tree.nodes.added"
+		$rootScope.$broadcast "tree.nodes.changed"
 
+	# Probably unnecessary
 	get = ->
 		treeData
 
@@ -22,8 +27,8 @@ Adventure.service "treeSrv", ($rootScope) ->
 Adventure.directive "treeVisualization", (treeSrv) ->
 	restrict: "E",
 	scope: {
-		data: "=",
-		onClick: "&"
+		data: "=", # binds treeData in a way that's accessible to the directive
+		onClick: "&" # binds a listener so the controller can access the directive's click data
 	},
 	link: ($scope, $element, $attrs) ->
 
@@ -31,7 +36,8 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 
 		console.log "treeVisualization linked!"
 
-		$scope.$on "tree.nodes.added", (evt) ->
+		# Re-render tree whenever the nodes are updated
+		$scope.$on "tree.nodes.changed", (evt) ->
 			$scope.render treeSrv.get()
 
 		$scope.render = (data) ->
@@ -53,8 +59,8 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			if $scope.svg == null
 				$scope.svg = d3.select($element[0])
 					.append("svg:svg")
-					.attr("width", 1000)
-					.attr("height",650)
+					.attr("width", 1000) # Size of actual SVG container
+					.attr("height",650) # Size of actual SVG container
 					.append("svg:g")
 					.attr("class", "container")
 					.attr("transform", "translate(0,50)") # translates position of overall tree in svg container
@@ -82,7 +88,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					"node #{d.type}"
 				)
 				.on("click", (d, i) ->
-					$scope.onClick {data: d.id}
+					$scope.onClick {data: d} # when clicked, we return all of the node's data
 				)
 				.attr("transform", (d) ->
 					"translate(#{d.x},#{d.y})"
@@ -108,9 +114,32 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 
 		$scope.render treeSrv.get()
 
-Adventure.controller "AdventureCtrl", ($scope, $filter, treeSrv) ->
+# Directive for the node modal dialog (add child, delete node, etc)
+Adventure.directive "nodeToolsDialog", (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+		# When target for the dialog changes, update the position values based on where the new node is
+		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
 
-	count = 0
+			xOffset = $scope.nodeTools.x + 10
+			yOffset = $scope.nodeTools.y + 70
+
+			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
+
+			$attrs.$set "style", styles
+
+		$scope.addANode = () ->
+			$scope.addNode $scope.nodeTools.target, $scope.BLANK
+
+		$scope.dropNode = () ->
+			$scope.findAndRemove $scope.treeData, $scope.nodeTools.target
+			$scope.nodeTools.show = false
+			treeSrv.set $scope.treeData
+
+Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
+
+	# Iterator that generates node IDs
+	count = 1
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -120,9 +149,19 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, treeSrv) ->
 
 	$scope.title = "My Adventure Widget"
 
+	# NodeTools is an object that holds the parameters for the node modal, works in tandem with the nodeToolsDialog directive
+	$scope.nodeTools =
+		show: false
+		target: null
+		x: 0
+		y: 0
+
+	# This instantiation of treeData is required. It populates the "Start" node.
 	$scope.treeData =
 		name: "Start"
 		type: "blank"
+		id: 0
+		parentId: -1
 		contents: []
 
 	# treeSrv.set $scope.treeData
@@ -140,32 +179,77 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, treeSrv) ->
 		$scope.$apply ->
 			$scope.showIntroDialog = true
 
+	# Controller recipient of the treeViz directive's onClick method
+	# data contains the node object
 	$scope.nodeSelected = (data) ->
+		$scope.$apply () ->
+			$scope.nodeTools.show = true
+			$scope.nodeTools.target = data.id
+			$scope.nodeTools.x = data.x
+			$scope.nodeTools.y = data.y
 
-		# console.log $filter("filter")($scope.treeData, {id: data})[0]
-		console.log findAndRemove(data)
-		# $scope.treeData.contents.pop()
-		treeSrv.set $scope.treeData
+	# Recursive function for finding a node and removing it
+	# parent: the tree structure to be iterated. Should initially reference the root node (treeData object)
+	# id: the id the node to be removed
+	$scope.findAndRemove = (parent, id) ->
 
-	findAndRemove = (id) ->
+		if !parent.children then return
 
-		# Eventually, this will include a search algorithm to find and remove the node from treeData based on the id.
-		for node, index in $scope.treeData.contents
-			console.log node
+		# iterator required instead of using angular.forEach
+		i = 0
 
-	$scope.addNode = (type) ->
-		console.log "adding node of type: " + type
+		while i < parent.children.length
 
+			child = parent.children[i]
+
+			if child.id == id
+				parent.children.splice i, 1
+			else
+				$scope.findAndRemove parent.children[i], id
+				i++
+
+		parent
+
+	# Recursive function for adding a node to a specified parent node
+	# tree: the tree structure to be iterated. Should initially reference the root node (treeData object)
+	# parentId: the ID of the node to append the new node to
+	# node: the data of the new node
+	$scope.findAndAdd = (tree, parentId, node) ->
+
+		if tree.id == parentId
+			tree.contents.push node
+			tree
+
+		if !tree.children then return
+
+		i = 0
+
+		while i < tree.children.length
+
+			child = tree.children[i]
+
+			if child.id == parentId
+				child.contents.push node
+				return
+			else
+				$scope.findAndAdd tree.children[i], parentId, node
+				i++
+
+		tree
+
+	# Function that pre-assembles a new node's data, adds it, then kicks off processes that have to happen afterwards
+	$scope.addNode = (parent, type) ->
 		newNode =
 			name: "Node #{count} (#{type})"
 			id: count
+			parentId: parent
 			type: type
 			contents: []
 
-		# $scope.treeData.contents.push { name: "Node #{count}", contents: [] }
+		$scope.findAndAdd $scope.treeData, parent, newNode
 
-		$scope.treeData.contents.push newNode
 		count++
 		treeSrv.set $scope.treeData
+		$scope.nodeTools.show = false
 
 	Materia.CreatorCore.start $scope

@@ -23,6 +23,10 @@ html, body {
 	}
 }
 
+.adventure-container {
+	position: relative;
+}
+
 g.node {
 	font-family: Verdana, Helvetica;
 	font-size: 12px;
@@ -67,3 +71,24 @@ path.link {
 p {
 	margin: 0px;
 }
+
+node-tools-dialog {
+	position: absolute;
+
+	width: 150px;
+	height: 75px;
+
+	background: #fff;
+	border: solid 1px #BDBDBD;
+	border-radius: 10px;
+}
+
+// .node-tools {
+// 	position: absolute;
+// 	top: 100px;
+// 	left: 100px;
+
+// 	width: 100px;
+// 	height: 50px;
+// 	background: #000;
+// }
