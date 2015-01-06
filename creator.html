@@ -21,13 +21,17 @@
 		<!-- MAIN CREATOR SCRIPT -->
 		<script src="creator.js"></script>
 	</head>
-	<body ng-controller="AdventureCtrl">
+	<body id="adventure-container" ng-controller="AdventureCtrl">
 		<div id="backgroundcover" ng-click="hideCover()" ng-class="{ show: showTitleDialog || showIntroDialog }"></div>
+		<node-tools-dialog ng-show="nodeTools.show" data-pos-x="{{nodeTools.x}}" data-pos-y="{{nodeTools.y}}">
+			<button type="button" ng-click="addANode()">Add a Node</button>
+			<button type="button" ng-click="dropNode()">Delete</button>
+		</node-tools-dialog>
 		<tree-visualization data="treeData" on-click="nodeSelected(data)"></tree-visualization>
 		<p>
-			<button type="button" ng-click="addNode(BLANK)">Add a Blank Node</button>
-			<button type="button" ng-click="addNode(MC)">Add a Multiple Choice Node</button>
-			<button type="button" ng-click="addNode(SHORTANS)">Add a Short Answer Node</button>
+			<button type="button" ng-click="addNode(0, BLANK)">Add a Blank Node</button>
+			<button type="button" ng-click="addNode(0, MC)">Add a Multiple Choice Node</button>
+			<button type="button" ng-click="addNode(0, SHORTANS)">Add a Short Answer Node</button>
 		</p>
 	</body>
 </html>
