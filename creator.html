@@ -5,7 +5,7 @@
 		<meta charset="utf-8" />
 
 		<!-- STYLESHEETS -->
-		<link rel="stylesheet" type="text/css" href="creator.css">
+		<link rel="stylesheet" type="text/css" href="creator-assets/creator.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script src="materia.creatorcore.js"></script>
@@ -19,7 +19,11 @@
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
 		<!-- MAIN CREATOR SCRIPT -->
-		<script src="creator.js"></script>
+		<script src="creator-assets/app.js"></script>
+		<script src="creator-assets/services.js"></script>
+		<script src="creator-assets/directives.js"></script>
+		<script src="creator-assets/controllers.js"></script>
+
 	</head>
 	<body id="adventure-container" ng-controller="AdventureCtrl">
 		<div id="backgroundcover" ng-click="hideCover()" ng-class="{ show: showTitleDialog || showIntroDialog }"></div>
