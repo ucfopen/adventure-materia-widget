@@ -26,17 +26,39 @@
 
 	</head>
 	<body id="adventure-container" ng-controller="AdventureCtrl">
-		<div id="backgroundcover" ng-click="hideCover()" ng-class="{ show: showTitleDialog || showIntroDialog }"></div>
 		<node-tools-dialog ng-show="nodeTools.show" data-pos-x="{{nodeTools.x}}" data-pos-y="{{nodeTools.y}}">
+			<button type="button" class="big-button" ng-click="editNode()">Edit Node</button>
 			<button type="button" ng-click="addANode()">Add a Node</button>
 			<button type="button" ng-click="dropNode()">Delete</button>
 		</node-tools-dialog>
+		<node-creation-selection-dialog ng-show="showCreationDialog && displayNodeCreation == 'none'">
+			<h2>What kind of node do you want to create?</h2>
+			<ul>
+				<li ng-click="displayNodeCreation = MC">MC</li>
+				<li ng-click="displayNodeCreation = SHORTANS">SA</li>
+				<li ng-click="displayNodeCreation = HOTSPOT">HS</li>
+				<li ng-click="displayNodeCreation = NARR">NARR</li>
+			</ul>
+		</node-creation-selection-dialog>
+
+		<node-creation-mc class="node-creation-screen" ng-show="displayNodeCreation == MC">
+			<h2>Multiple Choice for {{editedNode.name}}</h2>
+		</node-creation-mc>
+
+		<node-creation-sa class="node-creation-screen" ng-show="displayNodeCreation == SHORTANS">
+			<h2>Short Answer for {{editedNode.name}}</h2>
+		</node-creation-sa>
+
+		<node-creation-hs class="node-creation-screen" ng-show="displayNodeCreation == HOTSPOT">
+			<h2>HotSpot for {{editedNode.name}}</h2>
+		</node-creation-hs>
+
+		<node-creation-narr class="node-creation-screen" ng-show="displayNodeCreation == NARR">
+			<h2>Narrative for {{editedNode.name}}</h2>
+		</node-creation-narr>
+
+		<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
 		<tree-visualization data="treeData" on-click="nodeSelected(data)"></tree-visualization>
-		<p>
-			<button type="button" ng-click="addNode(0, BLANK)">Add a Blank Node</button>
-			<button type="button" ng-click="addNode(0, MC)">Add a Multiple Choice Node</button>
-			<button type="button" ng-click="addNode(0, SHORTANS)">Add a Short Answer Node</button>
-		</p>
 	</body>
 </html>
 
