@@ -8,6 +8,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
 	$scope.MC = "mc"
 	$scope.SHORTANS = "shortanswer"
 	$scope.HOTSPOT = "hotspot"
+	$scope.NARR = "narrative"
 	$scope.END = "end"
 
 	$scope.title = "My Adventure Widget"
@@ -27,6 +28,15 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
 		parentId: -1
 		contents: []
 
+	$scope.displayNodeCreation = "none"
+	$scope.editedNode = null # Node being targeted for editing
+
+	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
+		if newVal isnt oldVal and newVal isnt "none"
+			console.log "displayNodeCreation updated to: " + newVal
+			$scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+			console.log $scope.editedNode
+
 	# treeSrv.set $scope.treeData
 
 	$scope.setTitle = ->
@@ -34,13 +44,19 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
 		$scope.step = 1 # what's dis do?
 		$scope.hideCover()
 
-	$scope.hideCover = ->
-		$scope.showTitleDialog = $scope.showIntroDialog = false
+	$scope.hideCoverAndModals = ->
+		$scope.showBackgroundCover = false
+		$scope.nodeTools.show = false
+		$scope.showCreationDialog = false
+
+		$scope.displayNodeCreation = "none"
+		# $scope.showTitleDialog = $scope.showIntroDialog = false
 
 	$scope.initNewWidget = (widget, baseUrl) ->
 		console.log "initNewWidget"
 		$scope.$apply ->
 			$scope.showIntroDialog = true
+			$scope.showBackgroundCover = true
 
 	# Controller recipient of the treeViz directive's onClick method
 	# data contains the node object
@@ -51,56 +67,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
 			$scope.nodeTools.x = data.x
 			$scope.nodeTools.y = data.y
 
-	# Recursive function for finding a node and removing it
-	# parent: the tree structure to be iterated. Should initially reference the root node (treeData object)
-	# id: the id the node to be removed
-	$scope.findAndRemove = (parent, id) ->
-
-		if !parent.children then return
-
-		# iterator required instead of using angular.forEach
-		i = 0
-
-		while i < parent.children.length
-
-			child = parent.children[i]
-
-			if child.id == id
-				parent.children.splice i, 1
-			else
-				$scope.findAndRemove parent.children[i], id
-				i++
-
-		parent
-
-	# Recursive function for adding a node to a specified parent node
-	# tree: the tree structure to be iterated. Should initially reference the root node (treeData object)
-	# parentId: the ID of the node to append the new node to
-	# node: the data of the new node
-	$scope.findAndAdd = (tree, parentId, node) ->
-
-		if tree.id == parentId
-			tree.contents.push node
-			tree
-
-		if !tree.children then return
-
-		i = 0
-
-		while i < tree.children.length
-
-			child = tree.children[i]
-
-			if child.id == parentId
-				child.contents.push node
-				return
-			else
-				$scope.findAndAdd tree.children[i], parentId, node
-				i++
-
-		tree
-
 	# Function that pre-assembles a new node's data, adds it, then kicks off processes that have to happen afterwards
+	# TODO this ought to be moved to treeSrv
 	$scope.addNode = (parent, type) ->
 		newNode =
 			name: "Node #{count} (#{type})"
@@ -109,7 +77,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
 			type: type
 			contents: []
 
-		$scope.findAndAdd $scope.treeData, parent, newNode
+		treeSrv.findAndAdd $scope.treeData, parent, newNode
 
 		count++
 		treeSrv.set $scope.treeData

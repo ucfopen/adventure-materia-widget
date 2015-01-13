@@ -6,8 +6,11 @@ html, body {
 	background-color: $background;
 }
 
+/* Container formatting */
+
 #backgroundcover {
 	position: fixed;
+	z-index: 1;
 	top: 0px;
 	right: 0px;
 	bottom: 0px;
@@ -17,7 +20,7 @@ html, body {
 	opacity: 0;
 	transition: all 0.5s ease;
 	&.show {
-		z-index: 2000;
+		z-index: 1;
 		opacity: 0.5;
 		transition: opacity 0.5s ease;
 	}
@@ -27,6 +30,8 @@ html, body {
 	position: relative;
 }
 
+/* Tree Visualization Styles */
+
 g.node {
 	font-family: Verdana, Helvetica;
 	font-size: 12px;
@@ -34,6 +39,12 @@ g.node {
 
 	circle.node-dot {
 		stroke-width: 1px;
+
+		cursor: pointer;
+
+		&:hover {
+			stroke-width: 3px;
+		}
 	}
 
 	&.blank circle.node-dot {
@@ -52,17 +63,6 @@ g.node {
 	}
 }
 
-// circle.node-dot {
-// 	fill: #FF6666;
-// 	stroke: #FF0000;
-// 	stroke-width: 1px;
-
-// 	&.blank {
-// 		fill: #DDDDDD;
-// 		stroke: #ADADAD;
-// 	}
-// }
-
 path.link {
 	fill: none;
 	stroke: gray;
@@ -72,23 +72,78 @@ p {
 	margin: 0px;
 }
 
+/* Tools and dialog windows */
+
+
 node-tools-dialog {
 	position: absolute;
 
-	width: 150px;
+	width: 200px;
 	height: 75px;
 
 	background: #fff;
 	border: solid 1px #BDBDBD;
 	border-radius: 10px;
+
+	text-align: center;
+
+	.big-button {
+		width: 160px;
+		height: 30px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
 }
 
-// .node-tools {
-// 	position: absolute;
-// 	top: 100px;
-// 	left: 100px;
+node-creation-selection-dialog {
+	position: absolute;
+	left: 50%;
+	z-index: 5;
 
-// 	width: 100px;
-// 	height: 50px;
-// 	background: #000;
-// }
+	width: 600px;
+	height: 600px;
+	margin: 50px 0px 0px -300px;
+	border-radius: 10px;
+	background: #FFF;
+
+	text-align: center;
+
+	ul {
+		list-style-type: none;
+		margin: 0px;
+		padding: 0px;
+
+		li {
+			display: inline-block;
+
+			width: 200px;
+			height: 200px;
+
+			margin-top: 25px;
+
+			border-radius: 5px;
+			border: solid 1px #000;
+			background: #FFF;
+
+			text-align: center;
+
+			cursor: pointer;
+
+			&:nth-child(odd) {
+				margin-right: 15px;
+			}
+		}
+	}
+}
+
+.node-creation-screen {
+	position: absolute;
+	left: 50%;
+	z-index: 6;
+
+	width: 800px;
+	height: 600px;
+	margin: 50px 0px 0px -400px;
+	border-radius: 10px;
+	background: #FFF;
+}

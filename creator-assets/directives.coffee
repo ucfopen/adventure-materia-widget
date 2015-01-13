@@ -1,4 +1,5 @@
 Adventure = angular.module "AdventureCreator"
+
 Adventure.directive "treeVisualization", (treeSrv) ->
 	restrict: "E",
 	scope: {
@@ -62,7 +63,37 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				.attr("class", (d) ->
 					"node #{d.type}"
 				)
+				.on("mouseover", (d, i) ->
+					#  Animation effects on node mouseover
+					d3.select(this).select("circle")
+					.transition()
+					.attr("r", 30)
+
+					d3.select(this).select("text")
+					.text( (d) ->
+						d.name + " (Click to Edit)"
+					)
+					.transition()
+					.attr("x", 10)
+				)
+				.on("mouseout", () ->
+					# Animation effects on node mouseout
+					d3.select(this).select("circle")
+					.transition()
+					.attr("r", 20)
+
+					d3.select(this).select("text")
+					.text( (d) ->
+						d.name
+					)
+					.transition()
+					.attr("x", 0)
+				)
 				.on("click", (d, i) ->
+					d3.select(this)
+					.transition()
+					.attr("r", 35)
+
 					$scope.onClick {data: d} # when clicked, we return all of the node's data
 				)
 				.attr("transform", (d) ->
@@ -75,14 +106,15 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 
 			nodeGroup.append("svg:text")
 				.attr("text-anchor", (d) ->
-					if d.children then return "end"
-					else return "start"
+					return "start" # sets horizontal alignment of text anchor
+					# if d.children then return "end"
+					# else return "start"
 				)
-				.attr("dx", (d) ->
-					gap = 25
-					if d.children then return -gap # sets X label offset from node (negative left, positive right side)
-					else return gap
-				)
+				.attr("dx", 25) # sets X label offset from node (negative left, positive right side)
+				# .attr("dx", (d) ->
+				# 	# if d.children then return -gap
+				# 	# else return gap
+				# )
 				.attr("dy", 5) # sets Y label offset from node
 				.text (d) ->
 					d.name
@@ -107,6 +139,23 @@ Adventure.directive "nodeToolsDialog", (treeSrv) ->
 			$scope.addNode $scope.nodeTools.target, $scope.BLANK
 
 		$scope.dropNode = () ->
-			$scope.findAndRemove $scope.treeData, $scope.nodeTools.target
+			treeSrv.findAndRemove $scope.treeData, $scope.nodeTools.target
 			$scope.nodeTools.show = false
 			treeSrv.set $scope.treeData
+
+
+Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+		$scope.showDialog = false
+
+		$scope.editNode = () ->
+			$scope.showCreationDialog = true
+			$scope.showBackgroundCover = true
+
+Adventure.directive "nodeCreationMc", (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+			# $scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+			# console.log $scope.editedNode
