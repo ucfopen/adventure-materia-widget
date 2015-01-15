@@ -90,10 +90,6 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					.attr("x", 0)
 				)
 				.on("click", (d, i) ->
-					d3.select(this)
-					.transition()
-					.attr("r", 35)
-
 					$scope.onClick {data: d} # when clicked, we return all of the node's data
 				)
 				.attr("transform", (d) ->
@@ -157,5 +153,15 @@ Adventure.directive "nodeCreationMc", (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
-			# $scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
-			# console.log $scope.editedNode
+		# $scope.question = ""
+
+		$scope.$on "editedNode.target.changed", (evt) ->
+			console.log "edited node changed!"
+
+			if $scope.editedNode
+				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
+				else $scope.question = null
+
+		$scope.$watch "question", (newVal, oldVal) ->
+			if newVal
+				$scope.editedNode.question = newVal

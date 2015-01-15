@@ -1,5 +1,5 @@
 Adventure = angular.module "AdventureCreator"
-Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
+Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, treeSrv) ->
 
 	# Iterator that generates node IDs
 	count = 1
@@ -35,7 +35,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
 		if newVal isnt oldVal and newVal isnt "none"
 			console.log "displayNodeCreation updated to: " + newVal
 			$scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
-			console.log $scope.editedNode
+			# console.log $scope.editedNode
+
+			# Inform the edit screens that the edited node has changed
+			$rootScope.$broadcast "editedNode.target.changed"
 
 	# treeSrv.set $scope.treeData
 
@@ -63,13 +66,15 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
 	$scope.nodeSelected = (data) ->
 		$scope.$apply () ->
 			$scope.nodeTools.show = !$scope.nodeTools.show
-			$scope.nodeTools.target = data.id
 			$scope.nodeTools.x = data.x
 			$scope.nodeTools.y = data.y
+			$scope.nodeTools.target = data.id # nodeTools refresh triggered by change in target property
+									# (see nodeToolsDialog directive)
 
 	# Function that pre-assembles a new node's data, adds it, then kicks off processes that have to happen afterwards
 	# TODO this ought to be moved to treeSrv
 	$scope.addNode = (parent, type) ->
+
 		newNode =
 			name: "Node #{count} (#{type})"
 			id: count
@@ -81,6 +86,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, treeSrv) ->
 
 		count++
 		treeSrv.set $scope.treeData
+
 		$scope.nodeTools.show = false
+		$scope.nodeTools.target = null # forces nodeTools to refresh target data to account for change in parent Y
 
 	Materia.CreatorCore.start $scope

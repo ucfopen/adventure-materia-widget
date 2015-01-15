@@ -43,6 +43,10 @@
 
 		<node-creation-mc class="node-creation-screen" ng-show="displayNodeCreation == MC">
 			<h2>Multiple Choice for {{editedNode.name}}</h2>
+			<textarea class="question-box" ng-model="question" placeholder="Enter question here."></textarea>
+			<button type="button">Add Image</button>
+			<div class="answers-container">
+			</div>
 		</node-creation-mc>
 
 		<node-creation-sa class="node-creation-screen" ng-show="displayNodeCreation == SHORTANS">
