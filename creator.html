@@ -4,6 +4,9 @@
 		<title>Adventure Widget Player</title>
 		<meta charset="utf-8" />
 
+		<!-- FONTS -->
+		<link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900,400italic' rel='stylesheet' type='text/css'>
+
 		<!-- STYLESHEETS -->
 		<link rel="stylesheet" type="text/css" href="creator-assets/creator.css">
 
@@ -28,7 +31,7 @@
 	<body id="adventure-container" ng-controller="AdventureCtrl">
 		<node-tools-dialog ng-show="nodeTools.show" data-pos-x="{{nodeTools.x}}" data-pos-y="{{nodeTools.y}}">
 			<button type="button" class="big-button" ng-click="editNode()">Edit Node</button>
-			<button type="button" ng-click="addANode()">Add a Node</button>
+			<button type="button" ng-click="copyNode()">Copy</button>
 			<button type="button" ng-click="dropNode()">Delete</button>
 		</node-tools-dialog>
 		<node-creation-selection-dialog ng-show="showCreationDialog && displayNodeCreation == 'none'">
@@ -44,8 +47,17 @@
 		<node-creation-mc class="node-creation-screen" ng-show="displayNodeCreation == MC">
 			<h2>Multiple Choice for {{editedNode.name}}</h2>
 			<textarea class="question-box" ng-model="question" placeholder="Enter question here."></textarea>
-			<button type="button">Add Image</button>
+			<button type="button">Add Media</button>
 			<div class="answers-container">
+				<ul>
+					<li ng-repeat="answer in answers">
+						<button type="button" class="delete-button" ng-click="removeAnswer($index)" ng-disabled="$index == 0">X</button>
+						<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
+						<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
+						<button type="button">{{answer.target}}</button>
+					</li>
+				</ul>
+				<button class="add-answer" type="button" ng-click="newAnswer()">Add Answer Choice</button>
 			</div>
 		</node-creation-mc>
 
