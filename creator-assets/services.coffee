@@ -88,6 +88,16 @@ Adventure.service "treeSrv", ($rootScope) ->
 			child = parent.children[i]
 
 			if child.id == id
+
+				# also remove parent's answer row corresponding to this node
+				j = 0
+				while j < parent.answers.length
+					if parent.answers[j].target == id
+						parent.answers.splice j, 1
+						break
+					else
+						j++
+
 				parent.children.splice i, 1
 			else
 				findAndRemove parent.children[i], id

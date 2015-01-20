@@ -131,8 +131,8 @@ Adventure.directive "nodeToolsDialog", (treeSrv) ->
 
 			$attrs.$set "style", styles
 
-		$scope.addANode = () ->
-			$scope.addNode $scope.nodeTools.target, $scope.BLANK
+		$scope.copyNode = () ->
+			console.log "Copying NYI!"
 
 		$scope.dropNode = () ->
 			treeSrv.findAndRemove $scope.treeData, $scope.nodeTools.target
@@ -146,7 +146,16 @@ Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
 		$scope.showDialog = false
 
 		$scope.editNode = () ->
-			$scope.showCreationDialog = true
+			# We need the target's node type, so grab it
+			targetId = $scope.nodeTools.target
+			target = treeSrv.findNode $scope.treeData, targetId
+
+			# if node is blank, launch the node type selection. Otherwise, go right to the editor for that type
+			if target.type isnt $scope.BLANK
+				$scope.displayNodeCreation = target.type
+			else
+				$scope.showCreationDialog = true
+
 			$scope.showBackgroundCover = true
 
 Adventure.directive "nodeCreationMc", (treeSrv) ->
@@ -158,10 +167,49 @@ Adventure.directive "nodeCreationMc", (treeSrv) ->
 		$scope.$on "editedNode.target.changed", (evt) ->
 			console.log "edited node changed!"
 
+			# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
 			if $scope.editedNode
 				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
 				else $scope.question = null
 
+				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
+				else
+					$scope.answers = []
+					$scope.newAnswer()
+
+				# Update the node type
+				$scope.editedNode.type = $scope.MC
+
+		# Update the node's properties when the associated input models change
 		$scope.$watch "question", (newVal, oldVal) ->
 			if newVal
 				$scope.editedNode.question = newVal
+
+		$scope.$watch "answers", ((newVal, oldVal) ->
+			if newVal
+				$scope.editedNode.answers = $scope.answers
+		), true
+
+		$scope.newAnswer = () ->
+
+			# We create the new node first, so we can grab the new node's generated id
+			targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
+
+			newAnswer =
+				text: null
+				feedback: null
+				target: targetId
+
+			$scope.answers.push newAnswer
+
+		$scope.removeAnswer = (index) ->
+
+			# Grab node id of answer node to be removed
+			targetId = $scope.answers[index].target
+
+			# Remove it from answers array
+			$scope.answers.splice index, 1
+
+			# Remove the node from the tree
+			treeSrv.findAndRemove $scope.treeData, targetId
+			treeSrv.set $scope.treeData

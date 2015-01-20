@@ -1,9 +1,37 @@
 /* Choose Your Own Adventure Creator SCSS file */
 
-$background: #fefefe;
+/* Variable definitions */
+
+$black: #000000;
+$white: #ffffff;
+$red: #b90000;
+$red-lighter: #de0000;
+
+$blue: #3d90b1;
+$blue-lighter: #49afd7;
+$blue-lightest: #bdecff;
+
+$gray: #888888;
+$gray-lighter: #fefefe;
+
+
+$background: $gray-lighter;
+$color-primary: $white;
+$color-accent: $blue;
+$color-accent-highlight: $blue-lighter;
+$color-selection-hover: $blue-lightest;
+
+$shadow-dialog: 0px 3px 3px $gray;
+$shadow-small: 0px 0px 2px $gray;
+$shadow-small-highlight: 0px 0px 5px $gray;
+
+$edit-popup-width: 750px;
+$misc-popup-width: 600px;
 
 html, body {
 	background-color: $background;
+
+	font-family: 'Lato', sans-serif;
 }
 
 /* Container formatting */
@@ -15,13 +43,13 @@ html, body {
 	right: 0px;
 	bottom: 0px;
 	left: 0px;
-	background: #000;
+	background: $black;
 	z-index: -1;
 	opacity: 0;
 	transition: all 0.5s ease;
 	&.show {
 		z-index: 1;
-		opacity: 0.5;
+		opacity: 0.3;
 		transition: opacity 0.5s ease;
 	}
 }
@@ -68,8 +96,53 @@ path.link {
 	stroke: gray;
 }
 
+/* General element styles */
+
 p {
 	margin: 0px;
+}
+
+button {
+	background: $color-primary;
+	padding: 5px 10px;
+	border: none;
+	border-radius: 2px;
+
+	font-family: 'Lato', sans-serif;
+	font-weight: 700;
+
+	box-shadow: $shadow-small;
+
+	-webkit-transition: background 0.5s;
+	transition: background 0.5s;
+
+	&:hover {
+		color: $color-accent;
+	}
+
+	&.delete-button {
+		background: $red;
+		color: $white;
+
+		&:hover {
+			background: $red-lighter;
+		}
+
+		&:disabled {
+			background: $gray;
+		}
+	}
+
+	&.big-button {
+		background: $color-accent;
+		color: $white;
+
+		font-weight: 900;
+
+		&:hover {
+			background: $color-accent-highlight;
+		}
+	}
 }
 
 /* Tools and dialog windows */
@@ -82,8 +155,12 @@ node-tools-dialog {
 	height: 75px;
 
 	background: #fff;
-	border: solid 1px #BDBDBD;
-	border-radius: 10px;
+	// border: solid 1px #BDBDBD;
+
+	padding-top: 10px;
+	padding-bottom: 15px;
+
+	box-shadow: $shadow-small;
 
 	text-align: center;
 
@@ -100,13 +177,29 @@ node-creation-selection-dialog {
 	left: 50%;
 	z-index: 5;
 
-	width: 600px;
+	width: $misc-popup-width;
 	height: 600px;
 	margin: 50px 0px 0px -300px;
 	border-radius: 10px;
-	background: #FFF;
+	background: $color-primary;
+
+	box-shadow: $shadow-dialog;
 
 	text-align: center;
+
+	h2 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+
+		color: $color-primary;
+		background: $color-accent;
+	}
 
 	ul {
 		list-style-type: none;
@@ -114,20 +207,32 @@ node-creation-selection-dialog {
 		padding: 0px;
 
 		li {
+			position: relative;
 			display: inline-block;
+			top: 0px;
 
 			width: 200px;
 			height: 200px;
 
 			margin-top: 25px;
 
-			border-radius: 5px;
-			border: solid 1px #000;
-			background: #FFF;
+			background: $color-primary;
+			box-shadow: $shadow-small;
 
 			text-align: center;
 
 			cursor: pointer;
+
+			-webkit-transition: top 0.5s;
+			transition: top 0.5s;
+
+			&:hover {
+				top: -5px;
+				// -webkit-transition: top 1s;
+				// transition: top 1s;
+				box-shadow: $shadow-small-highlight;
+
+			}
 
 			&:nth-child(odd) {
 				margin-right: 15px;
@@ -141,17 +246,86 @@ node-creation-selection-dialog {
 	left: 50%;
 	z-index: 6;
 
-	width: 750px;
+	width: $edit-popup-width;
 	height: 580px;
 	margin: 50px 0px 0px -400px;
 
-	padding: 10px 25px;
-
 	border-radius: 10px;
-	background: #FFF;
+	background: $color-primary;
+
+	box-shadow: $shadow-dialog;
+
+	h2 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+
+		color: $white;
+		background: $color-accent;
+	}
 
 	.question-box {
 		width: 80%;
 		height: 250px;
+
+		margin: 20px 20px;
+
+		border: solid 1px #cccccc;
+		border-radius: 3px;
+
+		font-size: 2em;
+	}
+
+	.answers-container {
+		width: $edit-popup-width - 30;
+		max-height: 200px;
+		margin: 10px 10px;
+		padding: 5px;
+
+		overflow-y: auto;
+
+		ul {
+			list-style-type: none;
+			margin: 0px;
+			padding: 0px;
+
+			li {
+				width: 99%;
+				padding-left: 1%;
+
+				background: $color-primary;
+
+				-webkit-transition: background 0.5s;
+				transition: background 0.5s;
+
+				input {
+					position: relative;
+					width: 40%;
+					height: 2em;
+
+					margin: 10px 0 10px 5px;
+					padding-left: 15px;
+
+					border: solid 1px #cccccc;
+					border-radius: 3px;
+				}
+
+				&:hover {
+					background: $color-selection-hover;
+				}
+
+				// &:nth-child(1) {
+
+				// 	input:nth-child(1) {
+				// 		left: 27px;
+				// 	}
+				// }
+			}
+		}
 	}
 }

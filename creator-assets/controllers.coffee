@@ -75,9 +75,11 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	# TODO this ought to be moved to treeSrv
 	$scope.addNode = (parent, type) ->
 
+		newId = count
+
 		newNode =
 			name: "Node #{count} (#{type})"
-			id: count
+			id: newId
 			parentId: parent
 			type: type
 			contents: []
@@ -89,5 +91,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 
 		$scope.nodeTools.show = false
 		$scope.nodeTools.target = null # forces nodeTools to refresh target data to account for change in parent Y
+
+		# Sometimes getting the id of the newly created node is required, so return it
+		newId
 
 	Materia.CreatorCore.start $scope
