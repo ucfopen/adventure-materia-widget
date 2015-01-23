@@ -4,21 +4,35 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	# Iterator that generates node IDs
 	count = 1
 
+	# Define constants for node screen types
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
 	$scope.SHORTANS = "shortanswer"
 	$scope.HOTSPOT = "hotspot"
 	$scope.NARR = "narrative"
 	$scope.END = "end"
+	$scope.LINK = "link" # Probably not required
+
+	# Define constants for the link mode types
+	$scope.NEW = "new"
+	$scope.EXISTING = "existing"
+	$scope.SELF = "self"
 
 	$scope.title = "My Adventure Widget"
 
-	# NodeTools is an object that holds the parameters for the node modal, works in tandem with the nodeToolsDialog directive
+	# NodeTools is an object that holds the parameters for the nodeTools modal, works in tandem with the nodeToolsDialog directive
 	$scope.nodeTools =
 		show: false
 		target: null
 		x: 0
 		y: 0
+
+	$scope.newNodeManager =
+		show: false
+		target: null
+		x: 0
+		y: 0
+		linkMode: "new" # options should be "new" | "existing" | "self"
 
 	# This instantiation of treeData is required. It populates the "Start" node.
 	$scope.treeData =
@@ -39,6 +53,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 
 			# Inform the edit screens that the edited node has changed
 			$rootScope.$broadcast "editedNode.target.changed"
+		else if newVal is "none"
+			$scope.newNodeManager.show = false
+			$scope.newNodeManager.target = null
+			# console.log $scope.treeData
 
 	# treeSrv.set $scope.treeData
 
