@@ -91,6 +91,12 @@ g.node {
 	}
 }
 
+// g.bridge {
+// 	circle {
+		
+// 	}
+// }
+
 path.link {
 	fill: none;
 	stroke: gray;
@@ -115,6 +121,9 @@ button {
 
 	-webkit-transition: background 0.5s;
 	transition: background 0.5s;
+
+	// -webkit-animation-iteration-count: infinite;
+	// animation-iteration-count: infinite;
 
 	&:hover {
 		color: $color-accent;
@@ -170,6 +179,66 @@ node-tools-dialog {
 		margin-top: 10px;
 		margin-bottom: 10px;
 	}
+}
+
+new-node-manager-dialog {
+	position: absolute;
+	z-index: 1000;
+	width: 400px;
+	height: 150px;
+
+	left: 50%;
+	// top: 50%;
+	margin-left: -200px;
+
+	border-radius: 5px;
+
+	background: $color-primary;
+	box-shadow: $shadow-small;
+
+	h4 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+
+		color: $color-primary;
+		background: $color-accent;
+	}
+
+	ul {
+		list-style-type: none;
+		margin: 0px;
+		padding: 10px 0px 0px 0px;
+
+		li {
+			margin-bottom: 5px;
+			font-size: 11pt;
+
+			padding: 5px 0px 5px 10px;
+
+			background: $white;
+
+			-webkit-transition: background 0.5s;
+			transition: background 0.5s;
+
+			cursor: pointer;
+
+			&:hover {
+				background: $color-selection-hover;
+			}
+
+			&.selected {
+				color: $color-primary;
+				background: $color-accent;
+			}
+		}
+	}
+
 }
 
 node-creation-selection-dialog {
@@ -317,6 +386,13 @@ node-creation-selection-dialog {
 
 				&:hover {
 					background: $color-selection-hover;
+				}
+
+				button.answer-node-select {
+					&.managed {
+						color: $white;
+						background: $color-accent;
+					}
 				}
 
 				// &:nth-child(1) {
