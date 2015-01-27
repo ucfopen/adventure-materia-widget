@@ -93,11 +93,16 @@ g.node {
 
 // g.bridge {
 // 	circle {
-		
+
 // 	}
 // }
 
 path.link {
+	fill: none;
+	stroke: gray;
+}
+
+circle.loopback {
 	fill: none;
 	stroke: gray;
 }
