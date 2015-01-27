@@ -30,7 +30,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 
 			nodes = tree.nodes data # Setup nodes
 			links = tree.links nodes # Setup links
-			adjustedLinks = [] # Alternate links array that includes bridges (see forEach links below)
+			adjustedLinks = [] # Finalized links array that includes "special" links (loopbacks and bridges)
 
 			angular.forEach nodes, (node, index) ->
 
@@ -54,20 +54,21 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 
 							links.push newLink
 
+				# Generate "loopback" links that circle back to the same node
+				# This link has the same source/target, the node itself;
+				# It's just a formality really, so D3 -knows- a link exists here
 				if node.hasLinkToSelf
 
 					newLink = {}
-
 					newLink.source = node
 					newLink.target = node
 					newLink.specialCase = "loopBack"
-					# newLink.target = nodes[index - 1]
-
-					console.log "Hey! Generating pseudo link!"
-					# console.log nodes[index - 1]
 
 					links.push newLink
 
+
+			# We need to effectively "filter" each link and create the intermediate nodes
+			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
 				if link.specialCase is "otherNode"
@@ -80,6 +81,15 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 
 					adjustedLinks.push {source: source, target: intermediate}, {source: intermediate, target: target}
 
+				else if link.specialCase is "loopBack"
+
+					intermediate =
+						x: link.source.x + 75
+						y: link.source.y + 75
+						type: "bridge"
+
+					adjustedLinks.push link
+
 				else
 					source = link.source
 					target = link.target
@@ -91,12 +101,6 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					adjustedLinks.push link
 
 				nodes.push intermediate
-
-				# adjustedLinks.push {source: source, target: intermediate}, {source: intermediate, target: target}
-				# links.push {source: source, target: intermediate}, {source: intermediate, target: target}
-				# bilinks.push {source: source, target: intermediate}, {source: intermediate, target: target}
-
-			# console.log links
 
 			# Render tree
 			if $scope.svg == null
@@ -118,24 +122,29 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			# 		return [d.x, d.y] # seems to set whether the tree is drawn top-down or left-right
 			# 							# ensure the additional references to d.x and d.y are flipped too
 
-			$scope.svg.selectAll("path.link")
+			linkGroup = $scope.svg.selectAll("path.link")
 				.data(adjustedLinks)
 				.enter()
-				.append("svg:path")
+				.append("g")
+
+			linkGroup.append("svg:path")
 				.attr("class", "link")
-				.attr("class", (d) ->
-					if d.specialCase == "bridge" then return "link bridge"
-					else return "link"
-				)
 				.attr("d", link)
 
-				# .attr("d", (d) ->
-				# 	unless d.specialCase
-				# 		return link
+			linkGroup.append("svg:circle")
+				.attr("class","loopback")
+				.attr("r", 50)
+				.attr("transform", (d) ->
 
-				# 	bridgeLink = d3.svg.diagonal().projection (d) ->
+					xOffset = d.source.x + 40
+					yOffset = d.source.y + 40
 
-				# )
+					"translate(#{xOffset},#{yOffset})"
+				)
+				.style("display", (d) ->
+					if d.specialCase == "loopBack" then return null
+					else return "none"
+				)
 
 			nodeGroup = $scope.svg.selectAll("g.node")
 				.data(nodes)
