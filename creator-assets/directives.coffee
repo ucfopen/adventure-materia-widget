@@ -1,5 +1,29 @@
 Adventure = angular.module "AdventureCreator"
 
+Adventure.directive "toast", ($timeout) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.toastMessage = ""
+		$scope.showToast = false
+
+		# $scope.$watch "toast", (newVal, oldVal) ->
+		# 	if newVal
+		# 		$scope.toast = newVal
+		# 		$scope.showToast = true
+
+		$scope.toast = (message, autoCancel = true) ->
+			$scope.toastMessage = message
+			$scope.showToast = true
+
+			if autoCancel
+				$timeout (() ->
+					$scope.hideToast()
+				), 5000
+
+		$scope.hideToast = () ->
+			$scope.showToast = false
+
 Adventure.directive "treeVisualization", (treeSrv) ->
 	restrict: "E",
 	scope: {
@@ -9,8 +33,6 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 	link: ($scope, $element, $attrs) ->
 
 		$scope.svg = null
-
-		console.log "treeVisualization linked!"
 
 		# Re-render tree whenever the nodes are updated
 		$scope.$on "tree.nodes.changed", (evt) ->
@@ -71,34 +93,34 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
-				if link.specialCase is "otherNode"
-					source = link.source
-					target = link.target
-					intermediate =
-						x: source.x + (target.x - source.x)/2
-						y: (source.y + (target.y - source.y)/2) + 25
-						type: "bridge"
+				# if link.specialCase is "otherNode"
+				# 	source = link.source
+				# 	target = link.target
+				# 	intermediate =
+				# 		x: source.x + (target.x - source.x)/2
+				# 		y: (source.y + (target.y - source.y)/2) + 25
+				# 		type: "bridge"
 
-					adjustedLinks.push {source: source, target: intermediate}, {source: intermediate, target: target}
+				# 	adjustedLinks.push {source: source, target: intermediate}, {source: intermediate, target: target}
 
-				else if link.specialCase is "loopBack"
+				# else if link.specialCase is "loopBack"
 
-					intermediate =
-						x: link.source.x + 75
-						y: link.source.y + 75
-						type: "bridge"
+				# 	intermediate =
+				# 		x: link.source.x + 75
+				# 		y: link.source.y + 75
+				# 		type: "bridge"
 
-					adjustedLinks.push link
+				# 	adjustedLinks.push link
 
-				else
-					source = link.source
-					target = link.target
-					intermediate =
-						x: source.x + (target.x - source.x)/2
-						y: source.y + (target.y - source.y)/2
-						type: "bridge"
+				# else
+				source = link.source
+				target = link.target
+				intermediate =
+					x: source.x + (target.x - source.x)/2
+					y: source.y + (target.y - source.y)/2
+					type: "bridge"
 
-					adjustedLinks.push link
+				# adjustedLinks.push link
 
 				nodes.push intermediate
 
@@ -114,22 +136,48 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			else
 				$scope.svg.selectAll("*").remove()
 
-			link = d3.svg.diagonal (d) ->
-				return [d.x, d.y]
+			# Since we're using svg.line() instead of diagonal(), the links must be wrapped in a helper function
+			link = d3.svg.line()
+				.x( (point) ->
+					point.lx
+				)
+				.y( (point) ->
+					point.ly
+				)
 
-			# link = d3.svg.diagonal()
-			# 	.projection (d) ->
-			# 		return [d.x, d.y] # seems to set whether the tree is drawn top-down or left-right
-			# 							# ensure the additional references to d.x and d.y are flipped too
+
+			lineData = (d) ->
+				points = [
+					{lx: d.source.x, ly: d.source.y},
+					{lx: d.target.x, ly: d.target.y}
+				]
+
+				link(points)
+
+			# link = d3.svg.diagonal (d) ->
+			# 	return [d.x, d.y]
+
+			# Define the arrow markers that will be added to the end vertex of each link path
+			$scope.svg.append("defs").append("marker")
+				.attr("id", "arrowhead")
+				.attr("refX", 10 + 20)
+				.attr("refY", 5)
+				.attr("markerWidth", 10)
+				.attr("markerHeight", 10)
+				.attr("orient", "auto")
+				.append("path")
+					.attr("d","M 0,0 L 0,10 L 10,5 Z")
+
 
 			linkGroup = $scope.svg.selectAll("path.link")
-				.data(adjustedLinks)
+				.data(links)
 				.enter()
 				.append("g")
 
 			linkGroup.append("svg:path")
 				.attr("class", "link")
-				.attr("d", link)
+				.attr("marker-end", "url(#arrowhead)")
+				.attr("d", lineData)
 
 			linkGroup.append("svg:circle")
 				.attr("class","loopback")
@@ -164,12 +212,12 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					.transition()
 					.attr("r", 30)
 
-					d3.select(this).select("text")
-					.text( (d) ->
-						d.name + " (Click to Edit)"
-					)
-					.transition()
-					.attr("x", 10)
+					# d3.select(this).select("text")
+					# .text( (d) ->
+					# 	d.name + " (Click to Edit)"
+					# )
+					# .transition()
+					# .attr("x", 10)
 				)
 				.on("mouseout", (d, i) ->
 
@@ -184,8 +232,8 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					.text( (d) ->
 						d.name
 					)
-					.transition()
-					.attr("x", 0)
+					# .transition()
+					# .attr("x", 0)
 				)
 				.on("click", (d, i) ->
 					$scope.onClick {data: d} # when clicked, we return all of the node's data
@@ -197,9 +245,19 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			nodeGroup.append("svg:circle")
 				.attr("class", "node-dot")
 				.attr("r", (d) ->
-					if d.type is "bridge" then return 4
+					if d.type is "bridge" then return 20
 					else return 20
-				) 				# sets size of node bubbles
+				)
+
+								# sets size of node bubbles
+			nodeGroup.append("svg:rect")
+				.attr("width", (d) ->
+					if d.name then return 10 * d.name.length
+					else return 0
+				)
+				.attr("height", 16)
+				.attr("x", -10)
+				.attr("y", -8)
 
 			nodeGroup.append("svg:text")
 				.attr("text-anchor", (d) ->
@@ -207,12 +265,19 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					# if d.children then return "end"
 					# else return "start"
 				)
-				.attr("dx", 25) # sets X label offset from node (negative left, positive right side)
+				.attr("dx", (d) ->
+					if d.name
+						if d.name.length > 1 then return -10
+						else return -5
+					else return 0
+				) # sets X label offset from node (negative left, positive right side)
 				# .attr("dx", (d) ->
 				# 	# if d.children then return -gap
 				# 	# else return gap
 				# )
 				.attr("dy", 5) # sets Y label offset from node
+				.attr("font-family", "Lato")
+				.attr("font-size", 16)
 				.text (d) ->
 					d.name
 
@@ -239,6 +304,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv) ->
 			treeSrv.findAndRemove $scope.treeData, $scope.nodeTools.target
 			$scope.nodeTools.show = false
 			treeSrv.set $scope.treeData
+			$scope.toast "Node " + $scope.nodeTools.target + " has been removed."
 
 
 Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
@@ -266,7 +332,6 @@ Adventure.directive "nodeCreationMc", (treeSrv) ->
 		# $scope.question = ""
 
 		$scope.$on "editedNode.target.changed", (evt) ->
-			console.log "edited node changed!"
 
 			# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
 			if $scope.editedNode
@@ -382,35 +447,60 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 						$scope.answers[i].linkMode = $scope.NEW
 						console.log "New mode selected: NEW"
 
+						$scope.newNodeManager.target = null
+
 					when "existing"
 
-						# First, set the new answer's target to the selected node's target
-						# This prevents the row from being removed
+						# Suspend the node creation screen so the user can select an existing node
+						$scope.showBackgroundCover = false
+						$scope.nodeTools.show = false
+						$scope.displayNodeCreation = "suspended"
 
-						## TEMP: ANSWER TARGET SHOULD BE SELECTED VIA GUI ##
-						$scope.answers[i].target = $scope.editedNode.id - 1
+						# Set the node selection mode so click events are handled differently than normal
+						$scope.existingNodeSelectionMode = true
 
-						## HANDLE PRIOR LINK MODE: NEW
-						if $scope.answers[i].linkMode is $scope.NEW
+						$scope.toast "Select the point this answer should link to.", false
 
-							# Scrub the existing child node associated with this answer
-							childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
-							treeSrv.findAndRemove $scope.treeData, childNode.id
+						# All tasks are on hold until the user selects a node to link to
+						# Wait for the node to be selected
+						deregister = $scope.$watch "existingNodeSelected", (newVal, oldVal) ->
 
-						## HANDLE PRIOR LINK MODE: SELF
-						if $scope.answers[i].linkMode is $scope.SELF
+							if newVal
 
-							if $scope.editedNode.hasLinkToSelf
-								delete $scope.editedNode.hasLinkToSelf
+								$scope.hideToast()
 
-						# Set updated linkMode flags and redraw tree
-						$scope.editedNode.hasLinkToOther = true
-						$scope.answers[i].linkMode = $scope.EXISTING
+								# Set the answer's new target to the newly selected node
+								$scope.answers[i].target = newVal.id
 
-						treeSrv.set $scope.treeData
+								## HANDLE PRIOR LINK MODE: NEW
+								if $scope.answers[i].linkMode is $scope.NEW
 
-						$scope.newNodeManager.linkMode = $scope.EXISTING
-						console.log "New mode selected: EXISTING"
+									# Scrub the existing child node associated with this answer
+									childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
+									if childNode then treeSrv.findAndRemove $scope.treeData, childNode.id
+
+								## HANDLE PRIOR LINK MODE: SELF
+								if $scope.answers[i].linkMode is $scope.SELF
+
+									if $scope.editedNode.hasLinkToSelf
+										delete $scope.editedNode.hasLinkToSelf
+
+								# Set updated linkMode flags and redraw tree
+								$scope.editedNode.hasLinkToOther = true
+								$scope.answers[i].linkMode = $scope.EXISTING
+
+								treeSrv.set $scope.treeData
+
+								# $scope.newNodeManager.linkMode = $scope.EXISTING
+								console.log "New mode selected: EXISTING"
+
+								# Deregister the watch listener now that it's not needed
+								deregister()
+
+								$scope.existingNodeSelected = null
+								$scope.newNodeManager.target = null
+								$scope.displayNodeCreation = "none" # displayNodeCreation should be updated from "suspended"
+
 
 					when "self"
 
@@ -439,12 +529,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 						$scope.newNodeManager.linkMode = $scope.SELF
 						console.log "New mode selected: SELF"
 
+						$scope.newNodeManager.target = null
+
 			$scope.newNodeManager.show = false
-			$scope.newNodeManager.target = null
-
-		# $scope.closeModal = () ->
-		# 	console.log "Modal closed!"
-
-		# 	$scope.newNodeManager.show = false
-		# 	$scope.newNodeManager.target = null
 

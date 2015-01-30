@@ -34,6 +34,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		y: 0
 		linkMode: "new" # options should be "new" | "existing" | "self"
 
+	$scope.existingNodeSelectionMode = false
+	$scope.existingNodeSelected = null
+
 	# This instantiation of treeData is required. It populates the "Start" node.
 	$scope.treeData =
 		name: "Start"
@@ -46,13 +49,15 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	$scope.editedNode = null # Node being targeted for editing
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
-		if newVal isnt oldVal and newVal isnt "none"
-			console.log "displayNodeCreation updated to: " + newVal
+		if newVal isnt oldVal and newVal isnt "none" and newVal isnt "suspended"
 			$scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+			$scope.showCreationDialog = false
 			# console.log $scope.editedNode
 
 			# Inform the edit screens that the edited node has changed
 			$rootScope.$broadcast "editedNode.target.changed"
+		else if newVal is "suspended"
+			$scope.newNodeManager.show = false
 		else if newVal is "none"
 			$scope.newNodeManager.show = false
 			$scope.newNodeManager.target = null
@@ -82,12 +87,24 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	# Controller recipient of the treeViz directive's onClick method
 	# data contains the node object
 	$scope.nodeSelected = (data) ->
-		$scope.$apply () ->
-			$scope.nodeTools.show = !$scope.nodeTools.show
-			$scope.nodeTools.x = data.x
-			$scope.nodeTools.y = data.y
-			$scope.nodeTools.target = data.id # nodeTools refresh triggered by change in target property
-									# (see nodeToolsDialog directive)
+
+		# Don't do anything if the node is a bridge
+		# It's not a -real- node, we don't care about it like that
+		if data.type is "bridge" then return
+
+		# If we're in existingNodeSelectionMode, we need to listen for an existing node to be
+		# selected to update an answer's target.
+		if $scope.existingNodeSelectionMode
+			$scope.$apply () ->
+				$scope.existingNodeSelected = data
+				$scope.existingNodeSelectionMode = false
+		else # Default selection behavior
+			$scope.$apply () ->
+				$scope.nodeTools.show = !$scope.nodeTools.show
+				$scope.nodeTools.x = data.x
+				$scope.nodeTools.y = data.y
+				$scope.nodeTools.target = data.id # nodeTools refresh triggered by change in target property
+										# (see nodeToolsDialog directive)
 
 	# Function that pre-assembles a new node's data, adds it, then kicks off processes that have to happen afterwards
 	# TODO this ought to be moved to treeSrv
@@ -96,7 +113,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		newId = count
 
 		newNode =
-			name: "Node #{count} (#{type})"
+			name: "#{count}" # name: "Node #{count} (#{type})"
 			id: newId
 			parentId: parent
 			type: type

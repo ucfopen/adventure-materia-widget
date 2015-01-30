@@ -29,6 +29,7 @@
 
 	</head>
 	<body id="adventure-container" ng-controller="AdventureCtrl">
+		<toast ng-hide="!showToast" ng-click="hideToast()" class="fadeable">{{toastMessage}}</toast>
 		<node-tools-dialog ng-show="nodeTools.show" data-pos-x="{{nodeTools.x}}" data-pos-y="{{nodeTools.y}}">
 			<button type="button" class="big-button" ng-click="editNode()">Edit Node</button>
 			<button type="button" ng-click="copyNode()">Copy</button>
