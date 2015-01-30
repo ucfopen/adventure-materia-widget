@@ -11,6 +11,7 @@ $blue: #3d90b1;
 $blue-lighter: #49afd7;
 $blue-lightest: #bdecff;
 
+$gray-darker: #333333;
 $gray: #888888;
 $gray-lighter: #fefefe;
 
@@ -33,6 +34,10 @@ html, body {
 
 	font-family: 'Lato', sans-serif;
 }
+
+// .ng-hide-add, .ng-hide-remove {
+// 	display: block !important;
+// }
 
 /* Container formatting */
 
@@ -65,41 +70,56 @@ g.node {
 	font-size: 12px;
 	font-weight: bold;
 
-	circle.node-dot {
-		stroke-width: 1px;
+	cursor: pointer;
 
-		cursor: pointer;
-
-		&:hover {
+	&:hover {
+		circle {
 			stroke-width: 3px;
 		}
 	}
 
+	circle.node-dot {
+		stroke-width: 2px;
+	}
+
 	&.blank circle.node-dot {
-		fill: #DDDDDD;
+		fill: $white;
 		stroke: #ADADAD;
 	}
 
 	&.mc circle.node-dot {
-		fill: #FF6666;
+		fill: $white;
 		stroke: #FF0000;
 	}
 
 	&.shortanswer circle.node-dot {
-		fill: #66FF66;
+		fill: $white;
 		stroke: #00FF00;
+	}
+
+	rect {
+		fill: $white;
 	}
 }
 
-// g.bridge {
-// 	circle {
+g.bridge {
+	circle {
+		opacity: 0;
 
-// 	}
-// }
+		-webkit-transition: opacity 0.5s;
+		transition: opacity 0.5s;
+		// display: none;
+
+		&:hover {
+			opacity: 0.8;
+		}
+	}
+}
 
 path.link {
 	fill: none;
 	stroke: gray;
+	opacity: 0.5;
 }
 
 circle.loopback {
@@ -161,9 +181,41 @@ button {
 
 /* Tools and dialog windows */
 
+toast {
+	position: absolute;
+	z-index: 90;
+
+	width: 600px;
+	height: 30px;
+
+	bottom: 30px;
+	left: 50%;
+	margin-left: -300px;
+
+	padding-top: 5px;
+
+	border-radius: 5px;
+
+	text-align: center;
+
+	color: $color-primary;
+
+	background: $gray-darker;
+	box-shadow: $shadow-small;
+
+	// &.fadeable {
+	// 	transition: 0.5s linear all;
+	// 	opacity: 1;
+	// 	&.ng-hide {
+	// 		opacity: 0;
+	// 	}
+	// }
+}
+
 
 node-tools-dialog {
 	position: absolute;
+	z-index: 30;
 
 	width: 200px;
 	height: 75px;
@@ -249,7 +301,7 @@ new-node-manager-dialog {
 node-creation-selection-dialog {
 	position: absolute;
 	left: 50%;
-	z-index: 5;
+	z-index: 40;
 
 	width: $misc-popup-width;
 	height: 600px;
@@ -318,7 +370,7 @@ node-creation-selection-dialog {
 .node-creation-screen {
 	position: absolute;
 	left: 50%;
-	z-index: 6;
+	z-index: 50;
 
 	width: $edit-popup-width;
 	height: 580px;
