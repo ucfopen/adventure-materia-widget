@@ -47,9 +47,9 @@
 		<new-node-manager-dialog ng-show="newNodeManager.show" data-pos-x="{{newNodeManager.x}}" data-pos-y="{{newNodeManager.y}}">
 			<h4>Where should this answer point to? ></h4>
 			<ul>
-				<li ng-class="{'selected' : newNodeManager.linkMode == NEW}" ng-click="selectLinkMode(NEW)">New Destination (Node {{newNodeManager.target}})</li>
-				<li ng-class="{'selected' : newNodeManager.linkMode == EXISTING}"  ng-click="selectLinkMode(EXISTING)">An Existing Destination (Select)</li>
-				<li ng-class="{'selected' : newNodeManager.linkMode == SELF}"  ng-click="selectLinkMode(SELF)">Loop Back to This Destination (Node {{editedNode.id}})</li>
+				<li ng-class="{'selected' : newNodeManager.linkMode == NEW}" ng-click="selectLinkMode(NEW)">New Destination (Blank)</li>
+				<li ng-class="{'selected' : newNodeManager.linkMode == EXISTING}"  ng-click="selectLinkMode(EXISTING)">An Existing Destination</li>
+				<li ng-class="{'selected' : newNodeManager.linkMode == SELF}"  ng-click="selectLinkMode(SELF)">Loop Back to This Destination ( {{integerToLetters(editedNode.id)}} )</li>
 			</ul>
 		</new-node-manager-dialog>
 		<node-creation-mc class="node-creation-screen" ng-show="displayNodeCreation == MC">
@@ -62,7 +62,7 @@
 						<button type="button" class="delete-button" ng-click="removeAnswer($index)" ng-disabled="$index == 0">X</button>
 						<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
 						<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
-						<button type="button" class="answer-node-select" ng-class="{'managed' : answer.target == newNodeManager.target}" ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{answer.target}}</button>
+						<button type="button" class="answer-node-select" ng-class="{'managed' : answer.target == newNodeManager.target}" ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
 					</li>
 				</ul>
 				<button class="add-answer" type="button" ng-click="newAnswer()">Add Answer Choice</button>

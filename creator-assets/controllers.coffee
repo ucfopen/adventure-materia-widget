@@ -111,9 +111,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	$scope.addNode = (parent, type) ->
 
 		newId = count
+		newName = $scope.integerToLetters newId
 
 		newNode =
-			name: "#{count}" # name: "Node #{count} (#{type})"
+			name: "#{newName}" # name: "Node #{count} (#{type})"
 			id: newId
 			parentId: parent
 			type: type
@@ -129,5 +130,22 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 
 		# Sometimes getting the id of the newly created node is required, so return it
 		newId
+
+	$scope.integerToLetters = (val) ->
+
+		if val is 0 then return "Start"
+
+		iteration = 0
+		prefix = ""
+
+		while val > 26
+			iteration++
+			val -= 26
+
+		if iteration > 0 then prefix = String.fromCharCode 64 + iteration
+
+		chars = prefix + String.fromCharCode 64 + val
+
+		chars
 
 	Materia.CreatorCore.start $scope

@@ -74,12 +74,13 @@ g.node {
 
 	&:hover {
 		circle {
-			stroke-width: 3px;
+			stroke-width: 2px;
 		}
 	}
 
 	circle.node-dot {
-		stroke-width: 2px;
+		stroke-width: 1px;
+		box-shadow: $shadow-small;
 	}
 
 	&.blank circle.node-dot {

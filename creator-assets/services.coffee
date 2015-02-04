@@ -18,6 +18,9 @@ Adventure.service "treeSrv", ($rootScope) ->
 		treeData = data
 		$rootScope.$broadcast "tree.nodes.changed"
 
+	getMaxDepth = ->
+		findMaxDepth treeData
+
 	##
 	## NOTE: SHOULD THE FOLLOWING 3 FUNCTIONS BE CONDENSED INTO ONE?
 	##
@@ -105,8 +108,31 @@ Adventure.service "treeSrv", ($rootScope) ->
 
 		parent
 
+	findMaxDepth = (tree, depth=0) ->
+
+		if !tree.children
+
+			if tree.depth > depth
+				depth = tree.depth
+
+			return depth
+
+		i = 0
+
+		while i < tree.children.length
+
+			child = tree.children[i]
+
+			depth = findMaxDepth child, depth
+
+			i++
+
+		return depth
+
+
 	get : get
 	set : set
+	getMaxDepth : getMaxDepth
 	findNode : findNode
 	findAndAdd : findAndAdd
 	findAndRemove : findAndRemove

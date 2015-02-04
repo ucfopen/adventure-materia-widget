@@ -42,10 +42,15 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 
 			unless data? then return false
 
+			# Modify height of tree based on max depth
+			# Keeps initial tree from being absurdly sized
+			depth = treeSrv.getMaxDepth()
+			adjustedHeight = 200 + (depth * 50)
+
 			# Init tree data
 			tree = d3.layout.tree()
 				.sort(null)
-				.size([900, 350]) # sets size of tree
+				.size([900, adjustedHeight]) # sets size of tree
 				.children (d) -> # defines accessor function for nodes (e.g., what the "d" object is)
 					if !d.contents or d.contents.length is 0 then return null
 					else return d.contents
@@ -129,7 +134,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				$scope.svg = d3.select($element[0])
 					.append("svg:svg")
 					.attr("width", 1000) # Size of actual SVG container
-					.attr("height",650) # Size of actual SVG container
+					.attr("height",700) # Size of actual SVG container
 					.append("svg:g")
 					.attr("class", "container")
 					.attr("transform", "translate(0,50)") # translates position of overall tree in svg container
