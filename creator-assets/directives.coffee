@@ -7,11 +7,9 @@ Adventure.directive "toast", ($timeout) ->
 		$scope.toastMessage = ""
 		$scope.showToast = false
 
-		# $scope.$watch "toast", (newVal, oldVal) ->
-		# 	if newVal
-		# 		$scope.toast = newVal
-		# 		$scope.showToast = true
-
+		# Displays a toast with the given message.
+		# The autoCancel flag determines if the toast should automatically expire after 5 seconds
+		# If false, the toast will remain until clicked or disabled manually in code
 		$scope.toast = (message, autoCancel = true) ->
 			$scope.toastMessage = message
 			$scope.showToast = true
@@ -23,6 +21,16 @@ Adventure.directive "toast", ($timeout) ->
 
 		$scope.hideToast = () ->
 			$scope.showToast = false
+
+
+Adventure.directive 'enterSubmit', ($compile) ->
+	($scope, $element, $attrs) ->
+		$element.bind "keydown keypress", (event) ->
+			if event.which is 13
+				$scope.$apply ->
+					$scope.$eval $attrs.enterSubmit
+
+				event.preventDefault()
 
 Adventure.directive "treeVisualization", (treeSrv) ->
 	restrict: "E",
@@ -142,6 +150,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				$scope.svg.selectAll("*").remove()
 
 			# Since we're using svg.line() instead of diagonal(), the links must be wrapped in a helper function
+			# Hashtag justd3things
 			link = d3.svg.line()
 				.x( (point) ->
 					point.lx
@@ -150,7 +159,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					point.ly
 				)
 
-
+			# Creates special lx, ly properties so svg.line() knows what to do
 			lineData = (d) ->
 				points = [
 					{lx: d.source.x, ly: d.source.y},
@@ -250,11 +259,11 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			nodeGroup.append("svg:circle")
 				.attr("class", "node-dot")
 				.attr("r", (d) ->
-					if d.type is "bridge" then return 20
-					else return 20
+					return 20 # sets size of node bubbles
+					# if d.type is "bridge" then return 20
+					# else return 20
 				)
 
-								# sets size of node bubbles
 			nodeGroup.append("svg:rect")
 				.attr("width", (d) ->
 					if d.name then return 10 * d.name.length
@@ -275,11 +284,14 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 						if d.name.length > 1 then return -10
 						else return -5
 					else return 0
-				) # sets X label offset from node (negative left, positive right side)
+				)
+
+				# sets X label offset from node (negative left, positive right side)
 				# .attr("dx", (d) ->
 				# 	# if d.children then return -gap
 				# 	# else return gap
 				# )
+
 				.attr("dy", 5) # sets Y label offset from node
 				.attr("font-family", "Lato")
 				.attr("font-size", 16)
@@ -329,73 +341,6 @@ Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
 				$scope.showCreationDialog = true
 
 			$scope.showBackgroundCover = true
-
-Adventure.directive "nodeCreationMc", (treeSrv) ->
-	restrict: "E",
-	link: ($scope, $element, $attrs) ->
-
-		# $scope.question = ""
-
-		$scope.$on "editedNode.target.changed", (evt) ->
-
-			# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
-			if $scope.editedNode
-				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
-				else $scope.question = null
-
-				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
-				else
-					$scope.answers = []
-					$scope.newAnswer()
-
-				# Update the node type
-				$scope.editedNode.type = $scope.MC
-
-		# Update the node's properties when the associated input models change
-		$scope.$watch "question", (newVal, oldVal) ->
-			if newVal
-				$scope.editedNode.question = newVal
-
-		$scope.$watch "answers", ((newVal, oldVal) ->
-			if newVal
-				$scope.editedNode.answers = $scope.answers
-		), true
-
-		$scope.newAnswer = () ->
-
-			# We create the new node first, so we can grab the new node's generated id
-			targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
-
-			newAnswer =
-				text: null
-				feedback: null
-				target: targetId
-				linkMode: $scope.NEW
-
-			$scope.answers.push newAnswer
-
-		$scope.removeAnswer = (index) ->
-
-			# Grab node id of answer node to be removed
-			targetId = $scope.answers[index].target
-
-			# Remove it from answers array
-			$scope.answers.splice index, 1
-
-			# Remove the node from the tree
-			treeSrv.findAndRemove $scope.treeData, targetId
-			treeSrv.set $scope.treeData
-
-			# If the node manager modal is open for this answer, close it
-			if targetId is $scope.newNodeManager.target
-				$scope.newNodeManager.show = false
-				$scope.newNodeManager.target = null
-
-		$scope.manageNewNode = ($event, target, mode) ->
-			$scope.newNodeManager.x = $event.currentTarget.getBoundingClientRect().left
-			$scope.newNodeManager.y = $event.currentTarget.getBoundingClientRect().top
-			$scope.newNodeManager.linkMode = mode
-			$scope.newNodeManager.target = target
 
 Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 	restrict: "E",
@@ -537,4 +482,108 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 						$scope.newNodeManager.target = null
 
 			$scope.newNodeManager.show = false
+
+Adventure.directive "nodeCreation", (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$on "editedNode.target.changed", (evt) ->
+
+			console.log "editedNode updated! Type is now: " + $scope.editedNode.type
+
+			if $scope.editedNode
+				# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
+				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
+
+				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
+				else
+					$scope.answers = []
+					$scope.newAnswer()
+
+
+		# Update the node's properties when the associated input models change
+		$scope.$watch "question", (newVal, oldVal) ->
+			if newVal
+				$scope.editedNode.question = newVal
+
+		$scope.$watch "answers", ((newVal, oldVal) ->
+			if newVal
+				$scope.editedNode.answers = $scope.answers
+		), true
+
+		$scope.newAnswer = () ->
+
+			# We create the new node first, so we can grab the new node's generated id
+			targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
+
+			newAnswer =
+				text: null
+				feedback: null
+				target: targetId
+				linkMode: $scope.NEW
+
+			# Add a matches property to the answer object if it's a short answer question.
+			if $scope.editedNode.type is $scope.SHORTANS
+				newAnswer.matches = []
+
+			$scope.answers.push newAnswer
+
+		$scope.removeAnswer = (index) ->
+
+			# Grab node id of answer node to be removed
+			targetId = $scope.answers[index].target
+
+			# Remove it from answers array
+			$scope.answers.splice index, 1
+
+			# Remove the node from the tree
+			treeSrv.findAndRemove treeSrv.get(), targetId
+			treeSrv.set $scope.treeData
+
+			# If the node manager modal is open for this answer, close it
+			if targetId is $scope.newNodeManager.target
+				$scope.newNodeManager.show = false
+				$scope.newNodeManager.target = null
+
+		$scope.manageNewNode = ($event, target, mode) ->
+			$scope.newNodeManager.x = $event.currentTarget.getBoundingClientRect().left
+			$scope.newNodeManager.y = $event.currentTarget.getBoundingClientRect().top
+			$scope.newNodeManager.linkMode = mode
+			$scope.newNodeManager.target = target
+
+# Directive for each short answer set. Contains logic for adding and removing individual answer matches.
+Adventure.directive "shortAnswerSet", (treeSrv) ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.addAnswerMatch = (index) ->
+
+			# Don't do anything if there isn't anything actually submitted
+			unless $scope.newMatch.length then return
+
+			# first check to see if the entry already exists
+			i = 0
+
+			unless $scope.answers[index].matches.length
+				$scope.answers[index].matches.push $scope.newMatch
+				$scope.newMatch = ""
+				return
+
+			while i < $scope.answers[index].matches.length
+
+				matchTo = $scope.answers[index].matches[i].toLowerCase()
+
+				if matchTo.localeCompare($scope.newMatch.toLowerCase()) is 0
+					$scope.toast "This match already exists!"
+					return
+
+				i++
+
+			$scope.answers[index].matches.push $scope.newMatch
+			$scope.newMatch = ""
+
+		$scope.removeAnswerMatch = (matchIndex, answerIndex) ->
+
+			$scope.answers[answerIndex].matches.splice matchIndex, 1
+
 

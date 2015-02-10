@@ -13,7 +13,8 @@ $blue-lightest: #bdecff;
 
 $gray-darker: #333333;
 $gray: #888888;
-$gray-lighter: #fefefe;
+$gray-lighter: #cccccc;
+$gray-lightest: #fefefe;
 
 
 $background: $gray-lighter;
@@ -30,7 +31,7 @@ $edit-popup-width: 750px;
 $misc-popup-width: 600px;
 
 html, body {
-	background-color: $background;
+	background-color: $white;
 
 	font-family: 'Lato', sans-serif;
 }
@@ -90,12 +91,27 @@ g.node {
 
 	&.mc circle.node-dot {
 		fill: $white;
-		stroke: #FF0000;
+		stroke: #60b973;
 	}
 
 	&.shortanswer circle.node-dot {
 		fill: $white;
-		stroke: #00FF00;
+		stroke: #6ea0aa;
+	}
+
+	&.shortanswer circle.node-dot {
+		fill: $white;
+		stroke: #6ea0aa;
+	}
+
+	&.hotspot circle.node-dot {
+		fill: $white;
+		stroke: #ba83c7;
+	}
+
+	&.narrative circle.node-dot {
+		fill: $white;
+		stroke: #ffc656;
 	}
 
 	rect {
@@ -409,9 +425,10 @@ node-creation-selection-dialog {
 	}
 
 	.answers-container {
+		position: relative;
 		width: $edit-popup-width - 30;
-		max-height: 200px;
-		margin: 10px 10px;
+		height: 177px;
+		margin: 10px 10 0px 10px;
 		padding: 5px;
 
 		overflow-y: auto;
@@ -453,13 +470,62 @@ node-creation-selection-dialog {
 					}
 				}
 
-				// &:nth-child(1) {
+				&.short-answer-mode {
 
-				// 	input:nth-child(1) {
-				// 		left: 27px;
-				// 	}
-				// }
+					position: relative;
+
+					button.delete-button {
+						position: absolute;
+						top: 10px;
+						left: 10px;
+					}
+
+					button.answer-node-select {
+						position: absolute;
+						left: 90%;
+						top: 10px;
+					}
+
+					input {
+						width: 80%;
+						margin: 5px 0px 5px 40px;
+					}
+
+					.possible-answers-box {
+						position: relative;
+						display: inline-block;
+						width: 80%;
+
+						left: 35px;
+
+						margin: 5px 0 0 5px;
+						padding: 5px;
+
+						background: $gray-lighter;
+						border: solid 1px #cccccc;
+						border-radius: 5px;
+
+						button {
+							margin: 0px 2px 2px 0px;
+
+							&:hover {
+								background: $red;
+								color: $white;
+							}
+						}
+
+						p {
+							color: $gray;
+							font-size: 0.8em;
+						}
+					}
+				}
+
 			}
 		}
+	}
+
+	button.add-answer {
+		margin: 5px 0px 0px 15px;
 	}
 }
