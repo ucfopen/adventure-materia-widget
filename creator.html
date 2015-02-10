@@ -52,34 +52,36 @@
 				<li ng-class="{'selected' : newNodeManager.linkMode == SELF}"  ng-click="selectLinkMode(SELF)">Loop Back to This Destination ( {{integerToLetters(editedNode.id)}} )</li>
 			</ul>
 		</new-node-manager-dialog>
-		<node-creation-mc class="node-creation-screen" ng-show="displayNodeCreation == MC">
-			<h2>Multiple Choice for {{editedNode.name}}</h2>
+		<node-creation class="node-creation-screen" ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
+			<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
+			<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
+			<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
+			<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
 			<textarea class="question-box" ng-model="question" placeholder="Enter question here."></textarea>
 			<button type="button">Add Media</button>
-			<div class="answers-container">
+			<div class="answers-container" ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS">
 				<ul>
-					<li ng-repeat="answer in answers">
+					<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
 						<button type="button" class="delete-button" ng-click="removeAnswer($index)" ng-disabled="$index == 0">X</button>
 						<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
 						<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
 						<button type="button" class="answer-node-select" ng-class="{'managed' : answer.target == newNodeManager.target}" ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
 					</li>
+
+					<li ng-if="displayNodeCreation == 	SHORTANS" ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}" ng-repeat="answer in answers" short-answer-set>
+						<button type="button" class="delete-button" ng-click="removeAnswer($index)" ng-disabled="$index == 0">X</button>
+						<input type="text" ng-model="newMatch" placeholder="Add a possible answer. Matches are not case sensitive." enter-submit="addAnswerMatch($index)"></input>
+						<div class="possible-answers-box">
+							<p ng-hide="answer.matches.length">Possible answers will be shown here. Click an answer to remove it.</p>
+							<button type="button" ng-repeat="match in answer.matches" ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
+						</div>
+						<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
+						<button type="button" class="answer-node-select" ng-class="{'managed' : answer.target == newNodeManager.target}" ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+					</li>
 				</ul>
-				<button class="add-answer" type="button" ng-click="newAnswer()">Add Answer Choice</button>
 			</div>
-		</node-creation-mc>
-
-		<node-creation-sa class="node-creation-screen" ng-show="displayNodeCreation == SHORTANS">
-			<h2>Short Answer for {{editedNode.name}}</h2>
-		</node-creation-sa>
-
-		<node-creation-hs class="node-creation-screen" ng-show="displayNodeCreation == HOTSPOT">
-			<h2>HotSpot for {{editedNode.name}}</h2>
-		</node-creation-hs>
-
-		<node-creation-narr class="node-creation-screen" ng-show="displayNodeCreation == NARR">
-			<h2>Narrative for {{editedNode.name}}</h2>
-		</node-creation-narr>
+			<button class="add-answer big-button" type="button" ng-click="newAnswer()">Add Answer Choice</button>
+		</node-creation>
 
 		<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
 		<tree-visualization data="treeData" on-click="nodeSelected(data)"></tree-visualization>

@@ -53,6 +53,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 			$scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 			$scope.showCreationDialog = false
 			# console.log $scope.editedNode
+			if $scope.editedNode.type is $scope.BLANK then $scope.editedNode.type = $scope.displayNodeCreation
 
 			# Inform the edit screens that the edited node has changed
 			$rootScope.$broadcast "editedNode.target.changed"
@@ -131,6 +132,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		# Sometimes getting the id of the newly created node is required, so return it
 		newId
 
+	# Helper function that converts node IDs to their respective alphabetical counterparts
+	# e.g., 1 is "A", 2 is "B", 26 is "Z", 27 is "AA", 28 is "AB"
 	$scope.integerToLetters = (val) ->
 
 		if val is 0 then return "Start"
