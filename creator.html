@@ -42,6 +42,7 @@
 				<li ng-click="displayNodeCreation = SHORTANS">SA</li>
 				<li ng-click="displayNodeCreation = HOTSPOT">HS</li>
 				<li ng-click="displayNodeCreation = NARR">NARR</li>
+				<li ng-show="nodeTools.target != 0" ng-click="displayNodeCreation = END">END</li>
 			</ul>
 		</node-creation-selection-dialog>
 		<new-node-manager-dialog ng-show="newNodeManager.show" data-pos-x="{{newNodeManager.x}}" data-pos-y="{{newNodeManager.y}}">
@@ -57,7 +58,8 @@
 			<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
 			<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
 			<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
-			<textarea class="question-box" ng-model="question" placeholder="Enter question here."></textarea>
+			<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
+			<textarea class="question-box" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END) }" ng-model="question" placeholder="{{questionPlaceholder}}"></textarea>
 			<button type="button">Add Media</button>
 			<div class="answers-container" ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS">
 				<ul>
@@ -80,7 +82,11 @@
 					</li>
 				</ul>
 			</div>
-			<button class="add-answer big-button" type="button" ng-click="newAnswer()">Add Answer Choice</button>
+			<div class="continuity-container" ng-if="displayNodeCreation == NARR || displayNodeCreation == END">
+				<span>Select the destination to continue on:</span>
+				<button type="button" class="answer-node-select" ng-class="{'managed' : answers[0].target == newNodeManager.target}" ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+			</div>
+			<button class="add-answer big-button" type="button" ng-click="newAnswer()" ng-hide="displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
 		</node-creation>
 
 		<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>

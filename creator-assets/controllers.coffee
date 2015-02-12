@@ -52,7 +52,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		if newVal isnt oldVal and newVal isnt "none" and newVal isnt "suspended"
 			$scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 			$scope.showCreationDialog = false
-			# console.log $scope.editedNode
 			if $scope.editedNode.type is $scope.BLANK then $scope.editedNode.type = $scope.displayNodeCreation
 
 			# Inform the edit screens that the edited node has changed
