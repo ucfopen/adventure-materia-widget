@@ -14,7 +14,7 @@ $blue-lightest: #bdecff;
 $gray-darker: #333333;
 $gray: #888888;
 $gray-lighter: #cccccc;
-$gray-lightest: #fefefe;
+$gray-lightest: #eaeaea;
 
 
 $background: $gray-lighter;
@@ -112,6 +112,11 @@ g.node {
 	&.narrative circle.node-dot {
 		fill: $white;
 		stroke: #ffc656;
+	}
+
+	&.end circle.node-dot {
+		fill: $white;
+		stroke: $red;
 	}
 
 	rect {
@@ -380,6 +385,13 @@ node-creation-selection-dialog {
 			&:nth-child(odd) {
 				margin-right: 15px;
 			}
+
+			&:last-child {
+				width: 420px;
+				height: 50px;
+
+				margin: 25px 0 0 0;
+			}
 		}
 	}
 }
@@ -422,6 +434,10 @@ node-creation-selection-dialog {
 		border-radius: 3px;
 
 		font-size: 2em;
+
+		&.expanded {
+			height: 400px;
+		}
 	}
 
 	.answers-container {
@@ -527,5 +543,27 @@ node-creation-selection-dialog {
 
 	button.add-answer {
 		margin: 5px 0px 0px 15px;
+	}
+
+	.continuity-container {
+		position: absolute;
+		bottom: 0px;
+		width: $edit-popup-width - 30;
+		padding: 25px 15px 25px 15px;
+
+		overflow-y: auto;
+
+		background: $gray-lightest;
+		border-bottom-left-radius: 10px;
+		border-bottom-right-radius: 10px;
+
+		box-shadow: inset 0 2px 2px $gray-lighter;
+
+		span {
+			display: inline-block;
+
+			margin-left: 25px;
+			margin-right: 10px;
+		}
 	}
 }

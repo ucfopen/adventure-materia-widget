@@ -494,11 +494,21 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 			if $scope.editedNode
 				# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
 				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
+				else $scope.question = null
 
 				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
 				else
 					$scope.answers = []
 					$scope.newAnswer()
+
+			# Update question placeholder text based on the node creation type.
+			# TODO should this be included in the DOM instead through ng-if or a conditional in the attribute?
+			if $scope.editedNode.type is $scope.MC or $scope.editedNode.type is $scope.SHORTANS or $scope.editedNode.type is $scope.HOTSPOT
+				$scope.questionPlaceholder = "Enter question here."
+			else if $scope.editedNode.type is $scope.NARR
+				$scope.questionPlaceholder = "Enter some narrative text here."
+			else if $scope.editedNode.type is $scope.END
+				$scope.questionPlaceholder = "Enter a conclusion here for this decision tree or path."
 
 
 		# Update the node's properties when the associated input models change
