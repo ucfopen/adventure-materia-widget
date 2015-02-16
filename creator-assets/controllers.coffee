@@ -27,6 +27,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		x: 0
 		y: 0
 
+	# newNodeManager works like nodeTools, holds parameters of the newNodeManager modal and works w/ the directive
 	$scope.newNodeManager =
 		show: false
 		target: null
@@ -45,8 +46,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		parentId: -1
 		contents: []
 
+	# The displayNodeCreation flag controls the visiblity of node creation screens
 	$scope.displayNodeCreation = "none"
-	$scope.editedNode = null # Node being targeted for editing
+	# Scope reference for the node currently being edited in a creation screen, updates when displayNodeCreation changes
+	$scope.editedNode = null
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 		if newVal isnt oldVal and newVal isnt "none" and newVal isnt "suspended"
@@ -61,7 +64,14 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		else if newVal is "none"
 			$scope.newNodeManager.show = false
 			$scope.newNodeManager.target = null
+
 			# console.log $scope.treeData
+
+			# Warn the user if a final score hasn't been set upon closing the creation screen
+			# TODO there may be more post-creation-exit events required: condense these?
+			if $scope.editedNode and $scope.editedNode.type is $scope.END
+				if $scope.editedNode.finalScore is null
+					$scope.toast "End Point " + $scope.editedNode.name + " is missing a valid final score!"
 
 	# treeSrv.set $scope.treeData
 

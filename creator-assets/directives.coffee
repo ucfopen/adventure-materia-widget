@@ -318,6 +318,10 @@ Adventure.directive "nodeToolsDialog", (treeSrv) ->
 			console.log "Copying NYI!"
 
 		$scope.dropNode = () ->
+			if $scope.nodeTools.target is 0
+				$scope.toast "Can't delete Start!"
+				return
+
 			treeSrv.findAndRemove $scope.treeData, $scope.nodeTools.target
 			$scope.nodeTools.show = false
 			treeSrv.set $scope.treeData
@@ -498,8 +502,16 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 
 				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
 				else
-					$scope.answers = []
-					$scope.newAnswer()
+					if $scope.editedNode.type isnt $scope.END
+						$scope.answers = []
+						$scope.newAnswer()
+					else
+						# Manually redraw tree to reflect status change as end type node
+						treeSrv.set $scope.treeData
+
+				if $scope.editedNode.type is $scope.END
+					if $scope.editedNode.finalScore then $scope.finalScore = $scope.editedNode.finalScore
+					else $scope.finalScore = null
 
 			# Update question placeholder text based on the node creation type.
 			# TODO should this be included in the DOM instead through ng-if or a conditional in the attribute?
@@ -595,5 +607,13 @@ Adventure.directive "shortAnswerSet", (treeSrv) ->
 		$scope.removeAnswerMatch = (matchIndex, answerIndex) ->
 
 			$scope.answers[answerIndex].matches.splice matchIndex, 1
+
+Adventure.directive "finalScoreBox", () ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "finalScore", (newVal, oldVal) ->
+			if $scope.finalScoreForm.finalScoreInput.$valid
+				$scope.editedNode.finalScore = newVal
 
 
