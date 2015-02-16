@@ -82,9 +82,16 @@
 					</li>
 				</ul>
 			</div>
-			<div class="continuity-container" ng-if="displayNodeCreation == NARR || displayNodeCreation == END">
+			<div class="continuity-container" ng-if="displayNodeCreation == NARR">
 				<span>Select the destination to continue on:</span>
 				<button type="button" class="answer-node-select" ng-class="{'managed' : answers[0].target == newNodeManager.target}" ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+			</div>
+			<div class="continuity-container" ng-if="displayNodeCreation == END">
+				<span>The user's path will conclude with this destination. Set the final score:</span>
+				<final-score-box ng-form="finalScoreForm" name="finalScoreForm">
+					<input type="number" name="finalScoreInput" class="final-score" ng-class="{'invalid' : !finalScoreForm.$valid}" ng-model="finalScore" placeholder="100" min="0" max="100" />
+				</final-score-box>
+				<span>%</span>
 			</div>
 			<button class="add-answer big-button" type="button" ng-click="newAnswer()" ng-hide="displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
 		</node-creation>

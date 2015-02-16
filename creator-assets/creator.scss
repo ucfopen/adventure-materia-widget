@@ -6,6 +6,7 @@ $black: #000000;
 $white: #ffffff;
 $red: #b90000;
 $red-lighter: #de0000;
+$red-lightest: #ffd7d7;
 
 $blue: #3d90b1;
 $blue-lighter: #49afd7;
@@ -549,7 +550,7 @@ node-creation-selection-dialog {
 		position: absolute;
 		bottom: 0px;
 		width: $edit-popup-width - 30;
-		padding: 25px 15px 25px 15px;
+		padding: 20px 15px 20px 15px;
 
 		overflow-y: auto;
 
@@ -564,6 +565,33 @@ node-creation-selection-dialog {
 
 			margin-left: 25px;
 			margin-right: 10px;
+
+			&:last-child {
+				margin-left: 2px;
+			}
+		}
+
+		.final-score {
+			width: 55px;
+			height: 30px;
+			font-size: 20px;
+			border: solid 1px $gray-lighter;
+
+			color: $black;
+			background: $white;
+
+			outline: none;
+
+			border-radius: 5px;
+
+			-webkit-transition: background 0.5s;
+			transition: background 0.5s;
+
+			&.invalid {
+				background: $red-lighter;
+				border-color: $red;
+				color: $white;
+			}
 		}
 	}
 }
