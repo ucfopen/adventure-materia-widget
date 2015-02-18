@@ -160,4 +160,22 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 
 		chars
 
+	# onMediaImportComplete is required by the creator core
+	# Since it's not intrinsically tied to any one dom element, and does no dom manipulation,
+	# we just update the editedNode object and kick off a broadcast that directives will listen for
+	$scope.onMediaImportComplete = (media) ->
+
+		unless $scope.editedNode
+			console.log "Uh oh, media import doesn't have a target node"
+			return
+
+		$scope.editedNode.media =
+			type: "image"
+			url: Materia.CreatorCore.getMediaUrl media[0].id
+			align: "right"
+
+		$rootScope.$broadcast "editedNode.media.updated"
+
+
+	# Start 'er up!
 	Materia.CreatorCore.start $scope

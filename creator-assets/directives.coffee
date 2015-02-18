@@ -509,14 +509,26 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 						# Manually redraw tree to reflect status change as end type node
 						treeSrv.set $scope.treeData
 
+				if $scope.editedNode.media
+					# TODO add type check for media here
+					$scope.image = new Image()
+					$scope.image.src = $scope.editedNode.media.url
+					$scope.mediaReady = true
+					$scope.image.onload = ->
+						console.log "image upload via stored editedNode media data complete!"
+				else $scope.mediaReady = false
+
+
 				if $scope.editedNode.type is $scope.END
 					if $scope.editedNode.finalScore then $scope.finalScore = $scope.editedNode.finalScore
 					else $scope.finalScore = null
 
 			# Update question placeholder text based on the node creation type.
 			# TODO should this be included in the DOM instead through ng-if or a conditional in the attribute?
-			if $scope.editedNode.type is $scope.MC or $scope.editedNode.type is $scope.SHORTANS or $scope.editedNode.type is $scope.HOTSPOT
+			if $scope.editedNode.type is $scope.MC or $scope.editedNode.type is $scope.SHORTANS
 				$scope.questionPlaceholder = "Enter question here."
+			else if $scope.editedNode.type is $scope.HOTSPOT
+				$scope.questionPlaceholder = "Enter an optional question here."
 			else if $scope.editedNode.type is $scope.NARR
 				$scope.questionPlaceholder = "Enter some narrative text here."
 			else if $scope.editedNode.type is $scope.END
@@ -532,6 +544,16 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 			if newVal
 				$scope.editedNode.answers = $scope.answers
 		), true
+
+		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
+		$scope.$on "editedNode.media.updated", (evt) ->
+			if $scope.editedNode.type isnt $scope.HOTSPOT
+				$scope.image = new Image()
+				$scope.image.src = $scope.editedNode.media.url
+				$scope.image.onload = ->
+					$scope.$apply ->
+						$scope.mediaReady = true
+						console.log "image upload via media.updated broadcast complete!"
 
 		$scope.newAnswer = () ->
 
@@ -572,6 +594,22 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 			$scope.newNodeManager.y = $event.currentTarget.getBoundingClientRect().top
 			$scope.newNodeManager.linkMode = mode
 			$scope.newNodeManager.target = target
+
+		$scope.beginMediaImport = () ->
+			Materia.CreatorCore.showMediaImporter()
+
+		$scope.removeMedia = ->
+			$scope.mediaReady = false
+			$scope.image = null
+			delete $scope.editedNode.media
+
+		$scope.changeMedia = ->
+			$scope.beginMediaImport()
+
+		$scope.swapMediaAndQuestion = ->
+			switch $scope.editedNode.media.align
+				when "left" then $scope.editedNode.media.align = "right"
+				when "right" then $scope.editedNode.media.align = "left"
 
 # Directive for each short answer set. Contains logic for adding and removing individual answer matches.
 Adventure.directive "shortAnswerSet", (treeSrv) ->
@@ -616,4 +654,30 @@ Adventure.directive "finalScoreBox", () ->
 			if $scope.finalScoreForm.finalScoreInput.$valid
 				$scope.editedNode.finalScore = newVal
 
+Adventure.directive "hotspotManager", () ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		# $scope.mediaReady = false
+
+		$scope.$on "editedNode.media.updated", (evt) ->
+
+			$scope.image = new Image()
+			$scope.image.src = $scope.editedNode.media.url
+			$scope.image.onload = ->
+				$scope.$apply ->
+					$scope.mediaReady = true
+
+Adventure.directive "hotspotToolbar", () ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.startEllipticalHotspot = ->
+			console.log "Starting an elliptical hotspot!"
+
+		$scope.startSquareHotspot = ->
+			console.log "Starting a square hotspot!"
+
+		$scope.startPolygonHotspot = ->
+			console.log "Starting a polygonal hotspot!"
 
