@@ -59,8 +59,16 @@
 			<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
 			<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
 			<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
-			<textarea class="question-box" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END) }" ng-model="question" placeholder="{{questionPlaceholder}}"></textarea>
-			<button type="button">Add Media</button>
+			<textarea class="question-box" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END), 'tiny' : displayNodeCreation == HOTSPOT, 'shared' : (mediaReady && displayNodeCreation != HOTSPOT), 'align-right' : editedNode.media.align == 'left' }" ng-model="question" placeholder="{{questionPlaceholder}}"></textarea>
+			<div class="media-box" ng-class="{'align-left' : editedNode.media.align == 'left', 'align-right' : editedNode.media.align == 'right'}" ng-show="mediaReady && displayNodeCreation != HOTSPOT">
+				<img ng-src="{{image.src}}" />
+				<div class="media-toolbar">
+					<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
+					<button type="button" ng-click="changeMedia()">Change Image</button>
+					<button type="button" class="delete-button" ng-click="removeMedia()">Remove</button>
+				</div>
+			</div>
+			<button type="button" id="big-upload-button" ng-if="displayNodeCreation != HOTSPOT" ng-hide="mediaReady" ng-click="beginMediaImport()"><span>+</span>Add Media</button>
 			<div class="answers-container" ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS">
 				<ul>
 					<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
@@ -82,6 +90,21 @@
 					</li>
 				</ul>
 			</div>
+			<hotspot-manager class="hotspot-container" ng-if="displayNodeCreation == HOTSPOT">
+				<div class="image-container">
+					<button type="button" id="uploadButton" class="big-button" ng-show="!mediaReady" ng-click="beginMediaImport()">Upload an Image</button>
+					<hotspot-toolbar ng-show="mediaReady">
+						<ul>
+							<li><button type="button" ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
+							<li><button type="button" ng-click="startSquareHotspot()">+ Square Hotspot</button></li>
+							<li><button type="button" ng-click="startPolygonHotspot()">+ Polygon Hotspot</button></li>
+							<li><button type="button">Edit Visibility</button></li>
+							<li><button type="button" ng-click="changeMedia()">Change Image</button></li>
+						</ul>
+					</hotspot-toolbar>
+					<img id="hotspotImage" ng-src="{{image.src}}" ng-show="mediaReady" />
+				</div>
+			</hotspot-manager>
 			<div class="continuity-container" ng-if="displayNodeCreation == NARR">
 				<span>Select the destination to continue on:</span>
 				<button type="button" class="answer-node-select" ng-class="{'managed' : answers[0].target == newNodeManager.target}" ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
@@ -93,7 +116,7 @@
 				</final-score-box>
 				<span>%</span>
 			</div>
-			<button class="add-answer big-button" type="button" ng-click="newAnswer()" ng-hide="displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
+			<button class="add-answer big-button" type="button" ng-click="newAnswer()" ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
 		</node-creation>
 
 		<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>

@@ -403,7 +403,7 @@ node-creation-selection-dialog {
 	z-index: 50;
 
 	width: $edit-popup-width;
-	height: 580px;
+	height: 620px;
 	margin: 50px 0px 0px -400px;
 
 	border-radius: 10px;
@@ -429,7 +429,7 @@ node-creation-selection-dialog {
 		width: 80%;
 		height: 250px;
 
-		margin: 20px 20px;
+		margin: 20px 20px 30px 20px;
 
 		border: solid 1px #cccccc;
 		border-radius: 3px;
@@ -439,12 +439,76 @@ node-creation-selection-dialog {
 		&.expanded {
 			height: 400px;
 		}
+
+		&.tiny {
+			width: 698px;
+			height: 50px;
+
+			font-size: 1.8em;
+		}
+
+		&.shared {
+			width: 340px;
+		}
+
+		&.align-right {
+			margin: 20px 20px 30px 380px;
+		}
+	}
+
+	#big-upload-button {
+
+		position: absolute;
+		top: 154px;
+
+		text-align: center;
+
+		span {
+			display: block;
+			width: 100%;
+			font-size:48px;
+		}
+	}
+
+	.media-box {
+		position: absolute;
+		top: 69px;
+		width: 340px;
+		height: 254px;
+
+		border: solid 1px $gray-lighter;
+
+		text-align: center;
+
+		&.align-right {
+			right: 20px;
+		}
+
+		&.align-left {
+			left: 20px;
+		}
+
+		img {
+			max-width: 100%;
+			max-height: 100%;
+		}
+
+		div.media-toolbar {
+			width: 340px;
+			height: 30px;
+
+			padding-top: 2px;
+
+			text-align: center;
+
+			// background-color: rgba(0,0,0,0.6);
+		}
 	}
 
 	.answers-container {
 		position: relative;
 		width: $edit-popup-width - 30;
-		height: 177px;
+		height: 207px;
 		margin: 10px 10 0px 10px;
 		padding: 5px;
 
@@ -591,6 +655,68 @@ node-creation-selection-dialog {
 				background: $red-lighter;
 				border-color: $red;
 				color: $white;
+			}
+		}
+	}
+
+	hotspot-manager {
+		position: relative;
+		display: block;
+		width: 100%;
+
+		.image-container {
+			display: block;
+			width: 698px;
+			height: 400px;
+
+			margin: 5px 25px 10px 25px;
+			padding-bottom: 40px;
+
+			border: solid 1px $gray-lighter;
+
+			text-align: center;
+
+			#uploadButton {
+				display: block;
+				margin-top: 100px;
+				margin-left: auto;
+				margin-right: auto;
+
+				padding: 10px 15px;
+				font-size: 15px;
+			}
+
+			img {
+				max-width: 100%;
+				max-height: 100%;
+			}
+		}
+
+		hotspot-toolbar {
+			position: absolute;
+			display: block;
+
+			bottom: 0px;
+
+			width: 698px;
+			height: 30px;
+
+			padding-top: 10px;
+
+			background-color: rgba(0, 0, 0, 0.6);
+
+			ul {
+				list-style-type: none;
+				padding: 0px;
+				margin: 0px;
+
+				li {
+					display: inline-block;
+
+					button {
+						margin-right: 5px;
+					}
+				}
 			}
 		}
 	}
