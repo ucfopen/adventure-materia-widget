@@ -502,9 +502,12 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 
 				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
 				else
-					if $scope.editedNode.type isnt $scope.END
+					if $scope.editedNode.type isnt $scope.END and $scope.editedNode.type isnt $scope.HOTSPOT
 						$scope.answers = []
 						$scope.newAnswer()
+
+					else if $scope.editedNode.type is $scope.HOTSPOT
+						$scope.answers = []
 					else
 						# Manually redraw tree to reflect status change as end type node
 						treeSrv.set $scope.treeData
@@ -658,7 +661,20 @@ Adventure.directive "hotspotManager", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
-		# $scope.mediaReady = false
+		# The selectedSVG object holds the temporary properties of the selected SVG hotspot
+		# Works in a similar way to the nodeTools and nodeManager objects
+		# Attempts to nest these properties inside an svg-specific directive unsuccessful
+		$scope.selectedSVG =
+			target: null
+			moving: false
+			originX: null
+			originY: null
+			matrix: null
+
+		$scope.hotspotAnswerManager =
+			show: false
+			x: null
+			y: null
 
 		$scope.$on "editedNode.media.updated", (evt) ->
 
@@ -668,16 +684,99 @@ Adventure.directive "hotspotManager", () ->
 				$scope.$apply ->
 					$scope.mediaReady = true
 
+		$scope.selectSVG = (evt) ->
+			# console.log "SELECTED"
+
+			# Update selectedSVG property with necessary event information
+			$scope.selectedSVG.moving = true
+			$scope.selectedSVG.target = angular.element evt.target # wrap event target in jqLite
+			$scope.selectedSVG.originX = evt.clientX
+			$scope.selectedSVG.originY = evt.clientY
+
+			# The matrix controls the position information of the SVG, have to grab data from transform attribute
+			# TODO definitely a better place to store this info?
+			matrixArr = $scope.selectedSVG.target.attr("transform").slice(7, -1).split(" ")
+
+			# Have to convert string data in the matrix array to floats
+			# TODO sloppy, fix plz
+			i = 0
+			while i < matrixArr.length
+				matrixArr[i] = parseFloat matrixArr[i]
+				i++
+
+			$scope.selectedSVG.matrix = matrixArr
+
+		# If SVG is deselected (or mouse moves away from SVG), clear the object
+		$scope.deselectSVG = (evt) ->
+			# console.log "DESELECTED"
+			$scope.selectedSVG =
+			target: null
+			moving: false
+			originX: null
+			originY: null
+			matrix: null
+
+		# Update selected SVG's position information as it moves based on cursor position
+		$scope.moveSVG = (index, evt) ->
+			if $scope.selectedSVG.moving is true
+				dx = evt.clientX - $scope.selectedSVG.originX
+				dy = evt.clientY - $scope.selectedSVG.originY
+
+				$scope.selectedSVG.matrix[4] += dx
+				$scope.selectedSVG.matrix[5] += dy
+
+				newMatrix = "matrix(" + $scope.selectedSVG.matrix.join(" ") + ")"
+
+				$scope.answers[index].svg.matrix = newMatrix
+
+				$scope.selectedSVG.originX = evt.clientX
+				$scope.selectedSVG.originY = evt.clientY
+
+		$scope.manageSVG = (evt) ->
+			console.log "Managing SVG window open!"
+
+
 Adventure.directive "hotspotToolbar", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
 		$scope.startEllipticalHotspot = ->
 			console.log "Starting an elliptical hotspot!"
+			$scope.newAnswer()
+
+			answerIndex = $scope.answers.length - 1
+
+			$scope.answers[answerIndex].svg =
+				type: "elliptical"
+				cx: 349
+				cy: 200
+				r: 50
+				fill: "blue"
+				stroke: 2
+				matrix: "matrix(1 0 0 1 0 0)"
 
 		$scope.startSquareHotspot = ->
 			console.log "Starting a square hotspot!"
 
+			$scope.newAnswer()
+
+			answerIndex = $scope.answers.length - 1
+
+			$scope.answers[answerIndex].svg =
+				type: "rect"
+				x: 349
+				y: 200
+				width: 100
+				height: 75
+				fill: "green"
+				stroke: 2
+				matrix: "matrix(1 0 0 1 0 0)"
+
 		$scope.startPolygonHotspot = ->
 			console.log "Starting a polygonal hotspot!"
+
+Adventure.directive "hotspotAnswerManager", () ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
 

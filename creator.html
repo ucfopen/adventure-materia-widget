@@ -29,8 +29,13 @@
 
 	</head>
 	<body id="adventure-container" ng-controller="AdventureCtrl">
-		<toast ng-hide="!showToast" ng-click="hideToast()" class="fadeable">{{toastMessage}}</toast>
-		<node-tools-dialog ng-show="nodeTools.show" data-pos-x="{{nodeTools.x}}" data-pos-y="{{nodeTools.y}}">
+		<toast ng-hide="!showToast"
+			ng-click="hideToast()"
+			class="fadeable">{{toastMessage}}</toast>
+		<node-tools-dialog
+			ng-show="nodeTools.show"
+			data-pos-x="{{nodeTools.x}}"
+			data-pos-y="{{nodeTools.y}}">
 			<button type="button" class="big-button" ng-click="editNode()">Edit Node</button>
 			<button type="button" ng-click="copyNode()">Copy</button>
 			<button type="button" ng-click="dropNode()">Delete</button>
@@ -45,7 +50,9 @@
 				<li ng-show="nodeTools.target != 0" ng-click="displayNodeCreation = END">END</li>
 			</ul>
 		</node-creation-selection-dialog>
-		<new-node-manager-dialog ng-show="newNodeManager.show" data-pos-x="{{newNodeManager.x}}" data-pos-y="{{newNodeManager.y}}">
+		<new-node-manager-dialog ng-show="newNodeManager.show"
+			data-pos-x="{{newNodeManager.x}}"
+			data-pos-y="{{newNodeManager.y}}">
 			<h4>Where should this answer point to? ></h4>
 			<ul>
 				<li ng-class="{'selected' : newNodeManager.linkMode == NEW}" ng-click="selectLinkMode(NEW)">New Destination (Blank)</li>
@@ -59,8 +66,19 @@
 			<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
 			<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
 			<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
-			<textarea class="question-box" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END), 'tiny' : displayNodeCreation == HOTSPOT, 'shared' : (mediaReady && displayNodeCreation != HOTSPOT), 'align-right' : editedNode.media.align == 'left' }" ng-model="question" placeholder="{{questionPlaceholder}}"></textarea>
-			<div class="media-box" ng-class="{'align-left' : editedNode.media.align == 'left', 'align-right' : editedNode.media.align == 'right'}" ng-show="mediaReady && displayNodeCreation != HOTSPOT">
+			<textarea class="question-box"
+				ng-class="{
+					'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
+					'tiny' : displayNodeCreation == HOTSPOT,
+					'shared' : (mediaReady && displayNodeCreation != HOTSPOT),
+					'align-right' : editedNode.media.align == 'left' }"
+				ng-model="question"
+				placeholder="{{questionPlaceholder}}"></textarea>
+			<div class="media-box"
+				ng-class="{
+					'align-left' : editedNode.media.align == 'left',
+					'align-right' : editedNode.media.align == 'right'}"
+				ng-show="mediaReady && displayNodeCreation != HOTSPOT">
 				<img ng-src="{{image.src}}" />
 				<div class="media-toolbar">
 					<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
@@ -68,31 +86,63 @@
 					<button type="button" class="delete-button" ng-click="removeMedia()">Remove</button>
 				</div>
 			</div>
-			<button type="button" id="big-upload-button" ng-if="displayNodeCreation != HOTSPOT" ng-hide="mediaReady" ng-click="beginMediaImport()"><span>+</span>Add Media</button>
+			<button type="button"
+				id="big-upload-button"
+				ng-if="displayNodeCreation != HOTSPOT"
+				ng-hide="mediaReady"
+				ng-click="beginMediaImport()">
+					<span>+</span>Add Media
+			</button>
 			<div class="answers-container" ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS">
 				<ul>
 					<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
-						<button type="button" class="delete-button" ng-click="removeAnswer($index)" ng-disabled="$index == 0">X</button>
+						<button type="button"
+							class="delete-button"
+							ng-click="removeAnswer($index)"
+							ng-disabled="$index == 0">X</button>
 						<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
 						<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
-						<button type="button" class="answer-node-select" ng-class="{'managed' : answer.target == newNodeManager.target}" ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+						<button type="button"
+							class="answer-node-select"
+							ng-class="{'managed' : answer.target == newNodeManager.target}"
+							ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
 					</li>
 
-					<li ng-if="displayNodeCreation == 	SHORTANS" ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}" ng-repeat="answer in answers" short-answer-set>
-						<button type="button" class="delete-button" ng-click="removeAnswer($index)" ng-disabled="$index == 0">X</button>
-						<input type="text" ng-model="newMatch" placeholder="Add a possible answer. Matches are not case sensitive." enter-submit="addAnswerMatch($index)"></input>
+					<li ng-if="displayNodeCreation == 	SHORTANS"
+						ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}"
+						ng-repeat="answer in answers"
+						short-answer-set>
+						<button type="button"
+							class="delete-button"
+							ng-click="removeAnswer($index)"
+							ng-disabled="$index == 0">X</button>
+						<input type="text"
+							ng-model="newMatch"
+							placeholder="Add a possible answer. Matches are not case sensitive."
+							enter-submit="addAnswerMatch($index)"></input>
 						<div class="possible-answers-box">
 							<p ng-hide="answer.matches.length">Possible answers will be shown here. Click an answer to remove it.</p>
-							<button type="button" ng-repeat="match in answer.matches" ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
+							<button type="button"
+								ng-repeat="match in answer.matches"
+								ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
 						</div>
-						<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
-						<button type="button" class="answer-node-select" ng-class="{'managed' : answer.target == newNodeManager.target}" ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+						<input type="text"
+							ng-model="answer.feedback"
+							placeholder="Enter Optional Feedback" />
+						<button type="button"
+							class="answer-node-select"
+							ng-class="{'managed' : answer.target == newNodeManager.target}"
+							ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
 					</li>
 				</ul>
 			</div>
 			<hotspot-manager class="hotspot-container" ng-if="displayNodeCreation == HOTSPOT">
 				<div class="image-container">
-					<button type="button" id="uploadButton" class="big-button" ng-show="!mediaReady" ng-click="beginMediaImport()">Upload an Image</button>
+					<button type="button"
+						id="uploadButton"
+						class="big-button"
+						ng-show="!mediaReady"
+						ng-click="beginMediaImport()">Upload an Image</button>
 					<hotspot-toolbar ng-show="mediaReady">
 						<ul>
 							<li><button type="button" ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
@@ -102,21 +152,78 @@
 							<li><button type="button" ng-click="changeMedia()">Change Image</button></li>
 						</ul>
 					</hotspot-toolbar>
-					<img id="hotspotImage" ng-src="{{image.src}}" ng-show="mediaReady" />
+					<hotspot-answer-manager ng-show="hotspotAnswerManager.show"
+						data-pos-x="{{hotspotAnswerManager.x}}"
+						data-pos-y="{{hotspotAnswerManager.y}}">
+
+					</hotspot-answer-manager>
+					<svg width="698" height="400" ng-show="mediaReady">
+						<g ng-repeat="answer in answers"
+							data-answer="answer">
+							<circle ng-if="answer.svg.type == 'elliptical'"
+								ng-attr-cx="{{answer.svg.cx}}"
+								ng-attr-cy="{{answer.svg.cy}}"
+								ng-attr-r="{{answer.svg.r}}"
+								fill="{{answer.svg.fill}}"
+								stroke="{{answer.svg.fill}}"
+								stroke-width="{{answer.svg.stroke}}"
+								fill-opacity="0.3"
+								ng-attr-transform="{{answer.svg.matrix}}"
+								ng-mousedown="selectSVG($event)"
+								ng-mouseup="deselectSVG($event)"
+								ng-mouseout="deselectSVG($event)"
+								ng-mousemove="moveSVG($index, $event)"
+								ng-click="manageSVG($event)" />
+
+							<rect ng-if="answer.svg.type == 'rect'"
+								ng-attr-x="{{answer.svg.x}}"
+								ng-attr-y="{{answer.svg.y}}"
+								ng-attr-width="{{answer.svg.width}}"
+								ng-attr-height="{{answer.svg.height}}"
+								fill="{{answer.svg.fill}}"
+								stroke="{{answer.svg.fill}}"
+								stroke-width="{{answer.svg.stroke}}"
+								fill-opacity="0.3"
+								ng-attr-transform="{{answer.svg.matrix}}"
+								ng-mousedown="selectSVG($event)"
+								ng-mouseup="deselectSVG($event)"
+								ng-mouseout="deselectSVG($event)"
+								ng-mousemove="moveSVG($index, $event)"
+								ng-click="manageSVG($event)" />
+						</g>
+					</svg>
+					<img id="hotspotImage"
+						ng-src="{{image.src}}"
+						ng-show="mediaReady" />
 				</div>
 			</hotspot-manager>
 			<div class="continuity-container" ng-if="displayNodeCreation == NARR">
 				<span>Select the destination to continue on:</span>
-				<button type="button" class="answer-node-select" ng-class="{'managed' : answers[0].target == newNodeManager.target}" ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+				<button type="button"
+					class="answer-node-select"
+					ng-class="{'managed' : answers[0].target == newNodeManager.target}"
+					ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
 			</div>
 			<div class="continuity-container" ng-if="displayNodeCreation == END">
 				<span>The user's path will conclude with this destination. Set the final score:</span>
-				<final-score-box ng-form="finalScoreForm" name="finalScoreForm">
-					<input type="number" name="finalScoreInput" class="final-score" ng-class="{'invalid' : !finalScoreForm.$valid}" ng-model="finalScore" placeholder="100" min="0" max="100" />
+				<final-score-box
+					ng-form="finalScoreForm"
+					name="finalScoreForm">
+					<input type="number"
+						name="finalScoreInput"
+						class="final-score"
+						ng-class="{'invalid' : !finalScoreForm.$valid}"
+						ng-model="finalScore"
+						placeholder="100"
+						min="0"
+						max="100" />
 				</final-score-box>
 				<span>%</span>
 			</div>
-			<button class="add-answer big-button" type="button" ng-click="newAnswer()" ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
+			<button class="add-answer big-button"
+				type="button"
+				ng-click="newAnswer()"
+				ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
 		</node-creation>
 
 		<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
