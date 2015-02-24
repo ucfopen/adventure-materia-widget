@@ -157,18 +157,19 @@
 						data-pos-y="{{hotspotAnswerManager.y}}">
 
 					</hotspot-answer-manager>
-					<svg width="698" height="400" ng-show="mediaReady">
+					<svg id="hotspot-canvas" width="698" height="400" ng-show="mediaReady">
 						<g ng-repeat="answer in answers"
-							data-answer="answer">
-							<circle ng-if="answer.svg.type == 'elliptical'"
-								ng-attr-cx="{{answer.svg.cx}}"
-								ng-attr-cy="{{answer.svg.cy}}"
-								ng-attr-r="{{answer.svg.r}}"
+							data-answer="answer"
+							ng-attr-transform="matrix(1 0 0 1 {{answer.svg.x}} {{answer.svg.y}})">
+							<ellipse ng-if="answer.svg.type == 'elliptical'"
+								ng-attr-cx="{{DEFAULTX}}"
+								ng-attr-cy="{{DEFAULTY}}"
+								ng-attr-rx="{{answer.svg.r + answer.svg.scaleXFactor}}"
+								ng-attr-ry="{{answer.svg.r + answer.svg.scaleYFactor}}"
 								fill="{{answer.svg.fill}}"
 								stroke="{{answer.svg.fill}}"
 								stroke-width="{{answer.svg.stroke}}"
 								fill-opacity="0.3"
-								ng-attr-transform="{{answer.svg.matrix}}"
 								ng-mousedown="selectSVG($event)"
 								ng-mouseup="deselectSVG($event)"
 								ng-mouseout="deselectSVG($event)"
@@ -176,20 +177,34 @@
 								ng-click="manageSVG($event)" />
 
 							<rect ng-if="answer.svg.type == 'rect'"
-								ng-attr-x="{{answer.svg.x}}"
-								ng-attr-y="{{answer.svg.y}}"
-								ng-attr-width="{{answer.svg.width}}"
-								ng-attr-height="{{answer.svg.height}}"
+								ng-attr-x="{{DEFAULTX}}"
+								ng-attr-y="{{DEFAULTY}}"
+								ng-attr-width="{{answer.svg.width + answer.svg.scaleXFactor}}"
+								ng-attr-height="{{answer.svg.height + answer.svg.scaleYFactor}}"
 								fill="{{answer.svg.fill}}"
 								stroke="{{answer.svg.fill}}"
 								stroke-width="{{answer.svg.stroke}}"
 								fill-opacity="0.3"
-								ng-attr-transform="{{answer.svg.matrix}}"
 								ng-mousedown="selectSVG($event)"
 								ng-mouseup="deselectSVG($event)"
 								ng-mouseout="deselectSVG($event)"
 								ng-mousemove="moveSVG($index, $event)"
 								ng-click="manageSVG($event)" />
+
+							<g class="scale"
+								ng-attr-transform="matrix(1 0 0 1 {{answer.svg.scaleXFactor}} {{answer.svg.scaleYFactor}})"
+								ng-mousedown="startSVGScale($event)"
+								ng-mousemove="scaleSVG($index, $event)"
+								ng-mouseout="endSVGScale($event)"
+								ng-mouseup="endSVGScale($event)">
+								<path class="scale-path"
+									d="M17.8,17.8h-7.2l2.8-2.8L10,11.6l1.7-1.7l3.3,3.3l2.8-2.8L17.8,17.8z M6.1,7.8L2.8,4.4L0,7.2L0,0l7.2,0L4.4,2.8l3.3,3.3 L6.1,7.8z"
+									ng-attr-transform="translate({{349 + answer.svg.scaleXOffset}}, {{200 + answer.svg.scaleYOffset}})"></path>
+								<rect width="40"
+									height="40"
+									ng-attr-x="{{339 + answer.svg.scaleXOffset}}"
+									ng-attr-y="{{190 + answer.svg.scaleYOffset}}"/>
+							</g>
 						</g>
 					</svg>
 					<img id="hotspotImage"

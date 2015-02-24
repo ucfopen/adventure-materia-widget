@@ -687,19 +687,32 @@ node-creation-selection-dialog {
 				font-size: 15px;
 			}
 
-			svg {
+			svg#hotspot-canvas {
 				position: absolute;
 				z-index: 100;
 
 				top: 0px;
 				left: 0px;
 
-				circle {
+				ellipse {
 					cursor: move;
 				}
 
 				rect {
 					cursor: move;
+				}
+
+				.scale {
+					cursor: move;
+
+					.scale-path {
+						stroke: $white;
+						stroke-width: 1px;
+					}
+
+					rect {
+						opacity: 0;
+					}
 				}
 			}
 
