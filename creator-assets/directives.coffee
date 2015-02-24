@@ -661,6 +661,9 @@ Adventure.directive "hotspotManager", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
+		$scope.DEFAULTX = 349
+		$scope.DEFAULTY = 200
+
 		# The selectedSVG object holds the temporary properties of the selected SVG hotspot
 		# Works in a similar way to the nodeTools and nodeManager objects
 		# Attempts to nest these properties inside an svg-specific directive unsuccessful
@@ -670,6 +673,13 @@ Adventure.directive "hotspotManager", () ->
 			originX: null
 			originY: null
 			matrix: null
+
+		# Holds temporary properties of selected SVG scale tool
+		$scope.selectedSVGScale =
+			target: null
+			moving: false
+			originX: null
+			originY: null
 
 		$scope.hotspotAnswerManager =
 			show: false
@@ -689,32 +699,17 @@ Adventure.directive "hotspotManager", () ->
 
 			# Update selectedSVG property with necessary event information
 			$scope.selectedSVG.moving = true
-			$scope.selectedSVG.target = angular.element evt.target # wrap event target in jqLite
+			$scope.selectedSVG.target = angular.element(evt.target).parent() # wrap event target in jqLite (targets g node, parent of svg)
 			$scope.selectedSVG.originX = evt.clientX
 			$scope.selectedSVG.originY = evt.clientY
 
-			# The matrix controls the position information of the SVG, have to grab data from transform attribute
-			# TODO definitely a better place to store this info?
-			matrixArr = $scope.selectedSVG.target.attr("transform").slice(7, -1).split(" ")
-
-			# Have to convert string data in the matrix array to floats
-			# TODO sloppy, fix plz
-			i = 0
-			while i < matrixArr.length
-				matrixArr[i] = parseFloat matrixArr[i]
-				i++
-
-			$scope.selectedSVG.matrix = matrixArr
-
 		# If SVG is deselected (or mouse moves away from SVG), clear the object
 		$scope.deselectSVG = (evt) ->
-			# console.log "DESELECTED"
 			$scope.selectedSVG =
 			target: null
 			moving: false
 			originX: null
 			originY: null
-			matrix: null
 
 		# Update selected SVG's position information as it moves based on cursor position
 		$scope.moveSVG = (index, evt) ->
@@ -722,15 +717,42 @@ Adventure.directive "hotspotManager", () ->
 				dx = evt.clientX - $scope.selectedSVG.originX
 				dy = evt.clientY - $scope.selectedSVG.originY
 
-				$scope.selectedSVG.matrix[4] += dx
-				$scope.selectedSVG.matrix[5] += dy
-
-				newMatrix = "matrix(" + $scope.selectedSVG.matrix.join(" ") + ")"
-
-				$scope.answers[index].svg.matrix = newMatrix
+				$scope.answers[index].svg.x += dx
+				$scope.answers[index].svg.y += dy
 
 				$scope.selectedSVG.originX = evt.clientX
 				$scope.selectedSVG.originY = evt.clientY
+
+		# If the scale tool of a given SVG hotspot is selected, have to handle it similarly
+		$scope.startSVGScale = (evt) ->
+
+			$scope.selectedSVGScale.moving = true
+			$scope.selectedSVGScale.target = angular.element evt.target
+			$scope.selectedSVGScale.originX = evt.clientX
+			$scope.selectedSVGScale.originY = evt.clientY
+
+		# Scale tool deselected
+		$scope.endSVGScale = (evt) ->
+
+			$scope.selectedSVGScale =
+				target: null
+				moving: false
+				originX: null
+				originY: null
+
+		# Change X & Y scale factors of given SVG hotspot based on changes in mouse movement
+		# Only while the associated scale tool is selected, of course
+		$scope.scaleSVG = (index, evt) ->
+			if $scope.selectedSVGScale.moving is true
+
+				dx = evt.clientX - $scope.selectedSVGScale.originX
+				dy = evt.clientY - $scope.selectedSVGScale.originY
+
+				$scope.answers[index].svg.scaleXFactor += dx
+				$scope.answers[index].svg.scaleYFactor += dy
+
+				$scope.selectedSVGScale.originX = evt.clientX
+				$scope.selectedSVGScale.originY = evt.clientY
 
 		$scope.manageSVG = (evt) ->
 			console.log "Managing SVG window open!"
@@ -740,6 +762,20 @@ Adventure.directive "hotspotToolbar", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
+		# Notes on SVG properties..
+		# -------------------------
+		# x:  X position of SVG, added to DEFAULTX
+		# y:  Y position of SVG, added to DEFAULTY
+		# r: initial radius of ellipse, altered by scaleXFactor & scaleYFactor (ellipse only)
+		# width: self explanatory, altered by scaleXFactor (rect only)
+		# height: self explanatory, altered by scaleYFactor (rect only)
+		# fill: fill color
+		# stroke: stroke width
+		# scaleXOffset: X Offset of scale tool icon relative to center of the SVG object, differs based on SVG type
+		# scaleYOffset: Y Offset of scale tool, same as above
+		# scaleXFactor: How much to scale SVG on the X axis
+		# scaleYFactor: How much to scale SVG on the Y axis
+
 		$scope.startEllipticalHotspot = ->
 			console.log "Starting an elliptical hotspot!"
 			$scope.newAnswer()
@@ -748,12 +784,15 @@ Adventure.directive "hotspotToolbar", () ->
 
 			$scope.answers[answerIndex].svg =
 				type: "elliptical"
-				cx: 349
-				cy: 200
+				x: 0
+				y: 0
 				r: 50
 				fill: "blue"
 				stroke: 2
-				matrix: "matrix(1 0 0 1 0 0)"
+				scaleXOffset: 30
+				scaleYOffset: 30
+				scaleXFactor: 0
+				scaleYFactor: 0
 
 		$scope.startSquareHotspot = ->
 			console.log "Starting a square hotspot!"
@@ -764,13 +803,16 @@ Adventure.directive "hotspotToolbar", () ->
 
 			$scope.answers[answerIndex].svg =
 				type: "rect"
-				x: 349
-				y: 200
+				x: 0
+				y: 0
 				width: 100
 				height: 75
 				fill: "green"
 				stroke: 2
-				matrix: "matrix(1 0 0 1 0 0)"
+				scaleXOffset: 90
+				scaleYOffset: 65
+				scaleXFactor: 0
+				scaleYFactor: 0
 
 		$scope.startPolygonHotspot = ->
 			console.log "Starting a polygonal hotspot!"
