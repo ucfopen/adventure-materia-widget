@@ -661,6 +661,7 @@ Adventure.directive "hotspotManager", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
+		# Default X,Y coords of SVGs when they're added. Represents the center of the image.
 		$scope.DEFAULTX = 349
 		$scope.DEFAULTY = 200
 
@@ -669,7 +670,8 @@ Adventure.directive "hotspotManager", () ->
 		# Attempts to nest these properties inside an svg-specific directive unsuccessful
 		$scope.selectedSVG =
 			target: null
-			moving: false
+			selected: false
+			hasMoved: false # determines whether or not to display the manager screen when a mouseup occurs
 			originX: null
 			originY: null
 			matrix: null
@@ -677,12 +679,16 @@ Adventure.directive "hotspotManager", () ->
 		# Holds temporary properties of selected SVG scale tool
 		$scope.selectedSVGScale =
 			target: null
-			moving: false
+			selected: false
 			originX: null
 			originY: null
 
+		$scope.hoverScale = false
+
 		$scope.hotspotAnswerManager =
 			show: false
+			target: null
+			answerIndex: null
 			x: null
 			y: null
 
@@ -698,22 +704,26 @@ Adventure.directive "hotspotManager", () ->
 			# console.log "SELECTED"
 
 			# Update selectedSVG property with necessary event information
-			$scope.selectedSVG.moving = true
+			$scope.selectedSVG.selected = true
 			$scope.selectedSVG.target = angular.element(evt.target).parent() # wrap event target in jqLite (targets g node, parent of svg)
 			$scope.selectedSVG.originX = evt.clientX
 			$scope.selectedSVG.originY = evt.clientY
 
 		# If SVG is deselected (or mouse moves away from SVG), clear the object
 		$scope.deselectSVG = (evt) ->
+
 			$scope.selectedSVG =
 			target: null
-			moving: false
+			selected: false
+			hasMoved : $scope.selectedSVG.hasMoved # carry hasMoved value over, since the click event needs to know what it is
 			originX: null
 			originY: null
 
 		# Update selected SVG's position information as it moves based on cursor position
 		$scope.moveSVG = (index, evt) ->
-			if $scope.selectedSVG.moving is true
+			if $scope.selectedSVG.selected is true
+				$scope.selectedSVG.hasMoved = true
+
 				dx = evt.clientX - $scope.selectedSVG.originX
 				dy = evt.clientY - $scope.selectedSVG.originY
 
@@ -726,7 +736,7 @@ Adventure.directive "hotspotManager", () ->
 		# If the scale tool of a given SVG hotspot is selected, have to handle it similarly
 		$scope.startSVGScale = (evt) ->
 
-			$scope.selectedSVGScale.moving = true
+			$scope.selectedSVGScale.selected = true
 			$scope.selectedSVGScale.target = angular.element evt.target
 			$scope.selectedSVGScale.originX = evt.clientX
 			$scope.selectedSVGScale.originY = evt.clientY
@@ -736,26 +746,62 @@ Adventure.directive "hotspotManager", () ->
 
 			$scope.selectedSVGScale =
 				target: null
-				moving: false
+				selected: false
 				originX: null
 				originY: null
 
 		# Change X & Y scale factors of given SVG hotspot based on changes in mouse movement
 		# Only while the associated scale tool is selected, of course
 		$scope.scaleSVG = (index, evt) ->
-			if $scope.selectedSVGScale.moving is true
+			if $scope.selectedSVGScale.selected is true
 
 				dx = evt.clientX - $scope.selectedSVGScale.originX
 				dy = evt.clientY - $scope.selectedSVGScale.originY
 
-				$scope.answers[index].svg.scaleXFactor += dx
-				$scope.answers[index].svg.scaleYFactor += dy
+				# Impose limits on how small the SVGs can be scaled
+				switch $scope.answers[index].svg.type
+					when "ellipse"
+						if ($scope.answers[index].svg.r + $scope.answers[index].svg.scaleXFactor + dx) >= 20
+							$scope.answers[index].svg.scaleXFactor += dx
+
+						if ($scope.answers[index].svg.r + $scope.answers[index].svg.scaleYFactor + dy) >= 20
+							$scope.answers[index].svg.scaleYFactor += dy
+
+					when "rect"
+						if ($scope.answers[index].svg.width + $scope.answers[index].svg.scaleXFactor + dx) >= 30
+							$scope.answers[index].svg.scaleXFactor += dx
+
+						if ($scope.answers[index].svg.height + $scope.answers[index].svg.scaleYFactor + dy) >= 30
+							$scope.answers[index].svg.scaleYFactor += dy
+
 
 				$scope.selectedSVGScale.originX = evt.clientX
 				$scope.selectedSVGScale.originY = evt.clientY
 
-		$scope.manageSVG = (evt) ->
-			console.log "Managing SVG window open!"
+		$scope.manageSVG = (index, evt) ->
+			unless $scope.selectedSVG.hasMoved
+
+				if $scope.hotspotAnswerManager.show is true
+					$scope.hotspotAnswerManager.show = false
+					$scope.hotspotAnswerManager.target = null
+					$scope.hotspotAnswerManager.answerIndex = null
+				else
+					$scope.hotspotAnswerManager.show = true
+					$scope.hotspotAnswerManager.x = $scope.answers[index].svg.x
+					$scope.hotspotAnswerManager.y = $scope.answers[index].svg.y
+					$scope.hotspotAnswerManager.answerIndex = index
+					$scope.hotspotAnswerManager.target = $scope.answers[index].target
+
+			$scope.selectedSVG.hasMoved = false # once the click event has checked on hasMoved, we can reset it
+
+		$scope.removeHotspot = (index) ->
+
+			$scope.hotspotAnswerManager.show = false
+			$scope.hotspotAnswerManager.target = null
+			$scope.hotspotAnswerManager.answerIndex = null
+
+			$scope.removeAnswer index
+
 
 
 Adventure.directive "hotspotToolbar", () ->
@@ -764,8 +810,8 @@ Adventure.directive "hotspotToolbar", () ->
 
 		# Notes on SVG properties..
 		# -------------------------
-		# x:  X position of SVG, added to DEFAULTX
-		# y:  Y position of SVG, added to DEFAULTY
+		# x:  X position of SVG, defaulted to DEFAULTX
+		# y:  Y position of SVG, defaulted to DEFAULTY
 		# r: initial radius of ellipse, altered by scaleXFactor & scaleYFactor (ellipse only)
 		# width: self explanatory, altered by scaleXFactor (rect only)
 		# height: self explanatory, altered by scaleYFactor (rect only)
@@ -783,9 +829,9 @@ Adventure.directive "hotspotToolbar", () ->
 			answerIndex = $scope.answers.length - 1
 
 			$scope.answers[answerIndex].svg =
-				type: "elliptical"
-				x: 0
-				y: 0
+				type: "ellipse"
+				x: $scope.DEFAULTX
+				y: $scope.DEFAULTY
 				r: 50
 				fill: "blue"
 				stroke: 2
@@ -803,8 +849,8 @@ Adventure.directive "hotspotToolbar", () ->
 
 			$scope.answers[answerIndex].svg =
 				type: "rect"
-				x: 0
-				y: 0
+				x: $scope.DEFAULTX
+				y: $scope.DEFAULTY
 				width: 100
 				height: 75
 				fill: "green"
@@ -820,5 +866,27 @@ Adventure.directive "hotspotToolbar", () ->
 Adventure.directive "hotspotAnswerManager", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "hotspotAnswerManager.target", (newVal, oldVal) ->
+
+			if newVal isnt null and newVal isnt undefined
+
+				xOffset = $scope.hotspotAnswerManager.x + 25
+				yOffset = $scope.hotspotAnswerManager.y + 15
+
+				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
+
+				$attrs.$set "style", styles
+
+		$scope.closeManager = (evt) ->
+
+			target = angular.element evt.target
+
+			# Whitelist elements that shouldn't close the hotspotAnswerManager
+			prop = angular.element(evt.target).prop("tagName").toLowerCase()
+			if prop is "ellipse" or prop is "rect" then return
+
+			$scope.hotspotAnswerManager.show = false
+			$scope.hotspotAnswerManager.target = null
 
 
