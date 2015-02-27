@@ -710,8 +710,15 @@ node-creation-selection-dialog {
 						stroke-width: 1px;
 					}
 
-					rect {
-						opacity: 0;
+					circle {
+						fill: $white;
+						fill-opacity: 0.5;
+
+						transition: all 0.5s ease;
+
+						&.hovered {
+							fill-opacity: 0.9;
+						}
 					}
 				}
 			}
@@ -749,6 +756,98 @@ node-creation-selection-dialog {
 					button {
 						margin-right: 5px;
 					}
+				}
+			}
+		}
+
+		hotspot-answer-manager {
+			position: absolute;
+			display: none;
+			width: 0px;
+			height: 0px;
+
+			z-index: 150;
+
+			background: $color-primary;
+
+			border-radius: 5px;
+			box-shadow: $shadow-small;
+
+			transition: width 0.5s ease;
+			transition: height 0.5s ease;
+
+			font-size:13px;
+
+			&.visible {
+				display: block;
+				width: 300px;
+				height: 250px;
+			}
+
+			h4 {
+				border-top-left-radius: 5px;
+				border-top-right-radius: 5px;
+
+				margin: 0px;
+				padding: 10px 25px;
+
+				color: $color-primary;
+				background: $color-accent;
+			}
+
+			input {
+				width: 245px;
+				height: 2em;
+
+				margin: 10px 0px 10px 0px;
+				padding-left: 15px;
+
+				border: solid 1px #cccccc;
+				border-radius: 3px;
+			}
+
+			textarea {
+				width: 245px;
+				height: 5em;
+
+				padding: 5px 5px 5px 15px;
+
+				border: solid 1px #cccccc;
+				border-radius: 3px;
+			}
+
+			div.button-options {
+				margin: 5px 0px 0px 15px;
+				text-align: left;
+
+				button {
+					margin-right: 8px;
+				}
+			}
+
+			div.continuity-container {
+				position: absolute;
+				bottom: 0px;
+
+				width: 260px;
+				padding: 10px 20px;
+
+				background: $gray-lighter;
+
+				text-align: left;
+
+				border-bottom-left-radius: 5px;
+				border-bottom-right-radius: 5px;
+
+				span {
+					display: inline-block;
+					width: 180px;
+				}
+
+				button {
+					position: absolute;
+					top: 15px;
+					right: 20px;
 				}
 			}
 		}

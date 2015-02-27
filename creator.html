@@ -136,13 +136,17 @@
 					</li>
 				</ul>
 			</div>
-			<hotspot-manager class="hotspot-container" ng-if="displayNodeCreation == HOTSPOT">
+			<!-- container for all hotspot-specific elements and interactions -->
+			<!-- effectively replaces the default answers container -->
+			<hotspot-manager class="hotspot-container"
+				ng-if="displayNodeCreation == HOTSPOT">
 				<div class="image-container">
 					<button type="button"
 						id="uploadButton"
 						class="big-button"
 						ng-show="!mediaReady"
 						ng-click="beginMediaImport()">Upload an Image</button>
+					<!-- bottom toolbar with buttons for adding and managing hotspots -->
 					<hotspot-toolbar ng-show="mediaReady">
 						<ul>
 							<li><button type="button" ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
@@ -152,18 +156,43 @@
 							<li><button type="button" ng-click="changeMedia()">Change Image</button></li>
 						</ul>
 					</hotspot-toolbar>
-					<hotspot-answer-manager ng-show="hotspotAnswerManager.show"
+					<!-- management popup when an individual hotspot is selected -->
+					<hotspot-answer-manager
+						ng-class="{'visible' : hotspotAnswerManager.show}"
 						data-pos-x="{{hotspotAnswerManager.x}}"
 						data-pos-y="{{hotspotAnswerManager.y}}">
+						<h4>Manage This Hotspot</h4>
+						<input type="text" placeholder="Enter hotspot label here."
+							ng-model="answers[hotspotAnswerManager.answerIndex].question"/>
+						<textarea class="feedback-box"
+							placeholder="Enter feedback here."
+							ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
+						<div class="button-options">
+							<button type="button">Up</button>
+							<button type="button">Down</button>
+							<button type="button" class="delete-button" ng-click="removeHotspot(hotspotAnswerManager.answerIndex)">Remove</button>
+						</div>
+						<div class="continuity-container">
+							<span>Select the destination this hotspot should lead to:</span>
+							<button type="button"
+								class="answer-node-select"
+								ng-class="{'managed' : answers[hotspotAnswerManager.answerIndex].target == newNodeManager.target}"
+								ng-click="manageNewNode($event, answers[hotspotAnswerManager.answerIndex].target, answers[hotspotAnswerManager.answerIndex].linkMode)">{{ integerToLetters(answers[hotspotAnswerManager.answerIndex].target) }}</button>
+						</div>
 
 					</hotspot-answer-manager>
-					<svg id="hotspot-canvas" width="698" height="400" ng-show="mediaReady">
+					<!-- SVG canvas upon which all hotspots are drawn -->
+					<svg id="hotspot-canvas"
+						width="698"
+						height="400"
+						ng-show="mediaReady"
+						ng-click="closeManager($event)">
 						<g ng-repeat="answer in answers"
 							data-answer="answer"
 							ng-attr-transform="matrix(1 0 0 1 {{answer.svg.x}} {{answer.svg.y}})">
-							<ellipse ng-if="answer.svg.type == 'elliptical'"
-								ng-attr-cx="{{DEFAULTX}}"
-								ng-attr-cy="{{DEFAULTY}}"
+							<ellipse ng-if="answer.svg.type == 'ellipse'"
+								ng-attr-cx="0"
+								ng-attr-cy="0"
 								ng-attr-rx="{{answer.svg.r + answer.svg.scaleXFactor}}"
 								ng-attr-ry="{{answer.svg.r + answer.svg.scaleYFactor}}"
 								fill="{{answer.svg.fill}}"
@@ -174,11 +203,11 @@
 								ng-mouseup="deselectSVG($event)"
 								ng-mouseout="deselectSVG($event)"
 								ng-mousemove="moveSVG($index, $event)"
-								ng-click="manageSVG($event)" />
+								ng-click="manageSVG($index, $event)" />
 
 							<rect ng-if="answer.svg.type == 'rect'"
-								ng-attr-x="{{DEFAULTX}}"
-								ng-attr-y="{{DEFAULTY}}"
+								ng-attr-x="0"
+								ng-attr-y="0"
 								ng-attr-width="{{answer.svg.width + answer.svg.scaleXFactor}}"
 								ng-attr-height="{{answer.svg.height + answer.svg.scaleYFactor}}"
 								fill="{{answer.svg.fill}}"
@@ -189,29 +218,32 @@
 								ng-mouseup="deselectSVG($event)"
 								ng-mouseout="deselectSVG($event)"
 								ng-mousemove="moveSVG($index, $event)"
-								ng-click="manageSVG($event)" />
-
+								ng-click="manageSVG($index, $event)" />
+							<!-- Icon for scaling the size of the given SVG hotspot -->
 							<g class="scale"
 								ng-attr-transform="matrix(1 0 0 1 {{answer.svg.scaleXFactor}} {{answer.svg.scaleYFactor}})"
 								ng-mousedown="startSVGScale($event)"
 								ng-mousemove="scaleSVG($index, $event)"
-								ng-mouseout="endSVGScale($event)"
-								ng-mouseup="endSVGScale($event)">
+								ng-mouseup="endSVGScale($event)"
+								ng-mouseenter="hoverScale = true"
+								ng-mouseleave="hoverScale = false">
+								<circle ng-attr-r="{{ hoverScale ? '40' : '20' }}"
+									ng-attr-cx="{{answer.svg.scaleXOffset + 8}}"
+									ng-attr-cy="{{answer.svg.scaleYOffset + 8}}"/
+									ng-class="{'hovered':hoverScale}"/>
 								<path class="scale-path"
 									d="M17.8,17.8h-7.2l2.8-2.8L10,11.6l1.7-1.7l3.3,3.3l2.8-2.8L17.8,17.8z M6.1,7.8L2.8,4.4L0,7.2L0,0l7.2,0L4.4,2.8l3.3,3.3 L6.1,7.8z"
-									ng-attr-transform="translate({{349 + answer.svg.scaleXOffset}}, {{200 + answer.svg.scaleYOffset}})"></path>
-								<rect width="40"
-									height="40"
-									ng-attr-x="{{339 + answer.svg.scaleXOffset}}"
-									ng-attr-y="{{190 + answer.svg.scaleYOffset}}"/>
+									ng-attr-transform="translate({{answer.svg.scaleXOffset}}, {{answer.svg.scaleYOffset}})"></path>
 							</g>
 						</g>
 					</svg>
+					<!-- Background image placed behind the hotspot's SVG canvas -->
 					<img id="hotspotImage"
 						ng-src="{{image.src}}"
 						ng-show="mediaReady" />
 				</div>
 			</hotspot-manager>
+			<!-- container for selecting the destination for narrative nodes -->
 			<div class="continuity-container" ng-if="displayNodeCreation == NARR">
 				<span>Select the destination to continue on:</span>
 				<button type="button"
@@ -219,6 +251,7 @@
 					ng-class="{'managed' : answers[0].target == newNodeManager.target}"
 					ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
 			</div>
+			<!-- container for selecting the destination for end nodes -->
 			<div class="continuity-container" ng-if="displayNodeCreation == END">
 				<span>The user's path will conclude with this destination. Set the final score:</span>
 				<final-score-box
