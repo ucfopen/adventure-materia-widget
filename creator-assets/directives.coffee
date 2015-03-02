@@ -683,8 +683,7 @@ Adventure.directive "hotspotManager", () ->
 			originX: null
 			originY: null
 
-		$scope.hoverScale = false
-
+		# Holds properties for the hotspot answer manager, the small modal for configuring a hotspot
 		$scope.hotspotAnswerManager =
 			show: false
 			target: null
@@ -692,6 +691,7 @@ Adventure.directive "hotspotManager", () ->
 			x: null
 			y: null
 
+		# Listener for updating the hotspot node's image once it's ready
 		$scope.$on "editedNode.media.updated", (evt) ->
 
 			$scope.image = new Image()
@@ -778,6 +778,8 @@ Adventure.directive "hotspotManager", () ->
 				$scope.selectedSVGScale.originX = evt.clientX
 				$scope.selectedSVGScale.originY = evt.clientY
 
+		# If a mousedown/mouseup event pair occurs and the SVG HAS NOT moved, we can assume it's a click
+		# Opens or closes the hotspotmanager and sets the properties as required
 		$scope.manageSVG = (index, evt) ->
 			unless $scope.selectedSVG.hasMoved
 
@@ -817,6 +819,7 @@ Adventure.directive "hotspotToolbar", () ->
 		# height: self explanatory, altered by scaleYFactor (rect only)
 		# fill: fill color
 		# stroke: stroke width
+		# points: a string of X,Y coordinates for drawing a polygon (polygon only)
 		# scaleXOffset: X Offset of scale tool icon relative to center of the SVG object, differs based on SVG type
 		# scaleYOffset: Y Offset of scale tool, same as above
 		# scaleXFactor: How much to scale SVG on the X axis
@@ -862,6 +865,23 @@ Adventure.directive "hotspotToolbar", () ->
 
 		$scope.startPolygonHotspot = ->
 			console.log "Starting a polygonal hotspot!"
+			$scope.polygonDrawMode = true
+
+			$scope.toast "Click anywhere to start drawing a polygon."
+
+		$scope.$on "editedNode.polygon.complete", (evt) ->
+
+			$scope.newAnswer()
+
+			answerIndex = $scope.answers.length - 1
+
+			$scope.answers[answerIndex].svg =
+				type: "polygon"
+				x: 0
+				y: 0
+				fill: "red"
+				stroke: 2
+				points: $scope.polygonPoints
 
 Adventure.directive "hotspotAnswerManager", () ->
 	restrict: "E",
@@ -884,9 +904,113 @@ Adventure.directive "hotspotAnswerManager", () ->
 
 			# Whitelist elements that shouldn't close the hotspotAnswerManager
 			prop = angular.element(evt.target).prop("tagName").toLowerCase()
-			if prop is "ellipse" or prop is "rect" then return
+			if prop is "ellipse" or prop is "rect" or prop is "polygon" then return
 
 			$scope.hotspotAnswerManager.show = false
 			$scope.hotspotAnswerManager.target = null
 
+		# Alters the order of the answers array so the selected SVG has a lower Z-index
+		# Answers closer to the end of the array are rendered above answers before them
+		$scope.moveAnswerBack = ->
+
+			oldIndex = $scope.hotspotAnswerManager.answerIndex
+
+			orphan = $scope.answers.splice(oldIndex, 1)[0]
+
+			$scope.answers.splice oldIndex - 1, 0, orphan
+
+			$scope.hotspotAnswerManager.answerIndex--
+
+		# Alters the order of the answers array so the selected SVG has a higher Z-index
+		# Answers closer to the front of the array are rendered below answers after them
+		$scope.moveAnswerForward = ->
+
+			oldIndex = $scope.hotspotAnswerManager.answerIndex
+
+			orphan = $scope.answers.splice(oldIndex, 1)[0]
+
+			$scope.answers.splice oldIndex + 1, 0, orphan
+
+			$scope.hotspotAnswerManager.answerIndex++
+
+Adventure.directive "polygonArtboard", ($rootScope) ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.polygonDrawMode = false
+		$scope.clickLocations = null
+		$scope.boundings = null
+		$scope.polygonPoints = null
+
+		$scope.lastClicked =
+			x : null
+			y : null
+
+		$scope.cursorPoint =
+			x : null
+			y : null
+
+		$scope.$watch "polygonDrawMode", (newVal, oldVal) ->
+			if newVal is true
+				$scope.clickLocations = []
+			else if newVal is false
+				$scope.clickLocations = null
+
+		$scope.recordClicks = (evt) ->
+			if $scope.polygonDrawMode is true
+
+				# For whatever reason, the BoundingClientRect hasn't been updated prior to this point
+				if $scope.boundings is null
+					$scope.boundings = $element[0].getBoundingClientRect()
+
+				# Convert event X and Y coords into coords for the SVG
+				xPos = evt.clientX - $scope.boundings.left
+				yPos = evt.clientY - $scope.boundings.top
+
+				if $scope.clickLocations.length > 3
+
+					if xPos < ($scope.clickLocations[0][0] + 15) and xPos > ($scope.clickLocations[0][0] - 15) and yPos < ($scope.clickLocations[0][1] + 15) and yPos > ($scope.clickLocations[0][1] - 15)
+						return completePolygon()
+
+				# Update the lastClicked location for the guide line
+				$scope.lastClicked.x = xPos
+				$scope.lastClicked.y = yPos
+
+				$scope.clickLocations.push [xPos, yPos]
+
+				# Rebuild the string describing all the points of the polygon
+				$scope.polygonPoints = $scope.renderPoints()
+
+		$scope.updateCursorPoint = (evt) ->
+			if $scope.clickLocations.length > 0
+				$scope.cursorPoint.x = evt.clientX - $scope.boundings.left
+				$scope.cursorPoint.y = evt.clientY - $scope.boundings.top
+
+		# Converts all the point pairs in the clickLocations array into the string used to draw the polyline
+		$scope.renderPoints = ->
+			pointsStr = ""
+
+			angular.forEach $scope.clickLocations, (point, index) ->
+
+				pointsStr += point[0] + "," + point[1] + " "
+
+			pointsStr
+
+		completePolygon = ->
+
+			$rootScope.$broadcast "editedNode.polygon.complete"
+
+			# Reset state for polygon scope variables
+			$scope.polygonDrawMode = false
+			$scope.clickLocations = null
+			$scope.boundings = null
+			$scope.polygonPoints = null
+
+			$scope.lastClicked =
+				x : null
+				y : null
+
+			$scope.cursorPoint =
+				x : null
+				y : null
 

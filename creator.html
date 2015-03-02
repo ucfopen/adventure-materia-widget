@@ -162,14 +162,19 @@
 						data-pos-x="{{hotspotAnswerManager.x}}"
 						data-pos-y="{{hotspotAnswerManager.y}}">
 						<h4>Manage This Hotspot</h4>
-						<input type="text" placeholder="Enter hotspot label here."
+						<input type="text" placeholder="Enter optional hotspot label here."
 							ng-model="answers[hotspotAnswerManager.answerIndex].question"/>
 						<textarea class="feedback-box"
-							placeholder="Enter feedback here."
+							placeholder="Enter optional feedback here."
 							ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
 						<div class="button-options">
-							<button type="button">Up</button>
-							<button type="button">Down</button>
+							<button type="button">Color</button>
+							<button type="button"
+								ng-disabled="hotspotAnswerManager.answerIndex == answers.length - 1"
+								ng-click="moveAnswerForward()">Forward</button>
+							<button type="button"
+								ng-disabled="hotspotAnswerManager.answerIndex == 0"
+								ng-click="moveAnswerBack()">Back</button>
 							<button type="button" class="delete-button" ng-click="removeHotspot(hotspotAnswerManager.answerIndex)">Remove</button>
 						</div>
 						<div class="continuity-container">
@@ -181,6 +186,23 @@
 						</div>
 
 					</hotspot-answer-manager>
+					<!-- SVG canvas placed over the primary hotspot canvas for drawing a polygon -->
+					<svg id="polygon-svg-artboard"
+						ng-show="polygonDrawMode"
+						ng-click="recordClicks($event)"
+						ng-mousemove="updateCursorPoint($event)"
+						polygon-artboard>
+						<!-- Guide line for indicating where next section of the polyline will be drawn -->
+						<line ng-attr-x1="{{lastClicked.x}}"
+							ng-attr-y1="{{lastClicked.y}}"
+							ng-attr-x2="{{cursorPoint.x}}"
+							ng-attr-y2="{{cursorPoint.y}}"
+							stroke="black" />
+						<!-- Open polygon, points will be converted to final polygon on the main hotspot svg -->
+						<polyline fill="none"
+							stroke="black"
+							ng-attr-points="{{polygonPoints}}" />
+					</svg>
 					<!-- SVG canvas upon which all hotspots are drawn -->
 					<svg id="hotspot-canvas"
 						width="698"
@@ -198,10 +220,11 @@
 								fill="{{answer.svg.fill}}"
 								stroke="{{answer.svg.fill}}"
 								stroke-width="{{answer.svg.stroke}}"
-								fill-opacity="0.3"
+								fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+								ng-mouseenter="highlightSVG = true"
 								ng-mousedown="selectSVG($event)"
 								ng-mouseup="deselectSVG($event)"
-								ng-mouseout="deselectSVG($event)"
+								ng-mouseleave="deselectSVG($event); highlightSVG = false"
 								ng-mousemove="moveSVG($index, $event)"
 								ng-click="manageSVG($index, $event)" />
 
@@ -213,14 +236,30 @@
 								fill="{{answer.svg.fill}}"
 								stroke="{{answer.svg.fill}}"
 								stroke-width="{{answer.svg.stroke}}"
-								fill-opacity="0.3"
+								fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+								ng-mouseenter="highlightSVG = true"
 								ng-mousedown="selectSVG($event)"
 								ng-mouseup="deselectSVG($event)"
-								ng-mouseout="deselectSVG($event)"
+								ng-mouseleave="deselectSVG($event); highlightSVG = false"
 								ng-mousemove="moveSVG($index, $event)"
 								ng-click="manageSVG($index, $event)" />
+
+							<polygon ng-if="answer.svg.type == 'polygon'"
+								ng-attr-points="{{answer.svg.points}}"
+								fill="{{answer.svg.fill}}"
+								stroke="{{answer.svg.fill}}"
+								stroke-width="{{answer.svg.stroke}}"
+								fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+								ng-mouseenter="highlightSVG = true"
+								ng-mousedown="selectSVG($event)"
+								ng-mouseup="deselectSVG($event)"
+								ng-mouseleave="deselectSVG($event); highlightSVG = false"
+								ng-mousemove="moveSVG($index, $event)"
+								ng-click="manageSVG($index, $event)" />
+
 							<!-- Icon for scaling the size of the given SVG hotspot -->
 							<g class="scale"
+								ng-if="answer.svg.type == 'rect' || answer.svg.type =='ellipse'"
 								ng-attr-transform="matrix(1 0 0 1 {{answer.svg.scaleXFactor}} {{answer.svg.scaleYFactor}})"
 								ng-mousedown="startSVGScale($event)"
 								ng-mousemove="scaleSVG($index, $event)"
