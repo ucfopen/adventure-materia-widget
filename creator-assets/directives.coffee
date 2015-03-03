@@ -906,8 +906,18 @@ Adventure.directive "hotspotAnswerManager", () ->
 			prop = angular.element(evt.target).prop("tagName").toLowerCase()
 			if prop is "ellipse" or prop is "rect" or prop is "polygon" then return
 
+			$scope.colorDrawerOpen = false
+
 			$scope.hotspotAnswerManager.show = false
 			$scope.hotspotAnswerManager.target = null
+
+		# Updates the currently managed polygon with the selected color
+		$scope.updatePolygonColor = (evt) ->
+			color = angular.element(evt.target).attr("data-color")
+
+			$scope.answers[$scope.hotspotAnswerManager.answerIndex].svg.fill = color
+
+			$scope.colorDrawerOpen = false
 
 		# Alters the order of the answers array so the selected SVG has a lower Z-index
 		# Answers closer to the end of the array are rendered above answers before them
@@ -972,9 +982,9 @@ Adventure.directive "polygonArtboard", ($rootScope) ->
 					if xPos < ($scope.clickLocations[0][0] + 15) and xPos > ($scope.clickLocations[0][0] - 15) and yPos < ($scope.clickLocations[0][1] + 15) and yPos > ($scope.clickLocations[0][1] - 15)
 						return completePolygon()
 
-				# Update the lastClicked location for the guide line
-				$scope.lastClicked.x = xPos
-				$scope.lastClicked.y = yPos
+				# Update the lastClicked and cursorPoint locations for the guide line
+				$scope.lastClicked.x = $scope.cursorPoint.x = xPos
+				$scope.lastClicked.y = $scope.cursorPoint.y = yPos
 
 				$scope.clickLocations.push [xPos, yPos]
 

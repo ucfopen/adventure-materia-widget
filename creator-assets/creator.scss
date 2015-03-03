@@ -768,9 +768,10 @@ node-creation-selection-dialog {
 			position: absolute;
 			display: none;
 			width: 0px;
-			height: 0px;
 
 			z-index: 150;
+
+			padding-bottom: 52px;
 
 			background: $color-primary;
 
@@ -785,7 +786,6 @@ node-creation-selection-dialog {
 			&.visible {
 				display: block;
 				width: 300px;
-				height: 250px;
 			}
 
 			h4 {
@@ -821,11 +821,87 @@ node-creation-selection-dialog {
 			}
 
 			div.button-options {
-				margin: 5px 0px 0px 15px;
+				margin: 5px 0px 10px 15px;
 				text-align: left;
 
 				button {
 					margin-right: 4px;
+				}
+			}
+
+			div.colors-container {
+				width: 270px;
+				margin-top: 5px;
+				padding: 10px 15px;
+
+				background: $gray-lightest;
+
+				button {
+					display: inline-block;
+					width: 20px;
+					height: 18px;
+
+					padding: 0px;
+
+					margin: 0px 5px 5px 0px;
+
+					border: solid 1px $gray;
+
+					&.blue {
+						background: #0000FF;
+					}
+
+					&.red {
+						background: #FF0000;
+					}
+
+					&.green {
+						background: #008000;
+					}
+
+					&.aliceblue {
+						background: #F0F8FF;
+					}
+
+					&.coral {
+						background: #FF7F50;
+					}
+
+					&.indigo {
+						background: #4B0082;
+					}
+
+					&.lightgreen {
+						background: #90EE90;
+					}
+
+					&.slategrey {
+						background: #708090;
+					}
+
+					&.yellow {
+						background: #FFFF00;
+					}
+
+					&.teal {
+						background: #008080;
+					}
+
+					&.blueviolet {
+						background: #8A2BE2;
+					}
+
+					&.darkred {
+						background: #8B0000;
+					}
+
+					&.cyan {
+						background: #00FFFF;
+					}
+
+					&.goldenrod {
+						background: #DAA520;
+					}
 				}
 			}
 
