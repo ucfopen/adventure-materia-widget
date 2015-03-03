@@ -521,6 +521,9 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 						console.log "image upload via stored editedNode media data complete!"
 				else $scope.mediaReady = false
 
+				if $scope.editedNode.type is $scope.HOTSPOT
+					unless $scope.editedNode.hotspotVisibility then $scope.editedNode.hotspotVisibility = "always"
+
 
 				if $scope.editedNode.type is $scope.END
 					if $scope.editedNode.finalScore then $scope.finalScore = $scope.editedNode.finalScore
@@ -661,6 +664,10 @@ Adventure.directive "hotspotManager", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
+		$scope.ALWAYS = "always"
+		$scope.MOUSEOVER = "mouseover"
+		$scope.NEVER = "never"
+
 		# Default X,Y coords of SVGs when they're added. Represents the center of the image.
 		$scope.DEFAULTX = 349
 		$scope.DEFAULTY = 200
@@ -690,6 +697,8 @@ Adventure.directive "hotspotManager", () ->
 			answerIndex: null
 			x: null
 			y: null
+
+		$scope.visibilityManagerOpen = false
 
 		# Listener for updating the hotspot node's image once it's ready
 		$scope.$on "editedNode.media.updated", (evt) ->
@@ -886,6 +895,23 @@ Adventure.directive "hotspotToolbar", () ->
 Adventure.directive "hotspotAnswerManager", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
+
+		$scope.colors = [
+			"blue",
+			"red",
+			"green",
+			"aliceblue",
+			"coral",
+			"indigo",
+			"lightgreen",
+			"slategrey",
+			"yellow",
+			"teal",
+			"darkred",
+			"blueviolet",
+			"cyan",
+			"goldenrod"
+		]
 
 		$scope.$watch "hotspotAnswerManager.target", (newVal, oldVal) ->
 

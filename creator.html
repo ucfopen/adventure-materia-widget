@@ -149,13 +149,29 @@
 					<!-- bottom toolbar with buttons for adding and managing hotspots -->
 					<hotspot-toolbar ng-show="mediaReady">
 						<ul>
-							<li><button type="button" ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
-							<li><button type="button" ng-click="startSquareHotspot()">+ Square Hotspot</button></li>
-							<li><button type="button" ng-click="startPolygonHotspot()">+ Polygon Hotspot</button></li>
-							<li><button type="button">Edit Visibility</button></li>
-							<li><button type="button" ng-click="changeMedia()">Change Image</button></li>
+							<li><button type="button"
+								ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
+							<li><button type="button"
+								ng-click="startSquareHotspot()">+ Square Hotspot</button></li>
+							<li><button type="button"
+								ng-click="startPolygonHotspot()">+ Polygon Hotspot</button></li>
+							<li><button type="button"
+								ng-click="visibilityManagerOpen = !visibilityManagerOpen">Edit Visibility</button></li>
+							<li><button type="button"
+								ng-click="changeMedia()">Change Image</button></li>
 						</ul>
 					</hotspot-toolbar>
+					<div class="visibility-manager" ng-show="visibilityManagerOpen">
+						<h4>For this image,</h4>
+						<ul>
+							<li ng-class="{'selected':editedNode.hotspotVisibility == ALWAYS}"
+								ng-click="editedNode.hotspotVisibility = ALWAYS; visibilityManagerOpen = false">Always show hotspots</li>
+							<li ng-class="{'selected':editedNode.hotspotVisibility == MOUSEOVER}"
+								ng-click="editedNode.hotspotVisibility = MOUSEOVER; visibilityManagerOpen = false">Reveal hotspots on mouseover</li>
+							<li ng-class="{'selected':editedNode.hotspotVisibility == NEVER}"
+								ng-click="editedNode.hotspotVisibility= NEVER; visibilityManagerOpen = false">Don't show hotspots</li>
+						</ul>
+					</div>
 					<!-- management popup when an individual hotspot is selected -->
 					<hotspot-answer-manager
 						ng-class="{'visible' : hotspotAnswerManager.show}"
@@ -181,60 +197,9 @@
 						</div>
 						<div class="colors-container" ng-show="colorDrawerOpen == true">
 							<button type="button"
-								class="color-selector blue"
-								data-color="blue"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector red"
-								data-color="red"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector green"
-								data-color="green"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector aliceblue"
-								data-color="aliceblue"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector coral"
-								data-color="coral"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector indigo"
-								data-color="indigo"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector lightgreen"
-								data-color="lightgreen"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector slategrey"
-								data-color="slategrey"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector yellow"
-								data-color="yellow"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector teal"
-								data-color="teal"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector darkred"
-								data-color="darkred"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector blueviolet"
-								data-color="blueviolet"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector cyan"
-								data-color="cyan"
-								ng-click="updatePolygonColor($event)"></button>
-							<button type="button"
-								class="color-selector goldenrod"
-								data-color="goldenrod"
+								ng-repeat="color in colors"
+								class="color-selector {{color}}"
+								data-color="{{color}}"
 								ng-click="updatePolygonColor($event)"></button>
 						</div>
 						<div class="continuity-container">
