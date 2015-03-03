@@ -168,7 +168,9 @@
 							placeholder="Enter optional feedback here."
 							ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
 						<div class="button-options">
-							<button type="button">Color</button>
+							<button type="button"
+								ng-class="{'big-button' : colorDrawerOpen}"
+								ng-click="colorDrawerOpen = !colorDrawerOpen">Color</button>
 							<button type="button"
 								ng-disabled="hotspotAnswerManager.answerIndex == answers.length - 1"
 								ng-click="moveAnswerForward()">Forward</button>
@@ -176,6 +178,64 @@
 								ng-disabled="hotspotAnswerManager.answerIndex == 0"
 								ng-click="moveAnswerBack()">Back</button>
 							<button type="button" class="delete-button" ng-click="removeHotspot(hotspotAnswerManager.answerIndex)">Remove</button>
+						</div>
+						<div class="colors-container" ng-show="colorDrawerOpen == true">
+							<button type="button"
+								class="color-selector blue"
+								data-color="blue"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector red"
+								data-color="red"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector green"
+								data-color="green"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector aliceblue"
+								data-color="aliceblue"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector coral"
+								data-color="coral"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector indigo"
+								data-color="indigo"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector lightgreen"
+								data-color="lightgreen"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector slategrey"
+								data-color="slategrey"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector yellow"
+								data-color="yellow"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector teal"
+								data-color="teal"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector darkred"
+								data-color="darkred"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector blueviolet"
+								data-color="blueviolet"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector cyan"
+								data-color="cyan"
+								ng-click="updatePolygonColor($event)"></button>
+							<button type="button"
+								class="color-selector goldenrod"
+								data-color="goldenrod"
+								ng-click="updatePolygonColor($event)"></button>
 						</div>
 						<div class="continuity-container">
 							<span>Select the destination this hotspot should lead to:</span>
