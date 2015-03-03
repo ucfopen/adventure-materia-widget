@@ -764,6 +764,62 @@ node-creation-selection-dialog {
 			}
 		}
 
+		div.visibility-manager {
+			position: absolute;
+			width: 300px;
+
+			left: 50%;
+			margin-left: -150px;
+			bottom: 40px;
+
+			z-index: 160;
+
+			background: $color-primary;
+
+			border-radius: 5px;
+			box-shadow: $shadow-small;
+
+			h4 {
+				border-top-left-radius: 5px;
+				border-top-right-radius: 5px;
+
+				margin: 0px;
+				padding: 10px 25px;
+
+				color: $color-primary;
+				background: $color-accent;
+			}
+
+			ul {
+				list-style-type: none;
+				margin: 0px;
+				padding: 10px 0px 0px 0px;
+
+				li {
+					margin-bottom: 5px;
+					font-size: 11pt;
+
+					padding: 5px 0px 5px 10px;
+
+					background: $white;
+
+					-webkit-transition: background 0.5s;
+					transition: background 0.5s;
+
+					cursor: pointer;
+
+					&:hover {
+						background: $color-selection-hover;
+					}
+
+					&.selected {
+						color: $color-primary;
+						background: $color-accent;
+					}
+				}
+			}
+		}
+
 		hotspot-answer-manager {
 			position: absolute;
 			display: none;
