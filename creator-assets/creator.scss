@@ -82,7 +82,6 @@ g.node {
 
 	circle.node-dot {
 		stroke-width: 1px;
-		box-shadow: $shadow-small;
 	}
 
 	&.blank circle.node-dot {
@@ -126,16 +125,30 @@ g.node {
 }
 
 g.bridge {
+
+	opacity: 0;
+
+	cursor: pointer;
+
+	-webkit-transition: opacity 0.5s;
+	transition: opacity 0.5s;
+
 	circle {
-		opacity: 0;
 
-		-webkit-transition: opacity 0.5s;
-		transition: opacity 0.5s;
-		// display: none;
+		// -webkit-transition: opacity 0.5s;
+		// transition: opacity 0.5s;
+	}
 
-		&:hover {
-			opacity: 0.8;
-		}
+	path {
+		// opacity: 0;
+		fill: $white;
+	}
+
+	&:hover {
+		// circle {
+		// 	opacity: 0.8;
+		// }
+		opacity: 0.8;
 	}
 }
 
@@ -410,6 +423,10 @@ node-creation-selection-dialog {
 	background: $color-primary;
 
 	box-shadow: $shadow-dialog;
+
+	&.short {
+		height: 570px;
+	}
 
 	h2 {
 		width: 100%;

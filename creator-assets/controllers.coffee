@@ -54,6 +54,12 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 		if newVal isnt oldVal and newVal isnt "none" and newVal isnt "suspended"
 			$scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+
+			if newVal is $scope.END and $scope.editedNode.pendingTarget
+				$scope.toast "Can't make an End Point! Move or remove child destinations first."
+				$scope.displayNodeCreation = "none"
+				return
+
 			$scope.showCreationDialog = false
 			if $scope.editedNode.type is $scope.BLANK then $scope.editedNode.type = $scope.displayNodeCreation
 
@@ -100,7 +106,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 
 		# Don't do anything if the node is a bridge
 		# It's not a -real- node, we don't care about it like that
-		if data.type is "bridge" then return
+		if data.type is "bridge"
+			$scope.addNodeInBetween data
+			return
 
 		# If we're in existingNodeSelectionMode, we need to listen for an existing node to be
 		# selected to update an answer's target.
@@ -140,6 +148,25 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 
 		# Sometimes getting the id of the newly created node is required, so return it
 		newId
+
+	# Function that explicitly adds a node between an existing parent and child
+	$scope.addNodeInBetween = (data) ->
+
+		newId = count
+		newName = $scope.integerToLetters newId
+
+		newNode =
+			name: "#{newName}" # name: "Node #{count} (#{type})"
+			id: newId
+			parentId: data.source
+			type: $scope.BLANK
+			contents: []
+			pendingTarget: data.target
+
+		treeSrv.findAndAddInBetween $scope.treeData, data.source, data.target, newNode
+
+		count++
+		treeSrv.set $scope.treeData
 
 	# Helper function that converts node IDs to their respective alphabetical counterparts
 	# e.g., 1 is "A", 2 is "B", 26 is "Z", 27 is "AA", 28 is "AB"
