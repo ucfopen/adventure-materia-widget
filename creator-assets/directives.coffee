@@ -132,6 +132,8 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					x: source.x + (target.x - source.x)/2
 					y: source.y + (target.y - source.y)/2
 					type: "bridge"
+					source: link.source.id
+					target: link.target.id
 
 				# adjustedLinks.push link
 
@@ -171,8 +173,10 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			# link = d3.svg.diagonal (d) ->
 			# 	return [d.x, d.y]
 
+			defs = $scope.svg.append("defs")
+
 			# Define the arrow markers that will be added to the end vertex of each link path
-			$scope.svg.append("defs").append("marker")
+			defs.append("marker")
 				.attr("id", "arrowhead")
 				.attr("refX", 10 + 20)
 				.attr("refY", 5)
@@ -181,6 +185,25 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				.attr("orient", "auto")
 				.append("path")
 					.attr("d","M 0,0 L 0,10 L 10,5 Z")
+
+			# Define gaussian blur outer glow that's applied to node circles
+			filter = defs.append("filter")
+				.attr("id", "dropshadow")
+			filter.append("feGaussianBlur")
+					.attr("in", "SourceGraphic")
+					.attr("stdDeviation", 1)
+					.attr("result", "blur")
+			filter.append("feOffset")
+					.attr("in", "blur")
+					.attr("dx", 0)
+					.attr("dy", 0)
+					.attr("result", "offsetBlur")
+
+			merge = filter.append("feMerge")
+			merge.append("feMergeNode")
+				.attr("in", "offsetBlur")
+			merge.append("feMergeNode")
+				.attr("in", "SourceGraphic")
 
 
 			linkGroup = $scope.svg.selectAll("path.link")
@@ -219,7 +242,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				)
 				.on("mouseover", (d, i) ->
 
-					if d.type is "bridge" then return
+					# if d.type is "bridge" then return
 
 					#  Animation effects on node mouseover
 					d3.select(this).select("circle")
@@ -235,7 +258,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				)
 				.on("mouseout", (d, i) ->
 
-					if d.type is "bridge" then return
+					# if d.type is "bridge" then return
 
 					# Animation effects on node mouseout
 					d3.select(this).select("circle")
@@ -263,6 +286,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					# if d.type is "bridge" then return 20
 					# else return 20
 				)
+				.attr("filter", "url(#dropshadow)")
 
 			nodeGroup.append("svg:rect")
 				.attr("width", (d) ->
@@ -297,6 +321,12 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				.attr("font-size", 16)
 				.text (d) ->
 					d.name
+
+			nodeGroup.append("path")
+				.attr("d", "M -3,12 L -3,3 L -12,3 L -12,-3 L -3,-3 L -3,-12 L 3,-12 L 3,-3 L 12,-3 L 12,3 L 3,3 L 3,12 Z")
+				.attr("visibility", (d) ->
+					if d.type isnt "bridge" then return "hidden"
+				)
 
 		$scope.render treeSrv.get()
 
@@ -563,8 +593,14 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 
 		$scope.newAnswer = () ->
 
-			# We create the new node first, so we can grab the new node's generated id
-			targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
+			# If the editedNode has a pending target, the new answer's target will be set to it
+			# pendingTarget is used for adding in-between nodes or linking orphaned nodes
+			if $scope.editedNode.pendingTarget
+				targetId = $scope.editedNode.pendingTarget
+				delete $scope.editedNode.pendingTarget
+			else
+				# We create the new node first, so we can grab the new node's generated id
+				targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
 
 			newAnswer =
 				text: null

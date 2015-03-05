@@ -60,7 +60,9 @@
 				<li ng-class="{'selected' : newNodeManager.linkMode == SELF}"  ng-click="selectLinkMode(SELF)">Loop Back to This Destination ( {{integerToLetters(editedNode.id)}} )</li>
 			</ul>
 		</new-node-manager-dialog>
-		<node-creation class="node-creation-screen" ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
+		<node-creation class="node-creation-screen"
+			ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END}"
+			ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
 			<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
 			<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
 			<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>

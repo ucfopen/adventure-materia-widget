@@ -11,13 +11,16 @@ Adventure.service "treeSrv", ($rootScope) ->
 		parentId: -1
 		contents: []
 
+	# Self explanatory getter function
 	get = ->
 		treeData
 
+	# Updating the tree prompts a redraw of the D3 visualization
 	set = (data) ->
 		treeData = data
 		$rootScope.$broadcast "tree.nodes.changed"
 
+	# Max depth is the maximum tree depth, used for determining height of the D3 canvas
 	getMaxDepth = ->
 		findMaxDepth treeData
 
@@ -73,6 +76,44 @@ Adventure.service "treeSrv", ($rootScope) ->
 			else
 				findAndAdd tree.children[i], parentId, node
 				i++
+
+		tree
+
+	# Recursive function for adding a node in between a given parent and child, essentially splitting an existing link
+	# tree: the tree structure to be iterated. Should initially reference the root node (treeData object)
+	# parentId: the ID of the parent node that serves as the source of the existing link
+	# childId: the ID of the child node that serves as the target of the existing link
+	# node: the node to be added between the parent and child
+	findAndAddInBetween = (tree, parentId, childId, node) ->
+
+		if tree.id == parentId
+
+			# First, find reference to childId in list of parent's children
+			n = 0
+			while n < tree.children.length
+
+				child = tree.children[n]
+
+				if child.id == childId # reference to childId found
+
+					# Set new node's child to the child node
+					node.children = [child]
+					node.contents = [child]
+
+					# Replace tree's existing child with new node
+					tree.children[n] = node
+
+					tree # return the revised tree
+				else
+					n++ # No recursion, since the childId node has to be a direct child of the parentId node
+
+		if ! tree.children then return
+
+		i = 0
+
+		while i < tree.children.length
+			findAndAddInBetween tree.children[i], parentId, childId, node
+			i++
 
 		tree
 
@@ -135,4 +176,5 @@ Adventure.service "treeSrv", ($rootScope) ->
 	getMaxDepth : getMaxDepth
 	findNode : findNode
 	findAndAdd : findAndAdd
+	findAndAddInBetween : findAndAddInBetween
 	findAndRemove : findAndRemove
