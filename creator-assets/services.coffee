@@ -94,6 +94,9 @@ Adventure.service "treeSrv", ($rootScope) ->
 
 				child = tree.children[n]
 
+				# Update the parent node's associated answer target with the new node ID
+				if tree.answers[n].target is childId then tree.answers[n].target = node.id
+
 				if child.id == childId # reference to childId found
 
 					# Set new node's child to the child node
