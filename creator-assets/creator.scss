@@ -334,6 +334,44 @@ new-node-manager-dialog {
 
 }
 
+delete-warning-dialog {
+	position: absolute;
+	width: 300px;
+
+	z-index: 1050;
+
+	background: $color-primary;
+
+	border-radius: 5px;
+	box-shadow: $shadow-small;
+
+	h4 {
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		color: $color-primary;
+		background: $red;
+	}
+
+	p {
+		padding: 10px 15px 10px 15px;
+	}
+
+	div.button-box {
+		width: 100%;
+		text-align: center;
+
+		margin: 10px 0px 20px 0px;
+
+		button {
+			margin-right: 10px;
+		}
+	}
+}
+
 node-creation-selection-dialog {
 	position: absolute;
 	left: 50%;

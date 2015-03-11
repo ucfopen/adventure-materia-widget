@@ -35,6 +35,14 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		y: 0
 		linkMode: "new" # options should be "new" | "existing" | "self"
 
+	# Parameters for the answer deletion confirmation dialog
+	$scope.deleteDialog =
+		show: false
+		target: null
+		targetIndex: null
+		x: 0
+		y: 0
+
 	$scope.existingNodeSelectionMode = false
 	$scope.existingNodeSelected = null
 
@@ -90,6 +98,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		$scope.showBackgroundCover = false
 		$scope.nodeTools.show = false
 		$scope.showCreationDialog = false
+		$scope.showDeleteWarning = false
 
 		$scope.displayNodeCreation = "none"
 		# $scope.showTitleDialog = $scope.showIntroDialog = false

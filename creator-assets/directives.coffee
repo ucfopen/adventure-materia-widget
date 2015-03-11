@@ -347,16 +347,6 @@ Adventure.directive "nodeToolsDialog", (treeSrv) ->
 		$scope.copyNode = () ->
 			console.log "Copying NYI!"
 
-		$scope.dropNode = () ->
-			if $scope.nodeTools.target is 0
-				$scope.toast "Can't delete Start!"
-				return
-
-			treeSrv.findAndRemove $scope.treeData, $scope.nodeTools.target
-			$scope.nodeTools.show = false
-			treeSrv.set $scope.treeData
-			$scope.toast "Node " + $scope.nodeTools.target + " has been removed."
-
 
 Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
 	restrict: "E",
@@ -517,7 +507,33 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 			$scope.newNodeManager.show = false
 
-Adventure.directive "nodeCreation", (treeSrv) ->
+Adventure.directive "deleteWarningDialog", (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "deleteDialog.target", (newVal, oldVal) ->
+
+			if newVal
+				offsetX = $scope.deleteDialog.x + 30
+				offsetY = $scope.deleteDialog.y
+
+				styles = "left: " + offsetX + "px; top: " + offsetY + "px"
+
+				$attrs.$set "style", styles
+
+		$scope.dropNodeAndChildren = ->
+
+			$scope.removeAnswer $scope.deleteDialog.targetIndex, $scope.deleteDialog.target
+
+			$scope.deleteDialog.show = false
+			$scope.deleteDialog.target = null
+
+		$scope.cancelDeleteDialog = ->
+			$scope.deleteDialog.show = false
+			$scope.deleteDialog.target = null
+
+
+Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -614,22 +630,48 @@ Adventure.directive "nodeCreation", (treeSrv) ->
 
 			$scope.answers.push newAnswer
 
-		$scope.removeAnswer = (index) ->
+		# Check to see if removing this answer will delete any child nodes of the selected answer's node
+		# If there are child nodes present, bring up the warning dialog
+		# Otherwise, go ahead and remove the answer (and associated node, if applicable)
+		$scope.removeAnswerPreCheck = (index, evt) ->
 
 			# Grab node id of answer node to be removed
 			targetId = $scope.answers[index].target
 
+			targetNode = treeSrv.findNode $scope.treeData, targetId
+
+			console.log "targetNode has " + targetNode.contents.length + " content nodes!"
+
+			if targetNode.contents.length > 0 and $scope.answers[index].linkMode is $scope.NEW
+				$scope.deleteDialog.x = evt.currentTarget.getBoundingClientRect().left
+				$scope.deleteDialog.y = evt.currentTarget.getBoundingClientRect().top
+				$scope.deleteDialog.targetIndex = index
+				$scope.deleteDialog.target = targetId # necessary?
+				$scope.deleteDialog.show = true
+			else
+				$scope.removeAnswer index, targetId
+
+
+		$scope.removeAnswer = (index, targetId) ->
+
+			# Remove the answer's associated node if it's an actual child of the parent
+			if $scope.answers[index].linkMode is $scope.NEW then treeSrv.findAndRemove treeSrv.get(), targetId
+
 			# Remove it from answers array
 			$scope.answers.splice index, 1
 
-			# Remove the node from the tree
-			treeSrv.findAndRemove treeSrv.get(), targetId
+			# Update tree to reflect new state
 			treeSrv.set $scope.treeData
 
 			# If the node manager modal is open for this answer, close it
 			if targetId is $scope.newNodeManager.target
 				$scope.newNodeManager.show = false
 				$scope.newNodeManager.target = null
+
+			# If it's a hotspot, let the manager know it's time to reset and close
+			# (Since the manager is defined in another directive, it needs to be broadcast)
+			if $scope.editedNode.type is $scope.HOTSPOT
+				$rootScope.$broadcast "editedNode.hotspotAnswerManager.reset"
 
 		$scope.manageNewNode = ($event, target, mode) ->
 			$scope.newNodeManager.x = $event.currentTarget.getBoundingClientRect().left
@@ -841,14 +883,11 @@ Adventure.directive "hotspotManager", () ->
 
 			$scope.selectedSVG.hasMoved = false # once the click event has checked on hasMoved, we can reset it
 
-		$scope.removeHotspot = (index) ->
-
+		# Broadcast listener to reset the hotspotAnswerManager
+		$scope.$on "editedNode.hotspotAnswerManager.reset", (evt) ->
 			$scope.hotspotAnswerManager.show = false
 			$scope.hotspotAnswerManager.target = null
 			$scope.hotspotAnswerManager.answerIndex = null
-
-			$scope.removeAnswer index
-
 
 
 Adventure.directive "hotspotToolbar", () ->
@@ -908,12 +947,16 @@ Adventure.directive "hotspotToolbar", () ->
 				scaleXFactor: 0
 				scaleYFactor: 0
 
+		# making a polygon is a little more complex, we don't actually create the new answer yet
+		# Instead, it activates the drawMode flag and enables the polygon drawing canvas
 		$scope.startPolygonHotspot = ->
 			console.log "Starting a polygonal hotspot!"
 			$scope.polygonDrawMode = true
 
 			$scope.toast "Click anywhere to start drawing a polygon."
 
+		# When the polygon drawing mode is complete, we can actually create the polygon using the defined points
+		# And the associated answer of course
 		$scope.$on "editedNode.polygon.complete", (evt) ->
 
 			$scope.newAnswer()
@@ -1028,6 +1071,9 @@ Adventure.directive "polygonArtboard", ($rootScope) ->
 			else if newVal is false
 				$scope.clickLocations = null
 
+		# Each click on the artboard becomes a new point of the polygon
+		# When a click is registered in proximity to the first point, it's assumed the polygon is being completed
+		# The array of points is then used to define the actual polygon SVG for the hotspot
 		$scope.recordClicks = (evt) ->
 			if $scope.polygonDrawMode is true
 
@@ -1039,6 +1085,8 @@ Adventure.directive "polygonArtboard", ($rootScope) ->
 				xPos = evt.clientX - $scope.boundings.left
 				yPos = evt.clientY - $scope.boundings.top
 
+				# If a click event happens within close (+/- 15px X & Y) proximity of the first point, complete the shape
+				# This can only occur when there are a minimum of three sides to the polygon, for obvious reasons
 				if $scope.clickLocations.length > 3
 
 					if xPos < ($scope.clickLocations[0][0] + 15) and xPos > ($scope.clickLocations[0][0] - 15) and yPos < ($scope.clickLocations[0][1] + 15) and yPos > ($scope.clickLocations[0][1] - 15)
