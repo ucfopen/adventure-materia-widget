@@ -18,7 +18,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	$scope.EXISTING = "existing"
 	$scope.SELF = "self"
 
-	$scope.title = "My Adventure Widget"
+	$scope.title = ""
 
 	# NodeTools is an object that holds the parameters for the nodeTools modal, works in tandem with the nodeToolsDialog directive
 	$scope.nodeTools =
@@ -109,6 +109,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	$scope.initNewWidget = (widget, baseUrl) ->
 		console.log "initNewWidget"
 		$scope.$apply ->
+			$scope.title = "My Adventure Widget"
+
 			$scope.showIntroDialog = true
 			$scope.showBackgroundCover = true
 

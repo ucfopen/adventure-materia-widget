@@ -32,6 +32,9 @@ $edit-popup-width: 750px;
 $misc-popup-width: 600px;
 
 html, body {
+	margin: 0px;
+	padding: 0px;
+
 	background-color: $white;
 
 	font-family: 'Lato', sans-serif;
@@ -61,8 +64,49 @@ html, body {
 	}
 }
 
-.adventure-container {
+header.title-header {
+	display: block;
+	width: 100%;
+	height: 46px;
+	padding-top: 14px;
+
+	background: $color-accent;
+
+	h1 {
+		display: inline-block;
+		margin: 0px 0px 0px 15px;
+
+		font-size: 24px;
+		font-weight: 300;
+		font-family: 'Lato', sans-serif;
+
+		color: $color-primary;
+	}
+
+	div.logo {
+		display: inline-block;
+		float: left;
+		background: url("materialogo.png") no-repeat;
+		width: 60px;
+		height: 50px;
+		margin-left:20px;
+	}
+
+	div.edit-title {
+		display: inline-block;
+		height: 24px;
+
+		margin-left: 10px;
+		text-decoration: underline;
+
+		color: $color-primary;
+	}
+}
+
+#adventure-container {
 	position: relative;
+	width: 100%;
+	height: 100%;
 }
 
 /* Tree Visualization Styles */
@@ -224,7 +268,7 @@ toast {
 	width: 600px;
 	height: 30px;
 
-	bottom: 10px;
+	bottom: 5px;
 	left: 50%;
 	margin-left: -300px;
 
@@ -388,7 +432,7 @@ node-creation-selection-dialog {
 
 	width: $misc-popup-width;
 	height: 600px;
-	margin: 50px 0px 0px -300px;
+	margin: 15px 0px 0px -300px;
 	border-radius: 10px;
 	background: $color-primary;
 
@@ -463,8 +507,8 @@ node-creation-selection-dialog {
 	z-index: 50;
 
 	width: $edit-popup-width;
-	height: 620px;
-	margin: 50px 0px 0px -400px;
+	height: 570px;
+	margin: 15px 0px 0px -400px;
 
 	border-radius: 10px;
 	background: $color-primary;
@@ -472,7 +516,11 @@ node-creation-selection-dialog {
 	box-shadow: $shadow-dialog;
 
 	&.short {
-		height: 570px;
+		height: 520px;
+	}
+
+	&.long {
+		height: 620px;
 	}
 
 	h2 {
@@ -491,7 +539,7 @@ node-creation-selection-dialog {
 
 	.question-box {
 		width: 80%;
-		height: 250px;
+		height: 200px;
 
 		margin: 20px 20px 30px 20px;
 
@@ -501,7 +549,7 @@ node-creation-selection-dialog {
 		font-size: 2em;
 
 		&.expanded {
-			height: 400px;
+			height: 350px;
 		}
 
 		&.tiny {
@@ -538,7 +586,7 @@ node-creation-selection-dialog {
 		position: absolute;
 		top: 69px;
 		width: 340px;
-		height: 254px;
+		height: 204px;
 
 		border: solid 1px $gray-lighter;
 
@@ -572,8 +620,8 @@ node-creation-selection-dialog {
 	.answers-container {
 		position: relative;
 		width: $edit-popup-width - 30;
-		height: 207px;
-		margin: 10px 10 0px 10px;
+		height: 192px;
+		margin: 10px 10px 0px 10px;
 		padding: 5px;
 
 		overflow-y: auto;
@@ -671,7 +719,7 @@ node-creation-selection-dialog {
 	}
 
 	button.add-answer {
-		margin: 5px 0px 0px 15px;
+		margin: 15px 0px 0px 15px;
 	}
 
 	.continuity-container {
