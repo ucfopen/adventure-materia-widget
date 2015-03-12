@@ -71,10 +71,13 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			depth = treeSrv.getMaxDepth()
 			adjustedHeight = 200 + (depth * 50)
 
+			# Compute SVG width based on window width
+			windowWidth = document.getElementById("adventure-container").offsetWidth
+
 			# Init tree data
 			tree = d3.layout.tree()
 				.sort(null)
-				.size([900, adjustedHeight]) # sets size of tree
+				.size([windowWidth, adjustedHeight]) # sets size of tree
 				.children (d) -> # defines accessor function for nodes (e.g., what the "d" object is)
 					if !d.contents or d.contents.length is 0 then return null
 					else return d.contents
@@ -159,8 +162,8 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			if $scope.svg == null
 				$scope.svg = d3.select($element[0])
 					.append("svg:svg")
-					.attr("width", 1000) # Size of actual SVG container
-					.attr("height",700) # Size of actual SVG container
+					.attr("width", windowWidth) # Size of actual SVG container
+					.attr("height",650) # Size of actual SVG container
 					.append("svg:g")
 					.attr("class", "container")
 					.attr("transform", "translate(0,50)") # translates position of overall tree in svg container
@@ -353,8 +356,8 @@ Adventure.directive "nodeToolsDialog", (treeSrv) ->
 		# When target for the dialog changes, update the position values based on where the new node is
 		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
 
-			xOffset = $scope.nodeTools.x + 10
-			yOffset = $scope.nodeTools.y + 70
+			xOffset = $scope.nodeTools.x + 15
+			yOffset = $scope.nodeTools.y + 50
 
 			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 
@@ -530,7 +533,7 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 
 			if newVal
 				offsetX = $scope.deleteDialog.x + 30
-				offsetY = $scope.deleteDialog.y
+				offsetY = $scope.deleteDialog.y - 56
 
 				styles = "left: " + offsetX + "px; top: " + offsetY + "px"
 
