@@ -349,6 +349,14 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 
 		$scope.render treeSrv.get()
 
+Adventure.directive "titleEditor", () ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "showTitleEditor", (newVal, oldVal) ->
+			if newVal
+				$scope.showBackgroundCover = true
+
 # Directive for the node modal dialog (add child, delete node, etc)
 Adventure.directive "nodeToolsDialog", (treeSrv) ->
 	restrict: "E",

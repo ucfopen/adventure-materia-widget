@@ -81,6 +81,8 @@ header.title-header {
 		font-family: 'Lato', sans-serif;
 
 		color: $color-primary;
+
+		cursor: pointer;
 	}
 
 	div.logo {
@@ -100,6 +102,8 @@ header.title-header {
 		text-decoration: underline;
 
 		color: $color-primary;
+
+		cursor: pointer;
 	}
 }
 
@@ -299,6 +303,46 @@ toast {
 	// 		opacity: 0;
 	// 	}
 	// }
+}
+
+title-editor {
+	position: absolute;
+	width: 450px;
+
+	top: 150px;
+	left: 50%;
+	margin-left: -175px;
+	padding-bottom: 25px;
+
+	z-index: 5;
+
+	background: $color-primary;
+	border-radius: 5px;
+
+	h4 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+
+		color: $color-primary;
+		background: $color-accent;
+	}
+
+	input {
+		width: 385px;
+		height: 2em;
+		font-weight: 1.2em;
+		padding: 5px 10px 5px 10px;
+		margin: 25px 5px 10px 20px;
+
+		border: solid 1px $gray-lighter;
+		border-radius: 3px;
+	}
 }
 
 

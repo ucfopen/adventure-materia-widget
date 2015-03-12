@@ -102,9 +102,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		$scope.nodeTools.show = false
 		$scope.showCreationDialog = false
 		$scope.showDeleteWarning = false
+		$scope.showTitleEditor = false
 
 		$scope.displayNodeCreation = "none"
-		# $scope.showTitleDialog = $scope.showIntroDialog = false
 
 	$scope.initNewWidget = (widget, baseUrl) ->
 		console.log "initNewWidget"

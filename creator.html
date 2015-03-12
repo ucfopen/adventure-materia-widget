@@ -32,10 +32,14 @@
 		<header class="title-header">
 			<div class="logo">
 			</div>
-			<h1 id="title">{{title}}</h1>
-			<div class="edit-title">Edit...</div>
+			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
+			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
 		</header>
 		<div id="adventure-container">
+			<title-editor ng-show="showTitleEditor">
+				<h4>Give Your Widget a Title</h4>
+				<input type="text" ng-model="title" />
+			</title-editor>
 			<toast ng-hide="!showToast"
 				ng-click="hideToast()"
 				class="fadeable">
