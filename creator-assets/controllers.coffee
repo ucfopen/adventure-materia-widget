@@ -79,6 +79,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 			$scope.newNodeManager.show = false
 			$scope.newNodeManager.target = null
 
+			# Make any existing toasts obsolete
+			$scope.hideToast()
+
 			console.log $scope.treeData
 
 			# Warn the user if a final score hasn't been set upon closing the creation screen

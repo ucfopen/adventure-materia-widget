@@ -224,7 +224,7 @@ toast {
 	width: 600px;
 	height: 30px;
 
-	bottom: 30px;
+	bottom: 10px;
 	left: 50%;
 	margin-left: -300px;
 
@@ -238,6 +238,15 @@ toast {
 
 	background: $gray-darker;
 	box-shadow: $shadow-small;
+
+	button {
+		position: absolute;
+		right: 5px;
+		height:24px;
+		text-align: center;
+
+		font-size: 14px;
+	}
 
 	// &.fadeable {
 	// 	transition: 0.5s linear all;

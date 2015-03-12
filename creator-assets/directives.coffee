@@ -6,6 +6,9 @@ Adventure.directive "toast", ($timeout) ->
 
 		$scope.toastMessage = ""
 		$scope.showToast = false
+		$scope.toastActionText = ""
+		$scope.toastAction = null
+		$scope.showToastActionButton = false
 
 		# Displays a toast with the given message.
 		# The autoCancel flag determines if the toast should automatically expire after 5 seconds
@@ -19,8 +22,21 @@ Adventure.directive "toast", ($timeout) ->
 					$scope.hideToast()
 				), 5000
 
+		# Displays a toast with an action button
+		# The action button is bound to an anonymous function that's passed as the action parameter
+		# Interactive toasts won't time out, so be sure to make a hideToast() call when you no longer need it
+		# hideToast() is automatically called when editedNode is reset, when a node creation interface is closed
+		$scope.interactiveToast = (message, actionText, action) ->
+			$scope.toastMessage = message
+			$scope.toastActionText = actionText
+			$scope.toastAction = action
+
+			$scope.showToast = true
+			$scope.showToastActionButton = true
+
 		$scope.hideToast = () ->
 			$scope.showToast = false
+			$scope.showToastActionButton = false
 
 
 Adventure.directive 'enterSubmit', ($compile) ->
@@ -393,7 +409,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 				if $scope.answers[i].target is $scope.newNodeManager.target then break
 				else i++
 
-
 			# Compare the prior link mode to the new one and deal with the changes
 			if mode != $scope.newNodeManager.linkMode
 				switch mode
@@ -655,10 +670,31 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 		$scope.removeAnswer = (index, targetId) ->
 
 			# Remove the answer's associated node if it's an actual child of the parent
-			if $scope.answers[index].linkMode is $scope.NEW then treeSrv.findAndRemove treeSrv.get(), targetId
+			if $scope.answers[index].linkMode is $scope.NEW
 
-			# Remove it from answers array
-			$scope.answers.splice index, 1
+				# Grab the node associated with the answer being removed and prep it for cold storage
+				removedNode = treeSrv.findNode $scope.treeData, targetId
+				coldStorage =
+					id: targetId
+					answerIndex: index
+					answer: $scope.answers[index]
+					node: removedNode
+					nodeIndex: $scope.editedNode.contents.indexOf removedNode # node index may differ from answer index due to answers with non-traditional links
+
+				# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
+				unless $scope.editedNode.deletedCache then $scope.editedNode.deletedCache = []
+				$scope.editedNode.deletedCache.push coldStorage
+
+				# Go ahead and actually remove the node
+				treeSrv.findAndRemove treeSrv.get(), targetId
+
+				# Display the interactive toast that provides the Undo option
+				# Toast is displayed until clicked or until the node creation screen is closed
+				$scope.interactiveToast "Node " + $scope.integerToLetters(targetId) + " was deleted.", "Undo", ->
+					$scope.restoreDeletedNode targetId
+			else
+				# Just remove it from answers array, no further action required
+				$scope.answers.splice index, 1
 
 			# Update tree to reflect new state
 			treeSrv.set $scope.treeData
@@ -672,6 +708,26 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 			# (Since the manager is defined in another directive, it needs to be broadcast)
 			if $scope.editedNode.type is $scope.HOTSPOT
 				$rootScope.$broadcast "editedNode.hotspotAnswerManager.reset"
+
+		# Restores an answer/node pair that's been deleted, formatted as a "cold storage" object
+		# The anwer/node pair must be a child of the current editedNode
+		$scope.restoreDeletedNode = (target) ->
+
+			# Assume deletedCache exists on the editedNode - if not, something's wrong
+			unless $scope.editedNode.deletedCache then return
+
+			angular.forEach $scope.editedNode.deletedCache, (item, index) ->
+
+				if item.id is target
+					# Splice the answer and node back into their respective arrays at their previous index positions
+					$scope.answers.splice item.answerIndex, 0, item.answer
+					$scope.editedNode.contents.splice item.nodeIndex, 0, item.node
+					$scope.editedNode.deletedCache.splice index, 1
+
+					# Update the tree to display the restored node
+					treeSrv.set $scope.treeData
+					return
+
 
 		$scope.manageNewNode = ($event, target, mode) ->
 			$scope.newNodeManager.x = $event.currentTarget.getBoundingClientRect().left
