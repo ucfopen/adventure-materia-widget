@@ -31,7 +31,12 @@
 	<body id="adventure-container" ng-controller="AdventureCtrl">
 		<toast ng-hide="!showToast"
 			ng-click="hideToast()"
-			class="fadeable">{{toastMessage}}</toast>
+			class="fadeable">
+			{{toastMessage}}
+			<button type="button"
+				ng-show="showToastActionButton"
+				ng-click="toastAction()">{{toastActionText}}</button>
+		</toast>
 		<node-tools-dialog
 			ng-show="nodeTools.show"
 			data-pos-x="{{nodeTools.x}}"
