@@ -404,7 +404,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 				$scope.newNodeManager.show = true
 
 				xOffset = $scope.newNodeManager.x - 205
-				yOffset = $scope.newNodeManager.y - 10
+				yOffset = $scope.newNodeManager.y - 60
 
 				styles =  "left: " + xOffset + "px; top: " + yOffset + "px"
 
@@ -530,6 +530,9 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 						console.log "New mode selected: SELF"
 
 						$scope.newNodeManager.target = null
+
+			else $scope.newNodeManager.target = null
+
 
 			$scope.newNodeManager.show = false
 
@@ -741,10 +744,15 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 
 
 		$scope.manageNewNode = ($event, target, mode) ->
-			$scope.newNodeManager.x = $event.currentTarget.getBoundingClientRect().left
-			$scope.newNodeManager.y = $event.currentTarget.getBoundingClientRect().top
-			$scope.newNodeManager.linkMode = mode
-			$scope.newNodeManager.target = target
+
+			if $scope.newNodeManager.show is true
+				$scope.newNodeManager.show = false
+				$scope.newNodeManager.target = null
+			else
+				$scope.newNodeManager.x = $event.currentTarget.getBoundingClientRect().left
+				$scope.newNodeManager.y = $event.currentTarget.getBoundingClientRect().top
+				$scope.newNodeManager.linkMode = mode
+				$scope.newNodeManager.target = target
 
 		$scope.beginMediaImport = () ->
 			Materia.CreatorCore.showMediaImporter()
