@@ -813,6 +813,13 @@ node-creation-selection-dialog {
 				color: $white;
 			}
 		}
+
+		button {
+			&.managed {
+				color: $white;
+				background: $color-accent;
+			}
+		}
 	}
 
 	hotspot-manager {
@@ -1140,6 +1147,11 @@ node-creation-selection-dialog {
 					position: absolute;
 					top: 15px;
 					right: 20px;
+
+					&.managed {
+						color: $white;
+						background: $color-accent;
+					}
 				}
 			}
 		}
