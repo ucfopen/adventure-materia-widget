@@ -90,12 +90,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 				if $scope.editedNode.finalScore is null
 					$scope.toast "End Point " + $scope.editedNode.name + " is missing a valid final score!"
 
-	# treeSrv.set $scope.treeData
-
-	$scope.setTitle = ->
-		$scope.title = $scope.introTitle or $scope.title
-		$scope.step = 1 # what's dis do?
-		$scope.hideCover()
 
 	$scope.hideCoverAndModals = ->
 		$scope.showBackgroundCover = false
@@ -216,6 +210,11 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 			align: "right"
 
 		$rootScope.$broadcast "editedNode.media.updated"
+
+	$scope.generateDebugQset = ->
+		qset = treeSrv.generateQSetFromTree $scope.treeData
+
+		console.log JSON.stringify(qset, null, 2)
 
 
 	# Start 'er up!

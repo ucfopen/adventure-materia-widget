@@ -263,6 +263,12 @@ button {
 	}
 }
 
+/* #### DEBUG #### */
+button.temp-qset-gen-button {
+	float: right;
+	margin-right: 25px;
+}
+
 /* Tools and dialog windows */
 
 toast {
@@ -476,7 +482,7 @@ node-creation-selection-dialog {
 
 	width: $misc-popup-width;
 	height: 600px;
-	margin: 15px 0px 0px -300px;
+	margin: 5px 0px 0px -300px;
 	border-radius: 10px;
 	background: $color-primary;
 
@@ -552,7 +558,7 @@ node-creation-selection-dialog {
 
 	width: $edit-popup-width;
 	height: 570px;
-	margin: 15px 0px 0px -400px;
+	margin: 5px 0px 0px -400px;
 
 	border-radius: 10px;
 	background: $color-primary;
@@ -615,7 +621,7 @@ node-creation-selection-dialog {
 	#big-upload-button {
 
 		position: absolute;
-		top: 154px;
+		top: 100px;
 
 		text-align: center;
 
@@ -670,6 +676,10 @@ node-creation-selection-dialog {
 
 		overflow-y: auto;
 
+		&.long {
+			height: 242px;
+		}
+
 		ul {
 			list-style-type: none;
 			margin: 0px;
@@ -719,7 +729,7 @@ node-creation-selection-dialog {
 
 					button.answer-node-select {
 						position: absolute;
-						left: 90%;
+						right: 30px;
 						top: 10px;
 					}
 
@@ -755,6 +765,50 @@ node-creation-selection-dialog {
 							color: $gray;
 							font-size: 0.8em;
 						}
+					}
+				}
+
+				&.unmatched-answers-row {
+
+					padding: 10px 0px;
+					margin-bottom: 10px;
+
+					background: $gray-lightest;
+					border-radius: 5px;
+
+					.unmatched-answers-box {
+						position: relative;
+						display: inline-block;
+						width: 80%;
+
+						left: 35px;
+
+						margin: 5px 0 0 5px;
+						padding: 5px;
+
+						background: $gray-lighter;
+						border: solid 1px #cccccc;
+						border-radius: 5px;
+
+						p {
+							color: $black;
+							font-size: 0.8em;
+
+							span {
+								font-weight: bold;
+							}
+						}
+					}
+
+					input {
+						width: 80%;
+						margin: 5px 0px 5px 40px;
+					}
+
+					button.answer-node-select {
+						position: absolute;
+						right: 35px;
+						top: 20px;
 					}
 				}
 
