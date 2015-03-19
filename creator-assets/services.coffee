@@ -1,5 +1,5 @@
 Adventure = angular.module "AdventureCreator"
-Adventure.service "treeSrv", ($rootScope) ->
+Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 	# TreeData is being initialized in -two- places right now.
 	# This one may or may not be required.
@@ -173,6 +173,81 @@ Adventure.service "treeSrv", ($rootScope) ->
 
 		return depth
 
+	generateQSetFromTree = (tree) ->
+
+		qset =
+			version: "2.0.1"
+			data:
+				items: formatTreeDataForQset tree, []
+				options: {}
+
+
+	formatTreeDataForQset = (tree, items) ->
+
+		if !tree.children or (($filter('filter')(items, {nodeId : tree.id}, true)).length is 0)
+
+			itemData =
+				materiaType: "question"
+				id: null
+				nodeId: tree.id # duplicate of options.id, needed for $filter query
+				question: if tree.question then tree.question else ""
+				options:
+					id: tree.id
+					type: tree.type
+				answers: []
+
+			if tree.media
+				itemData.options.asset =
+					materiaType: "asset"
+					align: tree.media.align # replacement of "layout" parameter
+					id: tree.media.url # URL likely needs conversion?
+					type: tree.media.type # right now just "image", will be expanded upon in the future
+
+			switch tree.type
+				when "hotspot"
+					itemData.options.visibility = tree.hotspotVisibility
+				when "end"
+					itemData.options.finalScore = tree.finalScore
+
+			#if tree.type is "hotspot" then itemData.options.visibility = answer.hotspotVisibility
+
+			itemAnswerData = {}
+
+			angular.forEach tree.answers, (answer, index) ->
+
+				itemAnswerData =
+					text: answer.text
+					value: 0
+					options:
+						link: answer.target
+						linkMode: answer.linkMode
+						feedback: answer.feedback
+
+				switch tree.type
+					when "shortanswer"
+						itemAnswerData.options.matches = answer.matches
+						if answer.isDefault then itemAnswerData.options.isDefault = true
+
+					when "hotspot"
+						itemAnswerData.options.svg = answer.svg
+
+				itemData.answers.push itemAnswerData
+
+			items.push itemData
+
+			if !tree.children then return items
+
+		i = 0
+
+		while i < tree.children.length
+
+			child = tree.children[i]
+			items = formatTreeDataForQset child, items
+			i++
+
+		return items
+
+
 
 	get : get
 	set : set
@@ -181,3 +256,4 @@ Adventure.service "treeSrv", ($rootScope) ->
 	findAndAdd : findAndAdd
 	findAndAddInBetween : findAndAddInBetween
 	findAndRemove : findAndRemove
+	generateQSetFromTree : generateQSetFromTree

@@ -420,6 +420,8 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 				if $scope.answers[i].target is $scope.newNodeManager.target then break
 				else i++
 
+			console.log "new mode: " + mode + " existing mode: " + $scope.newNodeManager.linkMode
+
 			# Compare the prior link mode to the new one and deal with the changes
 			if mode != $scope.newNodeManager.linkMode
 				switch mode
@@ -577,15 +579,26 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 
 				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
 				else
-					if $scope.editedNode.type isnt $scope.END and $scope.editedNode.type isnt $scope.HOTSPOT
-						$scope.answers = []
-						$scope.newAnswer()
+					switch $scope.editedNode.type
+						when $scope.HOTSPOT
+							$scope.answers = []
 
-					else if $scope.editedNode.type is $scope.HOTSPOT
-						$scope.answers = []
-					else
-						# Manually redraw tree to reflect status change as end type node
-						treeSrv.set $scope.treeData
+						when $scope.END
+							treeSrv.set $scope.treeData # Manually redraw tree to reflect status change as end type node
+
+						when $scope.SHORTANS
+							$scope.answers = []
+
+							# Create answer to pair with the "Unmatched Answers" option
+							$scope.newAnswer "[Unmatched Response]"
+							$scope.answers[0].isDefault = true
+
+							# Now create the first empty answer set
+							$scope.newAnswer()
+
+						else
+							$scope.answers = []
+							$scope.newAnswer()
 
 				if $scope.editedNode.media
 					# TODO add type check for media here
@@ -636,7 +649,7 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 						$scope.mediaReady = true
 						console.log "image upload via media.updated broadcast complete!"
 
-		$scope.newAnswer = () ->
+		$scope.newAnswer = (text = null) ->
 
 			# If the editedNode has a pending target, the new answer's target will be set to it
 			# pendingTarget is used for adding in-between nodes or linking orphaned nodes
@@ -648,7 +661,7 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 				targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
 
 			newAnswer =
-				text: null
+				text: text
 				feedback: null
 				target: targetId
 				linkMode: $scope.NEW

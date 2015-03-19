@@ -235,25 +235,32 @@ h1 {
 	}
 }
 
-.hotarea {
-	position: absolute;
-	display: block;
-	top: 145px;
-	left: 50%;
-	margin-left: -365px;
-}
-
 .hotspot {
+	position: relative;
 	text-align: center;
+
 	img {
-		position:absolute;
-		top: 145px;
-		left: 50%;
-		margin-left: -365px;
-		max-width: 730px;
-		max-height: 650px;
+		position: relative;
+
+		max-width: 698px;
+		max-height: 400px;
+
+		margin-left: auto;
+		margin-right: auto;
 	}
-	
+
+	svg.hotarea {
+		position: absolute;
+		display: block;
+
+		width: 698px;
+		height: 400px;
+		z-index: 10;
+
+		left: 50%;
+		margin-left: -349px;
+	}
+
 	.answerbubble {
 		position:absolute;
 		margin-top: 115px;
@@ -268,7 +275,7 @@ h1 {
 	}
 }
 
-path, ellipse {
+rect, ellipse, polygon {
 	cursor: pointer;
 	&:hover {
 		opacity: 0.7;

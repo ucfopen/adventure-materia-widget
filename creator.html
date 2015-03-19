@@ -34,6 +34,7 @@
 			</div>
 			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
 			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
+			<button type="button" class="temp-qset-gen-button" ng-click="generateDebugQset()">Generate QSet</button>
 		</header>
 		<div id="adventure-container">
 			<title-editor ng-show="showTitleEditor">
@@ -84,7 +85,7 @@
 				</ul>
 			</new-node-manager-dialog>
 			<node-creation class="node-creation-screen"
-				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == HOTSPOT}"
+				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
 				<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
@@ -118,8 +119,22 @@
 					ng-click="beginMediaImport()">
 						<span>+</span>Add Media
 				</button>
-				<div class="answers-container" ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS">
+				<div class="answers-container"
+					ng-class="{'long' : displayNodeCreation == SHORTANS}"
+					ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS">
 					<ul>
+						<li class="unmatched-answers-row"
+							ng-if="displayNodeCreation == SHORTANS">
+							<div class="unmatched-answers-box">
+								<p><span>Unmatched Answers:</span> Used if the response doesn't match any possible answers you provided.</p>
+							</div>
+							<input type="text" ng-model="answers[0].feedback" placeholder="Enter Optional Feedback" />
+							<button type="button"
+								class="answer-node-select"
+								ng-class="{'managed' : answers[0].target == newNodeManager.target}"
+								ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+
+						</li>
 						<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
 							<button type="button"
 								class="delete-button"
@@ -136,6 +151,7 @@
 						<li ng-if="displayNodeCreation == 	SHORTANS"
 							ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}"
 							ng-repeat="answer in answers"
+							ng-show="$index > 0"
 							short-answer-set>
 							<button type="button"
 								class="delete-button"
