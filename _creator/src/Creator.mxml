@@ -71,6 +71,8 @@
 		// private var _initialScore:int = 100;
 		// [Bindable]
 		// private var _scoreStyleLabel:String = "None Selected";
+
+		public var interfaceReady:Boolean = false;
 		//--------------------------------------------------------------------------
 		//
 		//  Accessor Functions
@@ -156,7 +158,19 @@
 			// Load the score style (quiz|quest|free)
 			// _scoreStyle = questionSet.items[0].options.scoreStyle;
 			// Load the qset into the tree
-			_adventureTree.createTreeFromQset(questionSet);
+
+			// if interface is prepped, go ahead and create the tree
+			// otherwise, wait for it to finish
+			// "interfaceReady" call is dispatched from DisplayTree->onAddedToStage
+			if (interfaceReady == true) {
+				_adventureTree.createTreeFromQset(questionSet);
+			}
+			else
+			{
+				addEventListener("interfaceReady", function(event:Event):void {
+					_adventureTree.createTreeFromQset(questionSet);
+				});
+			}
 		}
 
 		public override function startImportingSet():void

@@ -97,7 +97,7 @@ public class DisplayTree extends Sprite
 	private var _branchHighlightLayer:Sprite;
 	private var _tree:Sprite;
 	private var _root:DisplayNode;
-	private var _debugButton:Button;
+	//private var _debugButton:Button;
 	private var _debugField:TextField;
 	private var _prependBubble:PrependBubble;
 	private var _nodeBubble:NodeBubble;
@@ -636,8 +636,8 @@ public class DisplayTree extends Sprite
 		// remove any display nodes that need to be deleted
 		while(_pendingDeletions.length) _tree.removeChild(_pendingDeletions.pop());
 		// adjust debug button
-		_debugButton.x = PADDING_H;
-		_debugButton.y = _overlay.height - _debugButton.height - PADDING_V;
+		//_debugButton.x = PADDING_H;
+		//_debugButton.y = _overlay.height - _debugButton.height - PADDING_V;
 	}
 	private function autoScrollDown(e:Event):void
 	{
@@ -889,6 +889,7 @@ public class DisplayTree extends Sprite
 			else _recoveredIds.push(i);
 		}
 		// draw the tree
+		trace("CALLING REDRAW FROM createTreeFromQset");
 		redraw();
 		
 		if(errors > 0)
@@ -980,6 +981,8 @@ public class DisplayTree extends Sprite
 		// Store important parent references
 		_displayArea = UIComponent(parent);
 		_container = Container(_displayArea.parent);
+		_creator.interfaceReady = true;
+		_creator.dispatchEvent(new Event("interfaceReady"));
 		// Add Event Listeners
 		_displayArea.addEventListener(Event.RESIZE, onResize, false, 0, true);
 		_container.addEventListener(MouseEvent.MOUSE_WHEEL, onScroll, false, 0, true);
@@ -995,9 +998,9 @@ public class DisplayTree extends Sprite
 	private function draw():void
 	{
 		// add debug button at bottom
-		_debugButton = new Button("Debug");
+		//_debugButton = new Button("Debug");
 //		_overlay.addChild(_debugButton);
-		_debugButton.addEventListener(MouseEvent.CLICK, onDebugClick, false, 0, true);
+		//_debugButton.addEventListener(MouseEvent.CLICK, onDebugClick, false, 0, true);
 		redraw();
 		/*
 		// draw the legend
