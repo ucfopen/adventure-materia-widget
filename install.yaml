@@ -12,9 +12,9 @@ general:
   is_storage_enabled: No
   api_version: 2
 files:
-  creator: assets/adventure-creator.swf
-  player: player.html
-  flash_version: 0
+  creator: swf/adventure-creator.swf
+  player: swf/adventure-engine.swf
+  flash_version: 10
 score:
   is_scorable: Yes
   score_module: Adventure
