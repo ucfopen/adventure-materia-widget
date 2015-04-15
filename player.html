@@ -87,8 +87,6 @@
 				<div ng-repeat='answer in answers'
 					class='answerbubble'
 					ng-click="handleAnswerSelection(answer.link,answer.index)"
-					ng-mouseover='answer.hover=true'
-					ng-mouseout='answer.hover=false'
 					ng-show='answer.hover'
 					style='top:{{answer.balloontop}}px;left:{{answer.balloonleft}}px;'>
 					{{answer.text}}
@@ -102,7 +100,9 @@
 					xmlns:xlink="http://www.w3.org/1999/xlink"
 					xml:space="preserve">
 					<g ng-repeat="answer in answers"
-						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})">
+						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})"
+						ng-mouseover='answer.hover=true'
+						ng-mouseout='answer.hover=false'>
 						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
 							ng-attr-cx="0"
 							ng-attr-cy="0"

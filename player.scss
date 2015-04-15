@@ -263,13 +263,14 @@ h1 {
 
 	.answerbubble {
 		position:absolute;
-		margin-top: 115px;
-		margin-left: 0px;
+		z-index: 15;
+
+		padding: 8px;
+
+		border-radius: 5px;
 		color: #fff;
 		background: rgba(0,0,0,0.8);
 		font-weight: normal;
-		padding: 8px;
-		border-radius: 5px;
 
 		cursor: pointer;
 	}

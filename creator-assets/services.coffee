@@ -200,7 +200,7 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 				itemData.options.asset =
 					materiaType: "asset"
 					align: tree.media.align # replacement of "layout" parameter
-					id: tree.media.url # URL likely needs conversion?
+					id: tree.media.id # URL likely needs conversion?
 					type: tree.media.type # right now just "image", will be expanded upon in the future
 
 			switch tree.type
