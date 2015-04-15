@@ -204,9 +204,12 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 			console.log "Uh oh, media import doesn't have a target node"
 			return
 
+		console.log media
+
 		$scope.editedNode.media =
 			type: "image"
 			url: Materia.CreatorCore.getMediaUrl media[0].id
+			id: media[0].id
 			align: "right"
 
 		$rootScope.$broadcast "editedNode.media.updated"
