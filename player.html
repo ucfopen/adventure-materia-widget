@@ -41,38 +41,38 @@
 				ng-click="closeFeedback()">
 		</div>
 
-		<section class="question clearfix" ng-switch="question.layout">
-			<div ng-switch-when='0'>
+		<section class="question clearfix" ng-switch="layout">
+			<div ng-switch-when="image-only">
 				<figure class="asset">
 					<img src="{{ question.image }}" />
 				</figure>
 			</div>
-			<div ng-switch-when='1'>
+			<div ng-switch-when="text-only">
 				<h2 class="text">{{ question.text }}</h2>
 			</div>
-			<div ng-switch-when='2'>
+			<div ng-switch-when="right">
 				<h2 class="text left">{{ question.text }}</h2>
 				<figure class="asset right">
 					<img src="{{ question.image }}" />
 				</figure>
 			</div>
-			<div ng-switch-when='3'>
+			<div ng-switch-when="left">
 				<figure class="asset left">
 					<img src="{{ question.image }}" />
 				</figure>
 				<h2 class="text right">{{ question.text }}</h2>
 			</div>
-			<div ng-switch-when='4'>
-				<h2 class="text">{{ question.text }}</h2>
+			<div ng-switch-when="bottom">
+				<h2 class="text bottom">{{ question.text }}</h2>
 				<figure class="asset center">
 					<img src="{{ question.image }}" />
 				</figure>
 			</div>
-			<div ng-switch-when='5'>
+			<div ng-switch-when="top">
 				<figure class="asset center">
 					<img src="{{ question.image }}" />
 				</figure>
-				<h2 class="text">{{ question.text }}</h2>
+				<h2 class="text top">{{ question.text }}</h2>
 			</div>
 		</section>
 		<section class="answers">

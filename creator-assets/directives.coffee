@@ -782,6 +782,12 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 			switch $scope.editedNode.media.align
 				when "left" then $scope.editedNode.media.align = "right"
 				when "right" then $scope.editedNode.media.align = "left"
+				when "top" then $scope.editedNode.media.align = "bottom"
+				when "bottom" then $scope.editedNode.media.align = "top"
+
+		$scope.swapMediaOrientation = ->
+			if $scope.editedNode.media.align is "left" or $scope.editedNode.media.align is "right" then $scope.editedNode.media.align = "top"
+			else $scope.editedNode.media.align = "right"
 
 # Directive for each short answer set. Contains logic for adding and removing individual answer matches.
 Adventure.directive "shortAnswerSet", (treeSrv) ->
