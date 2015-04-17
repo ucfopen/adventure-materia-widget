@@ -44,6 +44,8 @@ h1 {
 		font-size:22px;
 		color:#363636;
 
+		vertical-align: top;
+
 		&.left {
 			width:45%;
 			display:inline-block;
@@ -55,6 +57,9 @@ h1 {
 			top: 60px;
 			right: 20px;
 		}
+		&.top, &.bottom {
+			text-align: center;
+		}
 	}
 }
 
@@ -63,14 +68,14 @@ h1 {
 
 	img {
 		max-width: 100%;
-		max-height: 500px;
+		max-height: 350px;
 	}
 
 	&.right {
-		position: absolute;
-		top: 60px;
-		right: -20px;
+		display: inline-block;
+		margin-right: 40px;
 	}
+
 	&.center {
 		width: 90%;
 		margin: auto;

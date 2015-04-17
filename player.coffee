@@ -2,14 +2,6 @@ AdventureApp = angular.module('AdventureApp', [])
 
 AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
-	# TODO Deprecate these constants
-	LAYOUT_IMAGE_ONLY = 0	# Layout that contains only an image
-	LAYOUT_TEXT_ONLY = 1 	# Layout that contains only text
-	LAYOUT_HORIZ_TEXT = 2 	# Horizontal layout that contains text and then an image
-	LAYOUT_HORIZ_IMAGE = 3 	# Horizontal layout that contains an image and then text
-	LAYOUT_VERT_TEXT = 4 	# Vertical layout that contains text and then an image
-	LAYOUT_VERT_IMAGE = 5 	# Vertical layout that contains an image and then text
-
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
 	$scope.SHORTANS = "shortanswer"
@@ -44,9 +36,12 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 			if $scope.qset.items[n].options.id is questionId
 				q_data = $scope.qset.items[n]
 
+		unless q_data.options.asset then $scope.layout = "text-only"
+		else $scope.layout = q_data.options.asset.align
+
 		$scope.question =
 			text : q_data.question, # questions is no longer an array of objects, flattened to single property
-			layout: 1 # q_data.options.layout   //  TODO add back in
+			layout: $scope.layout,
 			type : q_data.options.type,
 			id : q_data.options.id
 			options: q_data.options
@@ -68,8 +63,9 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 
 		# TODO Add back in with Layout support
 		# check if question has an associated asset (for now, just an image)
-		if $scope.question.type is $scope.HOTSPOT then $scope.question.layout = LAYOUT_VERT_TEXT
-		if $scope.question.layout isnt LAYOUT_TEXT_ONLY
+		# if $scope.question.type is $scope.HOTSPOT then $scope.question.layout = LAYOUT_VERT_TEXT
+		if $scope.question.type is $scope.HOTSPOT then $scope.question.layout = "bottom"
+		if $scope.question.layout isnt "text-only"
 			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			$scope.question.image = image_url
 
