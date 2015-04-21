@@ -276,6 +276,49 @@ button.temp-qset-gen-button {
 	margin-right: 25px;
 }
 
+debug-qset-loader {
+	position: absolute;
+	width: 450px;
+
+	top: 150px;
+	left: 50%;
+	margin-left: -175px;
+	padding-bottom: 25px;
+
+	z-index: 5;
+
+	background: $color-primary;
+	border-radius: 5px;
+
+	box-shadow: $shadow-small;
+
+	h4 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+
+		color: $color-primary;
+		background: $color-accent;
+	}
+
+	textarea {
+		width: 400px;
+		height: 300px;
+		margin-left: 25px;
+		margin-top: 25px;
+	}
+
+	button {
+		margin-top: 15px;
+		margin-left: 25px;
+	}
+}
+
 /* Tools and dialog windows */
 
 toast {

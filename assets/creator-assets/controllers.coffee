@@ -1,9 +1,6 @@
 Adventure = angular.module "AdventureCreator"
 Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, treeSrv) ->
 
-	# Iterator that generates node IDs
-	count = 1
-
 	# Define constants for node screen types
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -108,6 +105,21 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 			$scope.showIntroDialog = true
 			$scope.showBackgroundCover = true
 
+	$scope.initExistingWidget = (title,widget,qset,version,baseUrl) ->
+
+
+		if qset
+			$scope.$apply () ->
+				$scope.title = title
+				$scope.treeData = treeSrv.createTreeDataFromQset qset
+				treeSrv.set $scope.treeData
+
+	$scope.onSaveClicked = (mode = 'save') ->
+		qset = treeSrv.createQSetFromTree $scope.treeData
+		Materia.CreatorCore.save $scope.title, qset
+
+	$scope.onSaveComplete = (title, widget, qset, version) -> true
+
 	# Controller recipient of the treeViz directive's onClick method
 	# data contains the node object
 	$scope.nodeSelected = (data) ->
@@ -136,8 +148,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	# TODO this ought to be moved to treeSrv
 	$scope.addNode = (parent, type) ->
 
-		newId = count
-		newName = $scope.integerToLetters newId
+		newId = treeSrv.getNodeCount()
+		newName = treeSrv.integerToLetters newId
 
 		newNode =
 			name: "#{newName}" # name: "Node #{count} (#{type})"
@@ -148,7 +160,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 
 		treeSrv.findAndAdd $scope.treeData, parent, newNode
 
-		count++
+		treeSrv.incrementNodeCount()
 		treeSrv.set $scope.treeData
 
 		$scope.nodeTools.show = false
@@ -160,8 +172,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	# Function that explicitly adds a node between an existing parent and child
 	$scope.addNodeInBetween = (data) ->
 
-		newId = count
-		newName = $scope.integerToLetters newId
+		newId = treeSrv.getNodeCount()
+		newName = treeSrv.integerToLetters newId
 
 		newNode =
 			name: "#{newName}" # name: "Node #{count} (#{type})"
@@ -173,27 +185,12 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 
 		treeSrv.findAndAddInBetween $scope.treeData, data.source, data.target, newNode
 
-		count++
+		treeSrv.incrementNodeCount()
 		treeSrv.set $scope.treeData
 
-	# Helper function that converts node IDs to their respective alphabetical counterparts
-	# e.g., 1 is "A", 2 is "B", 26 is "Z", 27 is "AA", 28 is "AB"
+	# Reference function so the integerToLetters function from treeSrv can be called using two-way data binding
 	$scope.integerToLetters = (val) ->
-
-		if val is 0 then return "Start"
-
-		iteration = 0
-		prefix = ""
-
-		while val > 26
-			iteration++
-			val -= 26
-
-		if iteration > 0 then prefix = String.fromCharCode 64 + iteration
-
-		chars = prefix + String.fromCharCode 64 + val
-
-		chars
+		return treeSrv.integerToLetters(val)
 
 	# onMediaImportComplete is required by the creator core
 	# Since it's not intrinsically tied to any one dom element, and does no dom manipulation,
@@ -215,7 +212,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		$rootScope.$broadcast "editedNode.media.updated"
 
 	$scope.generateDebugQset = ->
-		qset = treeSrv.generateQSetFromTree $scope.treeData
+		qset = treeSrv.createQSetFromTree $scope.treeData
 
 		console.log JSON.stringify(qset, null, 2)
 

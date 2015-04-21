@@ -11,6 +11,9 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 		parentId: -1
 		contents: []
 
+	# Iterator that generates node IDs
+	count = 1
+
 	# Self explanatory getter function
 	get = ->
 		treeData
@@ -19,6 +22,15 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 	set = (data) ->
 		treeData = data
 		$rootScope.$broadcast "tree.nodes.changed"
+
+	getNodeCount = ->
+		count
+
+	setNodeCount = (val) ->
+		count = val
+
+	incrementNodeCount = ->
+		count++
 
 	# Max depth is the maximum tree depth, used for determining height of the D3 canvas
 	getMaxDepth = ->
@@ -35,19 +47,19 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		if tree.id == id then return tree
 
-		if !tree.children then return null
+		if !tree.contents then return null
 
 		# iterator required instead of using angular.forEach
 		i = 0
 
-		while i < tree.children.length
+		while i < tree.contents.length
 
-			child = tree.children[i]
+			child = tree.contents[i]
 
 			if child.id == id
 				return child
 			else
-				node =  findNode tree.children[i], id
+				node =  findNode tree.contents[i], id
 				if node isnt null then return node
 				i++
 		null
@@ -60,21 +72,21 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		if tree.id == parentId
 			tree.contents.push node
-			tree
+			return tree
 
-		if !tree.children then return
+		if !tree.contents then return
 
 		i = 0
 
-		while i < tree.children.length
+		while i < tree.contents.length
 
-			child = tree.children[i]
+			child = tree.contents[i]
 
 			if child.id == parentId
 				child.contents.push node
-				return
+				return tree
 			else
-				findAndAdd tree.children[i], parentId, node
+				findAndAdd tree.contents[i], parentId, node
 				i++
 
 		tree
@@ -90,9 +102,9 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 			# First, find reference to childId in list of parent's children
 			n = 0
-			while n < tree.children.length
+			while n < tree.contents.length
 
-				child = tree.children[n]
+				child = tree.contents[n]
 
 				# Update the parent node's associated answer target with the new node ID
 				if tree.answers[n].target is childId then tree.answers[n].target = node.id
@@ -104,18 +116,19 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 					node.contents = [child]
 
 					# Replace tree's existing child with new node
-					tree.children[n] = node
+					tree.contents[n] = node
 
-					tree # return the revised tree
+					return tree # return the revised tree
 				else
 					n++ # No recursion, since the childId node has to be a direct child of the parentId node
 
-		if ! tree.children then return
+		console.log tree.contents
+		if ! tree.contents then return
 
 		i = 0
 
-		while i < tree.children.length
-			findAndAddInBetween tree.children[i], parentId, childId, node
+		while i < tree.contents.length
+			findAndAddInBetween tree.contents[i], parentId, childId, node
 			i++
 
 		tree
@@ -125,14 +138,14 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 	# id: the id the node to be removed
 	findAndRemove = (parent, id) ->
 
-		if !parent.children then return
+		if !parent.contents then return
 
 		# iterator required instead of using angular.forEach
 		i = 0
 
-		while i < parent.children.length
+		while i < parent.contents.length
 
-			child = parent.children[i]
+			child = parent.contents[i]
 
 			if child.id == id
 
@@ -145,16 +158,16 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 					else
 						j++
 
-				parent.children.splice i, 1
+				parent.contents.splice i, 1
 			else
-				findAndRemove parent.children[i], id
+				findAndRemove parent.contents[i], id
 				i++
 
 		parent
 
 	findMaxDepth = (tree, depth=0) ->
 
-		if !tree.children
+		if !tree.contents
 
 			if tree.depth > depth
 				depth = tree.depth
@@ -163,9 +176,9 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		i = 0
 
-		while i < tree.children.length
+		while i < tree.contents.length
 
-			child = tree.children[i]
+			child = tree.contents[i]
 
 			depth = findMaxDepth child, depth
 
@@ -173,13 +186,13 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		return depth
 
-	generateQSetFromTree = (tree) ->
+	createQSetFromTree = (tree) ->
 
 		qset =
-			version: "2.0.1"
-			data:
-				items: formatTreeDataForQset tree, []
-				options: {}
+			items: formatTreeDataForQset tree, []
+			options:
+				nodeCount: count
+
 
 
 	formatTreeDataForQset = (tree, items) ->
@@ -193,6 +206,7 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 				question: if tree.question then tree.question else ""
 				options:
 					id: tree.id
+					parentId: tree.parentId
 					type: tree.type
 				answers: []
 
@@ -209,9 +223,8 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 				when "end"
 					itemData.options.finalScore = tree.finalScore
 
-			#if tree.type is "hotspot" then itemData.options.visibility = answer.hotspotVisibility
-
-			itemAnswerData = {}
+			if tree.hasLinkToOther then itemData.options.hasLinkToOther = true
+			if tree.hasLinkToSelf then itemData.options.hasLinkToSelf = true
 
 			angular.forEach tree.answers, (answer, index) ->
 
@@ -247,13 +260,96 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		return items
 
+	createTreeDataFromQset = (qset) ->
 
+		tree = {}
+
+		if qset.options.nodeCount then setNodeCount qset.options.nodeCount
+
+		angular.forEach qset.items, (item, index) ->
+
+			node =
+				id: item.nodeId
+				name: integerToLetters item.nodeId
+				parentId: item.options.parentId
+				type: item.options.type
+				contents: []
+
+			if item.question then node.question = item.question
+
+			if item.options.asset
+				node.media =
+					id: item.options.asset.id
+					url: Materia.CreatorCore.getMediaUrl item.options.asset.id
+					align: item.options.asset.align
+					type: item.options.asset.type
+
+			switch item.options.type
+				when "hotspot"
+					node.hotspotVisibility = item.options.visibility
+				when "end"
+					node.finalScore = item.options.finalScore
+
+			if item.options.hasLinkToOther then node.hasLinkToOther = true
+			if item.options.hasLinkToSelf then node.hasLinkToSelf = true
+
+			angular.forEach item.answers, (answer, index) ->
+
+				unless node.answers then node.answers = []
+
+				nodeAnswer =
+					text: answer.text
+					value: answer.value
+					target: answer.options.link
+					linkMode: answer.options.linkMode
+					feedback: answer.options.feedback
+
+				switch item.options.type
+					when "shortanswer"
+						nodeAnswer.matches = answer.options.matches
+						if answer.options.isDefault then nodeAnswer.isDefault = true
+
+					when "hotspot"
+						nodeAnswer.svg = answer.options.svg
+
+				node.answers.push nodeAnswer
+
+			# Logic to append node to its intended position on the tree
+			if node.parentId is -1 then tree = node
+			else
+				tree = findAndAdd tree, node.parentId, node
+
+		tree
+
+	# Helper function that converts node IDs to their respective alphabetical counterparts
+	# e.g., 1 is "A", 2 is "B", 26 is "Z", 27 is "AA", 28 is "AB"
+	integerToLetters = (val) ->
+
+		if val is 0 then return "Start"
+
+		iteration = 0
+		prefix = ""
+
+		while val > 26
+			iteration++
+			val -= 26
+
+		if iteration > 0 then prefix = String.fromCharCode 64 + iteration
+
+		chars = prefix + String.fromCharCode 64 + val
+
+		chars
 
 	get : get
 	set : set
+	getNodeCount : getNodeCount
+	setNodeCount : setNodeCount
+	incrementNodeCount : incrementNodeCount
 	getMaxDepth : getMaxDepth
 	findNode : findNode
 	findAndAdd : findAndAdd
 	findAndAddInBetween : findAndAddInBetween
 	findAndRemove : findAndRemove
-	generateQSetFromTree : generateQSetFromTree
+	createQSetFromTree : createQSetFromTree
+	createTreeDataFromQset : createTreeDataFromQset
+	integerToLetters : integerToLetters
