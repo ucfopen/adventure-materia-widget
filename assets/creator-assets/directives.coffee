@@ -48,6 +48,12 @@ Adventure.directive 'enterSubmit', ($compile) ->
 
 				event.preventDefault()
 
+Adventure.directive "autoSelect", () ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+		$element.on "click", () ->
+			this.select()
+
 Adventure.directive "treeVisualization", (treeSrv) ->
 	restrict: "E",
 	scope: {
@@ -1227,4 +1233,26 @@ Adventure.directive "polygonArtboard", ($rootScope) ->
 			$scope.cursorPoint =
 				x : null
 				y : null
+
+# MEANT FOR DEBUG PURPOSES ONLY
+Adventure.directive "debugQsetLoader", (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.debugQset = ""
+
+		$scope.loadDebugQset = ->
+
+			try
+				qset = JSON.parse $scope.debugQset
+				$scope.treeData = treeSrv.createTreeDataFromQset qset
+				console.log $scope.treeData
+			catch err
+				console.log err
+				$scope.showQsetLoader = false
+				return
+
+			treeSrv.set $scope.treeData
+			$scope.showQsetLoader = false
+
 

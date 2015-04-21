@@ -8,7 +8,7 @@
 		<link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900,400italic' rel='stylesheet' type='text/css'>
 
 		<!-- STYLESHEETS -->
-		<link rel="stylesheet" type="text/css" href="creator-assets/creator.css">
+		<link rel="stylesheet" type="text/css" href="assets/creator-assets/creator.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script src="materia.creatorcore.js"></script>
@@ -22,10 +22,10 @@
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
 		<!-- MAIN CREATOR SCRIPT -->
-		<script src="creator-assets/app.js"></script>
-		<script src="creator-assets/services.js"></script>
-		<script src="creator-assets/directives.js"></script>
-		<script src="creator-assets/controllers.js"></script>
+		<script src="assets/creator-assets/app.js"></script>
+		<script src="assets/creator-assets/services.js"></script>
+		<script src="assets/creator-assets/directives.js"></script>
+		<script src="assets/creator-assets/controllers.js"></script>
 
 	</head>
 	<body ng-controller="AdventureCtrl">
@@ -35,12 +35,18 @@
 			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
 			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
 			<button type="button" class="temp-qset-gen-button" ng-click="generateDebugQset()">Generate QSet</button>
+			<button type="button" class="temp-qset-gen-button" ng-click="showQsetLoader = true">Load QSet</button>
 		</header>
 		<div id="adventure-container">
 			<title-editor ng-show="showTitleEditor">
 				<h4>Give Your Widget a Title</h4>
-				<input type="text" ng-model="title" />
+				<input type="text" ng-model="title" enter-submit="hideCoverAndModals()" auto-select />
 			</title-editor>
+			<debug-qset-loader ng-show="showQsetLoader">
+				<h4>Load a QSet to Debug</h4>
+				<textarea ng-model="debugQset"></textarea>
+				<button type="button" ng-click="loadDebugQset()">Load Qset</button>
+			</debug-qset-loader>
 			<toast ng-hide="!showToast"
 				ng-click="hideToast()"
 				class="fadeable">
