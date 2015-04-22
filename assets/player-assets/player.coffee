@@ -64,7 +64,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		# TODO Add back in with Layout support
 		# check if question has an associated asset (for now, just an image)
 		# if $scope.question.type is $scope.HOTSPOT then $scope.question.layout = LAYOUT_VERT_TEXT
-		if $scope.question.type is $scope.HOTSPOT then $scope.question.layout = "bottom"
+		if $scope.question.type is $scope.HOTSPOT then $scope.layout = "text-only"
 		if $scope.question.layout isnt "text-only"
 			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			$scope.question.image = image_url

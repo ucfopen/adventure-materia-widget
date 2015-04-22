@@ -111,6 +111,9 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 				if child.id == childId # reference to childId found
 
+					# make sure the child knows who its new momma is
+					child.parentId = node.id
+
 					# Set new node's child to the child node
 					node.children = [child]
 					node.contents = [child]
@@ -225,6 +228,8 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 			if tree.hasLinkToOther then itemData.options.hasLinkToOther = true
 			if tree.hasLinkToSelf then itemData.options.hasLinkToSelf = true
+			if tree.pendingTarget then itemData.options.pendingTarget = tree.pendingTarget
+			# TODO should deletedCache be included in QSet?
 
 			angular.forEach tree.answers, (answer, index) ->
 
@@ -292,6 +297,7 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 			if item.options.hasLinkToOther then node.hasLinkToOther = true
 			if item.options.hasLinkToSelf then node.hasLinkToSelf = true
+			if item.options.pendingTarget then node.pendingTarget = item.options.pendingTarget
 
 			angular.forEach item.answers, (answer, index) ->
 
