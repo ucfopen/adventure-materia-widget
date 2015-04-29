@@ -63,9 +63,15 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 	link: ($scope, $element, $attrs) ->
 
 		$scope.svg = null
+		$scope.copyMode = false
 
 		# Re-render tree whenever the nodes are updated
 		$scope.$on "tree.nodes.changed", (evt) ->
+			$scope.render treeSrv.get()
+
+		# Re-render the tree with copyMode enabled (highlights blank nodes)
+		$scope.$on "mode.copy", (evt) ->
+			$scope.copyMode = true
 			$scope.render treeSrv.get()
 
 		$scope.render = (data) ->
@@ -93,6 +99,10 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 			adjustedLinks = [] # Finalized links array that includes "special" links (loopbacks and bridges)
 
 			angular.forEach nodes, (node, index) ->
+
+				# the parent attribute isn't needed, and causes deep copy methods to fail since they recurse infinitely
+				# best to remove it
+				if node.parent then delete node.parent
 
 				# If the node has any non-hierarchical links, have to process them
 				# And generate new links that d3 won't create by default
@@ -263,6 +273,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				# .attr("class", "node")
 				.attr("class", (d) ->
 					if d.type is "bridge" then return "bridge"
+					else if $scope.copyMode and d.type is "blank" then return "node copyMode #{d.type}"
 					else return "node #{d.type}"
 				)
 				.on("mouseover", (d, i) ->
@@ -353,6 +364,8 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					if d.type isnt "bridge" then return "hidden"
 				)
 
+			$scope.copyMode = false
+
 		$scope.render treeSrv.get()
 
 Adventure.directive "titleEditor", () ->
@@ -364,9 +377,14 @@ Adventure.directive "titleEditor", () ->
 				$scope.showBackgroundCover = true
 
 # Directive for the node modal dialog (add child, delete node, etc)
-Adventure.directive "nodeToolsDialog", (treeSrv) ->
+Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
+
+		sourceTree = null
+		copyTree = null
+		targetNode = null
+
 		# When target for the dialog changes, update the position values based on where the new node is
 		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
 
@@ -378,7 +396,120 @@ Adventure.directive "nodeToolsDialog", (treeSrv) ->
 			$attrs.$set "style", styles
 
 		$scope.copyNode = () ->
-			console.log "Copying NYI!"
+
+			# Turn on copy mode and broadcast the change so the tree re-renders with copy mode enabled
+			# Causes the blank nodes to be highlighted so user can select a target to copy to
+			$scope.copyNodeMode = true
+			$scope.nodeTools.show = false
+
+			$rootScope.$broadcast "mode.copy"
+
+			$scope.toast "Select a blank node to copy this node to.", false
+
+			# Listen for the event associated with the user selecting a node to copy to
+			# copyNodeTarget is updated from the nodeSelected method in the controller
+			deregister = $scope.$watch "copyNodeTarget", (newVal, oldVal) ->
+
+				if newVal
+					$scope.hideToast()
+					# First, grab node to be copied
+					sourceTree = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+
+					# Make a deep copy of this tree that will be altered with values to be copied
+					copyTree = angular.copy sourceTree
+
+					# Copy data of nodeTools target to copy target (targetNode is node to be replaced)
+					targetNode = treeSrv.findNode $scope.treeData, newVal.id
+
+					# Recursively generate the copied tree
+					$scope.recursiveCopy copyTree
+
+					# Update the original tree target with the copy
+					result = treeSrv.findAndReplace $scope.treeData, targetNode.id, copyTree
+
+					deregister()
+
+					# Update the tree
+					treeSrv.set $scope.treeData
+
+					# Reset all values
+					$scope.copyNodeTarget = null
+					sourceTree = null
+					copyTree = null
+					targetNode = null
+
+		# Recursively copies the selected node & child nodes, updating ids, names, parent ids, and answer targets as needed
+		# The root node (the actual node being copied/replaced) retains the target node's tree position properties and id, name, and parent id.
+		# For all child nodes, new ids and names must be generated, and the parent ids updated with new parent ids
+		# The answer targets must be updated with the new ids as well
+		$scope.recursiveCopy = (copy, parentId = null) ->
+
+			# If it's the root node, the tree position properties and identity properties remain
+			if copy.id is sourceTree.id
+
+				angular.forEach targetNode, (val, key) ->
+
+					switch key
+						when "id", "name", "parentId", "depth", "x", "y"
+							copy[key] = val
+						when "children"
+							delete copy[key]
+
+			# Otherwise, if it's a child node, we have to generate new identity properties and link it to the updated parent id
+			# tree position properties are removed and re-generated when the tree is re-rendered
+			else
+
+				angular.forEach copy, (val, key) ->
+
+					switch key
+						when "id"
+
+							copy.formerId = copy.id
+							copy.id = treeSrv.getNodeCount()
+							treeSrv.incrementNodeCount()
+
+							# If the name attribute has already been passed over, need to go back & update it based on new id
+							if copy.updatedName
+								copy.name = copy.name = treeSrv.integerToLetters copy.id
+								delete copy.updatedName
+							# otherwise, leave a flag so it gets updated properly later
+							else copy.updatedId = true
+
+						when "name"
+
+							# If flag is set that ID is updated, go ahead and update the name
+							if copy.updatedId
+								copy.name = treeSrv.integerToLetters copy.id
+								delete copy.updatedId
+							# Otherwise, leave a flag so it gets updated when the ID is updated
+							else copy.updatedName = true
+
+							# copy.name = treeSrv.integerToLetters copy.id
+						when "parentId"
+							copy.parentId = parentId
+						when "depth", "x", "y", "children"
+							delete copy[key]
+
+				# Now, grab the parent's node so we can update its associated answer to point to the updated node
+				parentNode = treeSrv.findNode copyTree, parentId
+
+				angular.forEach parentNode.answers, (answer, index) ->
+					if answer.target is copy.formerId
+						console.log "Located answer pointing to former id " + copy.formerId + ", updating to " + copy.id
+						answer.target = copy.id
+						delete copy.formerId
+
+
+			if copy.contents.length is 0 then return
+
+			i = 0
+
+			while i < copy.contents.length
+
+				$scope.recursiveCopy copy.contents[i], copy.id
+				i++
+
+			return copy
 
 
 Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->

@@ -91,6 +91,33 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		tree
 
+	# Recursive function for replacing a given node on a tree with another node
+	# tree: the tree structure to be iterated. Should initially reference the root node
+	# parentId: the ID of the node to be replaced
+	# node: the node to replace the node of the given ID with
+	findAndReplace = (tree, id, node) ->
+
+		if tree.id == id
+			tree = node
+			return tree
+
+		if !tree.contents then return false
+
+		i = 0
+
+		while i < tree.contents.length
+
+			child = tree.contents[i]
+			if child.id == id
+				tree.contents[i] = node
+				return tree
+			else
+				next = findAndReplace tree.contents[i], id, node
+				if next isnt false then return tree
+				i++
+
+		false
+
 	# Recursive function for adding a node in between a given parent and child, essentially splitting an existing link
 	# tree: the tree structure to be iterated. Should initially reference the root node (treeData object)
 	# parentId: the ID of the parent node that serves as the source of the existing link
@@ -354,6 +381,7 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 	getMaxDepth : getMaxDepth
 	findNode : findNode
 	findAndAdd : findAndAdd
+	findAndReplace : findAndReplace
 	findAndAddInBetween : findAndAddInBetween
 	findAndRemove : findAndRemove
 	createQSetFromTree : createQSetFromTree
