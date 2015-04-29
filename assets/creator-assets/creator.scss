@@ -144,6 +144,13 @@ g.node {
 		stroke: #ADADAD;
 	}
 
+	&.copyMode.blank {
+		circle.node-dot {
+			stroke: $color-accent;
+			stroke-width: 3px;
+		}
+	}
+
 	&.mc circle.node-dot {
 		fill: $white;
 		stroke: #60b973;

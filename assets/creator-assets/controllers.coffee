@@ -43,6 +43,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	$scope.existingNodeSelectionMode = false
 	$scope.existingNodeSelected = null
 
+	$scope.copyNodeMode = false
+	$scope.copyNodeTarget = null
+
 	# This instantiation of treeData is required. It populates the "Start" node.
 	$scope.treeData =
 		name: "Start"
@@ -136,6 +139,14 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 			$scope.$apply () ->
 				$scope.existingNodeSelected = data
 				$scope.existingNodeSelectionMode = false
+
+		# Otherwise, if we're in copyNodeMode, the selected target is considered the copyNodeTarget
+		# Kicks off the listener to complete the node copy mode
+		else if $scope.copyNodeMode
+			$scope.$apply () ->
+				$scope.copyNodeTarget = data
+				$scope.copyNodeMode = false
+
 		else # Default selection behavior
 			$scope.$apply () ->
 				$scope.nodeTools.show = !$scope.nodeTools.show
