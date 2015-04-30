@@ -1,5 +1,5 @@
 Adventure = angular.module "AdventureCreator"
-Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, treeSrv) ->
+Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $timeout, treeSrv) ->
 
 	# Define constants for node screen types
 	$scope.BLANK = "blank"
@@ -58,6 +58,15 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 	$scope.displayNodeCreation = "none"
 	# Scope reference for the node currently being edited in a creation screen, updates when displayNodeCreation changes
 	$scope.editedNode = null
+
+	$scope.hoveredNode =
+		showTooltip: false
+		target: null
+		targetParent: null
+		x: 0
+		y: 0
+		text: null
+		pendingHide: false
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 		if newVal isnt oldVal and newVal isnt "none" and newVal isnt "suspended"
@@ -122,6 +131,32 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, tr
 		Materia.CreatorCore.save $scope.title, qset
 
 	$scope.onSaveComplete = (title, widget, qset, version) -> true
+
+	$scope.onNodeHover = (data) ->
+		if data.type is "bridge" then return
+		$scope.hoveredNode.pendingHide = false
+		if $scope.hoveredNode.target isnt data.id and data.parentId isnt -1
+
+			$scope.$apply () ->
+				$scope.hoveredNode.x = data.x
+				$scope.hoveredNode.y = data.y
+				$scope.hoveredNode.targetParent = data.parentId
+				$scope.hoveredNode.target = data.id
+
+	$scope.onNodeHoverOut = (data) ->
+		if data.type is "bridge" then return
+		if $scope.hoveredNode.target is data.id and data.parentId isnt -1
+			if $scope.hoveredNode.showTooltip is true
+				$scope.hoveredNode.pendingHide = true
+				$timeout (() ->
+					if $scope.hoveredNode.pendingHide is true
+						$scope.$apply () ->
+							$scope.hoveredNode.showTooltip = false
+							$scope.hoveredNode.target = null
+							$scope.hoveredNode.targetParent = null
+				), 500
+		else if $scope.hoveredNode.target isnt data.id
+			$scope.hoveredNode.showTooltip = false
 
 	# Controller recipient of the treeViz directive's onClick method
 	# data contains the node object

@@ -389,9 +389,9 @@
 					ng-click="newAnswer()"
 					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
 			</node-creation>
-
+			<answer-tooltip ng-show="hoveredNode.showTooltip">{{hoveredNode.text}}</answer-tooltip>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
-			<tree-visualization data="treeData" on-click="nodeSelected(data)"></tree-visualization>
+			<tree-visualization data="treeData" on-hover="onNodeHover(data)" on-hover-out="onNodeHoverOut(data)" on-click="nodeSelected(data)"></tree-visualization>
 		</div>
 	</body>
 </html>

@@ -58,7 +58,9 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 	restrict: "E",
 	scope: {
 		data: "=", # binds treeData in a way that's accessible to the directive
-		onClick: "&" # binds a listener so the controller can access the directive's click data
+		onClick: "&", # binds a listener so the controller can access the directive's click data
+		onHover: "&",
+		onHoverOut: "&"
 	},
 	link: ($scope, $element, $attrs) ->
 
@@ -278,7 +280,7 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				)
 				.on("mouseover", (d, i) ->
 
-					# if d.type is "bridge" then return
+					$scope.onHover {data: d}
 
 					#  Animation effects on node mouseover
 					d3.select(this).select("circle")
@@ -295,6 +297,8 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				.on("mouseout", (d, i) ->
 
 					# if d.type is "bridge" then return
+
+					$scope.onHoverOut {data: d}
 
 					# Animation effects on node mouseout
 					d3.select(this).select("circle")
@@ -375,6 +379,30 @@ Adventure.directive "titleEditor", () ->
 		$scope.$watch "showTitleEditor", (newVal, oldVal) ->
 			if newVal
 				$scope.showBackgroundCover = true
+
+Adventure.directive "answerTooltip", (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+		$scope.$watch "hoveredNode.target", (newVal, oldVal) ->
+			if newVal isnt null
+
+				xOffset = $scope.hoveredNode.x + 35
+				yOffset = $scope.hoveredNode.y + 35
+
+				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
+
+				$attrs.$set "style", styles
+
+				parent = treeSrv.findNode $scope.treeData, $scope.hoveredNode.targetParent
+
+				angular.forEach parent.answers, (answer, index) ->
+					if answer.target is $scope.hoveredNode.target
+						if answer.text isnt null
+							$scope.hoveredNode.text = answer.text
+						else
+							$scope.hoveredNode.text = "[No Answer Text]"
+
+				$scope.hoveredNode.showTooltip = true
 
 # Directive for the node modal dialog (add child, delete node, etc)
 Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
