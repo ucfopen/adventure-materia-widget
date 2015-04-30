@@ -380,21 +380,23 @@ Adventure.directive "titleEditor", () ->
 			if newVal
 				$scope.showBackgroundCover = true
 
+# Directive for the small tooltip displaying the answer associated with a given node on mouseover
 Adventure.directive "answerTooltip", (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 		$scope.$watch "hoveredNode.target", (newVal, oldVal) ->
 			if newVal isnt null
 
+				# Update the position of the tooltip
 				xOffset = $scope.hoveredNode.x + 35
 				yOffset = $scope.hoveredNode.y + 35
-
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
-
 				$attrs.$set "style", styles
 
+				# Grab the parent node so we can find the associated answer text
 				parent = treeSrv.findNode $scope.treeData, $scope.hoveredNode.targetParent
 
+				# Find the answer and update the tooltip text appropriately
 				angular.forEach parent.answers, (answer, index) ->
 					if answer.target is $scope.hoveredNode.target
 						if answer.text isnt null
@@ -967,22 +969,25 @@ Adventure.directive "shortAnswerSet", (treeSrv) ->
 			# first check to see if the entry already exists
 			i = 0
 
-			unless $scope.answers[index].matches.length
-				$scope.answers[index].matches.push $scope.newMatch
-				$scope.newMatch = ""
-				return
+			while i < $scope.answers.length
 
-			while i < $scope.answers[index].matches.length
+				j = 0
 
-				matchTo = $scope.answers[index].matches[i].toLowerCase()
+				while j < $scope.answers[i].matches.length
 
-				if matchTo.localeCompare($scope.newMatch.toLowerCase()) is 0
-					$scope.toast "This match already exists!"
-					return
+					matchTo = $scope.answers[i].matches[j].toLowerCase()
+
+					if matchTo.localeCompare($scope.newMatch.toLowerCase()) is 0
+						$scope.toast "This match already exists!"
+						return
+
+					j++
 
 				i++
 
+			# If we're all clear, go ahead and add it
 			$scope.answers[index].matches.push $scope.newMatch
+			$scope.answers[index].text = $scope.answers[index].matches.join ", "
 			$scope.newMatch = ""
 
 		$scope.removeAnswerMatch = (matchIndex, answerIndex) ->
