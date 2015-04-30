@@ -368,6 +368,18 @@ toast {
 	// }
 }
 
+answer-tooltip {
+	position: absolute;
+	max-width: 250px;
+	padding: 5px 10px;
+
+	border-radius: 5px;
+	background: $gray-darker;
+
+	color: $color-primary;
+	font-size: 0.7em;
+}
+
 title-editor {
 	position: absolute;
 	width: 450px;
