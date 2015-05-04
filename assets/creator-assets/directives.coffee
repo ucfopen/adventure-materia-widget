@@ -54,7 +54,7 @@ Adventure.directive "autoSelect", () ->
 		$element.on "click", () ->
 			this.select()
 
-Adventure.directive "treeVisualization", (treeSrv) ->
+Adventure.directive "treeVisualization", (treeSrv, $q) ->
 	restrict: "E",
 	scope: {
 		data: "=", # binds treeData in a way that's accessible to the directive
@@ -286,13 +286,6 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					d3.select(this).select("circle")
 					.transition()
 					.attr("r", 30)
-
-					# d3.select(this).select("text")
-					# .text( (d) ->
-					# 	d.name + " (Click to Edit)"
-					# )
-					# .transition()
-					# .attr("x", 10)
 				)
 				.on("mouseout", (d, i) ->
 
@@ -304,13 +297,6 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 					d3.select(this).select("circle")
 					.transition()
 					.attr("r", 20)
-
-					d3.select(this).select("text")
-					.text( (d) ->
-						d.name
-					)
-					# .transition()
-					# .attr("x", 0)
 				)
 				.on("click", (d, i) ->
 					$scope.onClick {data: d} # when clicked, we return all of the node's data
@@ -328,14 +314,39 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				)
 				.attr("filter", "url(#dropshadow)")
 
+			nodeGroup.append("svg:image")
+				.attr("xlink:href", (d) ->
+					switch d.type
+						when "blank" then return "assets/creator-assets/blank.svg"
+						when "mc" then return "assets/creator-assets/mc.svg"
+						when "shortanswer" then return "assets/creator-assets/sa.svg"
+						when "hotspot" then return "assets/creator-assets/hs.svg"
+						when "narrative" then return "assets/creator-assets/narr.svg"
+						when "end" then return "assets/creator-assets/end.svg"
+						else return ""
+				)
+				.attr("x", "-18")
+				.attr("y", "-18")
+				.attr("width","36")
+				.attr("height","36")
+
 			nodeGroup.append("svg:rect")
 				.attr("width", (d) ->
-					if d.name then return 10 * d.name.length
-					else return 0
+					unless d.name then return 0
+
+					if d.name.length > 1 then return 9 * d.name.length
+					else return 20
 				)
-				.attr("height", 16)
-				.attr("x", -10)
-				.attr("y", -8)
+				.attr("height", 19)
+				.attr("x", (d) ->
+					unless d.name then return 0
+
+					if d.name.length > 1 then return 8
+					else return 11
+				)
+				.attr("y", 0)
+				.attr("rx", 3)
+				.attr("ry", 3)
 
 			nodeGroup.append("svg:text")
 				.attr("text-anchor", (d) ->
@@ -345,8 +356,8 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				)
 				.attr("dx", (d) ->
 					if d.name
-						if d.name.length > 1 then return -10
-						else return -5
+						if d.name.length > 1 then return 10 # -10
+						else return 15 # -5
 					else return 0
 				)
 
@@ -356,9 +367,9 @@ Adventure.directive "treeVisualization", (treeSrv) ->
 				# 	# else return gap
 				# )
 
-				.attr("dy", 5) # sets Y label offset from node
+				.attr("dy", 15) # sets Y label offset from node
 				.attr("font-family", "Lato")
-				.attr("font-size", 16)
+				.attr("font-size", 14)
 				.text (d) ->
 					d.name
 
@@ -389,7 +400,7 @@ Adventure.directive "answerTooltip", (treeSrv) ->
 
 				# Update the position of the tooltip
 				xOffset = $scope.hoveredNode.x + 35
-				yOffset = $scope.hoveredNode.y + 35
+				yOffset = $scope.hoveredNode.y + 45
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 				$attrs.$set "style", styles
 
@@ -418,7 +429,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 		# When target for the dialog changes, update the position values based on where the new node is
 		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
 
-			xOffset = $scope.nodeTools.x + 15
+			xOffset = $scope.nodeTools.x + 0
 			yOffset = $scope.nodeTools.y + 50
 
 			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
@@ -749,6 +760,7 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 					switch $scope.editedNode.type
 						when $scope.HOTSPOT
 							$scope.answers = []
+							treeSrv.set $scope.treeData # Manually redraw tree to reflect status change as hotspot node
 
 						when $scope.END
 							treeSrv.set $scope.treeData # Manually redraw tree to reflect status change as end type node

@@ -152,7 +152,6 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 				else
 					n++ # No recursion, since the childId node has to be a direct child of the parentId node
 
-		console.log tree.contents
 		if ! tree.contents then return
 
 		i = 0
@@ -197,8 +196,7 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 	findMaxDepth = (tree, depth=0) ->
 
-		if !tree.contents
-
+		if !tree.children
 			if tree.depth > depth
 				depth = tree.depth
 
@@ -206,9 +204,9 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		i = 0
 
-		while i < tree.contents.length
+		while i < tree.children.length
 
-			child = tree.contents[i]
+			child = tree.children[i]
 
 			depth = findMaxDepth child, depth
 
