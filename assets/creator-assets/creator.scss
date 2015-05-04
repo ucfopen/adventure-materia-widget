@@ -24,6 +24,13 @@ $color-accent: $blue;
 $color-accent-highlight: $blue-lighter;
 $color-selection-hover: $blue-lightest;
 
+$color-blank: #ADADAD;
+$color-mc: #60b973;
+$color-sa: #6ea0aa;
+$color-hotspot: #ba83c7;
+$color-narr: #ffc656;
+$color-end: $red;
+
 $shadow-dialog: 0px 3px 3px $gray;
 $shadow-small: 0px 0px 2px $gray;
 $shadow-small-highlight: 0px 0px 5px $gray;
@@ -139,9 +146,16 @@ g.node {
 		stroke-width: 1px;
 	}
 
-	&.blank circle.node-dot {
-		fill: $white;
-		stroke: #ADADAD;
+	&.blank {
+
+		.node-type {
+			fill: $color-blank;
+		}
+
+		circle.node-dot {
+			fill: $white;
+			stroke: $color-blank;
+		}
 	}
 
 	&.copyMode.blank {
@@ -151,38 +165,73 @@ g.node {
 		}
 	}
 
-	&.mc circle.node-dot {
-		fill: $white;
-		stroke: #60b973;
+	&.mc {
+		.node-type {
+			fill: $color-mc;
+		}
+
+		circle.node-dot {
+			fill: $white;
+			stroke: $color-mc;
+		}
 	}
 
-	&.shortanswer circle.node-dot {
-		fill: $white;
-		stroke: #6ea0aa;
+	&.shortanswer {
+
+		.node-type {
+			fill: $color-sa;
+		}
+
+		circle.node-dot {
+			fill: $white;
+			stroke: $color-sa;
+		}
 	}
 
-	&.shortanswer circle.node-dot {
-		fill: $white;
-		stroke: #6ea0aa;
+	&.hotspot {
+
+		.node-type {
+			fill: $color-hotspot;
+		}
+
+		circle.node-dot {
+			fill: $white;
+			stroke: $color-hotspot;
+		}
 	}
 
-	&.hotspot circle.node-dot {
-		fill: $white;
-		stroke: #ba83c7;
+	&.narrative {
+
+		.node-type {
+			fill: $color-narr;
+		}
+
+		circle.node-dot {
+			fill: $white;
+			stroke: $color-narr;
+		}
 	}
 
-	&.narrative circle.node-dot {
-		fill: $white;
-		stroke: #ffc656;
-	}
+	&.end {
 
-	&.end circle.node-dot {
-		fill: $white;
-		stroke: $red;
+		.node-type {
+			fill: $color-end;
+		}
+
+		circle.node-dot {
+			fill: $white;
+			stroke: $color-end;
+		}
 	}
 
 	rect {
 		fill: $white;
+		stroke: $gray-lightest;
+		stroke-width: 2px;
+	}
+
+	text {
+		fill: $black;
 	}
 }
 
@@ -426,13 +475,14 @@ node-tools-dialog {
 	z-index: 30;
 
 	width: 200px;
-	height: 75px;
-
-	background: #fff;
-	// border: solid 1px #BDBDBD;
+	height: 85px;
 
 	padding-top: 10px;
 	padding-bottom: 15px;
+
+	background: $color-primary;
+	// border: solid 1px #BDBDBD;
+	border-radius: 6px;
 
 	box-shadow: $shadow-small;
 

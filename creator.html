@@ -59,8 +59,10 @@
 				ng-show="nodeTools.show"
 				data-pos-x="{{nodeTools.x}}"
 				data-pos-y="{{nodeTools.y}}">
+				Destination: {{ integerToLetters(nodeTools.target) }}
 				<button type="button" class="big-button" ng-click="editNode()">Edit Node</button>
 				<button type="button" ng-click="copyNode()">Copy</button>
+				<button type="button">Reset</button>
 			</node-tools-dialog>
 			<delete-warning-dialog ng-show="deleteDialog.show">
 				<h4>Confirm Node Deletion</h4>
