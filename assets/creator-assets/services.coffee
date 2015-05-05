@@ -20,6 +20,8 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 	# Updating the tree prompts a redraw of the D3 visualization
 	set = (data) ->
+		# console.log "TREEDATA UPDATED IN SERVICE"
+		# console.log treeData
 		treeData = data
 		$rootScope.$broadcast "tree.nodes.changed"
 
