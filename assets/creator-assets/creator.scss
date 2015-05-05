@@ -427,6 +427,13 @@ answer-tooltip {
 
 	color: $color-primary;
 	font-size: 0.7em;
+
+	.tooltip-title {
+		display: block;
+		font-size: 0.6em;
+
+		margin-bottom: 3px;
+	}
 }
 
 title-editor {
@@ -475,7 +482,7 @@ node-tools-dialog {
 	z-index: 30;
 
 	width: 200px;
-	height: 85px;
+	// height: 85px;
 
 	padding-top: 10px;
 	padding-bottom: 15px;
@@ -493,6 +500,21 @@ node-tools-dialog {
 		height: 30px;
 		margin-top: 10px;
 		margin-bottom: 10px;
+	}
+
+	.warning-dialog-section {
+		width: 180px;
+		margin-top: 10px;
+
+		padding: 10px;
+
+		font-size: 9pt;
+
+		background: $gray-lighter;
+
+		p {
+			margin: 0px 0px 15px 0px;
+		}
 	}
 }
 
@@ -638,6 +660,8 @@ node-creation-selection-dialog {
 
 			margin-top: 25px;
 
+			vertical-align: top;
+
 			background: $color-primary;
 			box-shadow: $shadow-small;
 
@@ -665,6 +689,32 @@ node-creation-selection-dialog {
 				height: 50px;
 
 				margin: 25px 0 0 0;
+
+				text-align: left;
+
+				img {
+					display: inline-block;
+					width: 48px;
+					height: 48px;
+
+					margin: 1px 15px 1px 100px;
+				}
+
+				span {
+					display: inline-block;
+					vertical-align: top;
+
+					margin-top: 16px;
+					margin-bottom: 15px;
+				}
+			}
+
+			img {
+				display: block;
+				width: 100px;
+				height: 100px;
+
+				margin: 25px auto 15px auto;
 			}
 		}
 	}

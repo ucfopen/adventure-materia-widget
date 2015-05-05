@@ -422,6 +422,11 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
+		# Flags for displaying the reset node confirmation dialog
+		hasChildrenFlag = false
+		$scope.nodeTools.showResetWarning = false
+
+		# Helper vars for copying node/child trees, stored up here for scope reasons
 		sourceTree = null
 		copyTree = null
 		targetNode = null
@@ -435,6 +440,9 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 
 			$attrs.$set "style", styles
+
+			# Reset the visibility of the warning flag
+			$scope.nodeTools.showResetWarning = false
 
 		$scope.copyNode = () ->
 
@@ -551,6 +559,47 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 				i++
 
 			return copy
+
+		$scope.resetNodePreCheck = () ->
+			hasChildrenFlag = false
+
+			node = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+
+			angular.forEach node.contents, (child, index) ->
+				if child.contents.length > 0
+					hasChildrenFlag = true
+					$scope.nodeTools.showResetWarning = true
+
+			unless hasChildrenFlag then $scope.resetNode()
+
+		$scope.resetNode = () ->
+
+			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+
+			angular.forEach target.answers, (answer, index) ->
+				treeSrv.findAndRemove $scope.treeData, answer.target
+
+			angular.forEach target, (val, key) ->
+				switch key
+					when "id", "name", "parentId", "x", "y", "depth", "type"
+						# do nothing
+					else
+						delete target[key]
+
+			target.type = $scope.BLANK
+			target.contents = []
+
+			if $scope.editedNode.id is $scope.nodeTools.target
+				$scope.editedNode = {}
+
+			treeSrv.findAndReplace $scope.treeData, target.id, target
+			treeSrv.set $scope.treeData
+
+			$scope.toast "Node " + target.name + " has been reset."
+
+			$scope.nodeTools.showResetWarning = false
+			$scope.nodeTools.show = false
+			$scope.nodeTools.target = null
 
 
 Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
@@ -848,7 +897,6 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 			# Add a matches property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
 				newAnswer.matches = []
-
 			$scope.answers.push newAnswer
 
 		# Check to see if removing this answer will delete any child nodes of the selected answer's node
@@ -860,8 +908,6 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 			targetId = $scope.answers[index].target
 
 			targetNode = treeSrv.findNode $scope.treeData, targetId
-
-			console.log "targetNode has " + targetNode.contents.length + " content nodes!"
 
 			if targetNode.contents.length > 0 and $scope.answers[index].linkMode is $scope.NEW
 				$scope.deleteDialog.x = evt.currentTarget.getBoundingClientRect().left

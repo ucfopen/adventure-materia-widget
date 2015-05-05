@@ -21,8 +21,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	$scope.nodeTools =
 		show: false
 		target: null
+		type: null
 		x: 0
 		y: 0
+		showResetWarning: false
 
 	# newNodeManager works like nodeTools, holds parameters of the newNodeManager modal and works w/ the directive
 	$scope.newNodeManager =
@@ -187,14 +189,17 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				$scope.nodeTools.show = !$scope.nodeTools.show
 				$scope.nodeTools.x = data.x
 				$scope.nodeTools.y = data.y
+				$scope.nodeTools.type = data.type
 				$scope.nodeTools.target = data.id # nodeTools refresh triggered by change in target property
 										# (see nodeToolsDialog directive)
+				$scope.nodeTools.showResetWarning = false
 
 	# Function that pre-assembles a new node's data, adds it, then kicks off processes that have to happen afterwards
 	# TODO this ought to be moved to treeSrv
 	$scope.addNode = (parent, type) ->
 
 		newId = treeSrv.getNodeCount()
+		treeSrv.incrementNodeCount()
 		newName = treeSrv.integerToLetters newId
 
 		newNode =
@@ -206,7 +211,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 		treeSrv.findAndAdd $scope.treeData, parent, newNode
 
-		treeSrv.incrementNodeCount()
 		treeSrv.set $scope.treeData
 
 		$scope.nodeTools.show = false

@@ -60,9 +60,19 @@
 				data-pos-x="{{nodeTools.x}}"
 				data-pos-y="{{nodeTools.y}}">
 				Destination: {{ integerToLetters(nodeTools.target) }}
-				<button type="button" class="big-button" ng-click="editNode()">Edit Node</button>
-				<button type="button" ng-click="copyNode()">Copy</button>
-				<button type="button">Reset</button>
+				<button type="button"
+					class="big-button"
+					ng-click="editNode()">Edit Node</button>
+				<button type="button"
+					ng-click="copyNode()">Copy</button>
+				<button type="button"
+					ng-disabled="nodeTools.type==BLANK"
+					ng-click="resetNodePreCheck()">Reset</button>
+				<div class="warning-dialog-section" ng-show="nodeTools.showResetWarning == true">
+					<p>Careful! Resetting this destination will delete all child destinations. Are you sure?</p>
+					<button type="button" class="delete-button" ng-click="resetNode()">Reset</button>
+					<button type="button" ng-click="nodeTools.showResetWarning = false">Cancel</button>
+				</div>
 			</node-tools-dialog>
 			<delete-warning-dialog ng-show="deleteDialog.show">
 				<h4>Confirm Node Deletion</h4>
@@ -75,11 +85,16 @@
 			<node-creation-selection-dialog ng-show="showCreationDialog && displayNodeCreation == 'none'">
 				<h2>What kind of node do you want to create?</h2>
 				<ul>
-					<li ng-click="displayNodeCreation = MC">MC</li>
-					<li ng-click="displayNodeCreation = SHORTANS">SA</li>
-					<li ng-click="displayNodeCreation = HOTSPOT">HS</li>
-					<li ng-click="displayNodeCreation = NARR">NARR</li>
-					<li ng-show="nodeTools.target != 0" ng-click="displayNodeCreation = END">END</li>
+					<li ng-click="displayNodeCreation = MC">
+						<img src="assets/creator-assets/mc.svg">Multiple Choice</li>
+					<li ng-click="displayNodeCreation = SHORTANS" />
+						<img src="assets/creator-assets/sa.svg">Short Answer</li>
+					<li ng-click="displayNodeCreation = HOTSPOT" />
+						<img src="assets/creator-assets/hs.svg">Hotspot</li>
+					<li class="narr" ng-click="displayNodeCreation = NARR">
+						<img src="assets/creator-assets/narr.svg" />Narrative</li>
+					<li class="end" ng-show="nodeTools.target != 0" ng-click="displayNodeCreation = END">
+						<img src="assets/creator-assets/end.svg" /><span>End Point</span></li>
 				</ul>
 			</node-creation-selection-dialog>
 			<new-node-manager-dialog ng-show="newNodeManager.show"
@@ -391,7 +406,7 @@
 					ng-click="newAnswer()"
 					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
 			</node-creation>
-			<answer-tooltip ng-show="hoveredNode.showTooltip">{{hoveredNode.text}}</answer-tooltip>
+			<answer-tooltip ng-show="hoveredNode.showTooltip"><span class="tooltip-title">Associated Answer from {{ integerToLetters(hoveredNode.targetParent) }}:</span>{{hoveredNode.text}}</answer-tooltip>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
 			<tree-visualization data="treeData" on-hover="onNodeHover(data)" on-hover-out="onNodeHoverOut(data)" on-click="nodeSelected(data)"></tree-visualization>
 		</div>
