@@ -40,10 +40,11 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		else $scope.layout = q_data.options.asset.align
 
 		$scope.question =
-			text : q_data.question, # questions is no longer an array of objects, flattened to single property
+			text : q_data.questions[0].text, # questions MUST be an array, always 1 index w/ single text property
 			layout: $scope.layout,
 			type : q_data.options.type,
 			id : q_data.options.id
+			materiaId: q_data.id
 			options: q_data.options
 
 		$scope.answers = []
@@ -199,7 +200,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	_logProgress = ->
 
 		if $scope.selectedAnswer isnt null # TODO is this check required??
-			Materia.Score.submitQuestionForScoring $scope.question.id, $scope.selectedAnswer
+			Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer
 
 		# # if answer_index is -1 then answer_text = "N/A" else answer_text = question.answers[answer_index].text
 		# answer_text = null if answer_text == "[No Answer]"

@@ -232,13 +232,19 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 			itemData =
 				materiaType: "question"
 				id: null
-				nodeId: tree.id # duplicate of options.id, needed for $filter query
-				question: if tree.question then tree.question else ""
+				nodeId: tree.id # duplicate of options.id, needed for $filter query (removed by Materia when saved to DB)
+				type: "Adventure" # This is NOT the node type, but rather the type of qset question Materia should expect.
+				questions: []
 				options:
 					id: tree.id
 					parentId: tree.parentId
 					type: tree.type
 				answers: []
+
+			question =
+				text: if tree.question then tree.question else ""
+
+			itemData.questions.push question
 
 			if tree.media
 				itemData.options.asset =
@@ -301,13 +307,13 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 		angular.forEach qset.items, (item, index) ->
 
 			node =
-				id: item.nodeId
-				name: integerToLetters item.nodeId
+				id: item.options.id
+				name: integerToLetters item.options.id
 				parentId: item.options.parentId
 				type: item.options.type
 				contents: []
 
-			if item.question then node.question = item.question
+			if item.questions[0].text then node.question = item.questions[0].text
 
 			if item.options.asset
 				node.media =

@@ -36,7 +36,7 @@ class Score_Modules_Adventure extends Score_Module
 
 		if (strcmp($log->item_id, '0') == 0)
 		{
-			foreach ($this->inst->qset->data['items'][0]['items'] as $item)
+			foreach ($this->inst->qset->data['items'] as $item)
 			{
 				if ($log->text == $item['questions'][0]['text'])
 				{
@@ -78,7 +78,7 @@ class Score_Modules_Adventure extends Score_Module
 	{
 		$q     = $this->questions[$log->item_id];
 		$score = $this->check_answer($log);
-		
+
 		return [
 			'data' => [
 				$this->get_ss_question($log, $q),
