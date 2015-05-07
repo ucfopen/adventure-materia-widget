@@ -134,6 +134,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 	$scope.onSaveComplete = (title, widget, qset, version) -> true
 
+	# handles hover behavior of associated tooltips
+	# (associated answer & validation warnings)
 	$scope.onNodeHover = (data) ->
 		if data.type is "bridge" then return
 		$scope.hoveredNode.pendingHide = false
@@ -145,6 +147,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				$scope.hoveredNode.targetParent = data.parentId
 				$scope.hoveredNode.target = data.id
 
+	# Handles hover-out behavior of associated tooltips
+	# Because hoverout can trigger quite often while mousing over node's dom elements, each time a hoverout happens, a pending flag is set
+	# if the flag is reset by another hover event happening, don't hide the tooltip (cursor is still traveling over the node)
+	# If it's not reset, go ahead and hide the tooltip
 	$scope.onNodeHoverOut = (data) ->
 		if data.type is "bridge" then return
 		if $scope.hoveredNode.target is data.id and data.parentId isnt -1

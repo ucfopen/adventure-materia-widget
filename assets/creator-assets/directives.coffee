@@ -54,7 +54,10 @@ Adventure.directive "autoSelect", () ->
 		$element.on "click", () ->
 			this.select()
 
-Adventure.directive "treeVisualization", (treeSrv, $q) ->
+# The true monster directive; handles the actual tree display for the widget
+# Give up all hope, ye who enter here
+# (Seriously, sorry in advance, D3 is a clusterf*ck)
+Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 	restrict: "E",
 	scope: {
 		data: "=", # binds treeData in a way that's accessible to the directive
@@ -66,6 +69,8 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 
 		$scope.svg = null
 		$scope.copyMode = false
+
+		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth
 
 		# Re-render tree whenever the nodes are updated
 		$scope.$on "tree.nodes.changed", (evt) ->
@@ -82,16 +87,14 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 
 			# Modify height of tree based on max depth
 			# Keeps initial tree from being absurdly sized
+			# Note that this will NOT take into account newly created nodes! As such, depth is likely to be off by +/- 1
 			depth = treeSrv.getMaxDepth()
-			adjustedHeight = 200 + (depth * 50)
-
-			# Compute SVG width based on window width
-			windowWidth = document.getElementById("adventure-container").offsetWidth
+			adjustedHeight = 200 + (depth * 75)
 
 			# Init tree data
 			tree = d3.layout.tree()
 				.sort(null)
-				.size([windowWidth, adjustedHeight]) # sets size of tree
+				.size([$scope.windowWidth, adjustedHeight]) # sets size of tree
 				.children (d) -> # defines accessor function for nodes (e.g., what the "d" object is)
 					if !d.contents or d.contents.length is 0 then return null
 					else return d.contents
@@ -176,17 +179,27 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 
 				nodes.push intermediate
 
+			# "post" depth accurately reads the new depth of the tree with any freshly created/deleted nodes
+			# Now that we have it, we can set the height of the tree's parent SVG
+			postDepth = treeSrv.getMaxDepth()
+			postAdjustedHeight = 200 + (postDepth * 75)
+			if postAdjustedHeight < 615 then svgHeight = 615 else svgHeight = postAdjustedHeight
+
 			# Render tree
 			if $scope.svg == null
 				$scope.svg = d3.select($element[0])
 					.append("svg:svg")
-					.attr("width", windowWidth) # Size of actual SVG container
-					.attr("height",650) # Size of actual SVG container
+					.attr("width", $scope.windowWidth) # Size of actual SVG container
+					.attr("height",svgHeight) # Size of actual SVG container
 					.append("svg:g")
 					.attr("class", "container")
 					.attr("transform", "translate(0,50)") # translates position of overall tree in svg container
 			else
 				$scope.svg.selectAll("*").remove()
+
+				# Somewhat hackish bullshit to update the height attribute of the SVG, since D3 doesn't like changing it
+				heightTarget = angular.element($element.children()[0])
+				heightTarget.attr("height",svgHeight)
 
 			# Since we're using svg.line() instead of diagonal(), the links must be wrapped in a helper function
 			# Hashtag justd3things
@@ -199,6 +212,7 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 				)
 
 			# Creates special lx, ly properties so svg.line() knows what to do
+			# Don't ask me why #justd3things
 			lineData = (d) ->
 				points = [
 					{lx: d.source.x, ly: d.source.y},
@@ -210,6 +224,8 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 			# link = d3.svg.diagonal (d) ->
 			# 	return [d.x, d.y]
 
+			# defs contains defined things that help prettify the tree
+			# Things like arrowheads, gaussian blurs, stuff like that
 			defs = $scope.svg.append("defs")
 
 			# Define the arrow markers that will be added to the end vertex of each link path
@@ -272,7 +288,6 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 				.data(nodes)
 				.enter()
 				.append("svg:g")
-				# .attr("class", "node")
 				.attr("class", (d) ->
 					if d.type is "bridge" then return "bridge"
 					else if $scope.copyMode and d.type is "blank" then return "node copyMode #{d.type}"
@@ -314,6 +329,7 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 				)
 				.attr("filter", "url(#dropshadow)")
 
+			# Icons displayed inside the node circles
 			nodeGroup.append("svg:image")
 				.attr("xlink:href", (d) ->
 					switch d.type
@@ -330,6 +346,7 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 				.attr("width","36")
 				.attr("height","36")
 
+			# rect that sits behind the node label text to cover the icon art
 			nodeGroup.append("svg:rect")
 				.attr("width", (d) ->
 					unless d.name then return 0
@@ -373,6 +390,7 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 				.text (d) ->
 					d.name
 
+			# The "+" symbol displayed on bridge nodes (the pseudo-nodes between nodes you can click to add an in-between node)
 			nodeGroup.append("path")
 				.attr("d", "M -3,12 L -3,3 L -12,3 L -12,-3 L -3,-3 L -3,-12 L 3,-12 L 3,-3 L 12,-3 L 12,3 L 3,3 L 3,12 Z")
 				.attr("visibility", (d) ->
@@ -381,8 +399,16 @@ Adventure.directive "treeVisualization", (treeSrv, $q) ->
 
 			$scope.copyMode = false
 
+		# Handle resizing of the browser window
+		window = angular.element($window)
+		window.bind "resize", () ->
+			$scope.windowWidth = document.getElementById("adventure-container").offsetWidth
+			$scope.render treeSrv.get()
+
+		# Kick off rendering the tree for the 1st time
 		$scope.render treeSrv.get()
 
+# Self explanatory directive for editing the title
 Adventure.directive "titleEditor", () ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
@@ -417,7 +443,7 @@ Adventure.directive "answerTooltip", (treeSrv) ->
 
 				$scope.hoveredNode.showTooltip = true
 
-# Directive for the node modal dialog (add child, delete node, etc)
+# Directive for the node modal dialog (edit the node, copy the node, reset the node, etc)
 Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
@@ -447,7 +473,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 		$scope.copyNode = () ->
 
 			# Turn on copy mode and broadcast the change so the tree re-renders with copy mode enabled
-			# Causes the blank nodes to be highlighted so user can select a target to copy to
+			# Causes blank nodes to be highlighted so user can select a target to copy to
 			$scope.copyNodeMode = true
 			$scope.nodeTools.show = false
 
@@ -560,6 +586,8 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 			return copy
 
+		# Check to see if the node being reset has any children that aren't blank
+		# If so, we should warn the user that resetting the node will delete those children and their children etc
 		$scope.resetNodePreCheck = () ->
 			hasChildrenFlag = false
 
@@ -601,7 +629,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			$scope.nodeTools.show = false
 			$scope.nodeTools.target = null
 
-
+# The "What kind of node do you want to create?" dialog
 Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
@@ -620,6 +648,8 @@ Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
 
 			$scope.showBackgroundCover = true
 
+# Dialog for selecting what kind of node a given answer should target
+# e.g., "new", "existing", "self"
 Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
@@ -765,6 +795,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 			$scope.newNodeManager.show = false
 
+# Dialog for warning that, oh shit, you're going to delete some child nodes if you decide to do this
 Adventure.directive "deleteWarningDialog", (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
@@ -790,7 +821,9 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 			$scope.deleteDialog.show = false
 			$scope.deleteDialog.target = null
 
-
+# The actual node creation screen
+# Functions related to features unique to individual node types (Short answer sets, hotspots, etc) are relegated to their own directives
+# The ones here are "universal" and apply to all new nodes
 Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
@@ -1370,6 +1403,8 @@ Adventure.directive "hotspotAnswerManager", () ->
 
 			$scope.hotspotAnswerManager.answerIndex++
 
+# The artboard is displayed over the hotspot image and allows the user to "draw" the polygon by generating new polylines when/where a click occurs
+# When a click occurs in proximity to the original click point, the polygon is considered "closed" and the points are used to generate an actual polygon hotspot
 Adventure.directive "polygonArtboard", ($rootScope) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
