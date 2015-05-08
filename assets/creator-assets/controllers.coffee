@@ -90,8 +90,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			$scope.newNodeManager.show = false
 			$scope.newNodeManager.target = null
 
-			# Make any existing toasts obsolete
-			$scope.hideToast()
+			# start a timer that makes toasts obsolete after 5 seconds
+			$timeout (() ->
+				$scope.hideToast()
+			), 5000
 
 			console.log $scope.treeData
 

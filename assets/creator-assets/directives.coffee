@@ -89,7 +89,7 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 			# Keeps initial tree from being absurdly sized
 			# Note that this will NOT take into account newly created nodes! As such, depth is likely to be off by +/- 1
 			depth = treeSrv.getMaxDepth()
-			adjustedHeight = 200 + (depth * 75)
+			adjustedHeight = 250 + (depth * 75)
 
 			# Init tree data
 			tree = d3.layout.tree()
@@ -182,7 +182,7 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 			# "post" depth accurately reads the new depth of the tree with any freshly created/deleted nodes
 			# Now that we have it, we can set the height of the tree's parent SVG
 			postDepth = treeSrv.getMaxDepth()
-			postAdjustedHeight = 200 + (postDepth * 75)
+			postAdjustedHeight = 250 + (postDepth * 75)
 			if postAdjustedHeight < 615 then svgHeight = 615 else svgHeight = postAdjustedHeight
 
 			# Render tree
@@ -1046,6 +1046,11 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 		$scope.swapMediaOrientation = ->
 			if $scope.editedNode.media.align is "left" or $scope.editedNode.media.align is "right" then $scope.editedNode.media.align = "top"
 			else $scope.editedNode.media.align = "right"
+
+		$scope.saveAndClose = ->
+			$scope.hideCoverAndModals()
+			# auto-hide set to false here because the timer in the displayNodeCreation $watch will handle it
+			$scope.toast "Node " + $scope.editedNode.name + " saved!", false
 
 # Directive for each short answer set. Contains logic for adding and removing individual answer matches.
 Adventure.directive "shortAnswerSet", (treeSrv) ->

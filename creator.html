@@ -405,6 +405,10 @@
 					type="button"
 					ng-click="newAnswer()"
 					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
+				<button class="save-button big-button"
+					ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+					type="button"
+					ng-click="saveAndClose()">Save</button>
 			</node-creation>
 			<answer-tooltip ng-show="hoveredNode.showTooltip"><span class="tooltip-title">Associated Answer from {{ integerToLetters(hoveredNode.targetParent) }}:</span>{{hoveredNode.text}}</answer-tooltip>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>

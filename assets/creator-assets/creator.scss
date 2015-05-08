@@ -37,7 +37,7 @@ $shadow-small-highlight: 0px 0px 5px $gray;
 
 $edit-popup-width: 750px;
 $edit-popup-padding: 20px;
-$edit-popup-content-width-full: 698px;
+$edit-popup-content-width-full: 708px;
 $edit-popup-standard-question-width: 600px;
 
 $edit-popup-content-width-half: 340px;
@@ -776,8 +776,10 @@ node-creation-selection-dialog {
 		}
 
 		&.tiny {
-			width: $edit-popup-content-width-full;
+			width: $edit-popup-content-width-full - 4;
 			height: 50px;
+
+			margin-bottom: 5px;
 
 			font-size: 1.8em;
 		}
@@ -1030,7 +1032,19 @@ node-creation-selection-dialog {
 	}
 
 	button.add-answer {
-		margin: 15px 0px 0px 15px;
+		margin: 10px 0px 0px 20px;
+	}
+
+	button.save-button {
+		position: absolute;
+		bottom: 20px;
+		right: 20px;
+
+		padding: 5px 15px 5px 15px;
+
+		&.lowered {
+			bottom: 10px;
+		}
 	}
 
 	.continuity-container {
@@ -1100,7 +1114,7 @@ node-creation-selection-dialog {
 			width: $edit-popup-content-width-full;
 			height: 400px;
 
-			margin: 5px 25px 10px 25px;
+			margin: 5px $edit-popup-padding 10px $edit-popup-padding;
 			padding-bottom: 40px;
 
 			border: solid 1px $gray-lighter;
@@ -1172,7 +1186,7 @@ node-creation-selection-dialog {
 
 			bottom: 0px;
 
-			width: 698px;
+			width: $edit-popup-content-width-full;
 			height: 30px;
 
 			padding-top: 10px;
