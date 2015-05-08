@@ -412,7 +412,7 @@
 			</node-creation>
 			<answer-tooltip ng-show="hoveredNode.showTooltip"><span class="tooltip-title">Associated Answer from {{ integerToLetters(hoveredNode.targetParent) }}:</span>{{hoveredNode.text}}</answer-tooltip>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
-			<tree-visualization data="treeData" on-hover="onNodeHover(data)" on-hover-out="onNodeHoverOut(data)" on-click="nodeSelected(data)"></tree-visualization>
+			<tree-visualization data="treeData" on-hover="onNodeHover(data)" on-hover-out="onNodeHoverOut(data)" node-click="nodeSelected(data)" bg-click="bgClicked()"></tree-visualization>
 		</div>
 	</body>
 </html>
