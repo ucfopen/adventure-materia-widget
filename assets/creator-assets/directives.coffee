@@ -61,7 +61,8 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 	restrict: "E",
 	scope: {
 		data: "=", # binds treeData in a way that's accessible to the directive
-		onClick: "&", # binds a listener so the controller can access the directive's click data
+		nodeClick: "&", # binds a listener so the controller can access the directive's click data
+		bgClick: "&",
 		onHover: "&",
 		onHoverOut: "&"
 	},
@@ -191,6 +192,9 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 					.append("svg:svg")
 					.attr("width", $scope.windowWidth) # Size of actual SVG container
 					.attr("height",svgHeight) # Size of actual SVG container
+					.on("click", () ->
+						$scope.bgClick()
+					)
 					.append("svg:g")
 					.attr("class", "container")
 					.attr("transform", "translate(0,50)") # translates position of overall tree in svg container
@@ -314,7 +318,8 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 					.attr("r", 20)
 				)
 				.on("click", (d, i) ->
-					$scope.onClick {data: d} # when clicked, we return all of the node's data
+					$scope.nodeClick {data: d} # when clicked, we return all of the node's data
+					d3.event.stopPropagation()
 				)
 				.attr("transform", (d) ->
 					"translate(#{d.x},#{d.y})"

@@ -202,6 +202,12 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 										# (see nodeToolsDialog directive)
 				$scope.nodeTools.showResetWarning = false
 
+	# Handles clicks in the negative space of the treeViz svg
+	# Used to close the nodeTools popup, or whatever else is needed
+	$scope.bgClicked = ->
+		$scope.$apply () ->
+			$scope.nodeTools.show = false
+
 	# Function that pre-assembles a new node's data, adds it, then kicks off processes that have to happen afterwards
 	# TODO this ought to be moved to treeSrv
 	$scope.addNode = (parent, type) ->
