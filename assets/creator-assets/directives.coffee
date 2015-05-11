@@ -71,7 +71,7 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 		$scope.svg = null
 		$scope.copyMode = false
 
-		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth
+		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
 
 		# Re-render tree whenever the nodes are updated
 		$scope.$on "tree.nodes.changed", (evt) ->
@@ -202,8 +202,9 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 				$scope.svg.selectAll("*").remove()
 
 				# Somewhat hackish bullshit to update the height attribute of the SVG, since D3 doesn't like changing it
-				heightTarget = angular.element($element.children()[0])
-				heightTarget.attr("height",svgHeight)
+				dimTarget = angular.element($element.children()[0])
+				dimTarget.attr("height",svgHeight)
+				dimTarget.attr("width", $scope.windowWidth)
 
 			# Since we're using svg.line() instead of diagonal(), the links must be wrapped in a helper function
 			# Hashtag justd3things
@@ -407,7 +408,8 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 		# Handle resizing of the browser window
 		window = angular.element($window)
 		window.bind "resize", () ->
-			$scope.windowWidth = document.getElementById("adventure-container").offsetWidth
+			$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
+			console.log $scope.windowWidth
 			$scope.render treeSrv.get()
 
 		# Kick off rendering the tree for the 1st time
