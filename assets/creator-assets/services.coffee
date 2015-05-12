@@ -203,6 +203,10 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		parent
 
+	# This is a really circumstantial one that searches through answers in a tree that point to a given target
+	# If it finds an answer with that target, it resets the answer to a newly created node
+	# This is for instances where a node is deleted with "existing"/non-hierarchical links pointing to it
+	# Those non-hierarchical links are replaced with links to new nodes instead
 	findAndFixAnswerTargets = (tree, targetId) ->
 
 		# iterate through answers of current node
