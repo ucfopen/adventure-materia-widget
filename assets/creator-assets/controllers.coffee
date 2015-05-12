@@ -25,6 +25,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		x: 0
 		y: 0
 		showResetWarning: false
+		showDeleteWarning: false
 
 	# newNodeManager works like nodeTools, holds parameters of the newNodeManager modal and works w/ the directive
 	$scope.newNodeManager =
@@ -201,6 +202,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				$scope.nodeTools.target = data.id # nodeTools refresh triggered by change in target property
 										# (see nodeToolsDialog directive)
 				$scope.nodeTools.showResetWarning = false
+				$scope.nodeTools.showDeleteWarning = false
 
 	# Handles clicks in the negative space of the treeViz svg
 	# Used to close the nodeTools popup, or whatever else is needed

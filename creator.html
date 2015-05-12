@@ -61,17 +61,29 @@
 				data-pos-y="{{nodeTools.y}}">
 				Destination: {{ integerToLetters(nodeTools.target) }}
 				<button type="button"
-					class="big-button"
+					class="important-button"
 					ng-click="editNode()">Edit Node</button>
 				<button type="button"
 					ng-click="copyNode()">Copy</button>
 				<button type="button"
 					ng-disabled="nodeTools.type==BLANK"
 					ng-click="resetNodePreCheck()">Reset</button>
-				<div class="warning-dialog-section" ng-show="nodeTools.showResetWarning == true">
-					<p>Careful! Resetting this destination will delete all child destinations. Are you sure?</p>
-					<button type="button" class="delete-button" ng-click="resetNode()">Reset</button>
-					<button type="button" ng-click="nodeTools.showResetWarning = false">Cancel</button>
+				<button type="button"
+					class="delete-button"
+					ng-disabled="nodeTools.target == 0"
+					ng-click="nodeTools.showDeleteWarning = true">Delete</button>
+				<div class="warning-dialog-section" ng-show="nodeTools.showResetWarning == true || nodeTools.showDeleteWarning == true">
+					<p ng-show="nodeTools.showResetWarning">Careful! Resetting this destination will delete all child destinations. Are you sure?</p>
+					<p ng-show="nodeTools.showDeleteWarning">Careful! Deleting this destination will delete all child destinations, as well as its associated parent's answer. Are you sure?</p>
+					<button type="button"
+						class="delete-button"
+						ng-show="nodeTools.showResetWarning"
+						ng-click="resetNode()">Reset</button>
+					<button type="button"
+						class="delete-button"
+						ng-show="nodeTools.showDeleteWarning"
+						ng-click="deleteNode()">Delete</button>
+					<button type="button" ng-click="nodeTools.showResetWarning = false; nodeTools.showDeleteWarning = false">Cancel</button>
 				</div>
 			</node-tools-dialog>
 			<delete-warning-dialog ng-show="deleteDialog.show">
@@ -166,8 +178,7 @@
 						<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
 							<button type="button"
 								class="delete-button"
-								ng-click="removeAnswerPreCheck($index, $event)"
-								ng-disabled="$index == 0">X</button>
+								ng-click="removeAnswerPreCheck($index, $event)">X</button>
 							<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
 							<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
 							<button type="button"
@@ -186,9 +197,13 @@
 								ng-click="removeAnswerPreCheck($index, $event)"
 								ng-disabled="$index == 0">X</button>
 							<input type="text"
+								class="shared-row"
 								ng-model="newMatch"
 								placeholder="Add a possible answer. Matches are not case sensitive."
 								enter-submit="addAnswerMatch($index)"></input>
+							<button type="button"
+								class="important-button"
+								ng-click="addAnswerMatch($index)">Add Match</button>
 							<div class="possible-answers-box">
 								<p ng-hide="answer.matches.length">Possible answers will be shown here. Click an answer to remove it.</p>
 								<button type="button"
@@ -212,7 +227,7 @@
 					<div class="image-container">
 						<button type="button"
 							id="uploadButton"
-							class="big-button"
+							class="important-button"
 							ng-show="!mediaReady"
 							ng-click="beginMediaImport()">Upload an Image</button>
 						<!-- bottom toolbar with buttons for adding and managing hotspots -->
@@ -254,7 +269,7 @@
 								ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
 							<div class="button-options">
 								<button type="button"
-									ng-class="{'big-button' : colorDrawerOpen}"
+									ng-class="{'important-button' : colorDrawerOpen}"
 									ng-click="colorDrawerOpen = !colorDrawerOpen">Color</button>
 								<button type="button"
 									ng-disabled="hotspotAnswerManager.answerIndex == answers.length - 1"
@@ -401,11 +416,11 @@
 					</final-score-box>
 					<span>%</span>
 				</div>
-				<button class="add-answer big-button"
+				<button class="add-answer important-button"
 					type="button"
 					ng-click="newAnswer()"
 					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
-				<button class="save-button big-button"
+				<button class="save-button important-button"
 					ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 					type="button"
 					ng-click="saveAndClose()">Save</button>

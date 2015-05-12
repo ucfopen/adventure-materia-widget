@@ -133,8 +133,15 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 				child = tree.contents[n]
 
-				# Update the parent node's associated answer target with the new node ID
-				if tree.answers[n].target is childId then tree.answers[n].target = node.id
+				# If the tree doesn't have answers, it's assumed to be a blank node
+				# If we're adding a new child node underneath the blank, it should have a pending target
+				unless tree.answers
+					if tree.pendingTarget is childId then tree.pendingTarget = node.id
+
+				# Otherwise, business as usual
+				else
+					# Update the parent node's associated answer target with the new node ID
+					if tree.answers[n].target is childId then tree.answers[n].target = node.id
 
 				if child.id == childId # reference to childId found
 
@@ -179,13 +186,15 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 			if child.id == id
 
 				# also remove parent's answer row corresponding to this node
-				j = 0
-				while j < parent.answers.length
-					if parent.answers[j].target == id
-						parent.answers.splice j, 1
-						break
-					else
-						j++
+				# provided the parent isn't blank, of course
+				if parent.answers
+					j = 0
+					while j < parent.answers.length
+						if parent.answers[j].target == id
+							parent.answers.splice j, 1
+							break
+						else
+							j++
 
 				parent.contents.splice i, 1
 			else
@@ -193,6 +202,47 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 				i++
 
 		parent
+
+	findAndFixAnswerTargets = (tree, targetId) ->
+
+		# iterate through answers of current node
+		if tree.answers
+			angular.forEach tree.answers, (answer, index) ->
+				# if answer target matches id, update it with a new, blank target node
+				if answer.target is targetId
+
+					# Since we're making a new target node, generate a new ID and name
+					newId = getNodeCount()
+					incrementNodeCount()
+					newName = integerToLetters newId
+
+					# Create the data for the new node
+					newNode =
+						name: "#{newName}"
+						id: newId
+						parentId: tree.id
+						type: "blank"
+						contents: []
+
+					# Update the answer too
+					answer.target = newId
+					answer.linkMode = "new"
+
+					# Update the tree
+					findAndAdd treeData, tree.id, newNode
+					# set treeData
+
+		if !tree.contents then return
+
+		i = 0
+
+		while i < tree.contents.length
+
+			child = tree.contents[i]
+
+			findAndFixAnswerTargets child, targetId
+
+			i++
 
 	findMaxDepth = (tree, depth=0) ->
 
@@ -388,6 +438,7 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 	findAndReplace : findAndReplace
 	findAndAddInBetween : findAndAddInBetween
 	findAndRemove : findAndRemove
+	findAndFixAnswerTargets : findAndFixAnswerTargets
 	createQSetFromTree : createQSetFromTree
 	createTreeDataFromQset : createTreeDataFromQset
 	integerToLetters : integerToLetters

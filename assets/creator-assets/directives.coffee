@@ -25,7 +25,7 @@ Adventure.directive "toast", ($timeout) ->
 		# Displays a toast with an action button
 		# The action button is bound to an anonymous function that's passed as the action parameter
 		# Interactive toasts won't time out, so be sure to make a hideToast() call when you no longer need it
-		# hideToast() is automatically called when editedNode is reset, when a node creation interface is closed
+		# hideToast() is automaticalfly called when editedNode is reset, when a node creation interface is closed
 		$scope.interactiveToast = (message, actionText, action) ->
 			$scope.toastMessage = message
 			$scope.toastActionText = actionText
@@ -409,7 +409,6 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 		window = angular.element($window)
 		window.bind "resize", () ->
 			$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
-			console.log $scope.windowWidth
 			$scope.render treeSrv.get()
 
 		# Kick off rendering the tree for the 1st time
@@ -458,6 +457,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 		# Flags for displaying the reset node confirmation dialog
 		hasChildrenFlag = false
 		$scope.nodeTools.showResetWarning = false
+		$scope.nodeTools.showDeleteWarning = false
 
 		# Helper vars for copying node/child trees, stored up here for scope reasons
 		sourceTree = null
@@ -607,13 +607,17 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 			unless hasChildrenFlag then $scope.resetNode()
 
+		# Resetting the node wipes QSet-related data clean, but retains the tree properties relevant to D3
+		# The node is returned to a blank node type with no children
 		$scope.resetNode = () ->
 
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 
+			# Remove each answer target
 			angular.forEach target.answers, (answer, index) ->
 				treeSrv.findAndRemove $scope.treeData, answer.target
 
+			# Remove all properties of the node except those whitelisted below
 			angular.forEach target, (val, key) ->
 				switch key
 					when "id", "name", "parentId", "x", "y", "depth", "type"
@@ -624,9 +628,11 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			target.type = $scope.BLANK
 			target.contents = []
 
+			# Set the editedNode to an empty object to ensure references to questions & answers aren't retained
 			if $scope.editedNode.id is $scope.nodeTools.target
 				$scope.editedNode = {}
 
+			# Go ahead and actually replace the existing node on the tree with the blank version
 			treeSrv.findAndReplace $scope.treeData, target.id, target
 			treeSrv.set $scope.treeData
 
@@ -635,6 +641,44 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			$scope.nodeTools.showResetWarning = false
 			$scope.nodeTools.show = false
 			$scope.nodeTools.target = null
+
+		# Delete the node, and the associated parent's answer
+		# Don't delete the node if it's a) a child of a narrative node or b) the associated node of a short answer's unmatched responses
+		$scope.deleteNode = () ->
+
+			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+			parent = treeSrv.findNode $scope.treeData, target.parentId
+			targetAnswerIndex = null
+
+			if parent.type is $scope.NARR
+				$scope.toast "Can't delete Destination " + target.name + "! Try linking " + parent.name + " to an existing destination instead."
+				$scope.nodeTools.showDeleteWarning = false
+				return
+
+			angular.forEach parent.answers, (answer, index) ->
+				if answer.target is target.id
+					targetAnswerIndex = index
+
+			if targetAnswerIndex isnt null
+
+				if parent.answers[targetAnswerIndex].isDefault and parent.type is $scope.SHORTANS
+					$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
+					$scope.nodeTools.showDeleteWarning = false
+					return
+
+			treeSrv.findAndRemove $scope.treeData, target.id
+
+			treeSrv.findAndFixAnswerTargets $scope.treeData, target.id
+
+			treeSrv.set $scope.treeData
+
+			$scope.nodeTools.showDeleteWarning = false
+			$scope.nodeTools.show = false
+			$scope.nodeTools.target = null
+
+			$scope.hoveredNode.showTooltip = false
+			$scope.hoveredNode.target = null
+			$scope.hoveredNode.targetParent = null
 
 # The "What kind of node do you want to create?" dialog
 Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
