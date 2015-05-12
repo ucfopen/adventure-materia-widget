@@ -318,7 +318,7 @@ button {
 		}
 	}
 
-	&.big-button {
+	&.important-button {
 		background: $color-accent;
 		color: $white;
 
@@ -386,7 +386,7 @@ toast {
 	z-index: 90;
 
 	width: 600px;
-	height: 30px;
+	min-height: 30px;
 
 	bottom: 5px;
 	left: 50%;
@@ -499,11 +499,11 @@ node-tools-dialog {
 
 	text-align: center;
 
-	.big-button {
+	.important-button {
 		width: 160px;
 		height: 30px;
 		margin-top: 10px;
-		margin-bottom: 10px;
+		margin-bottom: 15px;
 	}
 
 	.warning-dialog-section {
@@ -935,6 +935,7 @@ node-creation-selection-dialog {
 				&.short-answer-mode {
 
 					position: relative;
+					padding: 5px 0px;
 
 					button.delete-button {
 						position: absolute;
@@ -949,18 +950,22 @@ node-creation-selection-dialog {
 					}
 
 					input {
-						width: 80%;
-						margin: 5px 0px 5px 40px;
+						width: 582px; // 80%
+						margin: 2px 0px 2px 40px;
+
+						&.shared-row {
+							width: 503px;
+						}
 					}
 
 					.possible-answers-box {
 						position: relative;
 						display: inline-block;
-						width: 80%;
+						width: 587px; // 80%
 
 						left: 35px;
 
-						margin: 5px 0 0 5px;
+						margin: 5px 0 5px 5px;
 						padding: 5px;
 
 						background: $gray-lighter;
@@ -985,7 +990,7 @@ node-creation-selection-dialog {
 
 				&.unmatched-answers-row {
 
-					padding: 10px 0px;
+					padding: 10px 0px 10px 1%;
 					margin-bottom: 10px;
 
 					background: $gray-lightest;
@@ -994,7 +999,7 @@ node-creation-selection-dialog {
 					.unmatched-answers-box {
 						position: relative;
 						display: inline-block;
-						width: 80%;
+						width: 587px; // 80%
 
 						left: 35px;
 
@@ -1016,7 +1021,7 @@ node-creation-selection-dialog {
 					}
 
 					input {
-						width: 80%;
+						width: 582px; // 80%
 						margin: 5px 0px 5px 40px;
 					}
 
