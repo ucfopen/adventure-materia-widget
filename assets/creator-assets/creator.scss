@@ -381,6 +381,57 @@ debug-qset-loader {
 
 /* Tools and dialog windows */
 
+.intro-screen {
+	position: absolute;
+	width: 620px;
+	top: 15%;
+	left: 50%;
+	z-index: 2;
+	margin-left: -325px;
+
+	padding: 15px 15px 25px 20px;
+
+	border-radius: 5px;
+
+	background: $color-primary;
+
+	h2 {
+		vertical-align: top;
+
+		font-weight: 300;
+
+		font-size: 26px;
+	}
+
+	p {
+		width: 300px;
+
+		margin: 15px 0px 15px 0px;
+
+		font-weight: 300;
+		font-size: 18px;
+
+		&.bold {
+			font-weight: 700;
+		}
+	}
+
+	img {
+		float: right;
+		width: 250px;
+		height: 100%;
+		top: 0px;
+		margin: 20px 10px 20px 10px;
+	}
+
+	button {
+		margin-top: 20px;
+		padding: 10px 20px;
+		font-weight: 400;
+		font-size: 18px;
+	}
+}
+
 toast {
 	position: absolute;
 	z-index: 90;

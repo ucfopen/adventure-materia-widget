@@ -106,6 +106,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 
 	$scope.hideCoverAndModals = ->
+		$scope.showIntroDialog = false
 		$scope.showBackgroundCover = false
 		$scope.nodeTools.show = false
 		$scope.showCreationDialog = false
@@ -124,6 +125,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 	$scope.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 
+		showIntroDialog = false
 
 		if qset
 			$scope.$apply () ->
