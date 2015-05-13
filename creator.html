@@ -426,6 +426,15 @@
 					ng-click="saveAndClose()">Save</button>
 			</node-creation>
 			<answer-tooltip ng-show="hoveredNode.showTooltip"><span class="tooltip-title">Associated Answer from {{ integerToLetters(hoveredNode.targetParent) }}:</span>{{hoveredNode.text}}</answer-tooltip>
+			<div class="intro-screen" ng-show="showIntroDialog">
+			<img src="assets/creator-assets/sample-tree.png" />
+			<h2>Create Your Own Adventure!</h2>
+			<p>Build a branching decision tree! Each point on the tree, or "destination", represents a screen the student interacts with.</p>
+			<p>Each interaction leads to another destination, until a student finds an end point.</p>
+			<p>Students are given a score based on the end point they reach.</p>
+			<p class="bold">Remember: this widget is still in beta. Some features are buggy or not yet implemented.</p>
+			<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
+			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
 			<tree-visualization data="treeData" on-hover="onNodeHover(data)" on-hover-out="onNodeHoverOut(data)" node-click="nodeSelected(data)" bg-click="bgClicked()"></tree-visualization>
 		</div>
