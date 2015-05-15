@@ -240,6 +240,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	# Function that explicitly adds a node between an existing parent and child
 	$scope.addNodeInBetween = (data) ->
 
+		# console.log data
+		console.log "ADDING IN-BETWEEN NODE"
+		console.log data
+
 		newId = treeSrv.getNodeCount()
 		newName = treeSrv.integerToLetters newId
 
@@ -250,6 +254,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			type: $scope.BLANK
 			contents: []
 			pendingTarget: data.target
+
+		if data.specialCase
+			if data.specialCase is "otherNode"
+				newNode.hasLinkToOther = true
 
 		treeSrv.findAndAddInBetween $scope.treeData, data.source, data.target, newNode
 

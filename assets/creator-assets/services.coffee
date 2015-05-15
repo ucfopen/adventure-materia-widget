@@ -127,6 +127,40 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		if tree.id == parentId
 
+			# Determine if the addInBetween method is being targeted at a non-hierarchical link
+			# If so, we have to add a new blank node as a child of the source (parentId)
+			# Then point an existing node link from the new node to the intended target
+			if node.hasLinkToOther and tree.hasLinkToOther
+
+				# annoying flag for determining whether to clean the hasLinkToOther flag
+				# If there's only one existing link, then when the answer is updated to point to a NEW node, remove the flag
+				# Otherwise, if there's more than one, keep it
+				numExistingNodeLinks = 0
+
+				# If we're adding a node in front of a node pointing to another node using an existing link...
+				# This is making my head hurt
+				unless tree.answers
+					if tree.pendingTarget is childId
+						tree.pendingTarget = node.id
+						tree.contents.push node
+
+						numExistingNodeLinks++
+
+				# The -normal- scenario, the node has answers, find the right answer and update it to point to the new node
+				angular.forEach tree.answers, (answer, index) ->
+					if answer.target is childId and answer.linkMode is "existing"
+
+						tree.contents.push node
+						answer.target = node.id
+						answer.linkMode = "new"
+
+						numExistingNodeLinks++
+						# delete tree.hasLinkToOther
+					else if answer.linkMode is "existing" then numExistingNodeLinks++
+
+				if numExistingNodeLinks is 1 then delete tree.hasLinkToOther
+				if numExistingNodeLinks > 0 then return tree
+
 			# First, find reference to childId in list of parent's children
 			n = 0
 			while n < tree.contents.length

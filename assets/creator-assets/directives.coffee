@@ -114,6 +114,18 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 				# And generate new links that d3 won't create by default
 				if node.hasLinkToOther
 
+					# If the node is blank, but still has a non-hierarchical link, deal with it based on the pendingTarget id
+					unless node.answers
+						target = treeSrv.findNode treeSrv.get(), node.pendingTarget
+
+						newLink = {}
+						newLink.source = node
+						newLink.target = target
+						newLink.specialCase = "otherNode"
+
+						links.push newLink
+						return
+
 					angular.forEach node.answers, (answer, index) ->
 
 						if answer.linkMode is "existing"
@@ -147,16 +159,6 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
-				# if link.specialCase is "otherNode"
-				# 	source = link.source
-				# 	target = link.target
-				# 	intermediate =
-				# 		x: source.x + (target.x - source.x)/2
-				# 		y: (source.y + (target.y - source.y)/2) + 25
-				# 		type: "bridge"
-
-				# 	adjustedLinks.push {source: source, target: intermediate}, {source: intermediate, target: target}
-
 				# else if link.specialCase is "loopBack"
 
 				# 	intermediate =
@@ -166,7 +168,6 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 
 				# 	adjustedLinks.push link
 
-				# else
 				source = link.source
 				target = link.target
 				intermediate =
@@ -176,7 +177,12 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 					source: link.source.id
 					target: link.target.id
 
-				# adjustedLinks.push link
+				# If a link is a special case, the node's position isn't midway between source & target
+				# Add a reference to the link's associated bridge node so the node coords can be updated later
+				# This is a sort of hackish solution, but I've yet to discover a cleaner method
+				if link.specialCase
+					link.bridgeNodeIndex = nodes.length
+					intermediate.specialCase = link.specialCase
 
 				nodes.push intermediate
 
@@ -226,9 +232,6 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 
 				link(points)
 
-			# link = d3.svg.diagonal (d) ->
-			# 	return [d.x, d.y]
-
 			# defs contains defined things that help prettify the tree
 			# Things like arrowheads, gaussian blurs, stuff like that
 			defs = $scope.svg.append("defs")
@@ -263,16 +266,51 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 			merge.append("feMergeNode")
 				.attr("in", "SourceGraphic")
 
-
 			linkGroup = $scope.svg.selectAll("path.link")
 				.data(links)
 				.enter()
 				.append("g")
 
-			linkGroup.append("svg:path")
-				.attr("class", "link")
+			paths = linkGroup.append("svg:path")
+				.attr("class", (d) ->
+					if d.specialCase then return "special link"
+					else return "link"
+				)
 				.attr("marker-end", "url(#arrowhead)")
-				.attr("d", lineData)
+
+			# Paths come in two flavors:
+			# Standard, hierarchical links are straight, end-to-end paths from a parent node to a child
+			# Special, non-hierarchical links are curves, so the math for the curve must be computed for each link
+			# Also, the position of their associated bridge nodes must be updated to match the midpoint of the curve
+			angular.forEach paths[0], (path, index) ->
+
+				path = d3.select path
+
+				if links[index].specialCase
+
+					path.attr("d", (d) ->
+						dx = d.target.x - d.source.x
+						dy = d.target.y - d.source.y
+						dr = Math.sqrt(dx * dx + dy * dy)
+						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y
+					)
+
+					# Do some fancy math to find the midpoint of the curve once it's been computed
+					# This must happen AFTER the path is generated for the link
+					pathNode = path.node()
+					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
+					midX = midpoint.x
+					midY = midpoint.y
+
+					# Now find the associated bridge node using the bridgeNodeIndex flag on the given link
+					# And update its X,Y coordinates for the new midpoint location
+					nodeIndex = links[index].bridgeNodeIndex
+					nodes[nodeIndex].x = midX
+					nodes[nodeIndex].y = midY
+
+				# If it's just a standard link, this part is easy
+				else path.attr("d", lineData)
+
 
 			linkGroup.append("svg:circle")
 				.attr("class","loopback")
@@ -967,16 +1005,18 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 			# pendingTarget is used for adding in-between nodes or linking orphaned nodes
 			if $scope.editedNode.pendingTarget
 				targetId = $scope.editedNode.pendingTarget
+				linkMode = $scope.EXISTING
 				delete $scope.editedNode.pendingTarget
 			else
 				# We create the new node first, so we can grab the new node's generated id
 				targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
+				linkMode = $scope.NEW
 
 			newAnswer =
 				text: text
 				feedback: null
 				target: targetId
-				linkMode: $scope.NEW
+				linkMode: linkMode
 
 			# Add a matches property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
