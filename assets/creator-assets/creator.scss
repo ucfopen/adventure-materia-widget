@@ -269,8 +269,14 @@ g.bridge {
 
 path.link {
 	fill: none;
-	stroke: gray;
+	stroke: $gray-darker;
 	opacity: 0.5;
+
+	&.special {
+		stroke: $gray-darker;
+		opacity: 0.7;
+		stroke-dasharray: 5,3;
+	}
 }
 
 circle.loopback {
