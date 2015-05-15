@@ -159,28 +159,30 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
-				# else if link.specialCase is "loopBack"
-
-				# 	intermediate =
-				# 		x: link.source.x + 75
-				# 		y: link.source.y + 75
-				# 		type: "bridge"
-
-				# 	adjustedLinks.push link
-
 				source = link.source
 				target = link.target
-				intermediate =
-					x: source.x + (target.x - source.x)/2
-					y: source.y + (target.y - source.y)/2
-					type: "bridge"
-					source: link.source.id
-					target: link.target.id
+
+				# Right now, we're disabling bridge nodes on loopbacks
+				# Might add them back in later
+				if link.specialCase is "loopBack" then return
+					# intermediate =
+					# 	x: link.source.x + 75
+					# 	y: link.source.y + 75
+					# 	type: "bridge"
+					# 	source: link.source.id
+					# 	target: link.target.id
+				else
+					intermediate =
+						x: source.x + (target.x - source.x)/2
+						y: source.y + (target.y - source.y)/2
+						type: "bridge"
+						source: link.source.id
+						target: link.target.id
 
 				# If a link is a special case, the node's position isn't midway between source & target
 				# Add a reference to the link's associated bridge node so the node coords can be updated later
 				# This is a sort of hackish solution, but I've yet to discover a cleaner method
-				if link.specialCase
+				if link.specialCase is "otherNode"
 					link.bridgeNodeIndex = nodes.length
 					intermediate.specialCase = link.specialCase
 
@@ -278,15 +280,17 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 				)
 				.attr("marker-end", "url(#arrowhead)")
 
-			# Paths come in two flavors:
+			# Paths come in three flavors:
 			# Standard, hierarchical links are straight, end-to-end paths from a parent node to a child
 			# Special, non-hierarchical links are curves, so the math for the curve must be computed for each link
 			# Also, the position of their associated bridge nodes must be updated to match the midpoint of the curve
+			# Loopback paths don't really exist, they're just tiny paths extending out from the node so the endpoint arrow is positioned correctly
+			# The actual path is a circle drawn on the link, set to display:none unless it's a loopback link
 			angular.forEach paths[0], (path, index) ->
 
 				path = d3.select path
 
-				if links[index].specialCase
+				if links[index].specialCase and links[index].specialCase is "otherNode"
 
 					path.attr("d", (d) ->
 						dx = d.target.x - d.source.x
@@ -307,6 +311,15 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 					nodeIndex = links[index].bridgeNodeIndex
 					nodes[nodeIndex].x = midX
 					nodes[nodeIndex].y = midY
+
+
+				else if links[index].specialCase and links[index].specialCase is "loopBack"
+
+					path.attr("d", (d) ->
+						offsetX = d.source.x + 18
+						offsetY = d.source.y - 5
+						return "M" + offsetX + "," + offsetY + "L" + d.target.x + "," + d.target.y
+					)
 
 				# If it's just a standard link, this part is easy
 				else path.attr("d", lineData)
