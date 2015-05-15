@@ -281,7 +281,9 @@ path.link {
 
 circle.loopback {
 	fill: none;
-	stroke: gray;
+	stroke: $gray-darker;
+	opacity: 0.7;
+	stroke-dasharray: 5,3;
 }
 
 /* General element styles */
