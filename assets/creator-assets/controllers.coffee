@@ -291,7 +291,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	$scope.generateDebugQset = ->
 		qset = treeSrv.createQSetFromTree $scope.treeData
 
-		console.log JSON.stringify(qset, null, 2)
+		$scope.showQsetGenerator = true
+		$scope.generatedQset = JSON.stringify qset, null, 2
 
 
 	# Start 'er up!

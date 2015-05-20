@@ -42,6 +42,11 @@
 				<h4>Give Your Widget a Title</h4>
 				<input type="text" ng-model="title" enter-submit="hideCoverAndModals()" auto-select />
 			</title-editor>
+			<debug-qset-generator ng-show="showQsetGenerator">
+				<h4>Generated QSet</h4>
+				<textarea ng-model="generatedQset"></textarea>
+				<button type="button" ng-click="showQsetGenerator = false">Got it, thanks!</button>
+			</debug-qset-generator>
 			<debug-qset-loader ng-show="showQsetLoader">
 				<h4>Load a QSet to Debug</h4>
 				<textarea ng-model="debugQset"></textarea>
