@@ -201,8 +201,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				$scope.nodeTools.x = data.x
 				$scope.nodeTools.y = data.y
 				$scope.nodeTools.type = data.type
-				$scope.nodeTools.target = data.id # nodeTools refresh triggered by change in target property
-										# (see nodeToolsDialog directive)
+				# nodeTools refresh triggered by change in target property (see nodeToolsDialog directive)
+				if $scope.nodeTools.show is false then $scope.nodeTools.target = null else $scope.nodeTools.target = data.id
+
 				$scope.nodeTools.showResetWarning = false
 				$scope.nodeTools.showDeleteWarning = false
 
