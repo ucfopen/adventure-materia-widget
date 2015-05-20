@@ -90,7 +90,7 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 			# Keeps initial tree from being absurdly sized
 			# Note that this will NOT take into account newly created nodes! As such, depth is likely to be off by +/- 1
 			depth = treeSrv.getMaxDepth()
-			adjustedHeight = 250 + (depth * 75)
+			adjustedHeight = 180 + (depth * 100)
 
 			# Init tree data
 			tree = d3.layout.tree()
@@ -191,13 +191,14 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 			# "post" depth accurately reads the new depth of the tree with any freshly created/deleted nodes
 			# Now that we have it, we can set the height of the tree's parent SVG
 			postDepth = treeSrv.getMaxDepth()
-			postAdjustedHeight = 250 + (postDepth * 75)
+			postAdjustedHeight = 300 + (postDepth * 100)
 			if postAdjustedHeight < 615 then svgHeight = 615 else svgHeight = postAdjustedHeight
 
 			# Render tree
 			if $scope.svg == null
 				$scope.svg = d3.select($element[0])
 					.append("svg:svg")
+					.attr("id", "tree-svg")
 					.attr("width", $scope.windowWidth) # Size of actual SVG container
 					.attr("height",svgHeight) # Size of actual SVG container
 					.on("click", () ->
@@ -521,8 +522,20 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			xOffset = $scope.nodeTools.x + 0
 			yOffset = $scope.nodeTools.y + 50
 
-			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
+			xBound = xOffset + 200
+			yBound = yOffset + 122
 
+			container = document.getElementById("tree-svg")
+
+			if yBound > container.offsetHeight
+				diffY = yBound - container.offsetHeight - 35
+				yOffset -= diffY
+
+			if xBound > container.offsetWidth
+				diffX = (xBound - container.offsetWidth) + 35
+				xOffset -= diffX
+
+			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 			$attrs.$set "style", styles
 
 			# Reset the visibility of the warning flag
