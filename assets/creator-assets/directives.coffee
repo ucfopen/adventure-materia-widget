@@ -126,6 +126,8 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 						links.push newLink
 						return
 
+					sameTargetLinks = []
+
 					angular.forEach node.answers, (answer, index) ->
 
 						if answer.linkMode is "existing"
@@ -139,6 +141,12 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 							newLink.source = node
 							newLink.target = target
 							newLink.specialCase = "otherNode"
+
+							if sameTargetLinks[answer.target]
+								newLink.sameTargetOffset = sameTargetLinks[answer.target]
+								sameTargetLinks[answer.target]++
+							else
+								sameTargetLinks[answer.target] = 1
 
 							links.push newLink
 
@@ -297,6 +305,9 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 						dx = d.target.x - d.source.x
 						dy = d.target.y - d.source.y
 						dr = Math.sqrt(dx * dx + dy * dy)
+
+						if d.sameTargetOffset then dr = dr + ((dr * 0.25) * d.sameTargetOffset)
+
 						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y
 					)
 
@@ -720,7 +731,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 				return
 
 			angular.forEach parent.answers, (answer, index) ->
-				if answer.target is target.id
+				if answer.target is target.id and answer.linkMode is $scope.NEW
 					targetAnswerIndex = index
 
 			if targetAnswerIndex isnt null
@@ -921,8 +932,20 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 				offsetX = $scope.deleteDialog.x + 30
 				offsetY = $scope.deleteDialog.y - 56
 
-				styles = "left: " + offsetX + "px; top: " + offsetY + "px"
+				xBound = offsetX + 300
+				yBound = offsetY + 188
 
+				container = document.getElementById("tree-svg")
+
+				if yBound > container.offsetHeight
+					diffY = yBound - container.offsetHeight - 35
+					offsetY -= diffY
+
+				if xBound > container.offsetWidth
+					diffX = (xBound - container.offsetWidth) + 35
+					offsetX -= diffX
+
+				styles = "left: " + offsetX + "px; top: " + offsetY + "px"
 				$attrs.$set "style", styles
 
 		$scope.dropNodeAndChildren = ->
@@ -1031,7 +1054,10 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 			# pendingTarget is used for adding in-between nodes or linking orphaned nodes
 			if $scope.editedNode.pendingTarget
 				targetId = $scope.editedNode.pendingTarget
-				linkMode = $scope.EXISTING
+
+				if $scope.editedNode.hasLinkToSelf then linkMode = $scope.EXISTING
+				else linkMode = $scope.NEW
+
 				delete $scope.editedNode.pendingTarget
 			else
 				# We create the new node first, so we can grab the new node's generated id
