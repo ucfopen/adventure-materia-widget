@@ -137,6 +137,10 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 				# Otherwise, if there's more than one, keep it
 				numExistingNodeLinks = 0
 
+				# Another annoying flag to confirm that only one node is actually added in this process
+				# If there are multiple existing links connecting the same parent & target nodes
+				nodeAlreadyAdded = false
+
 				# If we're adding a node in front of a node pointing to another node using an existing link...
 				# This is making my head hurt
 				unless tree.answers
@@ -148,14 +152,15 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 				# The -normal- scenario, the node has answers, find the right answer and update it to point to the new node
 				angular.forEach tree.answers, (answer, index) ->
-					if answer.target is childId and answer.linkMode is "existing"
+					if answer.target is childId and answer.linkMode is "existing" and nodeAlreadyAdded is false
 
 						tree.contents.push node
 						answer.target = node.id
 						answer.linkMode = "new"
 
 						numExistingNodeLinks++
-						# delete tree.hasLinkToOther
+						nodeAlreadyAdded = true
+
 					else if answer.linkMode is "existing" then numExistingNodeLinks++
 
 				if numExistingNodeLinks is 1 then delete tree.hasLinkToOther
@@ -243,6 +248,9 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 	# Those non-hierarchical links are replaced with links to new nodes instead
 	findAndFixAnswerTargets = (tree, targetId) ->
 
+		# Flag to determine if the hasLinkToOther flag needs to be removed from a node after fixing a broken link
+		numExistingNodeLinks = 0
+
 		# iterate through answers of current node
 		if tree.answers
 			angular.forEach tree.answers, (answer, index) ->
@@ -268,7 +276,28 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 					# Update the tree
 					findAndAdd treeData, tree.id, newNode
-					# set treeData
+
+				else if answer.linkMode is "existing" then numExistingNodeLinks++
+
+		# the answer array and pendingTarget properties -should- never coexist.
+		else if tree.pendingTarget and tree.pendingTarget is targetId
+
+			newId = getNodeCount()
+			incrementNodeCount()
+			newName = integerToLetters newId
+
+			newNode =
+				name: "#{newName}"
+				id: newId
+				parentId: tree.id
+				type: "blank"
+				contents: []
+
+			tree.pendingTarget = newId
+
+			findAndAdd treeData, tree.id, newNode
+
+		if tree.hasLinkToOther and numExistingNodeLinks is 0 then delete tree.hasLinkToOther
 
 		if !tree.contents then return
 
