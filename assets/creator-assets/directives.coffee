@@ -1055,7 +1055,7 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 			if $scope.editedNode.pendingTarget
 				targetId = $scope.editedNode.pendingTarget
 
-				if $scope.editedNode.hasLinkToSelf then linkMode = $scope.EXISTING
+				if $scope.editedNode.hasLinkToOther then linkMode = $scope.EXISTING
 				else linkMode = $scope.NEW
 
 				delete $scope.editedNode.pendingTarget
