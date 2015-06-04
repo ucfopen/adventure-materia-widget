@@ -587,7 +587,7 @@ node-tools-dialog {
 }
 
 new-node-manager-dialog {
-	position: absolute;
+	position: fixed;
 	z-index: 1000;
 	width: 400px;
 	height: 150px;
@@ -647,7 +647,7 @@ new-node-manager-dialog {
 }
 
 delete-warning-dialog {
-	position: absolute;
+	position: fixed;
 	width: 300px;
 
 	z-index: 1050;
