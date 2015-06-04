@@ -787,7 +787,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 				$scope.newNodeManager.show = true
 
 				xOffset = $scope.newNodeManager.x - 205
-				yOffset = $scope.newNodeManager.y - 60
+				yOffset = $scope.newNodeManager.y
 
 				styles =  "left: " + xOffset + "px; top: " + yOffset + "px"
 
@@ -930,7 +930,7 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 
 			if newVal
 				offsetX = $scope.deleteDialog.x + 30
-				offsetY = $scope.deleteDialog.y - 56
+				offsetY = $scope.deleteDialog.y - 3
 
 				xBound = offsetX + 300
 				yBound = offsetY + 188
