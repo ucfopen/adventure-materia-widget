@@ -803,120 +803,131 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 				if $scope.answers[i].target is $scope.newNodeManager.target then break
 				else i++
 
-			console.log "new mode: " + mode + " existing mode: " + $scope.newNodeManager.linkMode
-
 			# Compare the prior link mode to the new one and deal with the changes
-			if mode != $scope.newNodeManager.linkMode
-				switch mode
-					when "new"
+			# if mode != $scope.newNodeManager.linkMode
+			switch mode
+				when "new"
 
-						## HANDLE PRIOR LINK MODE: SELF
-						if $scope.answers[i].linkMode is $scope.SELF
-
-							if $scope.editedNode.hasLinkToSelf
-								delete $scope.editedNode.hasLinkToSelf
-
-						## HANDLE PRIOR LINK MODE: EXISTING
-						else if $scope.answers[i].linkMode is $scope.EXISTING
-
-							if $scope.editedNode.hasLinkToOther
-								delete $scope.editedNode.hasLinkToOther
-
-
-						# Create new node and update the answer's target
-						targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
-						$scope.answers[i].target = targetId
-
-						# Set updated linkMode flags
-						$scope.newNodeManager.linkMode = $scope.NEW
-						$scope.answers[i].linkMode = $scope.NEW
-						console.log "New mode selected: NEW"
-
+					if $scope.newNodeManager.linkMode is $scope.NEW
 						$scope.newNodeManager.target = null
+						$scope.newNodeManager.show = false
+						return
 
-					when "existing"
+					## HANDLE PRIOR LINK MODE: SELF
+					if $scope.answers[i].linkMode is $scope.SELF
 
-						# Suspend the node creation screen so the user can select an existing node
-						$scope.showBackgroundCover = false
-						$scope.nodeTools.show = false
-						$scope.displayNodeCreation = "suspended"
+						if $scope.editedNode.hasLinkToSelf
+							delete $scope.editedNode.hasLinkToSelf
 
-						# Set the node selection mode so click events are handled differently than normal
-						$scope.existingNodeSelectionMode = true
+					## HANDLE PRIOR LINK MODE: EXISTING
+					else if $scope.answers[i].linkMode is $scope.EXISTING
 
-						$scope.toast "Select the point this answer should link to.", false
-
-						# All tasks are on hold until the user selects a node to link to
-						# Wait for the node to be selected
-						deregister = $scope.$watch "existingNodeSelected", (newVal, oldVal) ->
-
-							if newVal
-
-								$scope.hideToast()
-
-								# Set the answer's new target to the newly selected node
-								$scope.answers[i].target = newVal.id
-
-								## HANDLE PRIOR LINK MODE: NEW
-								if $scope.answers[i].linkMode is $scope.NEW
-
-									# Scrub the existing child node associated with this answer
-									childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
-									if childNode then treeSrv.findAndRemove $scope.treeData, childNode.id
-
-								## HANDLE PRIOR LINK MODE: SELF
-								if $scope.answers[i].linkMode is $scope.SELF
-
-									if $scope.editedNode.hasLinkToSelf
-										delete $scope.editedNode.hasLinkToSelf
-
-								# Set updated linkMode flags and redraw tree
-								$scope.editedNode.hasLinkToOther = true
-								$scope.answers[i].linkMode = $scope.EXISTING
-
-								treeSrv.set $scope.treeData
-
-								# $scope.newNodeManager.linkMode = $scope.EXISTING
-								console.log "New mode selected: EXISTING"
-
-								# Deregister the watch listener now that it's not needed
-								deregister()
-
-								$scope.existingNodeSelected = null
-								$scope.newNodeManager.target = null
-								$scope.displayNodeCreation = "none" # displayNodeCreation should be updated from "suspended"
+						if $scope.editedNode.hasLinkToOther
+							delete $scope.editedNode.hasLinkToOther
 
 
-					when "self"
+					# Create new node and update the answer's target
+					targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
+					$scope.answers[i].target = targetId
 
-						# Set answer row's target to the node being edited
-						$scope.answers[i].target = $scope.editedNode.id
+					# Set updated linkMode flags
+					$scope.newNodeManager.linkMode = $scope.NEW
+					$scope.answers[i].linkMode = $scope.NEW
+					console.log "New mode selected: NEW"
 
-						## HANDLE PRIOR LINK MODE: NEW
-						if $scope.answers[i].linkMode is $scope.NEW
+					$scope.newNodeManager.target = null
 
-							# Scrub the existing child node associated with this answer
-							childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
-							treeSrv.findAndRemove $scope.treeData, childNode.id
+				when "existing"
 
-						## HANDLE PRIOR LINK MODE: EXISTING
-						else if $scope.answers[i].linkMode is $scope.EXISTING
+					# Suspend the node creation screen so the user can select an existing node
+					$scope.showBackgroundCover = false
+					$scope.nodeTools.show = false
+					$scope.displayNodeCreation = "suspended"
 
-							if $scope.editedNode.hasLinkToOther
-								delete $scope.editedNode.hasLinkToOther
+					# Set the node selection mode so click events are handled differently than normal
+					$scope.existingNodeSelectionMode = true
 
-						# Set updated linkMode flags and redraw the tree
-						$scope.editedNode.hasLinkToSelf = true
-						$scope.answers[i].linkMode = $scope.SELF
+					$scope.toast "Select the point this answer should link to.", false
 
-						treeSrv.set $scope.treeData
+					# All tasks are on hold until the user selects a node to link to
+					# Wait for the node to be selected
+					deregister = $scope.$watch "existingNodeSelected", (newVal, oldVal) ->
 
-						$scope.newNodeManager.linkMode = $scope.SELF
-						console.log "New mode selected: SELF"
+						if newVal
 
+							$scope.hideToast()
+
+							# Set the answer's new target to the newly selected node
+							$scope.answers[i].target = newVal.id
+
+							## HANDLE PRIOR LINK MODE: NEW
+							if $scope.answers[i].linkMode is $scope.NEW
+
+								# Scrub the existing child node associated with this answer
+								childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
+								if childNode then treeSrv.findAndRemove $scope.treeData, childNode.id
+
+							## HANDLE PRIOR LINK MODE: SELF
+							if $scope.answers[i].linkMode is $scope.SELF
+
+								if $scope.editedNode.hasLinkToSelf
+									delete $scope.editedNode.hasLinkToSelf
+
+							# Set updated linkMode flags and redraw tree
+							$scope.editedNode.hasLinkToOther = true
+							$scope.answers[i].linkMode = $scope.EXISTING
+
+							treeSrv.set $scope.treeData
+
+							# $scope.newNodeManager.linkMode = $scope.EXISTING
+							console.log "New mode selected: EXISTING"
+
+							# Deregister the watch listener now that it's not needed
+							deregister()
+
+							# Cancel out the answer tooltip, or it persists
+							$scope.hoveredNode.showTooltip = false
+							$scope.hoveredNode.target = null
+							$scope.hoveredNode.targetParent = null
+
+							$scope.existingNodeSelected = null
+							$scope.newNodeManager.target = null
+							$scope.displayNodeCreation = "none" # displayNodeCreation should be updated from "suspended"
+
+
+				when "self"
+
+					if $scope.newNodeManager.linkMode is $scope.SELF
 						$scope.newNodeManager.target = null
+						$scope.newNodeManager.show = false
+						return
 
-			else $scope.newNodeManager.target = null
+					# Set answer row's target to the node being edited
+					$scope.answers[i].target = $scope.editedNode.id
+
+					## HANDLE PRIOR LINK MODE: NEW
+					if $scope.answers[i].linkMode is $scope.NEW
+
+						# Scrub the existing child node associated with this answer
+						childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
+						treeSrv.findAndRemove $scope.treeData, childNode.id
+
+					## HANDLE PRIOR LINK MODE: EXISTING
+					else if $scope.answers[i].linkMode is $scope.EXISTING
+
+						if $scope.editedNode.hasLinkToOther
+							delete $scope.editedNode.hasLinkToOther
+
+					# Set updated linkMode flags and redraw the tree
+					$scope.editedNode.hasLinkToSelf = true
+					$scope.answers[i].linkMode = $scope.SELF
+
+					treeSrv.set $scope.treeData
+
+					$scope.newNodeManager.linkMode = $scope.SELF
+					console.log "New mode selected: SELF"
+
+					$scope.newNodeManager.target = null
 
 
 			$scope.newNodeManager.show = false
