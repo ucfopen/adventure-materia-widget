@@ -521,6 +521,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 		hasChildrenFlag = false
 		$scope.nodeTools.showResetWarning = false
 		$scope.nodeTools.showDeleteWarning = false
+		$scope.nodeTools.showConvertDialog = false
 
 		# Helper vars for copying node/child trees, stored up here for scope reasons
 		sourceTree = null
@@ -754,6 +755,55 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			$scope.hoveredNode.showTooltip = false
 			$scope.hoveredNode.target = null
 			$scope.hoveredNode.targetParent = null
+
+		$scope.convertNode = (type) ->
+
+			node = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+
+			# Remove properties related to the former node type
+			switch $scope.nodeTools.type
+				when $scope.SHORTANS
+					angular.forEach node.answers, (answer, index) ->
+						delete answer.matches
+						if answer.isDefault then delete answer.isDefault
+
+				when $scope.HOTSPOT
+					delete node.hotspotVisibility
+					angular.forEach node.answers, (answer, index) ->
+						delete answer.svg
+
+			# Buncha bullshit required to add the default [Unmatched Response] required for shortans
+			if type is $scope.SHORTANS
+
+				# Add special matches property for each answer
+				angular.forEach node.answers, (answer, index) ->
+					answer.text = null
+					answer.matches = []
+
+				# Create the new node associated with the [Unmatched Response] answer
+				newDefaultId = $scope.addNode $scope.nodeTools.target, $scope.BLANK
+
+				newDefault =
+					text: "[Unmatched Response]"
+					feedback: null
+					target: newDefaultId
+					linkMode: $scope.NEW
+					matches: []
+					isDefault: true
+
+				# The new answer has to take the 0 index spot in the answers array
+				node.answers.splice 0, 0, newDefault
+
+				# Move the newly created node for the default answer to the 0 index spot of the content array
+				orphanIndex = node.contents.length - 1
+				orphan = node.contents.splice(orphanIndex, 1)[0]
+				node.contents.splice 0, 0, orphan
+
+			# Update the node type
+			node.type = type
+
+			$scope.nodeTools.showConvertDialog = false
+			treeSrv.set $scope.treeData
 
 # The "What kind of node do you want to create?" dialog
 Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->

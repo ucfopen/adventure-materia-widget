@@ -26,6 +26,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		y: 0
 		showResetWarning: false
 		showDeleteWarning: false
+		showConvertDialog: false
 
 	# newNodeManager works like nodeTools, holds parameters of the newNodeManager modal and works w/ the directive
 	$scope.newNodeManager =
@@ -96,7 +97,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				$scope.hideToast()
 			), 5000
 
-			console.log $scope.treeData
+			console.log $scope.editedNode
 
 			# Warn the user if a final score hasn't been set upon closing the creation screen
 			# TODO there may be more post-creation-exit events required: condense these?
