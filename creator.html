@@ -75,21 +75,43 @@
 					ng-disabled="nodeTools.type==BLANK"
 					ng-click="resetNodePreCheck()">Reset</button>
 				<button type="button"
+					ng-hide="noteTools.type==NARR || nodeTools.type==END || nodeTools.type==BLANK"
+					ng-click="nodeTools.showConvertDialog = true">Convert</button>
+				<button type="button"
 					class="delete-button"
 					ng-disabled="nodeTools.target == 0"
 					ng-click="nodeTools.showDeleteWarning = true">Delete</button>
-				<div class="warning-dialog-section" ng-show="nodeTools.showResetWarning == true || nodeTools.showDeleteWarning == true">
-					<p ng-show="nodeTools.showResetWarning">Careful! Resetting this destination will delete all child destinations. Are you sure?</p>
-					<p ng-show="nodeTools.showDeleteWarning">Careful! Deleting this destination will delete all child destinations, as well as its associated parent's answer. Are you sure?</p>
+				<!-- extended dialog for reset warning -->
+				<div class="warning-dialog-section"
+					ng-show="nodeTools.showResetWarning == true">
+					<p>Careful! Resetting this destination will delete all child destinations. Are you sure?</p>
 					<button type="button"
 						class="delete-button"
-						ng-show="nodeTools.showResetWarning"
 						ng-click="resetNode()">Reset</button>
 					<button type="button"
+						ng-click="nodeTools.showResetWarning = false">Cancel</button>
+				</div>
+				<!-- extended dialog for delete warning -->
+				<div class="warning-dialog-section"
+					ng-show="nodeTools.showDeleteWarning">
+					<p>Careful! Deleting this destination will delete all child destinations, as well as its associated parent's answer. Are you sure?</p>
+					<button type="button"
 						class="delete-button"
-						ng-show="nodeTools.showDeleteWarning"
 						ng-click="deleteNode()">Delete</button>
-					<button type="button" ng-click="nodeTools.showResetWarning = false; nodeTools.showDeleteWarning = false">Cancel</button>
+					<button type="button"
+						ng-click="nodeTools.showDeleteWarning = false">Cancel</button>
+				</div>
+				<div class="warning-dialog-section convert-dialog"
+					ng-show="nodeTools.showConvertDialog">
+					<p>Choose the type of destination to convert to.</p>
+					<button type="button"
+						ng-show="nodeTools.type==MC || nodeTools.type==HOTSPOT"
+						ng-click="convertNode(SHORTANS)">Short Answer</button>
+					<button type="button"
+						ng-show="nodeTools.type==SHORTANS || nodeTools.type==HOTSPOT"
+						ng-click="convertNode(MC)">Multiple Choice</button>
+					<button type="button"
+						ng-click="nodeTools.showConvertDialog = false">Cancel</button>
 				</div>
 			</node-tools-dialog>
 			<delete-warning-dialog ng-show="deleteDialog.show">

@@ -563,6 +563,10 @@ node-tools-dialog {
 
 	text-align: center;
 
+	button {
+		margin-bottom: 5px;
+	}
+
 	.important-button {
 		width: 160px;
 		height: 30px;
@@ -582,6 +586,12 @@ node-tools-dialog {
 
 		p {
 			margin: 0px 0px 15px 0px;
+		}
+
+		&.convert-dialog {
+			button {
+				width: 100%;
+			}
 		}
 	}
 }
