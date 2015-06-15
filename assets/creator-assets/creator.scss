@@ -1,39 +1,6 @@
-/* Choose Your Own Adventure Creator SCSS file */
+/* Adventure 2.0 Creator Styles */
 
-/* Variable definitions */
-
-$black: #000000;
-$white: #ffffff;
-$red: #b90000;
-$red-lighter: #de0000;
-$red-lightest: #ffd7d7;
-
-$blue: #3d90b1;
-$blue-lighter: #49afd7;
-$blue-lightest: #bdecff;
-
-$gray-darker: #333333;
-$gray: #888888;
-$gray-lighter: #cccccc;
-$gray-lightest: #eaeaea;
-
-
-$background: $gray-lighter;
-$color-primary: $white;
-$color-accent: $blue;
-$color-accent-highlight: $blue-lighter;
-$color-selection-hover: $blue-lightest;
-
-$color-blank: #ADADAD;
-$color-mc: #60b973;
-$color-sa: #6ea0aa;
-$color-hotspot: #ba83c7;
-$color-narr: #ffc656;
-$color-end: $red;
-
-$shadow-dialog: 0px 3px 3px $gray;
-$shadow-small: 0px 0px 2px $gray;
-$shadow-small-highlight: 0px 0px 5px $gray;
+@import 'variables';
 
 $edit-popup-width: 750px;
 $edit-popup-padding: 20px;
