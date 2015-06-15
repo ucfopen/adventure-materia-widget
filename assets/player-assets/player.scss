@@ -1,3 +1,7 @@
+/* Adventure 2.0 Player Styles */
+
+@import 'variables';
+
 * {
 	outline: 0;
 }
@@ -12,6 +16,12 @@ html, body {
 	overflow-y: hidden;
 
 	user-select: none;
+}
+
+body {
+	position: relative;
+	z-index: 0;
+	height: 593px; // determined from the height parameter in install.yaml
 }
 
 .header {
@@ -31,31 +41,59 @@ h1 {
 }
 
 .question {
-	padding: 10px 30px 0px 30px;
+	position: relative;
+	padding: 15px 30px 10px 30px;
 
 	display: block;
 	background: #fff;
 
-	max-height: 430px;
-	overflow-y: auto;
+	&.hotspot-mode {
+		max-height: 55px;
+
+		h2 {
+			max-height: 65px;
+		}
+	}
+
+	&.shortans-mode {
+		h2 {
+			max-height: 380px;
+		}
+	}
+
+	&.transitional-mode {
+		h2 {
+			max-height: 400px;
+
+			&.top, &.bottom {
+				max-height: 170px;
+			}
+		}
+	}
 
 	h2 {
+
+		// max-height: 220px;
+		margin: 0px;
+
+		overflow-y: auto;
+		vertical-align: top;
+
 		font-family: 'Open Sans', sans-serif;
 		font-size:22px;
 		color:#363636;
-
-		vertical-align: top;
 
 		&.left {
 			width:45%;
 			display:inline-block;
 		}
 		&.right {
-			width:45%;
-			display:inline-block;
 			position: absolute;
-			top: 60px;
+			display:inline-block;
+			top: 15px;
 			right: 20px;
+
+			width:45%;
 		}
 		&.top, &.bottom {
 			text-align: center;
@@ -64,11 +102,12 @@ h1 {
 }
 
 .asset {
+	margin: 0px 40px;
 	width: 40%;
 
 	img {
 		max-width: 100%;
-		max-height: 350px;
+		max-height: 222px;
 	}
 
 	&.right {
@@ -78,22 +117,49 @@ h1 {
 
 	&.center {
 		width: 90%;
-		margin: auto;
+		margin: 15px auto;
 		text-align: center;
 	}
 }
 
 .answers {
-	padding: 30px;
+	position: absolute;
+	bottom: 0px;
+	z-index: 10;
+
+	width: 740px;
+
+	margin: 15px;
+	padding: 15px;
+
+	max-height: 250px;
+	// overflow-y: auto;
+
 	font-family: 'Lora', serif;
 
-	.mc, .answers {
-		.sa {
-			width:100%;
-			height:100%;
+	background: $white;
+	box-shadow: 0px 0px 3px #888888;
+
+	&.hotspot-mode {
+		max-height: 410px;
+
+		&.no-question {
+			max-height: 440px;
+			bottom: 45px;
 		}
 	}
+
+	// .mc, .answers {
+	// 	.sa {
+	// 	}
+	// }
 	.mc {
+		// width:100%;
+		// height:100%;
+		max-height: 250px;
+
+		overflow-y: auto;
+
 		.answer {
 			display:block;
 			margin-bottom:10px;
@@ -118,6 +184,7 @@ h1 {
 	.sa {
 		position: relative;
 		text-align: center;
+		margin: 20px 0px;
 
 		&:before {
 			display: block;

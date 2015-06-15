@@ -1,6 +1,6 @@
-AdventureApp = angular.module('AdventureApp', [])
+Adventure = angular.module('Adventure', [])
 
-AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
+Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -27,6 +27,10 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 				$scope.qset = qset
 				manageQuestionScreen(qset.items[0].options.id)
 		manualResize: true
+
+	$scope.questionFormat =
+		fontSize: 22
+		height: 220
 
 	# Update the screen depending on the question type (narrative, mc, short answer, hotspot, etc)
 	manageQuestionScreen = (questionId) ->
@@ -65,7 +69,7 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 		# TODO Add back in with Layout support
 		# check if question has an associated asset (for now, just an image)
 		# if $scope.question.type is $scope.HOTSPOT then $scope.question.layout = LAYOUT_VERT_TEXT
-		if $scope.question.type is $scope.HOTSPOT then $scope.layout = "text-only"
+		if $scope.question.type is $scope.HOTSPOT then $scope.layout = "hotspot"
 		if $scope.question.layout isnt "text-only"
 			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			$scope.question.image = image_url
@@ -208,10 +212,18 @@ AdventureApp.controller 'AdventureController', ['$scope', ($scope) ->
 	_end = ->
 		Materia.Engine.end yes
 
-	Materia.Engine.start($scope.engine)
-]
+	# Kinda hackish, since both autoTextScale and dynamicScale directives update the "style" attribute,
+	# need to combine updated properties from both so they don't overwrite each other.
+	# If the node isn't MC, just return fontSize, height isn't used
+	$scope.formatQuestionStyles = ->
 
-AdventureApp.directive('ngEnter', ->
+		if $scope.question.type is $scope.MC
+			return "font-size:" + $scope.questionFormat.fontSize + "px; height:" + $scope.questionFormat.height + "px;"
+		else return "font-size:" + $scope.questionFormat.fontSize + "px;"
+
+	Materia.Engine.start($scope.engine)
+
+Adventure.directive('ngEnter', ->
 	return (scope, element, attrs) ->
 		element.bind("keypress", (event) ->
 			if(event.which == 13 or event.which == 10)
@@ -221,4 +233,75 @@ AdventureApp.directive('ngEnter', ->
 					scope.$eval(attrs.ngEnter)
 		)
 )
+
+# Font will progressively step down from 22px to 12px depending on question length after a threshold is reached
+Adventure.directive "autoTextScale", () ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		scaleFactor = 100
+		scaleThreshold = 200
+
+		style = ""
+
+		$scope.$watch "question", (newVal, oldVal) ->
+
+			if newVal
+
+				text = $element.text()
+
+				if angular.element($element[0]).hasClass("right") or angular.element($element).hasClass("left")
+					scaleFactor = 25
+					scaleThreshold = 180
+
+				else if angular.element($element[0]).hasClass("top") or angular.element($element).hasClass("bottom")
+					scaleFactor = 10
+					scaleThreshold = 140
+
+				else
+					scaleFactor = 100
+					scaleThreshold = 200
+
+				$scope.questionFormat.fontSize = 22 # default font size
+
+				if text.length > scaleThreshold
+					diff = (text.length - scaleThreshold) / scaleFactor
+					$scope.questionFormat.fontSize -= diff
+
+					if $scope.questionFormat.fontSize < 12 then $scope.questionFormat.fontSize = 12
+
+				$attrs.$set "style", $scope.formatQuestionStyles()
+
+# Scales the height of the question box dynamically based on the height of the answer box
+# Ensures the negative space is effectively filled up with question text
+# Only used for MC, since MC is the only node type with variable answer container heights
+Adventure.directive "dynamicScale", () ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		minHeight = 220
+		maxHeight = 400
+
+		style = ""
+
+		$scope.$watch "question", (newVal, oldVal) ->
+
+			# answer div:
+				# min: 94
+				# max: 250
+
+			# question div:
+				# min: 220
+				# max: 400
+
+			answersHeight = angular.element(".answers")[0].offsetHeight
+			console.log answersHeight
+
+			diff = 250 - answersHeight
+
+			if (diff + minHeight) < 400 then $scope.questionFormat.height = diff + minHeight
+			else $scope.questionFormat.height = 400
+
+			$attrs.$set "style", $scope.formatQuestionStyles()
+
 

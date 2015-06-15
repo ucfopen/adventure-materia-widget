@@ -26,7 +26,7 @@
 		<!-- MAIN PLAYER SCRIPT -->
 		<script type="text/javascript" src="assets/player-assets/player.js"></script>
 	</head>
-	<body ng-app="AdventureApp" ng-controller="AdventureController">
+	<body ng-app="Adventure" ng-controller="AdventureController">
 		<header class="header">
 			<h1>{{title}}</h1>
 		</header>
@@ -41,47 +41,79 @@
 				ng-click="closeFeedback()">
 		</div>
 
-		<section class="question clearfix" ng-switch="layout">
+		<section class="question clearfix"
+			ng-class="{
+				'hotspot-mode' : question.type == HOTSPOT,
+				'shortans-mode' : question.type == SHORTANS,
+				'transitional-mode' : question.type == NARR || question.type == END}"
+			ng-switch="layout">
+			<!-- just an image -->
 			<div ng-switch-when="image-only">
 				<figure class="asset">
 					<img src="{{ question.image }}" />
 				</figure>
 			</div>
+			<!-- just text; no image -->
 			<div ng-switch-when="text-only">
-				<h2 class="text">{{ question.text }}</h2>
+				<h2 class="text" auto-text-scale dynamic-scale>{{ question.text }}</h2>
 			</div>
+			<!-- image on the right -->
 			<div ng-switch-when="right">
-				<h2 class="text left">{{ question.text }}</h2>
+				<h2 class="text left" auto-text-scale dynamic-scale>{{ question.text }}</h2>
 				<figure class="asset right">
 					<img src="{{ question.image }}" />
 				</figure>
 			</div>
+			<!-- image on the left -->
 			<div ng-switch-when="left">
 				<figure class="asset left">
 					<img src="{{ question.image }}" />
 				</figure>
-				<h2 class="text right">{{ question.text }}</h2>
+				<h2 class="text right" auto-text-scale dynamic-scale>{{ question.text }}</h2>
 			</div>
+			<!-- image on the bottom -->
 			<div ng-switch-when="bottom">
-				<h2 class="text bottom">{{ question.text }}</h2>
+				<h2 class="text bottom" auto-text-scale> {{ question.text }}</h2>
 				<figure class="asset center">
 					<img src="{{ question.image }}" />
 				</figure>
 			</div>
+			<!-- image on the top -->
 			<div ng-switch-when="top">
 				<figure class="asset center">
 					<img src="{{ question.image }}" />
 				</figure>
-				<h2 class="text top">{{ question.text }}</h2>
+				<h2 class="text top" auto-text-scale>{{ question.text }}</h2>
+			</div>
+			<!-- hotspot mode. No image associated w/ question -->
+			<div ng-switch-when="hotspot">
+			<h2 class="text bottom"
+				ng-hide="question.text.length == 0"
+				auto-text-scale>{{ question.text }}</h2>
 			</div>
 		</section>
-		<section class="answers">
-			<div class="mc" ng-show="type == MC">
-				<a href="#" class="answer" ng-repeat="answer in answers" ng-click="handleAnswerSelection(answer.link, answer.index)" data-index="{{answer.index}}" data-link="{{answer.link}}">) {{answer.text}}</a>
+		<section class="answers"
+			ng-class="{
+				'hotspot-mode' : question.type == HOTSPOT,
+				'no-question' : question.text.length == 0}">
+			<div class="mc"
+				ng-show="type == MC">
+				<a href="#"
+					class="answer"
+					ng-repeat="answer in answers"
+					ng-click="handleAnswerSelection(answer.link, answer.index)"
+					data-index="{{answer.index}}"
+					data-link="{{answer.link}}">) {{answer.text}}</a>
 			</div>
-			<div class="sa" ng-show="type == SHORTANS">
-				<input type="text" class="short-answer" ng-model="response" ng-enter="handleShortAnswerInput()" />
-				<input type="button" class="trans-button" value="Submit" ng-click="handleShortAnswerInput()"/>
+			<div class="sa"ng-show="type == SHORTANS">
+				<input type="text"
+					class="short-answer"
+					ng-model="response"
+					ng-enter="handleShortAnswerInput()" />
+				<input type="button"
+					class="trans-button"
+					value="Submit"
+					ng-click="handleShortAnswerInput()"/>
 			</div>
 			<div class="hotspot" ng-if="type == HOTSPOT">
 				<div ng-repeat='answer in answers'
@@ -136,8 +168,12 @@
 				</svg>
 				<img src="{{question.image}}">
 			</div>
-			<div class="trans" ng-if="type == TRANS">
-				<input type="button" class="trans-button" ng-class='{ left: question.layout == 2, right: question.layout == 3 }' value="Continue" ng-click="handleAnswerSelection(link,0)"/>
+			<div class="trans"ng-if="type == TRANS">
+				<input type="button"
+					class="trans-button"
+					ng-class='{ left: question.layout == 2, right: question.layout == 3 }'
+					value="Continue"
+					ng-click="handleAnswerSelection(link,0)"/>
 			</div>
 		</section>
 	</body>

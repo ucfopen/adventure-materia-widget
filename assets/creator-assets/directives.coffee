@@ -1091,11 +1091,11 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 
 		# Update the node's properties when the associated input models change
 		$scope.$watch "question", (newVal, oldVal) ->
-			if newVal
+			if newVal isnt null and $scope.editedNode
 				$scope.editedNode.question = newVal
 
 		$scope.$watch "answers", ((newVal, oldVal) ->
-			if newVal
+			if newVal isnt null and $scope.editedNode
 				$scope.editedNode.answers = $scope.answers
 		), true
 
