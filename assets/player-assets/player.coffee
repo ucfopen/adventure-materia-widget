@@ -1,5 +1,6 @@
 Adventure = angular.module('Adventure', [])
 
+## CONTROLLER ##
 Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 
 	$scope.BLANK = "blank"
@@ -223,6 +224,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 
 	Materia.Engine.start($scope.engine)
 
+## DIRECTIVES ##
 Adventure.directive('ngEnter', ->
 	return (scope, element, attrs) ->
 		element.bind("keypress", (event) ->
@@ -285,7 +287,6 @@ Adventure.directive "dynamicScale", () ->
 		style = ""
 
 		$scope.$watch "question", (newVal, oldVal) ->
-
 			# answer div:
 				# min: 94
 				# max: 250
@@ -303,5 +304,29 @@ Adventure.directive "dynamicScale", () ->
 			else $scope.questionFormat.height = 400
 
 			$attrs.$set "style", $scope.formatQuestionStyles()
+
+# Handles the visibility of individual hotspots
+Adventure.directive "visibilityManager", () ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "question", (newVal, oldVal) ->
+
+			if $scope.question.type is $scope.HOTSPOT
+				$element.removeAttr "style"
+
+				switch $scope.q_data.options.visibility
+					when "mouseover"
+						style = "opacity: 0"
+						$attrs.$set "style", style
+
+						$element.bind "mouseover", (evt) ->
+							$element.removeAttr "style"
+							$element.unbind "mouseover"
+
+					when "never"
+						style = "opacity: 0"
+						$attrs.$set "style", style
+
 
 

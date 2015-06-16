@@ -119,7 +119,7 @@
 				<div ng-repeat='answer in answers'
 					class='answerbubble'
 					ng-click="handleAnswerSelection(answer.link,answer.index)"
-					ng-show='answer.hover'
+					ng-show='answer.hover && answer.text'
 					style='top:{{answer.balloontop}}px;left:{{answer.balloonleft}}px;'>
 					{{answer.text}}
 				</div>
@@ -133,8 +133,7 @@
 					xml:space="preserve">
 					<g ng-repeat="answer in answers"
 						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})"
-						ng-mouseover='answer.hover=true'
-						ng-mouseout='answer.hover=false'>
+						visibility-manager>
 						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
 							ng-attr-cx="0"
 							ng-attr-cy="0"
@@ -144,6 +143,8 @@
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
 							fill-opacity="0.5"
+							ng-mouseover='answer.hover=true'
+							ng-mouseout='answer.hover=false'
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
 
 						<rect ng-if="answer.options.svg.type == 'rect'"
@@ -155,6 +156,8 @@
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
 							fill-opacity="0.5"
+							ng-mouseover='answer.hover=true'
+							ng-mouseout='answer.hover=false'
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
 
 						<polygon ng-if="answer.options.svg.type == 'polygon'"
@@ -163,6 +166,8 @@
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
 							fill-opacity="0.5"
+							ng-mouseover='answer.hover=true'
+							ng-mouseout='answer.hover=false'
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
 					</g>
 				</svg>
