@@ -57,10 +57,11 @@ Adventure.directive "autoSelect", () ->
 # The true monster directive; handles the actual tree display for the widget
 # Give up all hope, ye who enter here
 # (Seriously, sorry in advance, D3 is a clusterf*ck)
-Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
+Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope) ->
 	restrict: "E",
 	scope: {
 		data: "=", # binds treeData in a way that's accessible to the directive
+		offset:"=", # svg transform values for the whole svg - passed thru draggable tree directive
 		nodeClick: "&", # binds a listener so the controller can access the directive's click data
 		bgClick: "&",
 		onHover: "&",
@@ -72,6 +73,8 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 		$scope.copyMode = false
 
 		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
+		$scope.windowHeight = document.getElementById("adventure-container").offsetHeight
+		$scope.treeContainerWidth = null
 
 		# Re-render tree whenever the nodes are updated
 		$scope.$on "tree.nodes.changed", (evt) ->
@@ -86,16 +89,19 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 
 			unless data? then return false
 
-			# Modify height of tree based on max depth
-			# Keeps initial tree from being absurdly sized
-			# Note that this will NOT take into account newly created nodes! As such, depth is likely to be off by +/- 1
-			depth = treeSrv.getMaxDepth()
-			adjustedHeight = 180 + (depth * 100)
+			# Determine the new nodeXOffset using the half width of the tree container
+			if $scope.treeContainerWidth is null then $scope.treeContainerWidth = $scope.windowWidth/2
+			else
+				treeContainer = angular.element($element)
+				$scope.treeContainerWidth = treeContainer[0].offsetWidth
+
+			$scope.nodeXOffset = $scope.treeContainerWidth / 2
 
 			# Init tree data
 			tree = d3.layout.tree()
 				.sort(null)
-				.size([$scope.windowWidth, adjustedHeight]) # sets size of tree
+				# .size([$scope.windowWidth, adjustedHeight]) # sets size of tree
+				.nodeSize([100, 160])
 				.children (d) -> # defines accessor function for nodes (e.g., what the "d" object is)
 					if !d.contents or d.contents.length is 0 then return null
 					else return d.contents
@@ -105,6 +111,12 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 			adjustedLinks = [] # Finalized links array that includes "special" links (loopbacks and bridges)
 
 			angular.forEach nodes, (node, index) ->
+
+				# Static offsets built into every node's X/Y coordinates
+				# nodeXOffset centers the tree within the window
+				# the Y offset moves the entire tree down slightly to create top padding
+				node.x += $scope.nodeXOffset
+				node.y += 50
 
 				# the parent attribute isn't needed, and causes deep copy methods to fail since they recurse infinitely
 				# best to remove it
@@ -196,31 +208,35 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 
 				nodes.push intermediate
 
-			# "post" depth accurately reads the new depth of the tree with any freshly created/deleted nodes
-			# Now that we have it, we can set the height of the tree's parent SVG
-			postDepth = treeSrv.getMaxDepth()
-			postAdjustedHeight = 300 + (postDepth * 100)
-			if postAdjustedHeight < 615 then svgHeight = 615 else svgHeight = postAdjustedHeight
-
 			# Render tree
 			if $scope.svg == null
 				$scope.svg = d3.select($element[0])
 					.append("svg:svg")
 					.attr("id", "tree-svg")
 					.attr("width", $scope.windowWidth) # Size of actual SVG container
-					.attr("height",svgHeight) # Size of actual SVG container
+					.attr("height",$scope.windowHeight) # Size of actual SVG container
+					.attr("tree-transforms","")
+					.attr("ng-model", "offset") # offset is equivalent to $scope.treeOffset, has to be passed to new directive
+					.attr("ng-mousedown","selectTree($event)") # addl directives to control dragging behavior
+					.attr("ng-mousemove", "moveTree($event)")
+					.attr("ng-mouseup", "deselectTree($event)")
 					.on("click", () ->
 						$scope.bgClick()
 					)
 					.append("svg:g")
+					.attr("id", "tree-container")
 					.attr("class", "container")
-					.attr("transform", "translate(0,50)") # translates position of overall tree in svg container
+					.attr("transform", "translate(0,0)") # translates position of overall tree in svg container
+
+				# Since new HTML has been added to the DOM, need to tell Angular to walk through it and identify new directives
+				svgDOMObject = document.getElementById("tree-svg")
+				$compile(svgDOMObject)($scope)
 			else
 				$scope.svg.selectAll("*").remove()
 
 				# Somewhat hackish bullshit to update the height attribute of the SVG, since D3 doesn't like changing it
 				dimTarget = angular.element($element.children()[0])
-				dimTarget.attr("height",svgHeight)
+				dimTarget.attr("height",$scope.windowHeight)
 				dimTarget.attr("width", $scope.windowWidth)
 
 			# Since we're using svg.line() instead of diagonal(), the links must be wrapped in a helper function
@@ -467,15 +483,160 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $timeout) ->
 				)
 
 			$scope.copyMode = false
+			$rootScope.$broadcast "tree.nodes.changed.complete" # inform the tree-transform directive that the tree has been re-rendered
 
 		# Handle resizing of the browser window
 		window = angular.element($window)
 		window.bind "resize", () ->
 			$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
+			$scope.windowHeight = document.getElementById("adventure-container").offsetHeight
 			$scope.render treeSrv.get()
 
 		# Kick off rendering the tree for the 1st time
 		$scope.render treeSrv.get()
+
+# Directive that handles all zoom & panning transforms of the tree visualization
+# This directive is dynamically applied to the tree-svg element when it's generated by D3 and linked via the $compile function
+Adventure.directive "treeTransforms", (treeSrv) ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		# flag for whether or not dragging is allowed (when tree extends beyond window in any direction)
+		$scope.dragFlag = false
+
+		originX = 0
+		originY = 0
+
+		# updated on mouseDown, used to compute max bounds for dragging
+		currWidth = null
+		currHeight = null
+
+		# padding for max bounds. Max bounds is twice the width or height, minus this value.
+		# prevents the tree from being dragged completely off-screen
+		# padding is also affected by the current scale value
+		maxBoundPadding = 50
+
+		treeContainer = angular.element document.getElementById("tree-container")
+
+		# When the tree is redrawn, check to see if it extends beyond the current window
+		$scope.$on "tree.nodes.changed.complete", (evt) ->
+
+			bounds = treeContainer[0].getBoundingClientRect()
+
+			# Check to see if tree extends beyond the current window
+			# Enable dragFlag if it is, updates cursor to move and allows for dragging
+			if bounds.left < 0 or bounds.right > $scope.windowWidth or bounds.top < 65 or bounds.bottom > $scope.windowHeight
+				unless $element.hasClass "draggable" then $element.addClass "draggable"
+				$scope.dragFlag = true
+
+			else
+				if $element.hasClass "draggable" then $element.removeClass "draggable"
+				$scope.dragFlag = false
+
+		# Mousedown behavior for dragging
+		$scope.selectTree = (evt) ->
+			if evt.target is $element[0] and $scope.dragFlag
+				$scope.offset.moving = true
+				originX = evt.clientX
+				originY = evt.clientY
+
+				currWidth = treeContainer[0].getBoundingClientRect().width
+				currHeight = treeContainer[0].getBoundingClientRect().height
+
+		# Move the tree svg via a transform when the mouse is depressed and dragging conditions are met
+		$scope.moveTree = (evt) ->
+			if $scope.offset.moving
+
+				dx = evt.clientX - originX
+				dy = evt.clientY - originY
+
+				$scope.offset.x += dx
+				$scope.offset.y += dy
+
+				originX = evt.clientX
+				originY = evt.clientY
+
+				# X offset exceeds max X bounds
+				if $scope.offset.x >= (currWidth - (maxBoundPadding * $scope.offset.scale))
+					$scope.offset.x = currWidth - (maxBoundPadding * $scope.offset.scale)
+
+				# Y offset exceeds max Y bounds
+				if $scope.offset.y >= (currHeight - (maxBoundPadding * $scope.offset.scale))
+					$scope.offset.y = currHeight - (maxBoundPadding * $scope.offset.scale)
+
+				# Y offset exceeds min Y bounds
+				if $scope.offset.y <= (-currHeight + (maxBoundPadding * $scope.offset.scale))
+					$scope.offset.y = -currHeight + (maxBoundPadding * $scope.offset.scale)
+
+				# X offset exceeds min X bounds
+				if $scope.offset.x <= (-currWidth + (maxBoundPadding * $scope.offset.scale))
+					$scope.offset.x = (-currWidth + (maxBoundPadding * $scope.offset.scale))
+
+				$scope.transformTree()
+
+				return false
+
+		# Mouseup behavior to turn off dragging
+		$scope.deselectTree = (evt) ->
+			$scope.offset.moving = false
+
+		# updates the matrix transform with new offset (translation) values & scale values
+		# translation combines the X/Y offsets from panning and adjustments made to center the SVG when scaled
+		$scope.transformTree = () ->
+			transform = "matrix(#{$scope.offset.scale} 0 0 #{$scope.offset.scale} #{($scope.offset.x + $scope.offset.scaleXOffset)} #{($scope.offset.y + $scope.offset.scaleYOffset)})"
+			treeContainer.attr "transform", transform
+
+		# Fancy math to scale the SVG tree and offset the transform-origin to the center of the window instead of top-left
+		$scope.$on "tree.scaled", (evt) ->
+
+			box = treeContainer[0].getBBox()
+
+			centerX = ($scope.windowWidth / 2)
+			centerY = ($scope.windowHeight / 2)
+
+			translateX = -(centerX) * ($scope.offset.scale - 1)
+			translateY = -(centerY) * ($scope.offset.scale - 1)
+
+			$scope.offset.scaleXOffset = translateX
+			$scope.offset.scaleYOffset = translateY
+
+			$scope.transformTree()
+			# Update the tree to get new bounds
+			$scope.render treeSrv.get()
+
+		# Reset all transforms on the tree
+		$scope.$on "tree.reset", (evt) ->
+
+			$scope.offset.scale = 1
+			$scope.offset.x = 0
+			$scope.offset.y = 0
+			$scope.offset.scaleXOffset = 0
+			$scope.offset.scaleYOffset = 0
+
+			$scope.transformTree()
+			$scope.render treeSrv.get()
+
+
+Adventure.directive "zoomButtons", ($rootScope) ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.zoomTreeOut = () ->
+			# set lower zoom limit
+			if $scope.treeOffset.scale <= 0.2 then return false
+
+			$scope.treeOffset.scale -= 0.1
+			$rootScope.$broadcast "tree.scaled"
+
+		$scope.zoomTreeIn = () ->
+			# set upper zoom limit
+			if $scope.treeOffset.scale >= 2 then return false
+
+			$scope.treeOffset.scale += 0.1
+			$rootScope.$broadcast "tree.scaled"
+
+		$scope.resetZoom = () ->
+			$rootScope.$broadcast "tree.reset"
 
 # Self explanatory directive for editing the title
 Adventure.directive "titleEditor", () ->
@@ -494,8 +655,9 @@ Adventure.directive "answerTooltip", (treeSrv) ->
 			if newVal isnt null
 
 				# Update the position of the tooltip
-				xOffset = $scope.hoveredNode.x + 35
-				yOffset = $scope.hoveredNode.y + 45
+				# Crazy math is due to ensuring the dialog continues to position properly after panning and/or zooming the tree
+				xOffset = ($scope.hoveredNode.x * $scope.treeOffset.scale) + $scope.treeOffset.x + $scope.treeOffset.scaleXOffset + (35 * $scope.treeOffset.scale)
+				yOffset = ($scope.hoveredNode.y * $scope.treeOffset.scale) + ($scope.treeOffset.y - 5) + $scope.treeOffset.scaleYOffset
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 				$attrs.$set "style", styles
 
@@ -531,8 +693,10 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 		# When target for the dialog changes, update the position values based on where the new node is
 		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
 
-			xOffset = $scope.nodeTools.x + 0
-			yOffset = $scope.nodeTools.y + 50
+			# Ensure the nodeTools dialog is positioned properly
+			# Crazy math is due to ensuring the dialog continues to position properly after panning and/or zooming the tree
+			xOffset = ($scope.nodeTools.x * $scope.treeOffset.scale) + $scope.treeOffset.x + $scope.treeOffset.scaleXOffset
+			yOffset = ($scope.nodeTools.y * $scope.treeOffset.scale) + $scope.treeOffset.y + $scope.treeOffset.scaleYOffset
 
 			xBound = xOffset + 200
 			yBound = yOffset + 122
@@ -1316,7 +1480,7 @@ Adventure.directive "hotspotManager", () ->
 
 		# The selectedSVG object holds the temporary properties of the selected SVG hotspot
 		# Works in a similar way to the nodeTools and nodeManager objects
-		# Attempts to nest these properties inside an svg-specific directive unsuccessful
+		# Attempts to nest these properties inside an svg-specific directive were unsuccessful
 		$scope.selectedSVG =
 			target: null
 			selected: false

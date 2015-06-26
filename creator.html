@@ -38,6 +38,23 @@
 			<button type="button" class="temp-qset-gen-button" ng-click="showQsetLoader = true">Load QSet</button>
 		</header>
 		<div id="adventure-container">
+			<div class="zoom-buttons" zoom-buttons>
+				<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
+				<svg class="zoom-button"
+					width="40"
+					height="40"
+					ng-click="zoomTreeIn()">
+					<path d="M 18,8 L 18,18 L 8,18 L 8,22 L 18,22 L 18,32 L 22,32 L 22,22 L 32,22 L 32,18 L 22,18 L 22,8 Z"></path>
+				</svg>
+				<svg class="zoom-button"
+					width="40"
+					height="40"
+					ng-click="zoomTreeOut()">
+					<path d="M 8,18 L 8,22 L 32,22 L 32,18 Z"></path>
+				</svg>
+				<button type="button"
+					ng-click="resetZoom()">Reset</button>
+			</div>
 			<title-editor ng-show="showTitleEditor">
 				<h4>Give Your Widget a Title</h4>
 				<input type="text" ng-model="title" enter-submit="hideCoverAndModals()" auto-select />
@@ -464,7 +481,12 @@
 			<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
 			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
-			<tree-visualization data="treeData" on-hover="onNodeHover(data)" on-hover-out="onNodeHoverOut(data)" node-click="nodeSelected(data)" bg-click="bgClicked()"></tree-visualization>
+			<tree-visualization data="treeData"
+				offset="treeOffset"
+				on-hover="onNodeHover(data)"
+				on-hover-out="onNodeHoverOut(data)"
+				node-click="nodeSelected(data)"
+				bg-click="bgClicked()"></tree-visualization>
 		</div>
 	</body>
 </html>
