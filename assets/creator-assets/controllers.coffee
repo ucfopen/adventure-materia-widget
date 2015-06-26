@@ -58,6 +58,17 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		parentId: -1
 		contents: []
 
+	# Since the entire tree SVG can be dragged around, we need to track the X & Y offsets representing where the SVG is positioned relative to "normal"
+	# These offsets are applied to modals that depend on item locations within the SVG, e.g., the nodeTools dialog and answer-tooltips
+	# This object is passed thru to the draggableTree directive when it's added to the tree-svg container that D3 generates
+	$scope.treeOffset =
+		x: 0
+		y: 0
+		moving: false
+		scale: 1
+		scaleXOffset: 0
+		scaleYOffset: 0
+
 	# The displayNodeCreation flag controls the visiblity of node creation screens
 	$scope.displayNodeCreation = "none"
 	# Scope reference for the node currently being edited in a creation screen, updates when displayNodeCreation changes
