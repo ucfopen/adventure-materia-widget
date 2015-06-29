@@ -73,7 +73,7 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 		$scope.copyMode = false
 
 		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
-		$scope.windowHeight = document.getElementById("adventure-container").offsetHeight
+		$scope.windowHeight = document.getElementById("adventure-container").offsetHeight - 60
 		$scope.treeContainerWidth = null
 
 		# Re-render tree whenever the nodes are updated
