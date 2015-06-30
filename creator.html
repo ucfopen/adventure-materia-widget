@@ -206,7 +206,8 @@
 				</button>
 				<div class="answers-container"
 					ng-class="{'long' : displayNodeCreation == SHORTANS}"
-					ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS">
+					ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS"
+					auto-scroll-and-select>
 					<ul>
 						<li class="unmatched-answers-row"
 							ng-if="displayNodeCreation == SHORTANS">

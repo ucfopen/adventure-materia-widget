@@ -1300,6 +1300,9 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 				newAnswer.matches = []
 			$scope.answers.push newAnswer
 
+			# Inform the answers-container auto-scroll-and-focus directive that a new answer is added
+			$rootScope.$broadcast "editedNode.answers.added"
+
 		# Check to see if removing this answer will delete any child nodes of the selected answer's node
 		# If there are child nodes present, bring up the warning dialog
 		# Otherwise, go ahead and remove the answer (and associated node, if applicable)
@@ -1863,6 +1866,30 @@ Adventure.directive "polygonArtboard", ($rootScope) ->
 			$scope.cursorPoint =
 				x : null
 				y : null
+
+# A rather straightforward little directive to ensure the answer container auto-scrolls to the newest row and focuses it when a new answer is added
+Adventure.directive "autoScrollAndSelect", ($timeout) ->
+	restrict: "A",
+	link: ($scope,$element, $attrs) ->
+
+		# Listen for when a new answer is added
+		$scope.$on "editedNode.answers.added", (evt) ->
+			if $scope.editedNode.type is $scope.MC or $scope.editedNode.type is $scope.SHORTANS
+
+				# need to delay execution of this code so the DOM has time to render the new HTML associated with the answer
+				# OH GOD THIS IS SO DIRTY
+				# Angular doesn't have an effective callback for post- DOM renders, stuck with $timeout for now
+				$timeout (() ->
+					# Auto-scroll to the bottom
+					$element[0].scrollTop = $element[0].scrollHeight
+
+					# Find the answer input box and focus it
+					list = angular.element($element.children()[0]).children()
+					if list.length > 0
+						row = angular.element list[list.length - 1]
+						# children()[1] references the answer text input box
+						row.children()[1].focus()
+				), 100
 
 # MEANT FOR DEBUG PURPOSES ONLY
 Adventure.directive "debugQsetLoader", (treeSrv) ->
