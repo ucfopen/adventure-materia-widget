@@ -75,12 +75,11 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	$scope.editedNode = null
 
 	$scope.hoveredNode =
-		showTooltip: false
+		showTooltips: false
 		target: null
-		targetParent: null
+		tooltips: [] # initially an empty array that's populated on-hover with the target's answerLinks array
 		x: 0
 		y: 0
-		text: null
 		pendingHide: false
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
@@ -109,6 +108,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			), 5000
 
 			console.log $scope.editedNode
+
+			# Refresh all answerLinks references as some have changed
+			treeSrv.updateAllAnswerLinks $scope.treeData
 
 			# Warn the user if a final score hasn't been set upon closing the creation screen
 			# TODO there may be more post-creation-exit events required: condense these?
@@ -145,6 +147,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 				treeSrv.set $scope.treeData
 
+				treeSrv.updateAllAnswerLinks $scope.treeData
+
 	$scope.onSaveClicked = (mode = 'save') ->
 		qset = treeSrv.createQSetFromTree $scope.treeData
 		Materia.CreatorCore.save $scope.title, qset
@@ -155,13 +159,13 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	# (associated answer & validation warnings)
 	$scope.onNodeHover = (data) ->
 		if data.type is "bridge" then return
+		if $scope.existingNodeSelectionMode is true then return
 		$scope.hoveredNode.pendingHide = false
-		if $scope.hoveredNode.target isnt data.id and data.parentId isnt -1
+		if $scope.hoveredNode.target isnt data.id
 
 			$scope.$apply () ->
 				$scope.hoveredNode.x = data.x
 				$scope.hoveredNode.y = data.y
-				$scope.hoveredNode.targetParent = data.parentId
 				$scope.hoveredNode.target = data.id
 
 	# Handles hover-out behavior of associated tooltips
@@ -170,25 +174,25 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	# If it's not reset, go ahead and hide the tooltip
 	$scope.onNodeHoverOut = (data) ->
 		if data.type is "bridge" then return
-		if $scope.hoveredNode.target is data.id and data.parentId isnt -1
-			if $scope.hoveredNode.showTooltip is true
+		if $scope.existingNodeSelectionMode is true then return
+		if $scope.hoveredNode.target is data.id
+			if $scope.hoveredNode.showTooltips is true
 				$scope.hoveredNode.pendingHide = true
 				$timeout (() ->
 					if $scope.hoveredNode.pendingHide is true
 						$scope.$apply () ->
-							$scope.hoveredNode.showTooltip = false
+							$scope.hoveredNode.showTooltips = false
 							$scope.hoveredNode.target = null
-							$scope.hoveredNode.targetParent = null
 				), 500
 		else if $scope.hoveredNode.target isnt data.id
-			$scope.hoveredNode.showTooltip = false
+			$scope.hoveredNode.showTooltips = false
 
 	# Controller recipient of the treeViz directive's onClick method
 	# data contains the node object
 	$scope.nodeSelected = (data) ->
 
-		# Don't do anything if the node is a bridge
-		# It's not a -real- node, we don't care about it like that
+		# If a bridge is clicked, automagically add a node to replace the bridge
+		# Creates a node between the bridge link's parent and child
 		if data.type is "bridge"
 			$scope.addNodeInBetween data
 			return
@@ -276,6 +280,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 		treeSrv.incrementNodeCount()
 		treeSrv.set $scope.treeData
+
+		treeSrv.updateAllAnswerLinks $scope.treeData
 
 	# Reference function so the integerToLetters function from treeSrv can be called using two-way data binding
 	$scope.integerToLetters = (val) ->

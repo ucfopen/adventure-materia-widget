@@ -311,6 +311,69 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 			i++
 
+	# Recurses through the given tree and finds all answers that point to the given target ID
+	# For each answer, creates an object with the answer's node ID & text and appends it to an array that's then returned
+	findAnswersWithTarget = (tree, target, answers = null) ->
+
+		if answers is null then answers = []
+
+		# Check all answers for the given node (tree) and create a matching answer object if the answer is targeting the target node
+		angular.forEach tree.answers, (answer, index) ->
+			if answer.target is target
+
+				newAnswer = {}
+				newAnswer.parent = tree.id
+
+				if answer.text isnt null and answer.text.length > 0 then newAnswer.text = answer.text
+				else newAnswer.text = "[No Answer Text]"
+
+				answers.push newAnswer
+
+		# If there's a pending target, and it matches, create an object with special text and add it
+		if tree.pendingTarget and tree.pendingTarget is target
+
+			pendingAnswer = {}
+			pendingAnswer.parent = tree.id
+			pendingAnswer.text = "[No Answer Yet; Edit #{integerToLetters(tree.id)} First!]"
+
+			answers.push pendingAnswer
+
+		if !tree.contents then return answers
+
+		i = 0
+
+		while i < tree.contents.length
+
+			child = tree.contents[i]
+
+			answers = findAnswersWithTarget tree.children[i], target, answers
+
+			i++
+
+		return answers
+
+	# Recursive function to update the answerLinks property for all nodes in the tree
+	# This is called any time an answer is added or removed or modified
+	# tree should be a reference to the root node initially, e.g., treeData
+	updateAllAnswerLinks = (tree) ->
+
+		tree.answerLinks = findAnswersWithTarget treeData, tree.id
+
+		if !tree.contents then return
+
+		i = 0
+
+		while i < tree.contents.length
+
+			child = tree.contents[i]
+
+			updateAllAnswerLinks child
+
+			i++
+
+		return
+
+	# Probably deprecated??
 	findMaxDepth = (tree, depth=0) ->
 
 		if !tree.children
@@ -500,6 +563,8 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 	setNodeCount : setNodeCount
 	incrementNodeCount : incrementNodeCount
 	getMaxDepth : getMaxDepth
+	findAnswersWithTarget : findAnswersWithTarget
+	updateAllAnswerLinks : updateAllAnswerLinks
 	findNode : findNode
 	findAndAdd : findAndAdd
 	findAndReplace : findAndReplace

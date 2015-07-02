@@ -174,6 +174,12 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 
 					links.push newLink
 
+				# console.log "generating answer links for the following node: " + node.id
+				# # console.log treeSrv.get()
+				# node.answerLinks = treeSrv.findAnswersWithTarget treeSrv.get(), node.id
+				# console.log node.answerLinks
+				# # console.log node.answerLinks
+
 
 			# We need to effectively "filter" each link and create the intermediate nodes
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
@@ -647,32 +653,29 @@ Adventure.directive "titleEditor", () ->
 			if newVal
 				$scope.showBackgroundCover = true
 
-# Directive for the small tooltip displaying the answer associated with a given node on mouseover
-Adventure.directive "answerTooltip", (treeSrv) ->
+# Directive for the small tooltips displaying the answers associated with a given node on mouseover
+Adventure.directive "answerTooltips", (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 		$scope.$watch "hoveredNode.target", (newVal, oldVal) ->
 			if newVal isnt null
 
-				# Update the position of the tooltip
+				# Update the position of the tooltip container
 				# Crazy math is due to ensuring the dialog continues to position properly after panning and/or zooming the tree
 				xOffset = ($scope.hoveredNode.x * $scope.treeOffset.scale) + $scope.treeOffset.x + $scope.treeOffset.scaleXOffset + (35 * $scope.treeOffset.scale)
 				yOffset = ($scope.hoveredNode.y * $scope.treeOffset.scale) + ($scope.treeOffset.y - 5) + $scope.treeOffset.scaleYOffset
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 				$attrs.$set "style", styles
 
-				# Grab the parent node so we can find the associated answer text
-				parent = treeSrv.findNode $scope.treeData, $scope.hoveredNode.targetParent
+				node = treeSrv.findNode $scope.treeData, $scope.hoveredNode.target
 
-				# Find the answer and update the tooltip text appropriately
-				angular.forEach parent.answers, (answer, index) ->
-					if answer.target is $scope.hoveredNode.target
-						if answer.text isnt null
-							$scope.hoveredNode.text = answer.text
-						else
-							$scope.hoveredNode.text = "[No Answer Text]"
+				$scope.hoveredNode.tooltips = []
 
-				$scope.hoveredNode.showTooltip = true
+				angular.forEach node.answerLinks, (answer, index) ->
+					$scope.hoveredNode.tooltips.push answer
+
+				$scope.hoveredNode.showTooltips = true
+
 
 # Directive for the node modal dialog (edit the node, copy the node, reset the node, etc)
 Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
@@ -912,13 +915,15 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 			treeSrv.set $scope.treeData
 
+			# Refresh all answerLinks references as some have changed
+			treeSrv.updateAllAnswerLinks $scope.treeData
+
 			$scope.nodeTools.showDeleteWarning = false
 			$scope.nodeTools.show = false
 			$scope.nodeTools.target = null
 
-			$scope.hoveredNode.showTooltip = false
+			$scope.hoveredNode.showTooltips = false
 			$scope.hoveredNode.target = null
-			$scope.hoveredNode.targetParent = null
 
 		$scope.convertNode = (type) ->
 
@@ -968,6 +973,9 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 			$scope.nodeTools.showConvertDialog = false
 			treeSrv.set $scope.treeData
+
+			# Refresh all answerLinks references as some have changed
+			treeSrv.updateAllAnswerLinks $scope.treeData
 
 # The "What kind of node do you want to create?" dialog
 Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
@@ -1051,6 +1059,9 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 					$scope.newNodeManager.target = null
 
+					# Refresh all answerLinks references as some have changed
+					treeSrv.updateAllAnswerLinks $scope.treeData
+
 				when "existing"
 
 					# Suspend the node creation screen so the user can select an existing node
@@ -1100,13 +1111,16 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 							deregister()
 
 							# Cancel out the answer tooltip, or it persists
-							$scope.hoveredNode.showTooltip = false
+							$scope.hoveredNode.showTooltips = false
 							$scope.hoveredNode.target = null
-							$scope.hoveredNode.targetParent = null
+							# $scope.hoveredNode.targetParent = null
 
 							$scope.existingNodeSelected = null
 							$scope.newNodeManager.target = null
 							$scope.displayNodeCreation = "none" # displayNodeCreation should be updated from "suspended"
+
+							# Refresh all answerLinks references as some have changed
+							treeSrv.updateAllAnswerLinks $scope.treeData
 
 
 				when "self"
@@ -1142,6 +1156,9 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					console.log "New mode selected: SELF"
 
 					$scope.newNodeManager.target = null
+
+					# Refresh all answerLinks references as some have changed
+					treeSrv.updateAllAnswerLinks $scope.treeData
 
 
 			$scope.newNodeManager.show = false
@@ -1300,8 +1317,12 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 				newAnswer.matches = []
 			$scope.answers.push newAnswer
 
+			# Refresh all answerLinks references as some have changed
+			treeSrv.updateAllAnswerLinks $scope.treeData
+
 			# Inform the answers-container auto-scroll-and-focus directive that a new answer is added
 			$rootScope.$broadcast "editedNode.answers.added"
+
 
 		# Check to see if removing this answer will delete any child nodes of the selected answer's node
 		# If there are child nodes present, bring up the warning dialog
@@ -1365,6 +1386,9 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 			if $scope.editedNode.type is $scope.HOTSPOT
 				$rootScope.$broadcast "editedNode.hotspotAnswerManager.reset"
 
+			# Refresh all answerLinks references as some have changed
+			treeSrv.updateAllAnswerLinks $scope.treeData
+
 		# Restores an answer/node pair that's been deleted, formatted as a "cold storage" object
 		# The anwer/node pair must be a child of the current editedNode
 		$scope.restoreDeletedNode = (target) ->
@@ -1382,6 +1406,9 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 
 					# Update the tree to display the restored node
 					treeSrv.set $scope.treeData
+
+					# Refresh all answerLinks references as some have changed
+					treeSrv.updateAllAnswerLinks $scope.treeData
 					return
 
 
@@ -1910,6 +1937,7 @@ Adventure.directive "debugQsetLoader", (treeSrv) ->
 				return
 
 			treeSrv.set $scope.treeData
+			treeSrv.updateAllAnswerLinks $scope.treeData
 			$scope.showQsetLoader = false
 
 
