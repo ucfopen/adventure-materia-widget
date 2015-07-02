@@ -471,7 +471,12 @@
 					type="button"
 					ng-click="saveAndClose()">Save</button>
 			</node-creation>
-			<answer-tooltip ng-show="hoveredNode.showTooltip"><span class="tooltip-title">Associated Answer from {{ integerToLetters(hoveredNode.targetParent) }}:</span>{{hoveredNode.text}}</answer-tooltip>
+			<answer-tooltips ng-show="hoveredNode.showTooltips">
+				<div class="tooltip"
+					ng-repeat="tooltip in hoveredNode.tooltips">
+					<span class="tooltip-title">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
+				</div>
+			</answer-tooltips>
 			<div class="intro-screen" ng-show="showIntroDialog">
 			<img src="assets/creator-assets/sample-tree.png" />
 			<h2>Create Your Own Adventure!</h2>
