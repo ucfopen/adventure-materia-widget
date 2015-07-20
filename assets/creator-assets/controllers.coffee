@@ -82,6 +82,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		y: 0
 		pendingHide: false
 
+	$scope.validation =
+		show: false
+		errors: []
+
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 		if newVal isnt oldVal and newVal isnt "none" and newVal isnt "suspended"
 			$scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
@@ -109,6 +113,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 			console.log $scope.editedNode
 
+			if $scope.editedNode and $scope.editedNode.hasProblem
+				delete $scope.editedNode.hasProblem
+				treeSrv.set $scope.treeData
+
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
 
@@ -126,6 +134,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		$scope.showCreationDialog = false
 		$scope.showDeleteWarning = false
 		$scope.showTitleEditor = false
+		$scope.validation.show = false
 
 		$scope.displayNodeCreation = "none"
 
@@ -145,13 +154,24 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			$scope.$apply () ->
 				$scope.title = title
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
-				treeSrv.set $scope.treeData
 
+				# Check to make sure the tree doesn't have errors
+				treeSrv.validateTreeOnStart $scope.treeData
+
+				treeSrv.set $scope.treeData
 				treeSrv.updateAllAnswerLinks $scope.treeData
 
 	$scope.onSaveClicked = (mode = 'save') ->
-		qset = treeSrv.createQSetFromTree $scope.treeData
-		Materia.CreatorCore.save $scope.title, qset
+		validation = treeSrv.validateTreeOnSave $scope.treeData
+
+		# Run the tree validation when save is clicked
+		# If errors are found, halt the save and bring up the validation dialog
+		if validation.length
+			$scope.validation.errors = validation
+			return Materia.CreatorCore.cancelSave ''
+		else
+			qset = treeSrv.createQSetFromTree $scope.treeData
+			Materia.CreatorCore.save $scope.title, qset
 
 	$scope.onSaveComplete = (title, widget, qset, version) -> true
 

@@ -8,6 +8,8 @@ $red: #b90000;
 $red-lighter: #de0000;
 $red-lightest: #ffd7d7;
 
+$yellow: #ffe400;
+
 $blue: #3d90b1;
 $blue-lighter: #49afd7;
 $blue-lightest: #bdecff;
@@ -254,10 +256,27 @@ g.node {
 		}
 	}
 
+	&.focused {
+		circle.node-dot {
+			stroke: $red;
+			stroke-width: 3px;
+		}
+	}
+
 	rect {
 		fill: $white;
 		stroke: $gray-lightest;
 		stroke-width: 2px;
+	}
+
+	g.warning-symbol {
+		stroke: $black;
+		fill: $yellow;
+
+		.exclamation {
+			stroke: none;
+			fill: $black;
+		}
 	}
 
 	text {
@@ -562,7 +581,7 @@ toast {
 	// }
 }
 
-answer-tooltips {
+node-tooltips {
 	position: absolute;
 
 	.tooltip {
@@ -1609,5 +1628,99 @@ node-creation-selection-dialog {
 			background: $white;
 			opacity: 0.7;
 		}
+	}
+}
+
+validation-dialog {
+	position: fixed;
+	left: 50%;
+	z-index: 60;
+
+	width: $misc-popup-width;
+	// height: 600px;
+	margin: 5px 0px 0px -300px;
+	padding-bottom: 75px;
+	border-radius: 5px;
+	background: $color-primary;
+
+	box-shadow: $shadow-dialog;
+
+	h4 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+
+		color: $color-primary;
+		background: $color-accent;
+	}
+
+	p.error-count {
+		margin: 15px 15px 5px 15px;
+		padding: 10px 15px;
+
+		color: $white;
+		font-weight: bold;
+
+		background: $red;
+		border-radius: 2px;
+
+		box-shadow: $shadow-small;
+	}
+
+	ul {
+		list-style-type: none;
+		margin: 0px;
+		padding: 25px 0px 0px 0px;
+
+		li {
+			display: box;
+			min-height: 35px;
+			margin: 0px 15px 0px 15px;
+			padding: 10px 0px;
+			// padding: 10px 15px;
+			// border: solid 1px $gray-lighter;
+
+			border-bottom: solid 1px $gray-lighter;
+
+			cursor: pointer;
+
+			&:hover {
+				background: $color-selection-hover;
+			}
+
+			svg {
+				float: left;
+				margin-left: 10px;
+				vertical-align: middle;
+			}
+
+			p {
+				display: inline-block;
+				width: 495px;
+				padding-right: 15px;
+				margin-top: 0px;
+				margin-left: 15px;
+
+				vertical-align: middle;
+
+				font-size: 13px;
+
+				// color: $black;
+				// font-weight: normal;
+			}
+		}
+	}
+
+	button {
+		position: absolute;
+		bottom: 15px;
+		left: 15px;
+
+		padding: 10px 15px;
 	}
 }

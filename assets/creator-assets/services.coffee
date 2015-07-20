@@ -538,6 +538,86 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 
 		tree
 
+	validateTreeOnStart = (tree) ->
+
+		nodes = queueNodesForValidation tree
+		ids = []
+		errors = []
+
+		ids = createIdArray nodes
+
+		angular.forEach nodes, (node, index) ->
+
+			angular.forEach node.answers, (answer, answerIndex) ->
+
+				if ids.indexOf(answer.target) is -1
+					error =
+						node: node.id
+						target: answer.target
+						type: "missing_answer_node"
+
+					errors.push error
+
+		return errors
+
+	validateTreeOnSave = (tree) ->
+
+		nodes = queueNodesForValidation tree
+		errors = []
+
+		angular.forEach nodes, (node, index) ->
+
+			if node.type is "blank"
+				error =
+					node: node.id
+					type: "blank_node"
+
+				errors.push error
+
+			else if node.type isnt "end" and (!node.answers or !node.answers.length)
+				error =
+					node: node.id
+					type: "has_no_answers"
+
+				errors.push error
+
+			else if node.type is "end" and node.finalScore is null
+				error =
+					node: node.id
+					type: "has_no_final_score"
+
+				errors.push error
+
+		return errors
+
+
+	queueNodesForValidation = (tree, arr = null) ->
+
+		if arr is null then arr = []
+
+		arr.push tree
+
+		if !tree.contents then return arr
+
+		i = 0
+
+		while i < tree.contents.length
+
+			arr = queueNodesForValidation tree.contents[i], arr
+			i++
+
+		return arr
+
+	createIdArray = (nodeArray) ->
+
+		ids = []
+
+		angular.forEach nodeArray, (node, index) ->
+			ids.push node.id
+
+		return ids
+
+
 	# Helper function that converts node IDs to their respective alphabetical counterparts
 	# e.g., 1 is "A", 2 is "B", 26 is "Z", 27 is "AA", 28 is "AB"
 	integerToLetters = (val) ->
@@ -573,4 +653,6 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 	findAndFixAnswerTargets : findAndFixAnswerTargets
 	createQSetFromTree : createQSetFromTree
 	createTreeDataFromQset : createTreeDataFromQset
+	validateTreeOnStart : validateTreeOnStart
+	validateTreeOnSave : validateTreeOnSave
 	integerToLetters : integerToLetters
