@@ -162,7 +162,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				treeSrv.updateAllAnswerLinks $scope.treeData
 
 	$scope.onSaveClicked = (mode = 'save') ->
-		validation = treeSrv.validateTreeOnSave $scope.treeData
+		if mode is "publish" then validation = treeSrv.validateTreeOnSave $scope.treeData
+		else validation = []
 
 		# Run the tree validation when save is clicked
 		# If errors are found, halt the save and bring up the validation dialog
