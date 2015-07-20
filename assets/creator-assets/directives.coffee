@@ -380,6 +380,9 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 				.append("svg:g")
 				.attr("class", (d) ->
 					if d.type is "bridge" then return "bridge"
+					else if d.hasTemporaryFocus
+						delete d.hasTemporaryFocus
+						return "node focused #{d.type}"
 					else if $scope.copyMode and d.type is "blank" then return "node copyMode #{d.type}"
 					else return "node #{d.type}"
 				)
@@ -480,6 +483,27 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 				.attr("font-size", 14)
 				.text (d) ->
 					d.name
+
+			# The small warning graphic applied to nodes with validation problems
+			warningSymbol = nodeGroup.append("svg:g")
+				.attr("class", "warning-symbol")
+				.attr("transform","translate(-30,5)")
+			warningSymbol.append("polygon")
+				.attr("points", "0.8,12.9 7.5,1.2 14.2,12.9")
+			warningSymbol.append("polygon")
+				.attr("class","exclamation")
+				.attr("points","8.1,9.5 6.9,9.5 6.5,5.3 8.5,5.3")
+			warningSymbol.append("rect")
+				.attr("class","exclamation")
+				.attr("x","6.6")
+				.attr("y","10")
+				.attr("width","1.8")
+				.attr("height","1.6")
+
+			warningSymbol.attr("display", (d) ->
+				if d.hasProblem then return null
+				else return "none"
+			)
 
 			# The "+" symbol displayed on bridge nodes (the pseudo-nodes between nodes you can click to add an in-between node)
 			nodeGroup.append("path")
@@ -610,6 +634,13 @@ Adventure.directive "treeTransforms", (treeSrv) ->
 			# Update the tree to get new bounds
 			$scope.render treeSrv.get()
 
+		# Focus the selected node in the center of the window
+		$scope.$on "tree.nodeFocus", (evt) ->
+			# Adjust offsets to center the node in the window
+			$scope.offset.x = ($scope.offset.x * -1) + $scope.windowWidth/2
+			$scope.offset.y = ($scope.offset.y * -1) + $scope.windowHeight/2
+			$scope.transformTree()
+
 		# Reset all transforms on the tree
 		$scope.$on "tree.reset", (evt) ->
 
@@ -654,7 +685,7 @@ Adventure.directive "titleEditor", () ->
 				$scope.showBackgroundCover = true
 
 # Directive for the small tooltips displaying the answers associated with a given node on mouseover
-Adventure.directive "answerTooltips", (treeSrv) ->
+Adventure.directive "nodeTooltips", (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 		$scope.$watch "hoveredNode.target", (newVal, oldVal) ->
@@ -1918,6 +1949,70 @@ Adventure.directive "autoScrollAndSelect", ($timeout) ->
 						row.children()[1].focus()
 				), 100
 
+# The validation dialog is linked to two validation events:
+# - when the qset is loaded and a problem is detected (node doesn't exist)
+# - when the widget is published and problems are detected
+# The dialog pulls the error data from the $scope.validation object, and operates on each
+# Each problem can be selected to visit the node in question (using the errorFollowUp function)
+Adventure.directive "validationDialog", (treeSrv, $rootScope) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "validation.errors", (newVal, oldVal) ->
+			if newVal and newVal.length > 0
+				$scope.validation.show = true
+				$scope.showBackgroundCover = true
+
+				angular.forEach $scope.validation.errors, (error, index) ->
+
+					switch error.type
+						# For missing answers, we generate a blank node and link the answer to it
+						when "missing_answer_node"
+							node = treeSrv.findNode $scope.treeData, error.node
+
+							node.hasProblem = true
+
+							answerIndex = null
+							angular.forEach node.answers, (answer, index) ->
+								if answer.target is error.target
+									answerIndex = index
+
+							newTarget = $scope.addNode node.id, $scope.BLANK
+
+							node.answers[answerIndex].target = newTarget
+							node.answers[answerIndex].linkMode = $scope.NEW
+
+							treeSrv.set $scope.treeData
+							treeSrv.updateAllAnswerLinks $scope.treeData
+
+							error.correctedTarget = newTarget
+
+						# For other error types, simply indicate there's a problem
+						when "blank_node", "has_no_answers", "has_no_final_score"
+							node = treeSrv.findNode $scope.treeData, error.node
+
+							node.hasProblem = true
+
+							treeSrv.set $scope.treeData
+
+		# Provide temporary focus to the selected node and translate the tree so it's centered in the window
+		$scope.errorFollowUp = (errorIndex) ->
+			error = $scope.validation.errors[errorIndex]
+
+			node = treeSrv.findNode $scope.treeData, error.node
+
+			node.hasTemporaryFocus = true
+
+			$scope.treeOffset.x = (node.x * $scope.treeOffset.scale) + $scope.treeOffset.scaleXOffset
+			$scope.treeOffset.y = (node.y * $scope.treeOffset.scale) + $scope.treeOffset.scaleYOffset
+
+			$rootScope.$broadcast "tree.nodeFocus"
+
+			treeSrv.set $scope.treeData
+			$scope.hideCoverAndModals()
+
+
+
 # MEANT FOR DEBUG PURPOSES ONLY
 Adventure.directive "debugQsetLoader", (treeSrv) ->
 	restrict: "E",
@@ -1935,6 +2030,10 @@ Adventure.directive "debugQsetLoader", (treeSrv) ->
 				console.log err
 				$scope.showQsetLoader = false
 				return
+
+			validation = treeSrv.validateTreeOnStart $scope.treeData
+			if validation.length
+				$scope.validation.errors = validation
 
 			treeSrv.set $scope.treeData
 			treeSrv.updateAllAnswerLinks $scope.treeData
