@@ -36,7 +36,7 @@
 			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
 			<button type="button" class="temp-qset-gen-button" ng-click="generateDebugQset()">Generate QSet</button>
 			<button type="button" class="temp-qset-gen-button" ng-click="showQsetLoader = true">Load QSet</button>
-			<button type="button" class="temp-qset-gen-button" ng-click="onSaveClicked()">Simulate Publish</button>
+			<!--<button type="button" class="temp-qset-gen-button" ng-click="onSaveClicked()">Simulate Publish</button>-->
 		</header>
 		<div id="adventure-container">
 			<div class="zoom-buttons" zoom-buttons>
@@ -118,7 +118,7 @@
 							</g>
 							<polygon points="22.8,29.1 19.7,26.1 19.2,31.5 "/>
 						</svg>
-						<p ng-if="error.type == 'missing_answer_node'">An answer for Destination {{integerToLetters(error.node)}} pointed somewhere that didn't exist. The answer now points to Destination {{integerToLetters(error.correctedTarget)}}</p>
+						<p ng-if="error.type == 'missing_answer_node'">An answer for <span class="bold">Destination {{integerToLetters(error.node)}}</span> pointed somewhere that didn't exist. The answer now points to Destination {{integerToLetters(error.correctedTarget)}}</p>
 
 						<!-- Blank Node Error -->
 						<svg width="35"
@@ -145,7 +145,7 @@
 										r="9"/>
 							</g>
 						</svg>
-						<p ng-if="error.type == 'blank_node'">Destination {{integerToLetters(error.node)}} is blank! It must be edited or removed from the tree prior to publishing.</p>
+						<p ng-if="error.type == 'blank_node'"><span class="bold">Destination {{integerToLetters(error.node)}}</span> is blank! It must be edited or removed from the tree prior to publishing.</p>
 
 						<!-- No Answers Error -->
 						<svg width="35"
@@ -185,7 +185,7 @@
 								stroke-miterlimit="10"
 								d="M17.2,29.8v-2.1c0,0,2.8,0,2.7-2.5 c-0.1-2.6-2.7-2.3-2.7-2.3s-2,0.1-2,2.5"/>
 						</svg>
-						<p ng-if="error.type == 'has_no_answers'">Destination {{integerToLetters(error.node)}} has no answers! Replace it with an end point or add at least one answer prior to publishing.</p>
+						<p ng-if="error.type == 'has_no_answers'"><span class="bold">Destination {{integerToLetters(error.node)}}</span> has no answers! Replace it with an end point or add at least one answer prior to publishing.</p>
 
 						<!-- No Final Score Error -->
 						<svg width="35"
@@ -225,7 +225,7 @@
 								cy="17.1"
 								r="1.3"/>
 						</svg>
-						<p ng-if="error.type == 'has_no_final_score'">End Point {{integerToLetters(error.node)}} doesn't have a valid final score!</p>
+						<p ng-if="error.type == 'has_no_final_score'"><span class="bold">End Point {{integerToLetters(error.node)}}</span> doesn't have a valid final score!</p>
 					</li>
 				</ul>
 				<button type="button"
