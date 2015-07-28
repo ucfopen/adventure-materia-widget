@@ -903,7 +903,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			target.contents = []
 
 			# Set the editedNode to an empty object to ensure references to questions & answers aren't retained
-			if $scope.editedNode.id is $scope.nodeTools.target
+			if $scope.editedNode and $scope.editedNode.id is $scope.nodeTools.target
 				$scope.editedNode = {}
 
 			# Go ahead and actually replace the existing node on the tree with the blank version
