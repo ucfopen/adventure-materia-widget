@@ -1958,8 +1958,8 @@ Adventure.directive "validationDialog", (treeSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
-		$scope.$watch "validation.errors", (newVal, oldVal) ->
-			if newVal and newVal.length > 0
+		$scope.$on "validation.error", (evt) ->
+			if $scope.validation.errors and $scope.validation.errors.length > 0
 				$scope.validation.show = true
 				$scope.showBackgroundCover = true
 
@@ -1994,6 +1994,7 @@ Adventure.directive "validationDialog", (treeSrv, $rootScope) ->
 							node.hasProblem = true
 
 							treeSrv.set $scope.treeData
+
 
 		# Provide temporary focus to the selected node and translate the tree so it's centered in the window
 		$scope.errorFollowUp = (errorIndex) ->
