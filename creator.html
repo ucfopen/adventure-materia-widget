@@ -62,6 +62,9 @@
 					ng-model="title"
 					enter-submit="hideCoverAndModals()"
 					auto-select />
+				<button type="button"
+					class="important-button"
+					ng-click="hideCoverAndModals()">Done</button>
 			</title-editor>
 			<debug-qset-generator ng-show="showQsetGenerator">
 				<h4>Generated QSet</h4>
