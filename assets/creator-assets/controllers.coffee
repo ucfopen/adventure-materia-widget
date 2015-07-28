@@ -169,6 +169,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		# If errors are found, halt the save and bring up the validation dialog
 		if validation.length
 			$scope.validation.errors = validation
+			$rootScope.$broadcast "validation.error"
+
 			return Materia.CreatorCore.cancelSave ''
 		else
 			qset = treeSrv.createQSetFromTree $scope.treeData
