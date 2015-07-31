@@ -435,6 +435,7 @@
 				<!-- container for all hotspot-specific elements and interactions -->
 				<!-- effectively replaces the default answers container -->
 				<hotspot-manager class="hotspot-container"
+					id="hotspot-manager"
 					ng-if="displayNodeCreation == HOTSPOT">
 					<div class="image-container">
 						<button type="button"
@@ -534,6 +535,7 @@
 								data-answer="answer"
 								ng-attr-transform="matrix(1 0 0 1 {{answer.svg.x}} {{answer.svg.y}})">
 								<ellipse ng-if="answer.svg.type == 'ellipse'"
+									ng-class="{'moving':selectedSVG.selected}"
 									ng-attr-cx="0"
 									ng-attr-cy="0"
 									ng-attr-rx="{{answer.svg.r + answer.svg.scaleXFactor}}"
@@ -550,6 +552,7 @@
 									ng-click="manageSVG($index, $event)" />
 
 								<rect ng-if="answer.svg.type == 'rect'"
+									ng-class="{'moving':selectedSVG.selected}"
 									ng-attr-x="0"
 									ng-attr-y="0"
 									ng-attr-width="{{answer.svg.width + answer.svg.scaleXFactor}}"
@@ -566,6 +569,7 @@
 									ng-click="manageSVG($index, $event)" />
 
 								<polygon ng-if="answer.svg.type == 'polygon'"
+									ng-class="{'moving':selectedSVG.selected}"
 									ng-attr-points="{{answer.svg.points}}"
 									fill="{{answer.svg.fill}}"
 									stroke="{{answer.svg.fill}}"

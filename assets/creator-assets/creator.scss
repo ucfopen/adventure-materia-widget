@@ -1323,16 +1323,12 @@ node-creation-selection-dialog {
 				top: 0px;
 				left: 0px;
 
-				ellipse {
-					cursor: move;
-				}
+				ellipse, rect, polygon {
+					cursor: pointer;
 
-				rect {
-					cursor: move;
-				}
-
-				polygon {
-					cursor: move;
+					&.moving {
+						cursor: move;
+					}
 				}
 
 				.scale {
