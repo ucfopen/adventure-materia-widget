@@ -33,6 +33,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 		fontSize: 22
 		height: 220
 
+	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
 		text: null
 		x: null
@@ -172,22 +173,6 @@ Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 
 		img = new Image()
 		img.src = $scope.question.image
-		# img.onload = ->
-
-		# 	for answer in $scope.answers
-
-		# 		answer.balloonleft = 
-		# 		# if answer.options.svg.type is "polygon"
-		# 		# 	coords = answer.options.svg.points.split(" ")[0].split(",")
-
-		# 		# 	console.log coords
-		# 		# 	answer.balloonleft = coords[0]
-		# 		# 	answer.balloontop = coords[1]
-		# 		# else
-		# 		# 	answer.balloonleft = answer.options.svg.x
-		# 		# 	answer.balloontop = answer.options.svg.y
-
-		# 	$scope.$apply()
 
 	handleShortAnswer = (q_data) ->
 		$scope.type = $scope.SHORTANS
@@ -280,23 +265,6 @@ Adventure.directive "autoTextScale", () ->
 					if $scope.questionFormat.fontSize < 12 then $scope.questionFormat.fontSize = 12
 
 				$attrs.$set "style", $scope.formatQuestionStyles()
-
-# Adventure.directive "hotspotManager", () ->
-# 	restrict: "A",
-# 	link: ($scope, $element, $attrs) ->
-
-# 		$scope.onHotspotHover = (answer, evt) ->
-
-# 			bounds = angular.element($element)[0].getBoundingClientRect()
-
-# 			console.log bounds
-
-# 			answer.balloonleft = evt.clientX - bounds.left + 15
-# 			answer.balloontop = evt.clientY - bounds.top
-# 			answer.hover = true
-
-# 			console.log "balloon left: " + answer.balloonleft
-# 			console.log "balloon top: " + answer.balloontop
 
 # Scales the height of the question box dynamically based on the height of the answer box
 # Ensures the negative space is effectively filled up with question text

@@ -1666,13 +1666,8 @@ Adventure.directive "hotspotManager", () ->
 				else
 					$scope.hotspotAnswerManager.show = true
 
-					# the manager appears adjacent to the mouse cursor, but we have to offset the x/y coords first
-					# clientX and clientY are based on the full iframe, have to offset to within the hotspot-manager
-					# boundings = angular.element($element)[0].getBoundingClientRect()
-
-					# $scope.hotspotAnswerManager.x = evt.clientX - boundings.left
-					# $scope.hotspotAnswerManager.y = evt.clientY - boundings.top
-
+					# The hotspot answer manager will appear adjacent to the cursor
+					# Pass it the cursor location, which is tweaked in the answer manager's directive before being applied
 					$scope.hotspotAnswerManager.x = evt.clientX
 					$scope.hotspotAnswerManager.y = evt.clientY
 
