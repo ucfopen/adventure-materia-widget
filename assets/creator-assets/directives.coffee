@@ -1665,8 +1665,17 @@ Adventure.directive "hotspotManager", () ->
 					$scope.hotspotAnswerManager.answerIndex = null
 				else
 					$scope.hotspotAnswerManager.show = true
-					$scope.hotspotAnswerManager.x = $scope.answers[index].svg.x
-					$scope.hotspotAnswerManager.y = $scope.answers[index].svg.y
+
+					# the manager appears adjacent to the mouse cursor, but we have to offset the x/y coords first
+					# clientX and clientY are based on the full iframe, have to offset to within the hotspot-manager
+					# boundings = angular.element($element)[0].getBoundingClientRect()
+
+					# $scope.hotspotAnswerManager.x = evt.clientX - boundings.left
+					# $scope.hotspotAnswerManager.y = evt.clientY - boundings.top
+
+					$scope.hotspotAnswerManager.x = evt.clientX
+					$scope.hotspotAnswerManager.y = evt.clientY
+
 					$scope.hotspotAnswerManager.answerIndex = index
 					$scope.hotspotAnswerManager.target = $scope.answers[index].target
 
@@ -1785,8 +1794,27 @@ Adventure.directive "hotspotAnswerManager", () ->
 
 			if newVal isnt null and newVal isnt undefined
 
-				xOffset = $scope.hotspotAnswerManager.x + 25
-				yOffset = $scope.hotspotAnswerManager.y + 15
+				xOffset = $scope.hotspotAnswerManager.x
+				yOffset = $scope.hotspotAnswerManager.y
+
+				# Get bounds of the answerManager and the entire tree container to check if the manager is off-screen
+				bounds = angular.element($element)[0].getBoundingClientRect()
+				container = document.getElementById("tree-svg")
+
+				# Move the manager so its back into frame if it's out of bounds
+				if (yOffset + bounds.height) > container.offsetHeight
+					diffY = (yOffset + bounds.height) - container.offsetHeight - 5
+					yOffset -= diffY
+
+				if (xOffset + bounds.width) > container.offsetWidth
+					diffX = (xOffset + bounds.width) - container.offsetWidth - 5
+					xOffset -= diffX
+
+				# Finally, update the position of the manager so the X/Y coords properly align with the hotspot canvas
+				managerBounds = document.getElementById("hotspot-manager").getBoundingClientRect()
+
+				xOffset -= managerBounds.left
+				yOffset -= managerBounds.top
 
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 

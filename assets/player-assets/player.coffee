@@ -33,6 +33,12 @@ Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 		fontSize: 22
 		height: 220
 
+	$scope.hotspotLabelTarget =
+		text: null
+		x: null
+		y: null
+		show: false
+
 	# Update the screen depending on the question type (narrative, mc, short answer, hotspot, etc)
 	manageQuestionScreen = (questionId) ->
 
@@ -166,21 +172,22 @@ Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 
 		img = new Image()
 		img.src = $scope.question.image
-		img.onload = ->
+		# img.onload = ->
 
-			for answer in $scope.answers
+		# 	for answer in $scope.answers
 
-				if answer.options.svg.type is "polygon"
-					coords = answer.options.svg.points.split(" ")[0].split(",")
+		# 		answer.balloonleft = 
+		# 		# if answer.options.svg.type is "polygon"
+		# 		# 	coords = answer.options.svg.points.split(" ")[0].split(",")
 
-					console.log coords
-					answer.balloonleft = coords[0]
-					answer.balloontop = coords[1]
-				else
-					answer.balloonleft = answer.options.svg.x
-					answer.balloontop = answer.options.svg.y
+		# 		# 	console.log coords
+		# 		# 	answer.balloonleft = coords[0]
+		# 		# 	answer.balloontop = coords[1]
+		# 		# else
+		# 		# 	answer.balloonleft = answer.options.svg.x
+		# 		# 	answer.balloontop = answer.options.svg.y
 
-			$scope.$apply()
+		# 	$scope.$apply()
 
 	handleShortAnswer = (q_data) ->
 		$scope.type = $scope.SHORTANS
@@ -274,6 +281,23 @@ Adventure.directive "autoTextScale", () ->
 
 				$attrs.$set "style", $scope.formatQuestionStyles()
 
+# Adventure.directive "hotspotManager", () ->
+# 	restrict: "A",
+# 	link: ($scope, $element, $attrs) ->
+
+# 		$scope.onHotspotHover = (answer, evt) ->
+
+# 			bounds = angular.element($element)[0].getBoundingClientRect()
+
+# 			console.log bounds
+
+# 			answer.balloonleft = evt.clientX - bounds.left + 15
+# 			answer.balloontop = evt.clientY - bounds.top
+# 			answer.hover = true
+
+# 			console.log "balloon left: " + answer.balloonleft
+# 			console.log "balloon top: " + answer.balloontop
+
 # Scales the height of the question box dynamically based on the height of the answer box
 # Ensures the negative space is effectively filled up with question text
 # Only used for MC, since MC is the only node type with variable answer container heights
@@ -327,6 +351,40 @@ Adventure.directive "visibilityManager", () ->
 					when "never"
 						style = "opacity: 0"
 						$attrs.$set "style", style
+
+Adventure.directive "labelManager", ($timeout) ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		# reference to hotspot div element (required for proper X/Y offset)
+		hotspotDivReference = angular.element($element).parent().parent()
+		# reference to label element (need to find width for proper X offset)
+		hotspotLabelReference = angular.element(document.getElementById("hotspot-label"))
+
+		$scope.onHotspotHover = (answer, evt) ->
+
+			if answer.text.length > 0 then $scope.hotspotLabelTarget.text = answer.text
+			else return false
+
+			svgBounds = angular.element($element)[0].getBoundingClientRect()
+
+			# Position the hotspot label just below the hotspot
+			$scope.hotspotLabelTarget.x = (svgBounds.left + (svgBounds.width/2)) - hotspotDivReference[0].getBoundingClientRect().left
+			$scope.hotspotLabelTarget.y = (svgBounds.bottom + 5) - hotspotDivReference[0].getBoundingClientRect().top
+
+			# Need a timeout so the text is rendered within the label
+			# Once its rendered, we offset the X position by half the width so its centered
+			$timeout (() ->
+				labelWidthOffset = hotspotLabelReference[0].getBoundingClientRect().width /2
+				$scope.hotspotLabelTarget.x -= labelWidthOffset
+				$scope.hotspotLabelTarget.show = true
+			), 25
+
+		$scope.onHotspotHoverOut = (evt) ->
+			$scope.hotspotLabelTarget.show = false
+			$scope.hotspotLabelTarget.x = null
+			$scope.hotspotLabelTarget.y = null
+
 
 
 

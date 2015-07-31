@@ -33,7 +33,9 @@
 
 		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
 
-		<div class="feedback" ng-class="{ show: feedback }">
+		<div class="feedback"
+			ng-class="{ show: feedback }"
+			style="z-index: {{ feedback ? 1000 : -1 }}">
 			{{feedback}}
 			<input class="feedback-button trans-button"
 				type="button"
@@ -116,13 +118,16 @@
 					ng-click="handleShortAnswerInput()"/>
 			</div>
 			<div class="hotspot" ng-if="type == HOTSPOT">
-				<div ng-repeat='answer in answers'
-					class='answerbubble'
+				<!-- label element for the hotspot label text, if it exists -->
+				<div class="hotspot-label"
+					id="hotspot-label"
 					ng-click="handleAnswerSelection(answer.link,answer.index)"
-					ng-show='answer.hover && answer.text'
-					style='top:{{answer.balloontop}}px;left:{{answer.balloonleft}}px;'>
-					{{answer.text}}
+					style="top:{{ hotspotLabelTarget.y }}px;
+						left:{{ hotspotLabelTarget.x }}px;
+						opacity:{{ hotspotLabelTarget.show ? 1 : 0 }}">
+					{{hotspotLabelTarget.text}}
 				</div>
+
 				<svg version="1.1"
 					class="hotarea"
 					xmlns:cc="http://web.resource.org/cc/"
@@ -133,7 +138,8 @@
 					xml:space="preserve">
 					<g ng-repeat="answer in answers"
 						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})"
-						visibility-manager>
+						visibility-manager
+						label-manager>
 						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
 							ng-attr-cx="0"
 							ng-attr-cy="0"
@@ -143,8 +149,8 @@
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
 							fill-opacity="0.5"
-							ng-mouseover='answer.hover=true'
-							ng-mouseout='answer.hover=false'
+							ng-mouseover='onHotspotHover(answer, $event)'
+							ng-mouseout='onHotspotHoverOut($event)'
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
 
 						<rect ng-if="answer.options.svg.type == 'rect'"
@@ -156,8 +162,8 @@
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
 							fill-opacity="0.5"
-							ng-mouseover='answer.hover=true'
-							ng-mouseout='answer.hover=false'
+							ng-mouseover='onHotspotHover(answer, $event)'
+							ng-mouseout='onHotspotHoverOut($event)'
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
 
 						<polygon ng-if="answer.options.svg.type == 'polygon'"
@@ -166,8 +172,8 @@
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
 							fill-opacity="0.5"
-							ng-mouseover='answer.hover=true'
-							ng-mouseout='answer.hover=false'
+							ng-mouseover='onHotspotHover(answer, $event)'
+							ng-mouseout='onHotspotHoverOut($event)'
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
 					</g>
 				</svg>
