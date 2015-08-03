@@ -951,6 +951,8 @@ node-creation-selection-dialog {
 
 		font-size: 2em;
 
+		resize: none;
+
 		&.expanded {
 			height: 350px;
 		}

@@ -75,17 +75,17 @@
 			</div>
 			<!-- image on the bottom -->
 			<div ng-switch-when="bottom">
-				<h2 class="text bottom" auto-text-scale> {{ question.text }}</h2>
 				<figure class="asset center">
 					<img src="{{ question.image }}" />
 				</figure>
+				<h2 class="text bottom" auto-text-scale> {{ question.text }}</h2>
 			</div>
 			<!-- image on the top -->
 			<div ng-switch-when="top">
+				<h2 class="text top" auto-text-scale>{{ question.text }}</h2>
 				<figure class="asset center">
 					<img src="{{ question.image }}" />
 				</figure>
-				<h2 class="text top" auto-text-scale>{{ question.text }}</h2>
 			</div>
 			<!-- hotspot mode. No image associated w/ question -->
 			<div ng-switch-when="hotspot">
