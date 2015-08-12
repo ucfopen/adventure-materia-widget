@@ -1,7 +1,7 @@
-Adventure = angular.module('Adventure', [])
+Adventure = angular.module "Adventure"
 
 ## CONTROLLER ##
-Adventure.controller 'AdventureController', ($scope, $rootScope) ->
+Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -23,6 +23,10 @@ Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 
 	$scope.engine =
 		start: (instance, qset, version = '1') ->
+
+			#Convert an old qset prior to running the widget
+			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
+
 			$scope.$apply ->
 				$scope.title = instance.name
 				$scope.qset = qset
@@ -81,6 +85,8 @@ Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 		if $scope.question.layout isnt "text-only"
 			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			$scope.question.image = image_url
+
+		console.log "question type is: " + $scope.question.type
 
 		switch q_data.options.type
 			when $scope.OVER then _end() # Creator doesn't pass a value like this back yet / technically this shouldn't be called - the end call is made is _handleAnswerSelection
@@ -165,14 +171,21 @@ Adventure.controller 'AdventureController', ($scope, $rootScope) ->
 		$scope.type = $scope.HOTSPOT
 		$scope.question.layout = 1
 
-		# TODO Update so each individual hotspot receives a color
 		$scope.question.options.hotspotColor = 7772386 if not $scope.question.options.hotspotColor
 		$scope.question.options.hotspotColor = '#' + ('000000' + $scope.question.options.hotspotColor.toString(16)).substr(-6)
 
-		console.log $scope.question.image
-
 		img = new Image()
 		img.src = $scope.question.image
+
+		img.onload = ->
+			# if it's an old QSet, the hotspot has to be scaled once the image is loaded
+			# The old hotspot coordinate system scales the hotspot points based on original image size, so can't do this step earlier
+			if $scope.q_data.options.legacyScaleMode
+				legacyQsetSrv.handleLegacyScale $scope.answers, img
+				$scope.$apply()
+
+				# This doesn't change the saved QSet, but it prevents the scaling from being applied twice if you come back to this node.
+				delete $scope.q_data.options.legacyScaleMode
 
 	handleShortAnswer = (q_data) ->
 		$scope.type = $scope.SHORTANS
@@ -288,7 +301,6 @@ Adventure.directive "dynamicScale", () ->
 				# max: 400
 
 			answersHeight = angular.element(".answers")[0].offsetHeight
-			console.log answersHeight
 
 			diff = 250 - answersHeight
 

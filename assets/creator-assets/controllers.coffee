@@ -1,4 +1,4 @@
-Adventure = angular.module "AdventureCreator"
+Adventure = angular.module "Adventure"
 Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $timeout, treeSrv) ->
 
 	# Define constants for node screen types
@@ -151,6 +151,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		showIntroDialog = false
 
 		if qset
+			# Convert the old qset prior to using it
+			if parseInt(version) is 1 then qset = LegacyQsetSrv.convertOldQset qset
+
 			$scope.$apply () ->
 				$scope.title = title
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
@@ -174,7 +177,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			return Materia.CreatorCore.cancelSave ''
 		else
 			qset = treeSrv.createQSetFromTree $scope.treeData
-			Materia.CreatorCore.save $scope.title, qset
+			Materia.CreatorCore.save $scope.title, qset, 2
 
 	$scope.onSaveComplete = (title, widget, qset, version) -> true
 
