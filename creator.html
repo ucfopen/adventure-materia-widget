@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="AdventureCreator">
+<html ng-app="Adventure">
 	<head>
 		<title>Adventure Widget Player</title>
 		<meta charset="utf-8" />
@@ -23,6 +23,7 @@
 
 		<!-- MAIN CREATOR SCRIPT -->
 		<script src="assets/creator-assets/app.js"></script>
+		<script src="assets/legacyQsetSrv.js"></script>
 		<script src="assets/creator-assets/services.js"></script>
 		<script src="assets/creator-assets/directives.js"></script>
 		<script src="assets/creator-assets/controllers.js"></script>
@@ -75,6 +76,7 @@
 				<h4>Load a QSet to Debug</h4>
 				<textarea ng-model="debugQset"></textarea>
 				<button type="button" ng-click="loadDebugQset()">Load Qset</button>
+				<button type="button" ng-click="loadOldDebugQset()">Load OLD Qset</button>
 			</debug-qset-loader>
 			<validation-dialog ng-show="validation.show">
 				<h4>Just a sec!</h4>

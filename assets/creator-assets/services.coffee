@@ -1,5 +1,5 @@
-Adventure = angular.module "AdventureCreator"
-Adventure.service "treeSrv", ($rootScope, $filter) ->
+Adventure = angular.module "Adventure"
+Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 	# TreeData is being initialized in -two- places right now.
 	# This one may or may not be required.
@@ -434,6 +434,7 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 			switch tree.type
 				when "hotspot"
 					itemData.options.visibility = tree.hotspotVisibility
+					if tree.legacyScaleMode then itemData.options.legacyScaleMode = true
 				when "end"
 					itemData.options.finalScore = tree.finalScore
 
@@ -503,6 +504,7 @@ Adventure.service "treeSrv", ($rootScope, $filter) ->
 			switch item.options.type
 				when "hotspot"
 					node.hotspotVisibility = item.options.visibility
+					if item.options.legacyScaleMode then node.legacyScaleMode = true
 				when "end"
 					node.finalScore = item.options.finalScore
 

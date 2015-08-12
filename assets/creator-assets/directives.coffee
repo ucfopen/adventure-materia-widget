@@ -1,4 +1,4 @@
-Adventure = angular.module "AdventureCreator"
+Adventure = angular.module "Adventure"
 
 Adventure.directive "toast", ($timeout) ->
 	restrict: "E",
@@ -1235,7 +1235,7 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 # The actual node creation screen
 # Functions related to features unique to individual node types (Short answer sets, hotspots, etc) are relegated to their own directives
 # The ones here are "universal" and apply to all new nodes
-Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
+Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1279,6 +1279,14 @@ Adventure.directive "nodeCreation", (treeSrv, $rootScope) ->
 					$scope.mediaReady = true
 					$scope.image.onload = ->
 						console.log "image upload via stored editedNode media data complete!"
+						# If the QSet is an old one, have to apply scaling to the hotspot only after the image is loaded
+						# This is due to the old hotspot coordinate system relying on the hotspot's original image dimensions
+						# Once the scaling is done, the flag is removed so the hotspot is "normal" from that point on
+						if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
+							legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
+							delete $scope.editedNode.legacyScaleMode
+							$scope.$apply()
+
 				else $scope.mediaReady = false
 
 				if $scope.editedNode.type is $scope.HOTSPOT
@@ -1527,7 +1535,7 @@ Adventure.directive "finalScoreBox", () ->
 			if $scope.finalScoreForm.finalScoreInput.$valid
 				$scope.editedNode.finalScore = newVal
 
-Adventure.directive "hotspotManager", () ->
+Adventure.directive "hotspotManager", (legacyQsetSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1567,6 +1575,8 @@ Adventure.directive "hotspotManager", () ->
 
 		$scope.visibilityManagerOpen = false
 
+		$scope.legacyScaleFactor = 1
+
 		# Listener for updating the hotspot node's image once it's ready
 		$scope.$on "editedNode.media.updated", (evt) ->
 
@@ -1575,6 +1585,13 @@ Adventure.directive "hotspotManager", () ->
 			$scope.image.onload = ->
 				$scope.$apply ->
 					$scope.mediaReady = true
+					# If the QSet is an old one, have to apply scaling to the hotspot only after the image is loaded
+					# This is due to the old hotspot coordinate system relying on the hotspot's original image dimensions
+					# Once the scaling is done, the flag is removed so the hotspot is "normal" from that point on
+					if $scope.editedNode.legacyScaleMode
+						legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
+						delete $scope.editedNode.legacyScaleMode
+						$scope.$apply()
 
 		$scope.selectSVG = (evt) ->
 			# console.log "SELECTED"
@@ -2038,11 +2055,18 @@ Adventure.directive "validationDialog", (treeSrv, $rootScope) ->
 
 
 # MEANT FOR DEBUG PURPOSES ONLY
-Adventure.directive "debugQsetLoader", (treeSrv) ->
+Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
 		$scope.debugQset = ""
+
+		$scope.loadOldDebugQset = ->
+			console.log "OLD QSET DETECTED, ATTEMPTING CONVERSION"
+			$scope.debugQset = JSON.parse $scope.debugQset
+			$scope.debugQset = legacyQsetSrv.convertOldQset $scope.debugQset
+
+			$scope.loadDebugQset()
 
 		$scope.loadDebugQset = ->
 
