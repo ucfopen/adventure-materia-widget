@@ -1340,6 +1340,9 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 				else linkMode = $scope.NEW
 
 				delete $scope.editedNode.pendingTarget
+
+				# manually redraw the tree, since the newly created node won't be updated otherwise
+				treeSrv.set $scope.treeData
 			else
 				# We create the new node first, so we can grab the new node's generated id
 				targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
