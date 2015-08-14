@@ -163,22 +163,26 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 							links.push newLink
 
 				# Generate "loopback" links that circle back to the same node
-				# This link has the same source/target, the node itself;
-				# It's just a formality really, so D3 -knows- a link exists here
+				# This link has the same source/target, the node itself
+				# We use this info to tell D3 to draw the loopback element & display it (if necessary)
 				if node.hasLinkToSelf
 
-					newLink = {}
-					newLink.source = node
-					newLink.target = node
-					newLink.specialCase = "loopBack"
+					numSelfLinks = 0
 
-					links.push newLink
+					for answer in node.answers
 
-				# console.log "generating answer links for the following node: " + node.id
-				# # console.log treeSrv.get()
-				# node.answerLinks = treeSrv.findAnswersWithTarget treeSrv.get(), node.id
-				# console.log node.answerLinks
-				# # console.log node.answerLinks
+						if answer.linkMode is "self"
+
+							newLink = {}
+							newLink.source = node
+							newLink.target = node
+							newLink.specialCase = "loopBack"
+
+							# Add an increased radius value for every additional loopback this node has
+							newLink.radiusOffset = numSelfLinks
+							numSelfLinks++
+
+							links.push newLink
 
 
 			# We need to effectively "filter" each link and create the intermediate nodes
@@ -191,12 +195,6 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 				# Right now, we're disabling bridge nodes on loopbacks
 				# Might add them back in later
 				if link.specialCase is "loopBack" then return
-					# intermediate =
-					# 	x: link.source.x + 75
-					# 	y: link.source.y + 75
-					# 	type: "bridge"
-					# 	source: link.source.id
-					# 	target: link.target.id
 				else
 					intermediate =
 						x: source.x + (target.x - source.x)/2
@@ -355,17 +353,27 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 						return "M" + offsetX + "," + offsetY + "L" + d.target.x + "," + d.target.y
 					)
 
+
 				# If it's just a standard link, this part is easy
 				else path.attr("d", lineData)
 
 
 			linkGroup.append("svg:circle")
 				.attr("class","loopback")
-				.attr("r", 50)
+				.attr("r", (d) ->
+					# Increase the radius by a certain amount if there are multiple loopbacks
+					if d.radiusOffset then 50 + d.radiusOffset * 5
+					else return 50
+				)
 				.attr("transform", (d) ->
 
 					xOffset = d.source.x + 40
 					yOffset = d.source.y + 40
+
+					# Increase the offset based on the increased radius of the circle for multiple loopbacks
+					if d.radiusOffset
+						xOffset += d.radiusOffset * 3
+						yOffset += d.radiusOffset * 3
 
 					"translate(#{xOffset},#{yOffset})"
 				)
@@ -418,8 +426,6 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 				.attr("class", "node-dot")
 				.attr("r", (d) ->
 					return 20 # sets size of node bubbles
-					# if d.type is "bridge" then return 20
-					# else return 20
 				)
 				.attr("filter", "url(#dropshadow)")
 
@@ -471,12 +477,6 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 						else return 15 # -5
 					else return 0
 				)
-
-				# sets X label offset from node (negative left, positive right side)
-				# .attr("dx", (d) ->
-				# 	# if d.children then return -gap
-				# 	# else return gap
-				# )
 
 				.attr("dy", 15) # sets Y label offset from node
 				.attr("font-family", "Lato")
@@ -1035,7 +1035,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 		# Watch the newNodeManager target and kick off associated logic when it updates
 		# Similar in functionality to the nodeTools dialog
-		$scope.$watch "newNodeManager.target", (newVal, oldVal) ->
+		$scope.$watch "newNodeManager.answerId", (newVal, oldVal) ->
 			if newVal isnt null
 				$scope.newNodeManager.show = true
 
@@ -1053,7 +1053,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 			# Grab the answer object that corresponds with the nodeManager's current target
 			i = 0
 			while i < $scope.answers.length
-				if $scope.answers[i].target is $scope.newNodeManager.target then break
+				if $scope.answers[i].id is $scope.newNodeManager.answerId then break
 				else i++
 
 			# Compare the prior link mode to the new one and deal with the changes
@@ -1063,32 +1063,41 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 					if $scope.newNodeManager.linkMode is $scope.NEW
 						$scope.newNodeManager.target = null
+						$scope.newNodeManager.answerId = null
 						$scope.newNodeManager.show = false
 						return
 
 					## HANDLE PRIOR LINK MODE: SELF
 					if $scope.answers[i].linkMode is $scope.SELF
 
-						if $scope.editedNode.hasLinkToSelf
-							delete $scope.editedNode.hasLinkToSelf
+						numSelfLinks = 0
+
+						for answer in $scope.answers
+							if answer.linkMode is $scope.SELF then numSelfLinks++
+
+						if $scope.editedNode.hasLinkToSelf and numSelfLinks is 1 then delete $scope.editedNode.hasLinkToSelf
 
 					## HANDLE PRIOR LINK MODE: EXISTING
 					else if $scope.answers[i].linkMode is $scope.EXISTING
 
-						if $scope.editedNode.hasLinkToOther
-							delete $scope.editedNode.hasLinkToOther
+						numExistingNodeLinks = 0
 
+						for answer in $scope.answers
+							if answer.linkMode is $scope.EXISTING then numExistingNodeLinks++
 
-					# Create new node and update the answer's target
-					targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
-					$scope.answers[i].target = targetId
+						if $scope.editedNode.hasLinkToOther and numExistingNodeLinks is 1 then delete $scope.editedNode.hasLinkToOther
 
 					# Set updated linkMode flags
 					$scope.newNodeManager.linkMode = $scope.NEW
 					$scope.answers[i].linkMode = $scope.NEW
 					console.log "New mode selected: NEW"
 
+					# Create new node and update the answer's target
+					targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
+					$scope.answers[i].target = targetId
+
 					$scope.newNodeManager.target = null
+					$scope.newNodeManager.answerId = null
 
 					# Refresh all answerLinks references as some have changed
 					treeSrv.updateAllAnswerLinks $scope.treeData
@@ -1126,8 +1135,12 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 							## HANDLE PRIOR LINK MODE: SELF
 							if $scope.answers[i].linkMode is $scope.SELF
 
-								if $scope.editedNode.hasLinkToSelf
-									delete $scope.editedNode.hasLinkToSelf
+								numSelfLinks = 0
+
+								for answer in $scope.answers
+									if answer.linkMode is $scope.SELF then numSelfLinks++
+
+								if $scope.editedNode.hasLinkToSelf and numSelfLinks is 1 then delete $scope.editedNode.hasLinkToSelf
 
 							# Set updated linkMode flags and redraw tree
 							$scope.editedNode.hasLinkToOther = true
@@ -1148,6 +1161,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 							$scope.existingNodeSelected = null
 							$scope.newNodeManager.target = null
+							$scope.newNodeManager.answerId = null
 							$scope.displayNodeCreation = "none" # displayNodeCreation should be updated from "suspended"
 
 							# Refresh all answerLinks references as some have changed
@@ -1158,6 +1172,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 					if $scope.newNodeManager.linkMode is $scope.SELF
 						$scope.newNodeManager.target = null
+						$scope.newNodeManager.answerId = null
 						$scope.newNodeManager.show = false
 						return
 
@@ -1174,8 +1189,12 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					## HANDLE PRIOR LINK MODE: EXISTING
 					else if $scope.answers[i].linkMode is $scope.EXISTING
 
-						if $scope.editedNode.hasLinkToOther
-							delete $scope.editedNode.hasLinkToOther
+						numExistingNodeLinks = 0
+
+						for answer in $scope.answers
+							if answer.linkMode is $scope.EXISTING then numExistingNodeLinks++
+
+						if $scope.editedNode.hasLinkToOther and numExistingNodeLinks is 1 then delete $scope.editedNode.hasLinkToOther
 
 					# Set updated linkMode flags and redraw the tree
 					$scope.editedNode.hasLinkToSelf = true
@@ -1187,6 +1206,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					console.log "New mode selected: SELF"
 
 					$scope.newNodeManager.target = null
+					$scope.newNodeManager.answerId = null
 
 					# Refresh all answerLinks references as some have changed
 					treeSrv.updateAllAnswerLinks $scope.treeData
@@ -1353,6 +1373,7 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 				feedback: null
 				target: targetId
 				linkMode: linkMode
+				id: treeSrv.generateAnswerHash()
 
 			# Add a matches property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
@@ -1419,9 +1440,10 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 			treeSrv.set $scope.treeData
 
 			# If the node manager modal is open for this answer, close it
-			if targetId is $scope.newNodeManager.target
+			if $scope.answers[index].id is $scope.newNodeManager.answerId
 				$scope.newNodeManager.show = false
 				$scope.newNodeManager.target = null
+				$scope.newNodeManager.answerId = null
 
 			# If it's a hotspot, let the manager know it's time to reset and close
 			# (Since the manager is defined in another directive, it needs to be broadcast)
@@ -1454,16 +1476,18 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 					return
 
 
-		$scope.manageNewNode = ($event, target, mode) ->
+		$scope.manageNewNode = ($event, target, id, mode) ->
 
 			if $scope.newNodeManager.show is true
 				$scope.newNodeManager.show = false
 				$scope.newNodeManager.target = null
+				$scope.newNodeManager.answerId = null
 			else
 				$scope.newNodeManager.x = $event.currentTarget.getBoundingClientRect().left
 				$scope.newNodeManager.y = $event.currentTarget.getBoundingClientRect().top
 				$scope.newNodeManager.linkMode = mode
 				$scope.newNodeManager.target = target
+				$scope.newNodeManager.answerId = id
 
 		$scope.beginMediaImport = () ->
 			Materia.CreatorCore.showMediaImporter()
