@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $timeout, treeSrv) ->
+Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $timeout, treeSrv, legacyQsetSrv) ->
 
 	# Define constants for node screen types
 	$scope.BLANK = "blank"
@@ -32,6 +32,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	$scope.newNodeManager =
 		show: false
 		target: null
+		answerId: null # alphanumeric hash to identify the exact answer (target can be non-unique)
 		x: 0
 		y: 0
 		linkMode: "new" # options should be "new" | "existing" | "self"
@@ -152,7 +153,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 		if qset
 			# Convert the old qset prior to using it
-			if parseInt(version) is 1 then qset = LegacyQsetSrv.convertOldQset qset
+			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
 			$scope.$apply () ->
 				$scope.title = title

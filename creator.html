@@ -385,8 +385,8 @@
 							<input type="text" ng-model="answers[0].feedback" placeholder="Enter Optional Feedback" />
 							<button type="button"
 								class="answer-node-select"
-								ng-class="{'managed' : answers[0].target == newNodeManager.target}"
-								ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+								ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
+								ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
 
 						</li>
 						<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
@@ -397,8 +397,8 @@
 							<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
 							<button type="button"
 								class="answer-node-select"
-								ng-class="{'managed' : answer.target == newNodeManager.target}"
-								ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
 						</li>
 
 						<li ng-if="displayNodeCreation == 	SHORTANS"
@@ -429,8 +429,8 @@
 								placeholder="Enter Optional Feedback" />
 							<button type="button"
 								class="answer-node-select"
-								ng-class="{'managed' : answer.target == newNodeManager.target}"
-								ng-click="manageNewNode($event, answer.target, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
 						</li>
 					</ul>
 				</div>
@@ -505,8 +505,8 @@
 								<span>Select the destination this hotspot should lead to:</span>
 								<button type="button"
 									class="answer-node-select"
-									ng-class="{'managed' : answers[hotspotAnswerManager.answerIndex].target == newNodeManager.target}"
-									ng-click="manageNewNode($event, answers[hotspotAnswerManager.answerIndex].target, answers[hotspotAnswerManager.answerIndex].linkMode)">{{ integerToLetters(answers[hotspotAnswerManager.answerIndex].target) }}</button>
+									ng-class="{'managed' : answers[hotspotAnswerManager.answerIndex].id == newNodeManager.answerId}"
+									ng-click="manageNewNode($event, answers[hotspotAnswerManager.answerIndex].target, answers[hotspotAnswerManager.answerIndex].id, answers[hotspotAnswerManager.answerIndex].linkMode)">{{ integerToLetters(answers[hotspotAnswerManager.answerIndex].target) }}</button>
 							</div>
 
 						</hotspot-answer-manager>
@@ -614,8 +614,8 @@
 					<span>Select the destination to continue on:</span>
 					<button type="button"
 						class="answer-node-select"
-						ng-class="{'managed' : answers[0].target == newNodeManager.target}"
-						ng-click="manageNewNode($event, answers[0].target, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+						ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
+						ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
 				</div>
 				<!-- container for selecting the destination for end nodes -->
 				<div class="continuity-container" ng-if="displayNodeCreation == END">

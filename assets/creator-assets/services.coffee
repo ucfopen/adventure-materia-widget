@@ -522,6 +522,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					target: answer.options.link
 					linkMode: answer.options.linkMode
 					feedback: answer.options.feedback
+					id: generateAnswerHash()
 
 				switch item.options.type
 					when "shortanswer"
@@ -639,6 +640,14 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 		chars
 
+	generateAnswerHash = ->
+
+		s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+		Array.apply(null, Array(6)).map( ->
+			return s.charAt Math.floor(Math.random() * s.length)
+		).join ''
+
 	get : get
 	set : set
 	getNodeCount : getNodeCount
@@ -658,3 +667,4 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 	validateTreeOnStart : validateTreeOnStart
 	validateTreeOnSave : validateTreeOnSave
 	integerToLetters : integerToLetters
+	generateAnswerHash : generateAnswerHash
