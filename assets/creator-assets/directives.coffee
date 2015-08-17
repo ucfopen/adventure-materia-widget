@@ -451,7 +451,11 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 				.attr("width", (d) ->
 					unless d.name then return 0
 
-					if d.name.length > 1 then return 9 * d.name.length
+					# Couldn't find a better solution to the rect width than this
+					# In the future, someone is welcome to clean this up
+					# If someone is getting to node labels with more than 3-4 characters, odds are the've got some other problems too
+					if d.name.length > 1 and d.name.length < 5 then return d.name.length * 12
+					else if d.name.length >= 5 then return d.name.length * 8
 					else return 20
 				)
 				.attr("height", 19)
@@ -766,22 +770,28 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			# copyNodeTarget is updated from the nodeSelected method in the controller
 			deregister = $scope.$watch "copyNodeTarget", (newVal, oldVal) ->
 
+				$scope.hideToast()
+
 				if newVal
-					$scope.hideToast()
-					# First, grab node to be copied
-					sourceTree = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+					# Don't copy to the same node, or a not-blank node
+					if newVal.type isnt $scope.BLANK or newVal.id is $scope.nodeTools.target
+						$scope.toast "Target destination should be blank!"
 
-					# Make a deep copy of this tree that will be altered with values to be copied
-					copyTree = angular.copy sourceTree
+					else
+						# First, grab node to be copied
+						sourceTree = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 
-					# Copy data of nodeTools target to copy target (targetNode is node to be replaced)
-					targetNode = treeSrv.findNode $scope.treeData, newVal.id
+						# Make a deep copy of this tree that will be altered with values to be copied
+						copyTree = angular.copy sourceTree
 
-					# Recursively generate the copied tree
-					$scope.recursiveCopy copyTree
+						# Copy data of nodeTools target to copy target (targetNode is node to be replaced)
+						targetNode = treeSrv.findNode $scope.treeData, newVal.id
 
-					# Update the original tree target with the copy
-					result = treeSrv.findAndReplace $scope.treeData, targetNode.id, copyTree
+						# Recursively generate the copied tree
+						$scope.recursiveCopy copyTree
+
+						# Update the original tree target with the copy
+						result = treeSrv.findAndReplace $scope.treeData, targetNode.id, copyTree
 
 					deregister()
 
@@ -972,6 +982,28 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 					angular.forEach node.answers, (answer, index) ->
 						delete answer.svg
 
+				when $scope.END
+					delete node.finalScore
+
+					newAnswerTarget = $scope.addNode $scope.nodeTools.target, $scope.BLANK
+
+					newAnswer =
+						id: treeSrv.generateAnswerHash()
+						text: null
+						feedback: null
+						target: newAnswerTarget
+						linkMode: $scope.NEW
+
+					node.answers = []
+					node.answers.push newAnswer
+
+				when $scope.NARR
+					node.contents = []
+					delete node.children
+					delete node.answers
+
+					treeSrv.set $scope.treeData
+
 			# Buncha bullshit required to add the default [Unmatched Response] required for shortans
 			if type is $scope.SHORTANS
 
@@ -984,6 +1016,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 				newDefaultId = $scope.addNode $scope.nodeTools.target, $scope.BLANK
 
 				newDefault =
+					id: treeSrv.generateAnswerHash()
 					text: "[Unmatched Response]"
 					feedback: null
 					target: newDefaultId
@@ -1121,6 +1154,11 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 						if newVal
 
 							$scope.hideToast()
+
+							# If selected node is itself, switch link mode to SELF
+							if newVal.id is $scope.editedNode.id
+								deregister()
+								return $scope.selectLinkMode $scope.SELF
 
 							# Set the answer's new target to the newly selected node
 							$scope.answers[i].target = newVal.id
@@ -1409,6 +1447,9 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 
 		$scope.removeAnswer = (index, targetId) ->
 
+			# hold onto the answer's unique id
+			answerId = $scope.answers[index].id
+
 			# Remove the answer's associated node if it's an actual child of the parent
 			if $scope.answers[index].linkMode is $scope.NEW
 
@@ -1440,7 +1481,7 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 			treeSrv.set $scope.treeData
 
 			# If the node manager modal is open for this answer, close it
-			if $scope.answers[index].id is $scope.newNodeManager.answerId
+			if answerId is $scope.newNodeManager.answerId
 				$scope.newNodeManager.show = false
 				$scope.newNodeManager.target = null
 				$scope.newNodeManager.answerId = null
@@ -2082,7 +2123,7 @@ Adventure.directive "validationDialog", (treeSrv, $rootScope) ->
 
 
 # MEANT FOR DEBUG PURPOSES ONLY
-Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv) ->
+Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -2109,6 +2150,7 @@ Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv) ->
 			validation = treeSrv.validateTreeOnStart $scope.treeData
 			if validation.length
 				$scope.validation.errors = validation
+				$rootScope.$broadcast "validation.error"
 
 			treeSrv.set $scope.treeData
 			treeSrv.updateAllAnswerLinks $scope.treeData

@@ -640,6 +640,9 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 		chars
 
+	# Since answers for the same node can share the same targets, they also need a unique id to reference
+	# The id doesn't have to persist across qset saves, it's generated on-the-fly when a new answer is added
+	# Or when the tree is first generated from a stored QSet
 	generateAnswerHash = ->
 
 		s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

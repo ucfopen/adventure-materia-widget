@@ -35,8 +35,9 @@
 			</div>
 			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
 			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
+			<!--
 			<button type="button" class="temp-qset-gen-button" ng-click="generateDebugQset()">Generate QSet</button>
-			<button type="button" class="temp-qset-gen-button" ng-click="showQsetLoader = true">Load QSet</button>
+			<button type="button" class="temp-qset-gen-button" ng-click="showQsetLoader = true">Load QSet</button>-->
 			<!-- <button type="button" class="temp-qset-gen-button" ng-click="onSaveClicked('publish')">Simulate Publish</button> -->
 		</header>
 		<div id="adventure-container">
@@ -123,7 +124,7 @@
 							</g>
 							<polygon points="22.8,29.1 19.7,26.1 19.2,31.5 "/>
 						</svg>
-						<p ng-if="error.type == 'missing_answer_node'">An answer for <span class="bold">Destination {{integerToLetters(error.node)}}</span> pointed somewhere that didn't exist. The answer now points to Destination {{integerToLetters(error.correctedTarget)}}</p>
+						<p ng-if="error.type == 'missing_answer_node'">An answer for <span class="bold">Destination {{integerToLetters(error.node)}}</span> pointed somewhere that didn't exist. The answer now points to Destination {{integerToLetters(error.correctedTarget)}}.</p>
 
 						<!-- Blank Node Error -->
 						<svg width="35"
@@ -253,14 +254,15 @@
 				Destination: {{ integerToLetters(nodeTools.target) }}
 				<button type="button"
 					class="important-button"
-					ng-click="editNode()">Edit Node</button>
+					ng-click="editNode()">Edit</button>
 				<button type="button"
+					ng-disabled="nodeTools.type==BLANK"
 					ng-click="copyNode()">Copy</button>
 				<button type="button"
 					ng-disabled="nodeTools.type==BLANK"
 					ng-click="resetNodePreCheck()">Reset</button>
 				<button type="button"
-					ng-hide="noteTools.type==NARR || nodeTools.type==END || nodeTools.type==BLANK"
+					ng-hide="nodeTools.type==BLANK"
 					ng-click="nodeTools.showConvertDialog = true">Convert</button>
 				<button type="button"
 					class="delete-button"
@@ -296,6 +298,12 @@
 						ng-show="nodeTools.type==SHORTANS || nodeTools.type==HOTSPOT"
 						ng-click="convertNode(MC)">Multiple Choice</button>
 					<button type="button"
+						ng-show="nodeTools.type==NARR"
+						ng-click="convertNode(END)">End Point</button>
+					<button type="button"
+						ng-show="nodeTools.type==END"
+						ng-click="convertNode(NARR)">Narrative</button>
+					<button type="button"
 						ng-click="nodeTools.showConvertDialog = false">Cancel</button>
 				</div>
 			</node-tools-dialog>
@@ -308,7 +316,7 @@
 				</div>
 			</delete-warning-dialog>
 			<node-creation-selection-dialog ng-show="showCreationDialog && displayNodeCreation == 'none'">
-				<h2>What kind of node do you want to create?</h2>
+				<h2>What kind of destination do you want to create?</h2>
 				<ul>
 					<li ng-click="displayNodeCreation = MC">
 						<img src="assets/creator-assets/mc.svg">Multiple Choice</li>
@@ -655,7 +663,6 @@
 			<p>Build a branching decision tree! Each point on the tree, or "destination", represents a screen the student interacts with.</p>
 			<p>Each interaction leads to another destination, until a student finds an end point.</p>
 			<p>Students are given a score based on the end point they reach.</p>
-			<p class="bold">Remember: this widget is still in beta. Some features are buggy or not yet implemented.</p>
 			<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
 			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
