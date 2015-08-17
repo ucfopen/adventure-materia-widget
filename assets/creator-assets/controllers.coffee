@@ -160,7 +160,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 
 				# Check to make sure the tree doesn't have errors
-				treeSrv.validateTreeOnStart $scope.treeData
+				validation = treeSrv.validateTreeOnStart $scope.treeData
+				if validation.length
+					$scope.validation.errors = validation
+					$rootScope.$broadcast "validation.error"
 
 				treeSrv.set $scope.treeData
 				treeSrv.updateAllAnswerLinks $scope.treeData

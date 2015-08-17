@@ -1126,9 +1126,12 @@ node-creation-selection-dialog {
 					}
 
 					button.answer-node-select {
-						position: absolute;
-						right: 30px;
-						top: 10px;
+						position: relative;
+						top: -68px;
+						left: 5px;
+						// position: absolute;
+						// right: 30px;
+						// top: 10px;
 					}
 
 					input {
@@ -1208,9 +1211,11 @@ node-creation-selection-dialog {
 					}
 
 					button.answer-node-select {
-						position: absolute;
-						right: 35px;
-						top: 20px;
+						position: relative;
+						top: -33px;
+						// position: absolute;
+						// right: 35px;
+						// top: 20px;
 					}
 				}
 
