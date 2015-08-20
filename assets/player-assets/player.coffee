@@ -104,6 +104,12 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 
 		$scope.selectedAnswer = $scope.q_data.answers[index].text
 
+		# Disable the hotspot label before moving on, if it's a hotspot
+		if $scope.type is $scope.HOTSPOT
+			$scope.hotspotLabelTarget.show = false
+			$scope.hotspotLabelTarget.x = null
+			$scope.hotspotLabelTarget.y = null
+
 		# record the answer
 		_logProgress()
 
@@ -205,7 +211,12 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		$scope.link = link
 		$scope.type = $scope.TRANS
 
-	handleEmptyNode = -> null
+	handleEmptyNode = (q_data) ->
+		$scope.type = $scope.TRANS
+		$scope.layout = "text-only"
+		$scope.question.text = "[Blank destination: click Continue to end the widget preview.]"
+		$scope.link = -1
+		Materia.Score.submitFinalScoreFromClient q_data.id, $scope.question.text, 100
 
 	# Submit the user's response to the logs
 	_logProgress = ->
