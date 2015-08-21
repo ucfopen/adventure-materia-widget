@@ -32,11 +32,21 @@ class Score_Modules_Adventure extends Score_Module
 	 */
 	public function check_answer($log)
 	{
-		// $q = $this->questions[$log->item_id];
 
 		if (strcmp($log->item_id, '0') == 0)
 		{
-			foreach ($this->inst->qset->data['items'] as $item)
+			$items;
+
+			if ($this->inst->qset->version == 1) # ['items'][0]['items'] strikes again!
+			{
+				$items = $this->inst->qset->data['items'][0]['items'];
+			}
+			else
+			{
+				$items = $this->inst->qset->data['items'];
+			}
+
+			foreach ($items as $item)
 			{
 				if ($log->text == $item['questions'][0]['text'])
 				{
@@ -49,7 +59,6 @@ class Score_Modules_Adventure extends Score_Module
 			return -1;
 		}
 
-		// this should never be returned.
 		return 0;
 	}
 
