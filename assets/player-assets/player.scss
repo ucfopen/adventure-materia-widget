@@ -1,0 +1,385 @@
+/* Adventure 2.0 Player Styles */
+
+/* Variable definitions */
+
+$black: #000000;
+$white: #ffffff;
+$red: #b90000;
+$red-lighter: #de0000;
+$red-lightest: #ffd7d7;
+
+$blue: #3d90b1;
+$blue-lighter: #49afd7;
+$blue-lightest: #bdecff;
+
+$gray-darker: #333333;
+$gray: #888888;
+$gray-lighter: #cccccc;
+$gray-lightest: #eaeaea;
+
+
+$background: $gray-lighter;
+$color-primary: $white;
+$color-accent: $blue;
+$color-accent-highlight: $blue-lighter;
+$color-selection-hover: $blue-lightest;
+
+$shadow-dialog: 0px 3px 3px $gray;
+$shadow-small: 0px 0px 2px $gray;
+$shadow-small-highlight: 0px 0px 5px $gray;
+
+* {
+	outline: 0;
+}
+
+html, body {
+	cursor: default;
+	background-color: #fff;
+	padding: 0;
+	margin: 0;
+	font-family: 'Open Sans', sans-serif;
+
+	overflow-y: hidden;
+
+	user-select: none;
+}
+
+body {
+	position: relative;
+	z-index: 0;
+	height: 593px; // determined from the height parameter in install.yaml
+}
+
+.header {
+	width:100%;
+	text-align:center;
+	background:#7299b5;
+	padding:10px 0px;
+	color:#ffffff;
+}
+
+.section {
+	background: #fff;
+}
+
+h1 {
+	margin: 0px;
+}
+
+.question {
+	position: relative;
+	padding: 15px 30px 10px 30px;
+
+	display: block;
+	background: #fff;
+
+	&.hotspot-mode {
+		max-height: 55px;
+
+		h2 {
+			max-height: 65px;
+		}
+	}
+
+	&.shortans-mode {
+		h2 {
+			max-height: 380px;
+		}
+	}
+
+	&.transitional-mode {
+		h2 {
+			max-height: 400px;
+
+			&.top, &.bottom {
+				max-height: 170px;
+			}
+		}
+	}
+
+	h2 {
+
+		// max-height: 220px;
+		margin: 0px;
+
+		overflow-y: auto;
+		vertical-align: top;
+
+		font-family: 'Open Sans', sans-serif;
+		font-size:22px;
+		color:#363636;
+
+		&.left {
+			width:45%;
+			display:inline-block;
+		}
+		&.right {
+			position: absolute;
+			display:inline-block;
+			top: 15px;
+			right: 20px;
+
+			width:45%;
+		}
+		&.top, &.bottom {
+			text-align: center;
+		}
+	}
+}
+
+.asset {
+	margin: 0px 40px;
+	width: 40%;
+
+	img {
+		max-width: 100%;
+		max-height: 222px;
+	}
+
+	&.right {
+		display: inline-block;
+		margin-right: 40px;
+	}
+
+	&.center {
+		width: 90%;
+		margin: 15px auto;
+		text-align: center;
+	}
+}
+
+.answers {
+	position: absolute;
+	bottom: 0px;
+	z-index: 10;
+
+	width: 740px;
+
+	margin: 15px;
+	padding: 15px;
+
+	max-height: 250px;
+	// overflow-y: auto;
+
+	font-family: 'Lora', serif;
+
+	background: $white;
+	box-shadow: 0px 0px 3px #888888;
+
+	&.hotspot-mode {
+		max-height: 410px;
+
+		&.no-question {
+			max-height: 440px;
+			bottom: 45px;
+		}
+	}
+
+	// .mc, .answers {
+	// 	.sa {
+	// 	}
+	// }
+	.mc {
+		// width:100%;
+		// height:100%;
+		max-height: 250px;
+
+		overflow-y: auto;
+
+		.answer {
+			display:block;
+			margin-bottom:10px;
+			font-size: 18px;
+			color:#000000;
+			text-decoration:none;
+
+			font-weight: normal;
+
+			counter-increment: q;
+			vertical-align: middle;
+
+			&:hover {
+				color: #7299b5;
+			}
+
+			&:before {
+				content: counter(q, upper-alpha);
+			}
+		}
+	}
+	.sa {
+		position: relative;
+		text-align: center;
+		margin: 20px 0px;
+
+		&:before {
+			display: block;
+			font-size: 14px;
+			font-family: 'Lora';
+			font-weight: bold;
+			color: #555;
+			background: #fef6b1;
+			position: absolute;
+			left: 115px;
+			top: -18px;
+			content: 'Type your answer here:';
+			padding: 0px 5px;
+		}
+
+		.trans-button {
+			vertical-align: top;
+			width: 100px;
+		}
+		.short-answer {
+			width: 400px;
+			height:36px;
+			font-size:20px;
+			font-family: 'Lora' serif;
+			border:solid 1px #d3d3d3;
+			border-radius:5px;
+			vertical-align: top;
+
+		}
+	}
+
+	.trans {
+		text-align: center;
+	}
+}
+
+.trans-button {
+	width:300px;
+	height:40px;
+	font-size:16px;
+	font-weight:bold;
+	background:#7299b5;
+	border:solid 1px #d3d3d3;
+	border-radius:5px;
+	color:#ffffff;
+	cursor: pointer;
+
+	&:hover {
+		background:#86b7d9;
+	}
+	&.left {
+		float: left;
+	}
+	&.right {
+		right: 50px;
+		position:absolute;
+		bottom: 20px;
+	}
+}
+
+.backgroundcover {
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	background: #000;
+	opacity: 0;
+	position: fixed;
+	z-index: -1;
+
+	&.show {
+		z-index: 12;
+		opacity: 0.5;
+	}
+}
+
+.feedback {
+	width: 500px;
+	height: 300px;
+	border: 5px solid #999;
+	padding: 20px;
+	background: #fff;
+	font-size: 24px;
+	font-weight: bold;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -270px;
+	margin-top: -170px;
+
+	z-index: -1;
+
+	opacity: 0;
+
+	&:before {
+		display: block;
+		font-size: 14px;
+		font-family: 'Lora';
+		font-weight: bold;
+		color: #555;
+		background: #fef6b1;
+		position: absolute;
+		left: -5px;
+		top: -25px;
+		content: 'FEEDBACK';
+		padding: 0px 5px;
+	}
+
+	&.show {
+		z-index: 10;
+		opacity: 1;
+	}
+
+	input {
+		position: absolute;
+		bottom: 10px;
+		left: 50%;
+		width: 120px;
+		margin-left: -60px;
+	}
+}
+
+.hotspot {
+	position: relative;
+	text-align: center;
+
+	img {
+		position: relative;
+
+		max-width: 698px;
+		max-height: 400px;
+
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	svg.hotarea {
+		position: absolute;
+		display: block;
+
+		width: 698px;
+		height: 400px;
+		z-index: 10;
+
+		left: 50%;
+		margin-left: -349px;
+	}
+
+	.hotspot-label {
+		position:absolute;
+		z-index: 15;
+
+		max-width: 180px;
+
+		padding: 8px;
+
+		border-radius: 5px;
+		color: #fff;
+		background: rgba(0,0,0,0.8);
+		font-weight: normal;
+
+		cursor: pointer;
+	}
+}
+
+rect, ellipse, polygon {
+	cursor: pointer;
+	&:hover {
+		opacity: 0.7;
+	}
+}
+

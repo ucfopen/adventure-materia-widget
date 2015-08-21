@@ -1,13 +1,678 @@
 <!DOCTYPE html>
+<html ng-app="Adventure">
 	<head>
 		<title>Adventure Widget Player</title>
 		<meta charset="utf-8" />
 
-		<!-- STYLESHEETS -->
-		<link rel="stylesheet" type="text/css" href="player.css">
-	</head>
-	<body ng-app="AdventureApp" ng-controller="AdventureController">
+		<!-- FONTS -->
+		<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900,400italic' rel='stylesheet' type='text/css'>
 
+		<!-- STYLESHEETS -->
+		<link rel="stylesheet" type="text/css" href="assets/creator-assets/creator.css">
+
+		<!-- REQUIRED MATERIA JAVASCRIPT -->
+		<script src="materia.creatorcore.js"></script>
+
+		<!-- YOUR PREREQUISITES -->
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular.min.js'></script>
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular-animate.min.js'></script>
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular-sanitize.min.js'></script>
+
+		<!-- D3.js -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+
+		<!-- MAIN CREATOR SCRIPT -->
+		<script src="assets/creator-assets/app.js"></script>
+		<script src="assets/legacyQsetSrv.js"></script>
+		<script src="assets/creator-assets/services.js"></script>
+		<script src="assets/creator-assets/directives.js"></script>
+		<script src="assets/creator-assets/controllers.js"></script>
+
+	</head>
+	<body ng-controller="AdventureCtrl">
+		<header class="title-header">
+			<div class="logo">
+			</div>
+			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
+			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
+			<!--
+			<button type="button" class="temp-qset-gen-button" ng-click="generateDebugQset()">Generate QSet</button>
+			<button type="button" class="temp-qset-gen-button" ng-click="showQsetLoader = true">Load QSet</button>-->
+			<!-- <button type="button" class="temp-qset-gen-button" ng-click="onSaveClicked('publish')">Simulate Publish</button> -->
+		</header>
+		<div id="adventure-container">
+			<div class="zoom-buttons" zoom-buttons>
+				<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
+				<svg class="zoom-button"
+					width="40"
+					height="40"
+					ng-click="zoomTreeIn()">
+					<path d="M 18,8 L 18,18 L 8,18 L 8,22 L 18,22 L 18,32 L 22,32 L 22,22 L 32,22 L 32,18 L 22,18 L 22,8 Z"></path>
+				</svg>
+				<svg class="zoom-button"
+					width="40"
+					height="40"
+					ng-click="zoomTreeOut()">
+					<path d="M 8,18 L 8,22 L 32,22 L 32,18 Z"></path>
+				</svg>
+				<button type="button"
+					ng-click="resetZoom()">Reset</button>
+			</div>
+			<title-editor ng-show="showTitleEditor">
+				<h4>Give Your Widget a Title</h4>
+				<input type="text"
+					ng-model="title"
+					enter-submit="hideCoverAndModals()"
+					auto-select />
+				<button type="button"
+					class="important-button"
+					ng-click="hideCoverAndModals()">Done</button>
+			</title-editor>
+			<debug-qset-generator ng-show="showQsetGenerator">
+				<h4>Generated QSet</h4>
+				<textarea ng-model="generatedQset" auto-select></textarea>
+				<button type="button" ng-click="showQsetGenerator = false">Got it, thanks!</button>
+			</debug-qset-generator>
+			<debug-qset-loader ng-show="showQsetLoader">
+				<h4>Load a QSet to Debug</h4>
+				<textarea ng-model="debugQset"></textarea>
+				<button type="button" ng-click="loadDebugQset()">Load Qset</button>
+				<button type="button" ng-click="loadOldDebugQset()">Load OLD Qset</button>
+			</debug-qset-loader>
+			<validation-dialog ng-show="validation.show">
+				<h4>Just a sec!</h4>
+				<p class="error-count">{{validation.errors.length}} problem{{validation.errors.length > 1 ? "s" : ""}} found.</p>
+				<ul>
+					<li ng-repeat="error in validation.errors"
+						ng-click="errorFollowUp($index)">
+
+						<!-- Missing Answer Error -->
+						<svg width="35"
+							height="35"
+							ng-if="error.type == 'missing_answer_node'">
+							<circle fill="none"
+								stroke="#000000"
+								stroke-width="2"
+								stroke-miterlimit="10"
+								cx="9.1"
+								cy="9.1"
+								r="6.1"/>
+							<circle cx="27.7"
+								cy="31.9"
+								r="2.1"/>
+							<path fill="none"
+								stroke="#000000"
+								stroke-width="2"
+								stroke-miterlimit="10"
+								d="M27.7,28.6v-2.7c0,0,3.6,0,3.5-3.2s-3.5-3-3.5-3s-2.6,0.1-2.6,3.2"/>
+							<g>
+								<g>
+									<path fill="none"
+										stroke="#000000"
+										stroke-miterlimit="10"
+										d="M9.4,15.2c0,0,0,0.4,0,1"/>
+									<path fill="none"
+										stroke="#000000"
+										stroke-miterlimit="10"
+										stroke-dasharray="2.0497,2.0497"
+										d="M9.7,18.2 c0.6,3.6,2.7,9.3,9.7,10.6"/>
+									<path fill="none"
+										stroke="#000000"
+										stroke-miterlimit="10"
+										d="M20.4,29c0.3,0,0.7,0.1,1,0.1"/>
+								</g>
+							</g>
+							<polygon points="22.8,29.1 19.7,26.1 19.2,31.5 "/>
+						</svg>
+						<p ng-if="error.type == 'missing_answer_node'">An answer for <span class="bold">Destination {{integerToLetters(error.node)}}</span> pointed somewhere that didn't exist. The answer now points to Destination {{integerToLetters(error.correctedTarget)}}.</p>
+
+						<!-- Blank Node Error -->
+						<svg width="35"
+							height="35"
+							ng-if="error.type == 'blank_node'">
+							<circle stroke="#000000"
+								fill="none"
+								stroke-width="2"
+								stroke-miterlimit="10"
+								cx="17.5"
+								cy="17.4"
+								r="16"/>
+							<g>
+								<circle fill="none"
+									cx="17.5"
+									cy="17.4"
+									r="9"/>
+									<circle fill="none"
+										stroke="#000000"
+										stroke-width="2"
+										stroke-miterlimit="10"
+										stroke-dasharray="3.1292,3.1292"
+										cx="17.5" cy="17.4"
+										r="9"/>
+							</g>
+						</svg>
+						<p ng-if="error.type == 'blank_node'"><span class="bold">Destination {{integerToLetters(error.node)}}</span> is blank! It must be edited or removed from the tree prior to publishing.</p>
+
+						<!-- No Answers Error -->
+						<svg width="35"
+							height="35"
+							ng-if="error.type == 'has_no_answers'">
+							<path fill="#FFFFFF"
+								stroke="#000000"
+								stroke-width="2"
+								stroke-miterlimit="5"
+								d="M28.8,18.7H6.2c-2.7,0-5-2.2-5-5V6 c0-2.8,2.2-5,5-5h22.7c2.8,0,5,2.2,5,5v7.7C33.8,16.4,31.6,18.7,28.8,18.7z"/>
+							<line fill="#FFFFFF"
+								stroke="#000000"
+								stroke-miterlimit="5"
+								x1="4.4" y1="6.1"
+								x2="30.4"
+								y2="6.1"/>
+							<line fill="#FFFFFF"
+								stroke="#000000"
+								stroke-miterlimit="5"
+								x1="4.4"
+								y1="9.6"
+								x2="29.3"
+								y2="9.6"/>
+							<line fill="#FFFFFF"
+								stroke="#000000"
+								stroke-miterlimit="5"
+								x1="4.4"
+								y1="13.1"
+								x2="28.1"
+								y2="13.1"/>
+							<circle cx="17.2"
+								cy="32.3"
+								r="1.7"/>
+							<path fill="none"
+								stroke="#000000"
+								stroke-width="2"
+								stroke-miterlimit="10"
+								d="M17.2,29.8v-2.1c0,0,2.8,0,2.7-2.5 c-0.1-2.6-2.7-2.3-2.7-2.3s-2,0.1-2,2.5"/>
+						</svg>
+						<p ng-if="error.type == 'has_no_answers'"><span class="bold">Destination {{integerToLetters(error.node)}}</span> has no answers! Replace it with an end point or add at least one answer prior to publishing.</p>
+
+						<!-- No Final Score Error -->
+						<svg width="35"
+							height="35"
+							ng-if="error.type == 'has_no_final_score'">
+							<path fill="none"
+								stroke="#000000"
+								stroke-width="2"
+								stroke-miterlimit="10"
+								d="M30,27H5.2c-2.2,0-4-1.8-4-4V11.2c0-2.2,1.8-4,4-4 H30c2.2,0,4,1.8,4,4V23C34,25.2,32.2,27,30,27z"/>
+							<circle cx="12.7"
+								cy="22.9"
+								r="2.1"/>
+							<path fill="none"
+								stroke="#000000"
+								stroke-width="2"
+								stroke-miterlimit="10"
+								d="M12.7,19.6v-2.7c0,0,3.6,0,3.5-3.2s-3.5-3-3.5-3 s-2.6,0.1-2.6,3.2"/>
+							<rect x="19.4"
+								y="14.5"
+								transform="matrix(0.7071 -0.7071 0.7071 0.7071 -3.3627 21.2424)"
+								fill="none"
+								stroke="#000000"
+								stroke-miterlimit="10"
+								width="9"
+								height="0.5"/>
+							<circle fill="none"
+								stroke="#000000"
+								stroke-miterlimit="10"
+								cx="21.7"
+								cy="12.2"
+								r="1.3"/>
+							<circle fill="none"
+								stroke="#000000"
+								stroke-miterlimit="10"
+								cx="26"
+								cy="17.1"
+								r="1.3"/>
+						</svg>
+						<p ng-if="error.type == 'has_no_final_score'"><span class="bold">End Point {{integerToLetters(error.node)}}</span> doesn't have a valid final score!</p>
+					</li>
+				</ul>
+				<button type="button"
+					class="important-button"
+					ng-click="hideCoverAndModals()">Got It!</button>
+			</validation-dialog>
+			<toast ng-hide="!showToast"
+				ng-click="hideToast()"
+				class="fadeable">
+				{{toastMessage}}
+				<button type="button"
+					ng-show="showToastActionButton"
+					ng-click="toastAction()">{{toastActionText}}</button>
+			</toast>
+			<node-tools-dialog
+				id="nodeTools"
+				ng-show="nodeTools.show"
+				data-pos-x="{{nodeTools.x}}"
+				data-pos-y="{{nodeTools.y}}">
+				Destination: {{ integerToLetters(nodeTools.target) }}
+				<button type="button"
+					class="important-button"
+					ng-click="editNode()">Edit</button>
+				<button type="button"
+					ng-disabled="nodeTools.type==BLANK"
+					ng-click="copyNode()">Copy</button>
+				<button type="button"
+					ng-disabled="nodeTools.type==BLANK"
+					ng-click="resetNodePreCheck()">Reset</button>
+				<button type="button"
+					ng-hide="nodeTools.type==BLANK"
+					ng-click="nodeTools.showConvertDialog = true">Convert</button>
+				<button type="button"
+					class="delete-button"
+					ng-disabled="nodeTools.target == 0"
+					ng-click="nodeTools.showDeleteWarning = true">Delete</button>
+				<!-- extended dialog for reset warning -->
+				<div class="warning-dialog-section"
+					ng-show="nodeTools.showResetWarning == true">
+					<p>Careful! Resetting this destination will delete all child destinations. Are you sure?</p>
+					<button type="button"
+						class="delete-button"
+						ng-click="resetNode()">Reset</button>
+					<button type="button"
+						ng-click="nodeTools.showResetWarning = false">Cancel</button>
+				</div>
+				<!-- extended dialog for delete warning -->
+				<div class="warning-dialog-section"
+					ng-show="nodeTools.showDeleteWarning">
+					<p>Careful! Deleting this destination will delete all child destinations, as well as its associated parent's answer. Are you sure?</p>
+					<button type="button"
+						class="delete-button"
+						ng-click="deleteNode()">Delete</button>
+					<button type="button"
+						ng-click="nodeTools.showDeleteWarning = false">Cancel</button>
+				</div>
+				<div class="warning-dialog-section convert-dialog"
+					ng-show="nodeTools.showConvertDialog">
+					<p>Choose the type of destination to convert to.</p>
+					<button type="button"
+						ng-show="nodeTools.type==MC || nodeTools.type==HOTSPOT"
+						ng-click="convertNode(SHORTANS)">Short Answer</button>
+					<button type="button"
+						ng-show="nodeTools.type==SHORTANS || nodeTools.type==HOTSPOT"
+						ng-click="convertNode(MC)">Multiple Choice</button>
+					<button type="button"
+						ng-show="nodeTools.type==NARR"
+						ng-click="convertNode(END)">End Point</button>
+					<button type="button"
+						ng-show="nodeTools.type==END"
+						ng-click="convertNode(NARR)">Narrative</button>
+					<button type="button"
+						ng-click="nodeTools.showConvertDialog = false">Cancel</button>
+				</div>
+			</node-tools-dialog>
+			<delete-warning-dialog ng-show="deleteDialog.show">
+				<h4>Confirm Node Deletion</h4>
+				<p>Careful! You're about to remove an answer and its associated destination. All of its child destinations will also be deleted. Are you sure?</p>
+				<div class="button-box">
+					<button type="button" class="delete-button" ng-click="dropNodeAndChildren()">Delete Answer</button>
+					<button type="button" ng-click="cancelDeleteDialog()">Cancel</button>
+				</div>
+			</delete-warning-dialog>
+			<node-creation-selection-dialog ng-show="showCreationDialog && displayNodeCreation == 'none'">
+				<h2>What kind of destination do you want to create?</h2>
+				<ul>
+					<li ng-click="displayNodeCreation = MC">
+						<img src="assets/creator-assets/mc.svg">Multiple Choice</li>
+					<li ng-click="displayNodeCreation = SHORTANS" />
+						<img src="assets/creator-assets/sa.svg">Short Answer</li>
+					<li ng-click="displayNodeCreation = HOTSPOT" />
+						<img src="assets/creator-assets/hs.svg">Hotspot</li>
+					<li class="narr" ng-click="displayNodeCreation = NARR">
+						<img src="assets/creator-assets/narr.svg" />Narrative</li>
+					<li class="end" ng-show="nodeTools.target != 0" ng-click="displayNodeCreation = END">
+						<img src="assets/creator-assets/end.svg" /><span>End Point</span></li>
+				</ul>
+			</node-creation-selection-dialog>
+			<new-node-manager-dialog ng-show="newNodeManager.show"
+				data-pos-x="{{newNodeManager.x}}"
+				data-pos-y="{{newNodeManager.y}}">
+				<h4>Where should this answer point to? ></h4>
+				<ul>
+					<li ng-class="{'selected' : newNodeManager.linkMode == NEW}" ng-click="selectLinkMode(NEW)">New Destination (Blank)</li>
+					<li ng-class="{'selected' : newNodeManager.linkMode == EXISTING}"  ng-click="selectLinkMode(EXISTING)">An Existing Destination</li>
+					<li ng-class="{'selected' : newNodeManager.linkMode == SELF}"  ng-click="selectLinkMode(SELF)">Loop Back to This Destination ( {{integerToLetters(editedNode.id)}} )</li>
+				</ul>
+			</new-node-manager-dialog>
+			<node-creation class="node-creation-screen"
+				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT}"
+				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
+				<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
+				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
+				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
+				<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
+				<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
+				<textarea class="question-box"
+					ng-class="{
+						'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
+						'tiny' : displayNodeCreation == HOTSPOT,
+						'align-top' : editedNode.media.align == 'top',
+						'align-bottom' : editedNode.media.align == 'bottom',
+						'shared' : (mediaReady && displayNodeCreation != HOTSPOT),
+						'align-right' : editedNode.media.align == 'left' }"
+					ng-model="question"
+					placeholder="{{questionPlaceholder}}"></textarea>
+				<div class="media-box"
+					ng-class="{
+						'align-left' : editedNode.media.align == 'left',
+						'align-right' : editedNode.media.align == 'right',
+						'align-top' : editedNode.media.align == 'top',
+						'align-bottom' : editedNode.media.align == 'bottom'}"
+					ng-show="mediaReady && displayNodeCreation != HOTSPOT">
+					<img ng-src="{{image.src}}" />
+					<div class="media-toolbar">
+						<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
+						<button type="button" ng-show="displayNodeCreation == NARR || displayNodeCreation == END" ng-click="swapMediaOrientation()">Change Orientation: {{ (editedNode.media.align == 'top' || editedNode.media.align == 'bottom') ? "Horizontal" : "Vertical" }}</button>
+						<button type="button" ng-click="changeMedia()">Change Image</button>
+						<button type="button" class="delete-button" ng-click="removeMedia()">Remove</button>
+					</div>
+				</div>
+				<button type="button"
+					id="big-upload-button"
+					ng-if="displayNodeCreation != HOTSPOT"
+					ng-hide="mediaReady"
+					ng-click="beginMediaImport()">
+						<span>+</span>Add Media
+				</button>
+				<div class="answers-container"
+					ng-class="{'long' : displayNodeCreation == SHORTANS}"
+					ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS"
+					auto-scroll-and-select>
+					<ul>
+						<li class="unmatched-answers-row"
+							ng-if="displayNodeCreation == SHORTANS">
+							<div class="unmatched-answers-box">
+								<p><span>Unmatched Answers:</span> Used if the response doesn't match any possible answers you provided.</p>
+							</div>
+							<input type="text" ng-model="answers[0].feedback" placeholder="Enter Optional Feedback" />
+							<button type="button"
+								class="answer-node-select"
+								ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
+								ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+
+						</li>
+						<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
+							<button type="button"
+								class="delete-button"
+								ng-click="removeAnswerPreCheck($index, $event)">X</button>
+							<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
+							<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
+							<button type="button"
+								class="answer-node-select"
+								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+						</li>
+
+						<li ng-if="displayNodeCreation == 	SHORTANS"
+							ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}"
+							ng-repeat="answer in answers"
+							ng-show="$index > 0"
+							short-answer-set>
+							<button type="button"
+								class="delete-button"
+								ng-click="removeAnswerPreCheck($index, $event)"
+								ng-disabled="$index == 0">X</button>
+							<input type="text"
+								class="shared-row"
+								ng-model="newMatch"
+								placeholder="Add a possible answer. Matches are not case sensitive."
+								enter-submit="addAnswerMatch($index)"></input>
+							<button type="button"
+								class="important-button"
+								ng-click="addAnswerMatch($index)">Add Match</button>
+							<div class="possible-answers-box">
+								<p ng-hide="answer.matches.length">Possible answers will be shown here. Click an answer to remove it.</p>
+								<button type="button"
+									ng-repeat="match in answer.matches"
+									ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
+							</div>
+							<input type="text"
+								ng-model="answer.feedback"
+								placeholder="Enter Optional Feedback" />
+							<button type="button"
+								class="answer-node-select"
+								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+						</li>
+					</ul>
+				</div>
+				<!-- container for all hotspot-specific elements and interactions -->
+				<!-- effectively replaces the default answers container -->
+				<hotspot-manager class="hotspot-container"
+					id="hotspot-manager"
+					ng-if="displayNodeCreation == HOTSPOT">
+					<div class="image-container">
+						<button type="button"
+							id="uploadButton"
+							class="important-button"
+							ng-show="!mediaReady"
+							ng-click="beginMediaImport()">Upload an Image</button>
+						<!-- bottom toolbar with buttons for adding and managing hotspots -->
+						<hotspot-toolbar ng-show="mediaReady">
+							<ul>
+								<li><button type="button"
+									ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
+								<li><button type="button"
+									ng-click="startSquareHotspot()">+ Square Hotspot</button></li>
+								<li><button type="button"
+									ng-click="startPolygonHotspot()">+ Polygon Hotspot</button></li>
+								<li><button type="button"
+									ng-click="visibilityManagerOpen = !visibilityManagerOpen">Edit Visibility</button></li>
+								<li><button type="button"
+									ng-click="changeMedia()">Change Image</button></li>
+							</ul>
+						</hotspot-toolbar>
+						<div class="visibility-manager" ng-show="visibilityManagerOpen">
+							<h4>For this image,</h4>
+							<ul>
+								<li ng-class="{'selected':editedNode.hotspotVisibility == ALWAYS}"
+									ng-click="editedNode.hotspotVisibility = ALWAYS; visibilityManagerOpen = false">Always show hotspots</li>
+								<li ng-class="{'selected':editedNode.hotspotVisibility == MOUSEOVER}"
+									ng-click="editedNode.hotspotVisibility = MOUSEOVER; visibilityManagerOpen = false">Reveal hotspots on mouseover</li>
+								<li ng-class="{'selected':editedNode.hotspotVisibility == NEVER}"
+									ng-click="editedNode.hotspotVisibility= NEVER; visibilityManagerOpen = false">Don't show hotspots</li>
+							</ul>
+						</div>
+						<!-- management popup when an individual hotspot is selected -->
+						<hotspot-answer-manager
+							ng-class="{'visible' : hotspotAnswerManager.show}"
+							data-pos-x="{{hotspotAnswerManager.x}}"
+							data-pos-y="{{hotspotAnswerManager.y}}">
+							<h4>Manage This Hotspot</h4>
+							<input type="text" placeholder="Enter optional hotspot label here."
+								ng-model="answers[hotspotAnswerManager.answerIndex].text"/>
+							<textarea class="feedback-box"
+								placeholder="Enter optional feedback here."
+								ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
+							<div class="button-options">
+								<button type="button"
+									ng-class="{'important-button' : colorDrawerOpen}"
+									ng-click="colorDrawerOpen = !colorDrawerOpen">Color</button>
+								<button type="button"
+									ng-disabled="hotspotAnswerManager.answerIndex == answers.length - 1"
+									ng-click="moveAnswerForward()">Forward</button>
+								<button type="button"
+									ng-disabled="hotspotAnswerManager.answerIndex == 0"
+									ng-click="moveAnswerBack()">Back</button>
+								<button type="button" class="delete-button" ng-click="removeAnswerPreCheck(hotspotAnswerManager.answerIndex, $event)">Remove</button>
+							</div>
+							<div class="colors-container" ng-show="colorDrawerOpen == true">
+								<button type="button"
+									ng-repeat="color in colors"
+									class="color-selector {{color}}"
+									data-color="{{color}}"
+									ng-click="updatePolygonColor($event)"></button>
+							</div>
+							<div class="continuity-container">
+								<span>Select the destination this hotspot should lead to:</span>
+								<button type="button"
+									class="answer-node-select"
+									ng-class="{'managed' : answers[hotspotAnswerManager.answerIndex].id == newNodeManager.answerId}"
+									ng-click="manageNewNode($event, answers[hotspotAnswerManager.answerIndex].target, answers[hotspotAnswerManager.answerIndex].id, answers[hotspotAnswerManager.answerIndex].linkMode)">{{ integerToLetters(answers[hotspotAnswerManager.answerIndex].target) }}</button>
+							</div>
+
+						</hotspot-answer-manager>
+						<!-- SVG canvas placed over the primary hotspot canvas for drawing a polygon -->
+						<svg id="polygon-svg-artboard"
+							ng-show="polygonDrawMode"
+							ng-click="recordClicks($event)"
+							ng-mousemove="updateCursorPoint($event)"
+							polygon-artboard>
+							<!-- Guide line for indicating where next section of the polyline will be drawn -->
+							<line ng-attr-x1="{{lastClicked.x}}"
+								ng-attr-y1="{{lastClicked.y}}"
+								ng-attr-x2="{{cursorPoint.x}}"
+								ng-attr-y2="{{cursorPoint.y}}"
+								stroke="black" />
+							<!-- Open polygon, points will be converted to final polygon on the main hotspot svg -->
+							<polyline fill="none"
+								stroke="black"
+								ng-attr-points="{{polygonPoints}}" />
+						</svg>
+						<!-- SVG canvas upon which all hotspots are drawn -->
+						<svg id="hotspot-canvas"
+							width="698"
+							height="400"
+							ng-show="mediaReady"
+							ng-click="closeManager($event)">
+							<g ng-repeat="answer in answers"
+								data-answer="answer"
+								ng-attr-transform="matrix(1 0 0 1 {{answer.svg.x}} {{answer.svg.y}})">
+								<ellipse ng-if="answer.svg.type == 'ellipse'"
+									ng-class="{'moving':selectedSVG.selected}"
+									ng-attr-cx="0"
+									ng-attr-cy="0"
+									ng-attr-rx="{{answer.svg.r + answer.svg.scaleXFactor}}"
+									ng-attr-ry="{{answer.svg.r + answer.svg.scaleYFactor}}"
+									fill="{{answer.svg.fill}}"
+									stroke="{{answer.svg.fill}}"
+									stroke-width="{{answer.svg.stroke}}"
+									fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+									ng-mouseenter="highlightSVG = true"
+									ng-mousedown="selectSVG($event)"
+									ng-mouseup="deselectSVG($event)"
+									ng-mouseleave="deselectSVG($event); highlightSVG = false"
+									ng-mousemove="moveSVG($index, $event)"
+									ng-click="manageSVG($index, $event)" />
+
+								<rect ng-if="answer.svg.type == 'rect'"
+									ng-class="{'moving':selectedSVG.selected}"
+									ng-attr-x="0"
+									ng-attr-y="0"
+									ng-attr-width="{{answer.svg.width + answer.svg.scaleXFactor}}"
+									ng-attr-height="{{answer.svg.height + answer.svg.scaleYFactor}}"
+									fill="{{answer.svg.fill}}"
+									stroke="{{answer.svg.fill}}"
+									stroke-width="{{answer.svg.stroke}}"
+									fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+									ng-mouseenter="highlightSVG = true"
+									ng-mousedown="selectSVG($event)"
+									ng-mouseup="deselectSVG($event)"
+									ng-mouseleave="deselectSVG($event); highlightSVG = false"
+									ng-mousemove="moveSVG($index, $event)"
+									ng-click="manageSVG($index, $event)" />
+
+								<polygon ng-if="answer.svg.type == 'polygon'"
+									ng-class="{'moving':selectedSVG.selected}"
+									ng-attr-points="{{answer.svg.points}}"
+									fill="{{answer.svg.fill}}"
+									stroke="{{answer.svg.fill}}"
+									stroke-width="{{answer.svg.stroke}}"
+									fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+									ng-mouseenter="highlightSVG = true"
+									ng-mousedown="selectSVG($event)"
+									ng-mouseup="deselectSVG($event)"
+									ng-mouseleave="deselectSVG($event); highlightSVG = false"
+									ng-mousemove="moveSVG($index, $event)"
+									ng-click="manageSVG($index, $event)" />
+
+								<!-- Icon for scaling the size of the given SVG hotspot -->
+								<g class="scale"
+									ng-if="answer.svg.type == 'rect' || answer.svg.type =='ellipse'"
+									ng-attr-transform="matrix(1 0 0 1 {{answer.svg.scaleXFactor}} {{answer.svg.scaleYFactor}})"
+									ng-mousedown="startSVGScale($event)"
+									ng-mousemove="scaleSVG($index, $event)"
+									ng-mouseup="endSVGScale($event)"
+									ng-mouseenter="hoverScale = true"
+									ng-mouseleave="hoverScale = false">
+									<circle ng-attr-r="{{ hoverScale ? '40' : '20' }}"
+										ng-attr-cx="{{answer.svg.scaleXOffset + 8}}"
+										ng-attr-cy="{{answer.svg.scaleYOffset + 8}}"/
+										ng-class="{'hovered':hoverScale}"/>
+									<path class="scale-path"
+										d="M17.8,17.8h-7.2l2.8-2.8L10,11.6l1.7-1.7l3.3,3.3l2.8-2.8L17.8,17.8z M6.1,7.8L2.8,4.4L0,7.2L0,0l7.2,0L4.4,2.8l3.3,3.3 L6.1,7.8z"
+										ng-attr-transform="translate({{answer.svg.scaleXOffset}}, {{answer.svg.scaleYOffset}})"></path>
+								</g>
+							</g>
+						</svg>
+						<!-- Background image placed behind the hotspot's SVG canvas -->
+						<img id="hotspotImage"
+							ng-src="{{image.src}}"
+							ng-show="mediaReady" />
+					</div>
+				</hotspot-manager>
+				<!-- container for selecting the destination for narrative nodes -->
+				<div class="continuity-container" ng-if="displayNodeCreation == NARR">
+					<span>Select the destination to continue on:</span>
+					<button type="button"
+						class="answer-node-select"
+						ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
+						ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+				</div>
+				<!-- container for selecting the destination for end nodes -->
+				<div class="continuity-container" ng-if="displayNodeCreation == END">
+					<span>The user's path will conclude with this destination. Set the final score:</span>
+					<final-score-box
+						ng-form="finalScoreForm"
+						name="finalScoreForm">
+						<input type="number"
+							name="finalScoreInput"
+							class="final-score"
+							ng-class="{'invalid' : !finalScoreForm.$valid}"
+							ng-model="finalScore"
+							placeholder="100"
+							min="0"
+							max="100" />
+					</final-score-box>
+					<span>%</span>
+				</div>
+				<button class="add-answer important-button"
+					type="button"
+					ng-click="newAnswer()"
+					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
+				<button class="save-button important-button"
+					ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+					type="button"
+					ng-click="saveAndClose()">Save</button>
+			</node-creation>
+			<node-tooltips ng-show="hoveredNode.showTooltips">
+				<div class="tooltip"
+					ng-repeat="tooltip in hoveredNode.tooltips">
+					<span class="tooltip-title">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
+				</div>
+			</node-tooltips>
+			<div class="intro-screen" ng-show="showIntroDialog">
+			<img src="assets/creator-assets/sample-tree.png" />
+			<h2>Create Your Own Adventure!</h2>
+			<p>Build a branching decision tree! Each point on the tree, or "destination", represents a screen the student interacts with.</p>
+			<p>Each interaction leads to another destination, until a student finds an end point.</p>
+			<p>Students are given a score based on the end point they reach.</p>
+			<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
+			</div>
+			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
+			<tree-visualization data="treeData"
+				offset="treeOffset"
+				on-hover="onNodeHover(data)"
+				on-hover-out="onNodeHoverOut(data)"
+				node-click="nodeSelected(data)"
+				bg-click="bgClicked()"></tree-visualization>
+		</div>
 	</body>
 </html>
 
