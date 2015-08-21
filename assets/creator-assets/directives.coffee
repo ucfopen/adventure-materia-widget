@@ -737,12 +737,12 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			yOffset = ($scope.nodeTools.y * $scope.treeOffset.scale) + $scope.treeOffset.y + $scope.treeOffset.scaleYOffset
 
 			xBound = xOffset + 200
-			yBound = yOffset + 122
+			yBound = yOffset + 127
 
 			container = document.getElementById("tree-svg")
 
 			if yBound > container.offsetHeight
-				diffY = yBound - container.offsetHeight - 35
+				diffY = yBound - container.offsetHeight + 35
 				yOffset -= diffY
 
 			if xBound > container.offsetWidth
@@ -1074,6 +1074,14 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 				xOffset = $scope.newNodeManager.x - 205
 				yOffset = $scope.newNodeManager.y
+
+				yBound = yOffset + 150
+
+				container = document.getElementById("tree-svg")
+
+				if yBound > container.offsetHeight
+					diffY = yBound - container.offsetHeight + 10
+					yOffset -= diffY
 
 				styles =  "left: " + xOffset + "px; top: " + yOffset + "px"
 
