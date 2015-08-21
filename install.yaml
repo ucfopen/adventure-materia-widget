@@ -12,7 +12,7 @@ general:
   is_storage_enabled: No
   api_version: 2
 files:
-  creator: assets/adventure-creator.swf
+  creator: creator.html
   player: player.html
   flash_version: 0
 score:

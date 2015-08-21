@@ -9,7 +9,7 @@
 
 		<!-- STYLESHEETS -->
 		<link href='http://fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="player.css">
+		<link rel="stylesheet" type="text/css" href="assets/player-assets/player.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -24,66 +24,169 @@
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.15/angular.min.js"></script>
 
 		<!-- MAIN PLAYER SCRIPT -->
-		<script type="text/javascript" src="player.js"></script>
+		<script type="text/javascript" src="assets/player-assets/app.js"></script>
+		<script type="text/javascript" src="assets/legacyQsetSrv.js"></script>
+		<script type="text/javascript" src="assets/player-assets/player.js"></script>
 	</head>
-	<body ng-app="AdventureApp" ng-controller="AdventureController">
+	<body ng-app="Adventure" ng-controller="AdventureController">
 		<header class="header">
 			<h1>{{title}}</h1>
 		</header>
 
 		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
 
-		<div class="feedback" ng-class="{ show: feedback }">
+		<div class="feedback"
+			ng-class="{ show: feedback }"
+			style="z-index: {{ feedback ? 1000 : -1 }}">
 			{{feedback}}
-			<input class="feedback-button trans-button" type="button" value="OK" ng-click="closeFeedback()">
+			<input class="feedback-button trans-button"
+				type="button"
+				value="OK"
+				ng-click="closeFeedback()">
 		</div>
 
-		<section class="question clearfix" ng-switch="question.layout">
-			<div ng-switch-when='0'>
-				<figure class="asset"><img src="{{ question.image }}" /></figure>
+		<section class="question clearfix"
+			ng-class="{
+				'hotspot-mode' : question.type == HOTSPOT,
+				'shortans-mode' : question.type == SHORTANS,
+				'transitional-mode' : question.type == NARR || question.type == END}"
+			ng-switch="layout">
+			<!-- just an image -->
+			<div ng-switch-when="image-only">
+				<figure class="asset">
+					<img src="{{ question.image }}" />
+				</figure>
 			</div>
-			<div ng-switch-when='1'>
-				<h2 class="text">{{ question.text }}</h2>
+			<!-- just text; no image -->
+			<div ng-switch-when="text-only">
+				<h2 class="text" auto-text-scale dynamic-scale>{{ question.text }}</h2>
 			</div>
-			<div ng-switch-when='2'>
-				<h2 class="text left">{{ question.text }}</h2>
-				<figure class="asset right"><img src="{{ question.image }}" /></figure>
+			<!-- image on the right -->
+			<div ng-switch-when="right">
+				<h2 class="text left" auto-text-scale dynamic-scale>{{ question.text }}</h2>
+				<figure class="asset right">
+					<img src="{{ question.image }}" />
+				</figure>
 			</div>
-			<div ng-switch-when='3'>
-				<figure class="asset left"><img src="{{ question.image }}" /></figure>
-				<h2 class="text right">{{ question.text }}</h2>
+			<!-- image on the left -->
+			<div ng-switch-when="left">
+				<figure class="asset left">
+					<img src="{{ question.image }}" />
+				</figure>
+				<h2 class="text right" auto-text-scale dynamic-scale>{{ question.text }}</h2>
 			</div>
-			<div ng-switch-when='4'>
-				<h2 class="text">{{ question.text }}</h2>
-				<figure class="asset center"><img src="{{ question.image }}" /></figure>
+			<!-- image on the bottom -->
+			<div ng-switch-when="bottom">
+				<figure class="asset center">
+					<img src="{{ question.image }}" />
+				</figure>
+				<h2 class="text bottom" auto-text-scale> {{ question.text }}</h2>
 			</div>
-			<div ng-switch-when='5'>
-				<figure class="asset center"><img src="{{ question.image }}" /></figure>
-				<h2 class="text">{{ question.text }}</h2>
+			<!-- image on the top -->
+			<div ng-switch-when="top">
+				<h2 class="text top" auto-text-scale>{{ question.text }}</h2>
+				<figure class="asset center">
+					<img src="{{ question.image }}" />
+				</figure>
+			</div>
+			<!-- hotspot mode. No image associated w/ question -->
+			<div ng-switch-when="hotspot">
+			<h2 class="text bottom"
+				ng-hide="question.text.length == 0"
+				auto-text-scale>{{ question.text }}</h2>
 			</div>
 		</section>
-		<section class="answers">
-			<div class="mc" ng-show="type == 'mc'">
-				<a href="#" class="answer" ng-repeat="answer in answers" ng-click="handleAnswerSelection(answer.link, answer.index)" data-index="{{answer.index}}" data-link="{{answer.link}}">) {{answer.text}}</a>
+		<section class="answers"
+			ng-class="{
+				'hotspot-mode' : question.type == HOTSPOT,
+				'no-question' : question.text.length == 0}">
+			<div class="mc"
+				ng-show="type == MC">
+				<a href="#"
+					class="answer"
+					ng-repeat="answer in answers"
+					ng-click="handleAnswerSelection(answer.link, answer.index)"
+					data-index="{{answer.index}}"
+					data-link="{{answer.link}}">) {{answer.text}}</a>
 			</div>
-			<div class="sa" ng-show="type == 'sa'">
-				<input type="text" class="short-answer" ng-model="response" ng-enter="handleShortAnswerInput()" />
-				<input type="button" class="trans-button" value="Submit" ng-click="handleShortAnswerInput()"/>
+			<div class="sa"ng-show="type == SHORTANS">
+				<input type="text"
+					class="short-answer"
+					ng-model="response"
+					ng-enter="handleShortAnswerInput()" />
+				<input type="button"
+					class="trans-button"
+					value="Submit"
+					ng-click="handleShortAnswerInput()"/>
 			</div>
-			<div class="hotspot" ng-if="type == 'hotspot'">
-				<img src="{{question.image}}">
-				<svg version="1.1" class="hotarea" xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="730px" height="650px" xml:space="preserve">
-				<g ng-repeat="answer in answers">
-				<path ng-show="answer.type != '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{question.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-d="{{answer.path}}"></path>
-				<ellipse ng-show="answer.type == '0'" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-attr-fill="{{question.options.hotspotColor}}" opacity="0.5" stroke="#fff" ng-click="handleAnswerSelection(answer.link,answer.index)" ng-attr-cx="{{answer.cx}}" ng-attr-cy="{{answer.cy}}" ng-attr-rx="{{answer.rx}}" ng-attr-ry="{{answer.ry}}"></ellipse>
-				</g>
-				</svg>
-				<div ng-repeat='answer in answers' class='answerbubble' ng-click="handleAnswerSelection(answer.link,answer.index)" ng-mouseover='answer.hover=true' ng-mouseout='answer.hover=false' ng-show='answer.hover' style='top:{{answer.balloontop}}px;left:{{answer.balloonleft}}px;'>
-					{{answer.text}}
+			<div class="hotspot" ng-if="type == HOTSPOT">
+				<!-- label element for the hotspot label text, if it exists -->
+				<div class="hotspot-label"
+					id="hotspot-label"
+					ng-click="handleAnswerSelection(answer.link,answer.index)"
+					style="top:{{ hotspotLabelTarget.y }}px;
+						left:{{ hotspotLabelTarget.x }}px;
+						opacity:{{ hotspotLabelTarget.show ? 1 : 0 }}">
+					{{hotspotLabelTarget.text}}
 				</div>
+
+				<svg version="1.1"
+					class="hotarea"
+					xmlns:cc="http://web.resource.org/cc/"
+					xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+					xmlns:dc="http://purl.org/dc/elements/1.1/"
+					xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink"
+					xml:space="preserve">
+					<g ng-repeat="answer in answers"
+						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})"
+						visibility-manager
+						label-manager>
+						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
+							ng-attr-cx="0"
+							ng-attr-cy="0"
+							ng-attr-rx="{{answer.options.svg.r + answer.options.svg.scaleXFactor}}"
+							ng-attr-ry="{{answer.options.svg.r + answer.options.svg.scaleYFactor}}"
+							fill="{{answer.options.svg.fill}}"
+							stroke="{{answer.options.svg.fill}}"
+							stroke-width="{{answer.options.svg.stroke}}"
+							fill-opacity="0.5"
+							ng-mouseover='onHotspotHover(answer, $event)'
+							ng-mouseout='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+
+						<rect ng-if="answer.options.svg.type == 'rect'"
+							ng-attr-x="0"
+							ng-attr-y="0"
+							ng-attr-width="{{answer.options.svg.width + answer.options.svg.scaleXFactor}}"
+							ng-attr-height="{{answer.options.svg.height + answer.options.svg.scaleYFactor}}"
+							fill="{{answer.options.svg.fill}}"
+							stroke="{{answer.options.svg.fill}}"
+							stroke-width="{{answer.options.svg.stroke}}"
+							fill-opacity="0.5"
+							ng-mouseover='onHotspotHover(answer, $event)'
+							ng-mouseout='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+
+						<polygon ng-if="answer.options.svg.type == 'polygon'"
+							ng-attr-points="{{answer.options.svg.points}}"
+							fill="{{answer.options.svg.fill}}"
+							stroke="{{answer.options.svg.fill}}"
+							stroke-width="{{answer.options.svg.stroke}}"
+							fill-opacity="0.5"
+							ng-mouseover='onHotspotHover(answer, $event)'
+							ng-mouseout='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+					</g>
+				</svg>
+				<img src="{{question.image}}">
 			</div>
-			<div class="trans" ng-if="type == 'trans'">
-				<input type="button" class="trans-button" ng-class='{ left: question.layout == 2, right: question.layout == 3 }' value="Continue" ng-click="handleAnswerSelection(link,0)"/>
+			<div class="trans"ng-if="type == TRANS">
+				<input type="button"
+					class="trans-button"
+					ng-class='{ left: question.layout == 2, right: question.layout == 3 }'
+					value="Continue"
+					ng-click="handleAnswerSelection(link,0)"/>
 			</div>
 		</section>
 	</body>
