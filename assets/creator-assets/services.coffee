@@ -211,9 +211,10 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 	# Recursive function for finding a node and removing it
 	# parent: the tree structure to be iterated. Should initially reference the root node (treeData object)
 	# id: the id the node to be removed
-	findAndRemove = (parent, id) ->
+	# Returns an array of IDs for all nodes deleted (the target node and all of its children)
+	findAndRemove = (parent, id, removed = null) ->
 
-		if !parent.contents then return
+		if !parent.contents then return removed
 
 		# iterator required instead of using angular.forEach
 		i = 0
@@ -236,11 +237,29 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 							j++
 
 				parent.contents.splice i, 1
+				# Grab the array of IDs representing all deleted nodes (child + children of child)
+				removed = getIdsFromSubtree child
 			else
-				findAndRemove parent.contents[i], id
+				removed = findAndRemove parent.contents[i], id, removed
 				i++
 
-		parent
+		return removed
+
+	# Returns an array of IDs representing all nodes in a given tree
+	getIdsFromSubtree = (tree, ids = []) ->
+
+		ids.push tree.id
+
+		if !tree.contents then return ids
+
+		i = 0
+
+		while i < tree.contents.length
+
+			ids = getIdsFromSubtree tree.contents[i], ids
+			i++
+
+		ids
 
 	# This is a really circumstantial one that searches through answers in a tree that point to a given target
 	# If it finds an answer with that target, it resets the answer to a newly created node
@@ -277,6 +296,8 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					# Update the tree
 					findAndAdd treeData, tree.id, newNode
 
+					console.log "REPLACED LINK TO " + integerToLetters(targetId) + " WITH NODE " + newName
+
 				else if answer.linkMode is "existing" then numExistingNodeLinks++
 
 		# the answer array and pendingTarget properties -should- never coexist.
@@ -296,6 +317,8 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 			tree.pendingTarget = newId
 
 			findAndAdd treeData, tree.id, newNode
+
+			console.log "REPLACED LINK TO " + integerToLetters(targetId) + " WITH NODE " + newName
 
 		if tree.hasLinkToOther and numExistingNodeLinks is 0 then delete tree.hasLinkToOther
 

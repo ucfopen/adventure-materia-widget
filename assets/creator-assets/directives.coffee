@@ -189,6 +189,8 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
+				# if !link.source or !link.target then return
+
 				source = link.source
 				target = link.target
 
@@ -950,9 +952,12 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 					$scope.nodeTools.showDeleteWarning = false
 					return
 
-			treeSrv.findAndRemove $scope.treeData, target.id
+			# Remove the node & grab array of IDs representing deleted node & its children
+			removed = treeSrv.findAndRemove $scope.treeData, target.id
 
-			treeSrv.findAndFixAnswerTargets $scope.treeData, target.id
+			# Recurse through all deleted IDs & fix answer targets for each deleted node
+			for id in removed
+				treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 			treeSrv.set $scope.treeData
 
@@ -1098,7 +1103,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 				else i++
 
 			# Compare the prior link mode to the new one and deal with the changes
-			# if mode != $scope.newNodeManager.linkMode
 			switch mode
 				when "new"
 
@@ -1167,6 +1171,12 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 							if newVal.id is $scope.editedNode.id
 								deregister()
 								return $scope.selectLinkMode $scope.SELF
+
+							# Slap the user on the hand if they try to link to the same node
+							if newVal.id is $scope.answers[i].target
+								$scope.toast "That's already the target destination for this answer!"
+								$scope.existingNodeSelectionMode = true
+								return
 
 							# Set the answer's new target to the newly selected node
 							$scope.answers[i].target = newVal.id
