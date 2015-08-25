@@ -296,8 +296,6 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					# Update the tree
 					findAndAdd treeData, tree.id, newNode
 
-					console.log "REPLACED LINK TO " + integerToLetters(targetId) + " WITH NODE " + newName
-
 				else if answer.linkMode is "existing" then numExistingNodeLinks++
 
 		# the answer array and pendingTarget properties -should- never coexist.
@@ -317,8 +315,6 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 			tree.pendingTarget = newId
 
 			findAndAdd treeData, tree.id, newNode
-
-			console.log "REPLACED LINK TO " + integerToLetters(targetId) + " WITH NODE " + newName
 
 		if tree.hasLinkToOther and numExistingNodeLinks is 0 then delete tree.hasLinkToOther
 
