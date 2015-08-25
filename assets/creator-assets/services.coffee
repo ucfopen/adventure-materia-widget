@@ -68,13 +68,13 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 	# tree: the tree structure to be iterated. Should initially reference the root node (treeData object)
 	# parentId: the ID of the node to append the new node to
 	# node: the data of the new node
-	findAndAdd = (tree, parentId, node) ->
+	findAndAdd = (tree, parentId, node, success=false) ->
 
 		if tree.id == parentId
 			tree.contents.push node
-			return tree
+			return success = true
 
-		if !tree.contents then return
+		if !tree.contents then return success
 
 		i = 0
 
@@ -84,12 +84,12 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 			if child.id == parentId
 				child.contents.push node
-				return tree
+				return success = true
 			else
-				findAndAdd tree.contents[i], parentId, node
+				success = findAndAdd tree.contents[i], parentId, node
 				i++
 
-		tree
+		success
 
 	# Recursive function for replacing a given node on a tree with another node
 	# tree: the tree structure to be iterated. Should initially reference the root node
