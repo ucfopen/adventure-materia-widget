@@ -189,8 +189,6 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
-				# if !link.source or !link.target then return
-
 				source = link.source
 				target = link.target
 
@@ -540,6 +538,8 @@ Adventure.directive "treeTransforms", (treeSrv) ->
 		# flag for whether or not dragging is allowed (when tree extends beyond window in any direction)
 		$scope.dragFlag = false
 
+		hasMoved = false # flag for whether the tree actually moved after a selectTree/moveTree/deselectTree event cycle
+
 		originX = 0
 		originY = 0
 
@@ -610,11 +610,16 @@ Adventure.directive "treeTransforms", (treeSrv) ->
 
 				$scope.transformTree()
 
+				hasMoved = true
+
 				return false
 
 		# Mouseup behavior to turn off dragging
 		$scope.deselectTree = (evt) ->
 			$scope.offset.moving = false
+			if hasMoved
+				$scope.$broadcast "tree.repositioned"
+				hasMoved = false
 
 		# updates the matrix transform with new offset (translation) values & scale values
 		# translation combines the X/Y offsets from panning and adjustments made to center the SVG when scaled
@@ -732,17 +737,51 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 		# When target for the dialog changes, update the position values based on where the new node is
 		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
+			updatePosition()
 
-			# Ensure the nodeTools dialog is positioned properly
+			# Reset the visibility of the warning flag
+			$scope.nodeTools.showResetWarning = false
+			$scope.nodeTools.showDeleteWarning = false
+			$scope.nodeTools.showConvertDialog = false
+
+		# update positioning whenever a dialog state changes
+		$scope.$watch "nodeTools.showResetWarning", (newVal, oldVal) ->
+				$scope.nodeTools.showDeleteWarning = false
+				$scope.nodeTools.showConvertDialog = false
+				updatePosition()
+
+		$scope.$watch "nodeTools.showDeleteWarning", (newVal, oldVal) ->
+				$scope.nodeTools.showResetWarning = false
+				$scope.nodeTools.showConvertDialog = false
+				updatePosition()
+
+		$scope.$watch "nodeTools.showConvertDialog", (newVal, oldVal) ->
+				$scope.nodeTools.showResetWarning = false
+				$scope.nodeTools.showDeleteWarning = false
+				updatePosition()
+
+		# nodeTools is repositioned fairly often due to changes in size (confirm/warning dialogs) & node repositioning
+		# note that the values here are static; I suspect there's an easier way of approaching the positioning logic,
+		# especially for repositioning due to resizing events
+		updatePosition = ->
 			# Crazy math is due to ensuring the dialog continues to position properly after panning and/or zooming the tree
 			xOffset = ($scope.nodeTools.x * $scope.treeOffset.scale) + $scope.treeOffset.x + $scope.treeOffset.scaleXOffset
 			yOffset = ($scope.nodeTools.y * $scope.treeOffset.scale) + $scope.treeOffset.y + $scope.treeOffset.scaleYOffset
 
+			# Can't rely on computed height of the element at the time this is called, so we have to set bounding box manually
 			xBound = xOffset + 200
 			yBound = yOffset + 127
 
+			# Adjust expected height of the bounds based on which dialog is open
+			if $scope.nodeTools.type isnt $scope.BLANK then yBound += 23
+
+			if $scope.nodeTools.showResetWarning then yBound += 128
+			else if $scope.nodeTools.showDeleteWarning then yBound += 143
+			else if $scope.nodeTools.showConvertDialog then yBound += 141
+
 			container = document.getElementById("tree-svg")
 
+			# Check for overflow
 			if yBound > container.offsetHeight
 				diffY = yBound - container.offsetHeight + 35
 				yOffset -= diffY
@@ -754,8 +793,9 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 			$attrs.$set "style", styles
 
-			# Reset the visibility of the warning flag
-			$scope.nodeTools.showResetWarning = false
+		# update nodeTools after tree reposition events
+		$scope.$on "tree.repositioned", (evt) ->
+			updatePosition()
 
 		$scope.copyNode = () ->
 
