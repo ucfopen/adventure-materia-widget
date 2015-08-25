@@ -645,6 +645,8 @@ Adventure.directive "treeTransforms", (treeSrv) ->
 			# Update the tree to get new bounds
 			$scope.render treeSrv.get()
 
+			$scope.$broadcast "tree.repositioned"
+
 		# Focus the selected node in the center of the window
 		$scope.$on "tree.nodeFocus", (evt) ->
 			# Adjust offsets to center the node in the window
@@ -962,7 +964,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			treeSrv.findAndReplace $scope.treeData, target.id, target
 			treeSrv.set $scope.treeData
 
-			$scope.toast "Node " + target.name + " has been reset."
+			$scope.toast "Destination " + target.name + " has been reset."
 
 			$scope.nodeTools.showResetWarning = false
 			$scope.nodeTools.show = false
@@ -1197,7 +1199,13 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					# Set the node selection mode so click events are handled differently than normal
 					$scope.existingNodeSelectionMode = true
 
-					$scope.toast "Select the point this answer should link to.", false
+					# Provide interactive toast to cancel the existing link selection mode
+					$scope.interactiveToast "Select the destination this answer should link to.", "Cancel", ->
+						$scope.existingNodeSelectionMode = false
+						$scope.newNodeManager.target = null
+						$scope.newNodeManager.answerId = null
+						$scope.displayNodeCreation = $scope.editedNode.type
+						$scope.showBackgroundCover = true
 
 					# All tasks are on hold until the user selects a node to link to
 					# Wait for the node to be selected
@@ -1529,7 +1537,7 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 
 				# Display the interactive toast that provides the Undo option
 				# Toast is displayed until clicked or until the node creation screen is closed
-				$scope.interactiveToast "Node " + $scope.integerToLetters(targetId) + " was deleted.", "Undo", ->
+				$scope.interactiveToast "Destination " + $scope.integerToLetters(targetId) + " was deleted.", "Undo", ->
 					$scope.restoreDeletedNode targetId
 			else
 				# Just remove it from answers array, no further action required
@@ -1613,7 +1621,7 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 		$scope.saveAndClose = ->
 			$scope.hideCoverAndModals()
 			# auto-hide set to false here because the timer in the displayNodeCreation $watch will handle it
-			$scope.toast "Node " + $scope.editedNode.name + " saved!", false
+			$scope.toast "Destination " + $scope.editedNode.name + " saved!", false
 
 # Directive for each short answer set. Contains logic for adding and removing individual answer matches.
 Adventure.directive "shortAnswerSet", (treeSrv) ->

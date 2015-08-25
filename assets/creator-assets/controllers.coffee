@@ -88,6 +88,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		errors: []
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
+
+		# Returning from a suspended node creation screen, don't do anything
+		if oldVal is "suspended" then return
+
 		if newVal isnt oldVal and newVal isnt "none" and newVal isnt "suspended"
 			$scope.editedNode = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 
@@ -108,9 +112,10 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			$scope.newNodeManager.target = null
 
 			# start a timer that makes toasts obsolete after 5 seconds
-			$timeout (() ->
-				$scope.hideToast()
-			), 5000
+			if $scope.showToast
+				$timeout (() ->
+					$scope.hideToast()
+				), 5000
 
 			console.log $scope.editedNode
 
