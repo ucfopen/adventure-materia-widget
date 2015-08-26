@@ -86,7 +86,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 				child.contents.push node
 				return success = true
 			else
-				success = findAndAdd tree.contents[i], parentId, node
+				success = findAndAdd tree.contents[i], parentId, node, success
 				i++
 
 		success
@@ -498,6 +498,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 	createTreeDataFromQset = (qset) ->
 
+		nodes = []
 		tree = {}
 
 		if qset.options.nodeCount then setNodeCount qset.options.nodeCount
@@ -553,10 +554,23 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 				node.answers.push nodeAnswer
 
-			# Logic to append node to its intended position on the tree
 			if node.parentId is -1 then tree = node
-			else
-				tree = findAndAdd tree, node.parentId, node
+			else nodes.push node
+
+		# Logic to append node to its intended position on the tree
+		i = nodes.length - 1 # using decrementing iterator
+		previousCount = 0 # used to check whether the node count has changed every time i is reset to the max value (prevents infinite loops)
+
+		while i >= 0
+			# findAndAdd returns true if the node was successfully added to the tree
+			if success = findAndAdd(tree, nodes[i].parentId, nodes[i]) then nodes.splice i, 1
+			i--
+
+			# If there are still nodes left, and i is -1, and the node array length has changed since the last reset, update i
+			# (Should never happen) but if previousCount matches, no new nodes are being pulled off the array & it'll recurse infinitely
+			if nodes.length and i < 0 and nodes.length isnt previousCount
+				i = nodes.length - 1
+				previousCount = nodes.length
 
 		tree
 
