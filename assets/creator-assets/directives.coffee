@@ -943,7 +943,11 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 			# Remove each answer target
 			angular.forEach target.answers, (answer, index) ->
-				treeSrv.findAndRemove $scope.treeData, answer.target
+				removed = treeSrv.findAndRemove $scope.treeData, answer.target
+
+				# Recurse through all deleted IDs & fix answer targets for each deleted node
+				for id in removed
+					treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 			# Remove all properties of the node except those whitelisted below
 			angular.forEach target, (val, key) ->
@@ -1234,7 +1238,11 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 								# Scrub the existing child node associated with this answer
 								childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
-								if childNode then treeSrv.findAndRemove $scope.treeData, childNode.id
+								if childNode
+									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
+									# Recurse through all deleted IDs & fix answer targets for each deleted node
+									for id in removed
+										treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 							## HANDLE PRIOR LINK MODE: SELF
 							if $scope.answers[i].linkMode is $scope.SELF
@@ -1288,7 +1296,11 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 						# Scrub the existing child node associated with this answer
 						childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
-						treeSrv.findAndRemove $scope.treeData, childNode.id
+						removed = treeSrv.findAndRemove $scope.treeData, childNode.id
+
+						# Recurse through all deleted IDs & fix answer targets for each deleted node
+						for id in removed
+							treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 					## HANDLE PRIOR LINK MODE: EXISTING
 					else if $scope.answers[i].linkMode is $scope.EXISTING
@@ -1359,7 +1371,7 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 # The actual node creation screen
 # Functions related to features unique to individual node types (Short answer sets, hotspots, etc) are relegated to their own directives
 # The ones here are "universal" and apply to all new nodes
-Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
+Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1466,7 +1478,9 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 				delete $scope.editedNode.pendingTarget
 
 				# manually redraw the tree, since the newly created node won't be updated otherwise
-				treeSrv.set $scope.treeData
+				# Have to call this in a $timeout to wait for $scope.answers' $watch cycle to complete
+				$timeout ->
+					treeSrv.set $scope.treeData
 			else
 				# We create the new node first, so we can grab the new node's generated id
 				targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
@@ -1533,7 +1547,11 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 				$scope.editedNode.deletedCache.push coldStorage
 
 				# Go ahead and actually remove the node
-				treeSrv.findAndRemove treeSrv.get(), targetId
+				removed = treeSrv.findAndRemove $scope.treeData, targetId
+
+				# Recurse through all deleted IDs & fix answer targets for each deleted node
+				for id in removed
+					treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 				# Display the interactive toast that provides the Undo option
 				# Toast is displayed until clicked or until the node creation screen is closed

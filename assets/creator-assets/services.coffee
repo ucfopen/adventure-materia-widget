@@ -166,21 +166,26 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 				if numExistingNodeLinks is 1 then delete tree.hasLinkToOther
 				if numExistingNodeLinks > 0 then return tree
 
-			# First, find reference to childId in list of parent's children
-			n = 0
-			while n < tree.contents.length
-
-				child = tree.contents[n]
+			# The link is a traditional one. Search parent's answers and update the right one
+			else
 
 				# If the tree doesn't have answers, it's assumed to be a blank node
 				# If we're adding a new child node underneath the blank, it should have a pending target
 				unless tree.answers
 					if tree.pendingTarget is childId then tree.pendingTarget = node.id
 
-				# Otherwise, business as usual
 				else
-					# Update the parent node's associated answer target with the new node ID
-					if tree.answers[n].target is childId then tree.answers[n].target = node.id
+					i = 0
+					while i < tree.answers.length
+						# Update the parent node's associated answer target with the new node ID
+						if tree.answers[i].target is childId and tree.answers[i].linkMode is "new" then tree.answers[i].target = node.id
+						i++
+
+			# First, find reference to childId in list of parent's children
+			n = 0
+			while n < tree.contents.length
+
+				child = tree.contents[n]
 
 				if child.id == childId # reference to childId found
 
@@ -235,6 +240,9 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 							break
 						else
 							j++
+
+				# If the parent of the deleted node is blank but still links to this node via pendingTarget, remove the flag
+				if parent.pendingTarget and parent.pendingTarget is id then delete parent.pendingTarget
 
 				parent.contents.splice i, 1
 				# Grab the array of IDs representing all deleted nodes (child + children of child)
@@ -498,7 +506,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 	createTreeDataFromQset = (qset) ->
 
-		nodes = []
+		orphans = []
 		tree = {}
 
 		if qset.options.nodeCount then setNodeCount qset.options.nodeCount
@@ -554,23 +562,26 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 				node.answers.push nodeAnswer
 
+			# Logic to append node to its intended position on the tree
 			if node.parentId is -1 then tree = node
-			else nodes.push node
+			else
+				# if a node isn't successfully added to the tree due to improper ordering, add it to the orphanage
+				unless findAndAdd(tree, node.parentId, node) then orphans.push node
 
-		# Logic to append node to its intended position on the tree
-		i = nodes.length - 1 # using decrementing iterator
-		previousCount = 0 # used to check whether the node count has changed every time i is reset to the max value (prevents infinite loops)
 
-		while i >= 0
-			# findAndAdd returns true if the node was successfully added to the tree
-			if success = findAndAdd(tree, nodes[i].parentId, nodes[i]) then nodes.splice i, 1
-			i--
+			# Now that all nodes that are in the "normal" arrangement are appended, work out appending all orphaned nodes
+			i = 0
+			previousCount = 0 # used to check whether the node count has changed every time i is reset to the max value (prevents infinite loops)
+
+			while i < orphans.length
+				if findAndAdd(tree, orphans[i].parentId, orphans[i]) then orphans.splice i, 1
+				i++
 
 			# If there are still nodes left, and i is -1, and the node array length has changed since the last reset, update i
 			# (Should never happen) but if previousCount matches, no new nodes are being pulled off the array & it'll recurse infinitely
-			if nodes.length and i < 0 and nodes.length isnt previousCount
-				i = nodes.length - 1
-				previousCount = nodes.length
+			if orphans.length and i >= orphans.length and orphans.length isnt previousCount
+				i = 0
+				previousCount = orphans.length
 
 		tree
 
