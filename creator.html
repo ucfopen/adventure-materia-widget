@@ -29,7 +29,7 @@
 		<script src="assets/creator-assets/controllers.js"></script>
 
 	</head>
-	<body ng-controller="AdventureCtrl">
+	<body ng-controller="AdventureCtrl" id="body">
 		<header class="title-header">
 			<div class="logo">
 			</div>
@@ -341,13 +341,16 @@
 				</ul>
 			</new-node-manager-dialog>
 			<node-creation class="node-creation-screen"
-				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT}"
+				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
 				<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
+				<button id="display-question-toggle"
+					ng-show="displayNodeCreation == HOTSPOT"
+					ng-click="showHotspotQuestion = !showHotspotQuestion">{{showHotspotQuestion ? "Hide Question" : "Show Question"}}</button>
 				<textarea class="question-box"
 					ng-class="{
 						'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
@@ -355,7 +358,9 @@
 						'align-top' : editedNode.media.align == 'top',
 						'align-bottom' : editedNode.media.align == 'bottom',
 						'shared' : (mediaReady && displayNodeCreation != HOTSPOT),
-						'align-right' : editedNode.media.align == 'left' }"
+						'align-right' : editedNode.media.align == 'left',
+						'hidden' : !showHotspotQuestion && displayNodeCreation == HOTSPOT,
+						'overlay-mode' : showHotspotQuestion && displayNodeCreation == HOTSPOT}"
 					ng-model="question"
 					placeholder="{{questionPlaceholder}}"></textarea>
 				<div class="media-box"
@@ -537,8 +542,6 @@
 						</svg>
 						<!-- SVG canvas upon which all hotspots are drawn -->
 						<svg id="hotspot-canvas"
-							width="698"
-							height="400"
 							ng-show="mediaReady"
 							ng-click="closeManager($event)">
 							<g ng-repeat="answer in answers"
@@ -649,7 +652,7 @@
 				<button class="save-button important-button"
 					ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 					type="button"
-					ng-click="saveAndClose()">Save</button>
+					ng-click="saveAndClose()">Done</button>
 			</node-creation>
 			<node-tooltips ng-show="hoveredNode.showTooltips">
 				<div class="tooltip"
