@@ -348,9 +348,6 @@
 				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
-				<button id="display-question-toggle"
-					ng-show="displayNodeCreation == HOTSPOT"
-					ng-click="showHotspotQuestion = !showHotspotQuestion">{{showHotspotQuestion ? "Hide Question" : "Show Question"}}</button>
 				<textarea class="question-box"
 					ng-class="{
 						'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
@@ -358,9 +355,7 @@
 						'align-top' : editedNode.media.align == 'top',
 						'align-bottom' : editedNode.media.align == 'bottom',
 						'shared' : (mediaReady && displayNodeCreation != HOTSPOT),
-						'align-right' : editedNode.media.align == 'left',
-						'hidden' : !showHotspotQuestion && displayNodeCreation == HOTSPOT,
-						'overlay-mode' : showHotspotQuestion && displayNodeCreation == HOTSPOT}"
+						'align-right' : editedNode.media.align == 'left'}"
 					ng-model="question"
 					placeholder="{{questionPlaceholder}}"></textarea>
 				<div class="media-box"
