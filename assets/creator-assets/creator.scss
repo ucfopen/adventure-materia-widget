@@ -1000,17 +1000,6 @@ node-creation-selection-dialog {
 			top: 10px;
 			width: $edit-popup-width + 15;
 			height: 535px;
-
-			button.save-button {
-				@media screen and (max-height: $edit-popup-standard-height + 69) {
-					position: relative;
-					bottom: 0px;
-					right: 0px;
-
-					margin-top: 10px;
-					margin-left: 670px;
-				}
-			}
 		}
 	}
 
@@ -1031,17 +1020,6 @@ node-creation-selection-dialog {
 
 		color: $white;
 		background: $color-accent;
-	}
-
-	#display-question-toggle {
-		position: absolute;
-		top: 49px;
-		left: 10px;
-		z-index: 150;
-
-		@media screen and (min-height: $edit-popup-standard-height + 70) {
-			display: none;
-		}
 	}
 
 	.question-box {
@@ -1102,23 +1080,20 @@ node-creation-selection-dialog {
 			height: 100px;
 			font-size: 1em;
 
-			&.hidden {
-				display: none;
-			}
+			transition: all 0.1s ease;
 
-			&.overlay-mode {
-				position: absolute;
-				top: 28px;
-				left: 15px;
-				z-index: 140;
+			&.tiny {
+				position: relative;
+				height: 22px;
+				font-size: 1em;
 
-				width: $edit-popup-standard-question-width - 8;
+				margin: 5px 20px 0px 20px;
 
-				padding: 10px 5px 5px 80px;
-				border: solid 1px $gray-lighter;
-				border-radius: 4px;
-
-				box-shadow: $shadow-small;
+				&:focus {
+					position: absolute;
+					z-index: 150;
+					height: 50px;
+				}
 			}
 		}
 	}
@@ -1388,6 +1363,11 @@ node-creation-selection-dialog {
 
 		&.lowered {
 			bottom: 10px;
+
+			@media screen and (max-height: $edit-popup-standard-height + 69) {
+				bottom: 16px;
+				right: 50px;
+			}
 		}
 	}
 
@@ -1451,6 +1431,11 @@ node-creation-selection-dialog {
 		position: relative;
 		display: block;
 		width: 100%;
+
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			position: absolute;
+			bottom: -2px;
+		}
 
 		.image-container {
 			position: relative;

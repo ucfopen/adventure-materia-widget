@@ -53,7 +53,7 @@ body {
 .header {
 	width:100%;
 	text-align:center;
-	background:#7299b5;
+	background:$blue;
 	padding:10px 0px;
 	color:#ffffff;
 }
@@ -201,7 +201,7 @@ h1 {
 			vertical-align: middle;
 
 			&:hover {
-				color: #7299b5;
+				color: $blue;
 			}
 
 			&:before {
@@ -254,14 +254,14 @@ h1 {
 	height:40px;
 	font-size:16px;
 	font-weight:bold;
-	background:#7299b5;
+	background:$blue;
 	border:solid 1px #d3d3d3;
 	border-radius:5px;
 	color:#ffffff;
 	cursor: pointer;
 
 	&:hover {
-		background:#86b7d9;
+		background: $blue-lighter;
 	}
 	&.left {
 		float: left;
