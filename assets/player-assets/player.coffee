@@ -358,6 +358,8 @@ Adventure.directive "labelManager", ($timeout) ->
 			if answer.text.length > 0 then $scope.hotspotLabelTarget.text = answer.text
 			else return false
 
+			container = document.getElementById "body"
+
 			svgBounds = angular.element($element)[0].getBoundingClientRect()
 
 			# Position the hotspot label just below the hotspot
@@ -366,11 +368,15 @@ Adventure.directive "labelManager", ($timeout) ->
 
 			# Need a timeout so the text is rendered within the label
 			# Once its rendered, we offset the X position by half the width so its centered
-			$timeout (() ->
+			# We also check to see if label is clipped by lower edge of iframe, if so move it so it's above the hotspot
+			$timeout ->
 				labelWidthOffset = hotspotLabelReference[0].getBoundingClientRect().width /2
 				$scope.hotspotLabelTarget.x -= labelWidthOffset
+
+				if hotspotLabelReference[0].getBoundingClientRect().bottom > container.offsetHeight
+					$scope.hotspotLabelTarget.y = (svgBounds.top + 5) - hotspotLabelReference[0].getBoundingClientRect().height - hotspotDivReference[0].getBoundingClientRect().top
+
 				$scope.hotspotLabelTarget.show = true
-			), 25
 
 		$scope.onHotspotHoverOut = (evt) ->
 			$scope.hotspotLabelTarget.show = false
