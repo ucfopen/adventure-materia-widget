@@ -1354,6 +1354,13 @@ node-creation-selection-dialog {
 		margin: 10px 0px 0px 20px;
 	}
 
+	div.random-select-container {
+		display: inline-block;
+		margin-left: 15px;
+
+		font-size: 0.8em;
+	}
+
 	button.save-button {
 		position: absolute;
 		bottom: 20px;

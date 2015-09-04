@@ -86,8 +86,6 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			$scope.question.image = image_url
 
-		console.log "question type is: " + $scope.question.type
-
 		switch q_data.options.type
 			when $scope.OVER then _end() # Creator doesn't pass a value like this back yet / technically this shouldn't be called - the end call is made is _handleAnswerSelection
 			when $scope.NARR, $scope.END then handleTransitional q_data
@@ -173,6 +171,15 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
+
+
+	# Filter function called by ng-repeat to order answers randomly (or not)
+	$scope.mcAnswerOrdering = (answer) ->
+		if $scope.q_data.options.randomize
+			return Math.random()
+		else
+			return $scope.answers.indexOf answer
+
 
 	handleHotspot = (q_data) ->
 		$scope.type = $scope.HOTSPOT

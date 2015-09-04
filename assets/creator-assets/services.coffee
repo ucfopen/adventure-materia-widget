@@ -459,6 +459,8 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					type: tree.media.type # right now just "image", will be expanded upon in the future
 
 			switch tree.type
+				when "mc"
+					itemData.options.randomize = tree.randomizeAnswers
 				when "hotspot"
 					itemData.options.visibility = tree.hotspotVisibility
 					if tree.legacyScaleMode then itemData.options.legacyScaleMode = true
@@ -530,6 +532,8 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					type: item.options.asset.type
 
 			switch item.options.type
+				when "mc"
+					if item.options.randomize then node.randomizeAnswers = item.options.randomize
 				when "hotspot"
 					node.hotspotVisibility = item.options.visibility
 					if item.options.legacyScaleMode then node.legacyScaleMode = true
