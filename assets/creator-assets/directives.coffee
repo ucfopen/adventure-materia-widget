@@ -1425,6 +1425,9 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 
 				else $scope.mediaReady = false
 
+				if $scope.editedNode.type is $scope.MC
+					unless $scope.editedNode.randomizeAnswers then $scope.editedNode.randomizeAnswers = false
+
 				if $scope.editedNode.type is $scope.HOTSPOT
 					unless $scope.editedNode.hotspotVisibility then $scope.editedNode.hotspotVisibility = "always"
 
