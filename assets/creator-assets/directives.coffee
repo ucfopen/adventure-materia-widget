@@ -903,6 +903,8 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 				# Now, grab the parent's node so we can update its associated answer to point to the updated node
 				parentNode = treeSrv.findNode copyTree, parentId
 
+				if parentNode.pendingTarget then parentNode.pendingTarget = copy.id
+
 				angular.forEach parentNode.answers, (answer, index) ->
 					if answer.target is copy.formerId
 						console.log "Located answer pointing to former id " + copy.formerId + ", updating to " + copy.id

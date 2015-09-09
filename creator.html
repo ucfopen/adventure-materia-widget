@@ -644,9 +644,8 @@
 					type="button"
 					ng-click="newAnswer()"
 					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
-				<div class="random-select-container">
+				<div class="random-select-container" ng-if="displayNodeCreation == MC">
 				<input type="checkbox"
-					ng-if="displayNodeCreation == MC"
 					ng-model="editedNode.randomizeAnswers"
 					value="true" /> Randomize Answers
 				</div>
