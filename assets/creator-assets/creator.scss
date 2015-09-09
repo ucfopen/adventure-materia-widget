@@ -547,14 +547,13 @@ debug-qset-loader, debug-qset-generator {
 }
 
 toast {
-	// position: absolute;
-	position: fixed;
+	position: absolute;
 	z-index: 90;
 
 	width: 600px;
 	min-height: 30px;
 
-	top: 660px;
+	bottom: 45px;
 	left: 50%;
 	margin-left: -300px;
 
@@ -568,10 +567,6 @@ toast {
 
 	background: $gray-darker;
 	box-shadow: $shadow-small;
-
-	@media screen and (max-height: $edit-popup-standard-height + 69) {
-		top: 520px;
-	}
 
 	button {
 		position: absolute;
