@@ -318,6 +318,30 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 		treeSrv.updateAllAnswerLinks $scope.treeData
 
+	# Restores an answer/node pair that's been deleted, formatted as a "cold storage" object
+	# target is the id of the node to be restored
+	# parent is a reference to the node that's storing the deleted node in its deletedCache array
+	$scope.restoreDeletedNode = (target, parent) ->
+
+		# Assume deletedCache exists on the editedNode - if not, something's wrong
+		unless parent.deletedCache then return
+
+		angular.forEach parent.deletedCache, (item, index) ->
+
+			if item.id is target
+				# Splice the answer and node back into their respective arrays at their previous index positions
+				parent.answers.splice item.answerIndex, 0, item.answer
+				parent.contents.splice item.nodeIndex, 0, item.node
+				parent.deletedCache.splice index, 1
+
+				# Update the tree to display the restored node
+				treeSrv.set $scope.treeData
+
+				# Refresh all answerLinks references as some have changed
+				treeSrv.updateAllAnswerLinks $scope.treeData
+
+				return
+
 	# Reference function so the integerToLetters function from treeSrv can be called using two-way data binding
 	$scope.integerToLetters = (val) ->
 		return treeSrv.integerToLetters(val)
