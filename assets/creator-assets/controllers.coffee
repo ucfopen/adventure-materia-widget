@@ -145,7 +145,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		$scope.displayNodeCreation = "none"
 
 	$scope.initNewWidget = (widget, baseUrl) ->
-		console.log "initNewWidget"
 		$scope.$apply ->
 			$scope.title = "My Adventure Widget"
 
@@ -292,10 +291,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	# Function that explicitly adds a node between an existing parent and child
 	$scope.addNodeInBetween = (data) ->
 
-		# console.log data
-		console.log "ADDING IN-BETWEEN NODE"
-		console.log data
-
 		newId = treeSrv.getNodeCount()
 		newName = treeSrv.integerToLetters newId
 
@@ -354,8 +349,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		unless $scope.editedNode
 			console.log "Uh oh, media import doesn't have a target node"
 			return
-
-		console.log media
 
 		$scope.editedNode.media =
 			type: "image"
