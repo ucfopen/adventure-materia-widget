@@ -3,7 +3,6 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 	# TreeData is being initialized in -two- places right now.
 	# This one may or may not be required.
-	# TODO: Find out if it's required.
 	treeData =
 		name: "Start"
 		type: "blank"

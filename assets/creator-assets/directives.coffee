@@ -907,7 +907,6 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 
 				angular.forEach parentNode.answers, (answer, index) ->
 					if answer.target is copy.formerId
-						console.log "Located answer pointing to former id " + copy.formerId + ", updating to " + copy.id
 						answer.target = copy.id
 						delete copy.formerId
 
@@ -1210,7 +1209,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					# Set updated linkMode flags
 					$scope.newNodeManager.linkMode = $scope.NEW
 					$scope.answers[i].linkMode = $scope.NEW
-					console.log "New mode selected: NEW"
 
 					# Create new node and update the answer's target
 					targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
@@ -1289,9 +1287,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 							treeSrv.set $scope.treeData
 
-							# $scope.newNodeManager.linkMode = $scope.EXISTING
-							console.log "New mode selected: EXISTING"
-
 							# Deregister the watch listener now that it's not needed
 							deregister()
 
@@ -1348,7 +1343,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					treeSrv.set $scope.treeData
 
 					$scope.newNodeManager.linkMode = $scope.SELF
-					console.log "New mode selected: SELF"
 
 					$scope.newNodeManager.target = null
 					$scope.newNodeManager.answerId = null
@@ -1406,8 +1400,6 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 
 		$scope.$on "editedNode.target.changed", (evt) ->
 
-			console.log "editedNode updated! Type is now: " + $scope.editedNode.type
-
 			if $scope.editedNode
 				# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
 				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
@@ -1438,12 +1430,10 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 							$scope.newAnswer()
 
 				if $scope.editedNode.media
-					# TODO add type check for media here
 					$scope.image = new Image()
 					$scope.image.src = $scope.editedNode.media.url
 					$scope.mediaReady = true
 					$scope.image.onload = ->
-						console.log "image upload via stored editedNode media data complete!"
 						# If the QSet is an old one, have to apply scaling to the hotspot only after the image is loaded
 						# This is due to the old hotspot coordinate system relying on the hotspot's original image dimensions
 						# Once the scaling is done, the flag is removed so the hotspot is "normal" from that point on
@@ -1493,9 +1483,14 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 				$scope.image = new Image()
 				$scope.image.src = $scope.editedNode.media.url
 				$scope.image.onload = ->
+
+					# Handle legacyScaleMode if it's a hotspot
+					if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
+						legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
+						delete $scope.editedNode.legacyScaleMode
+
 					$scope.$apply ->
 						$scope.mediaReady = true
-						console.log "image upload via media.updated broadcast complete!"
 
 		$scope.newAnswer = (text = null) ->
 
@@ -1737,26 +1732,7 @@ Adventure.directive "hotspotManager", (legacyQsetSrv) ->
 
 		$scope.visibilityManagerOpen = false
 
-		$scope.legacyScaleFactor = 1
-
-		# Listener for updating the hotspot node's image once it's ready
-		$scope.$on "editedNode.media.updated", (evt) ->
-
-			$scope.image = new Image()
-			$scope.image.src = $scope.editedNode.media.url
-			$scope.image.onload = ->
-				$scope.$apply ->
-					$scope.mediaReady = true
-					# If the QSet is an old one, have to apply scaling to the hotspot only after the image is loaded
-					# This is due to the old hotspot coordinate system relying on the hotspot's original image dimensions
-					# Once the scaling is done, the flag is removed so the hotspot is "normal" from that point on
-					if $scope.editedNode.legacyScaleMode
-						legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
-						delete $scope.editedNode.legacyScaleMode
-						$scope.$apply()
-
 		$scope.selectSVG = (evt) ->
-			# console.log "SELECTED"
 
 			# Update selectedSVG property with necessary event information
 			$scope.selectedSVG.selected = true
@@ -1882,7 +1858,6 @@ Adventure.directive "hotspotToolbar", () ->
 		# scaleYFactor: How much to scale SVG on the Y axis
 
 		$scope.startEllipticalHotspot = ->
-			console.log "Starting an elliptical hotspot!"
 			$scope.newAnswer()
 
 			answerIndex = $scope.answers.length - 1
@@ -1900,8 +1875,6 @@ Adventure.directive "hotspotToolbar", () ->
 				scaleYFactor: 0
 
 		$scope.startSquareHotspot = ->
-			console.log "Starting a square hotspot!"
-
 			$scope.newAnswer()
 
 			answerIndex = $scope.answers.length - 1
@@ -1922,7 +1895,6 @@ Adventure.directive "hotspotToolbar", () ->
 		# making a polygon is a little more complex, we don't actually create the new answer yet
 		# Instead, it activates the drawMode flag and enables the polygon drawing canvas
 		$scope.startPolygonHotspot = ->
-			console.log "Starting a polygonal hotspot!"
 			$scope.polygonDrawMode = true
 
 			$scope.toast "Click anywhere to start drawing a polygon."
@@ -2224,9 +2196,13 @@ Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv, $rootScope) ->
 		$scope.debugQset = ""
 
 		$scope.loadOldDebugQset = ->
-			console.log "OLD QSET DETECTED, ATTEMPTING CONVERSION"
-			$scope.debugQset = JSON.parse $scope.debugQset
-			$scope.debugQset = legacyQsetSrv.convertOldQset $scope.debugQset
+			try
+				$scope.debugQset = JSON.parse $scope.debugQset
+				$scope.debugQset = legacyQsetSrv.convertOldQset $scope.debugQset
+			catch err
+				alert "Uh oh! There was a problem loading this widget."
+				$scope.showQsetLoader = false
+				return
 
 			$scope.loadDebugQset()
 
@@ -2237,7 +2213,7 @@ Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv, $rootScope) ->
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 				console.log $scope.treeData
 			catch err
-				console.log err
+				alert "Uh oh! There was a problem loading this widget."
 				$scope.showQsetLoader = false
 				return
 
