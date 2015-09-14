@@ -114,7 +114,7 @@ return [
 					if ($r['type'] == 'SCORE_QUESTION_ANSWERED')
 					{
 						// If the question id is in the question array for the current csv.
-						if (array_search($r['item_id'], $cur_csv['questions']) != FALSE)
+						if (array_search($r['item_id'], $cur_csv['questions']) !== FALSE)
 						{
 							$position = array_search($r['item_id'], $cur_csv['questions']);
 							$logs[5 + $position] = $r['text'];
