@@ -231,9 +231,6 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		if $scope.selectedAnswer isnt null # TODO is this check required??
 			Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer
 
-		# # if answer_index is -1 then answer_text = "N/A" else answer_text = question.answers[answer_index].text
-		# answer_text = null if answer_text == "[No Answer]"
-
 	_end = ->
 		Materia.Engine.end yes
 

@@ -16,6 +16,7 @@ Adventure.directive "toast", ($timeout) ->
 		$scope.toast = (message, autoCancel = true) ->
 			$scope.toastMessage = message
 			$scope.showToast = true
+			$scope.showToastActionButton = false
 
 			if autoCancel
 				$timeout (() ->
