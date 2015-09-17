@@ -572,13 +572,13 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 				unless findAndAdd(tree, node.parentId, node) then orphans.push node
 
 
-			# Now that all nodes that are in the "normal" arrangement are appended, work out appending all orphaned nodes
-			i = 0
-			previousCount = 0 # used to check whether the node count has changed every time i is reset to the max value (prevents infinite loops)
+		# Now that all nodes that are in the "normal" arrangement are appended, work out appending all orphaned nodes
+		i = 0
+		previousCount = 0 # used to check whether the node count has changed every time i is reset to the max value (prevents infinite loops)
 
-			while i < orphans.length
-				if findAndAdd(tree, orphans[i].parentId, orphans[i]) then orphans.splice i, 1
-				i++
+		while i < orphans.length
+			if findAndAdd(tree, orphans[i].parentId, orphans[i]) then orphans.splice i, 1
+			i++
 
 			# If there are still nodes left, and i is -1, and the node array length has changed since the last reset, update i
 			# (Should never happen) but if previousCount matches, no new nodes are being pulled off the array & it'll recurse infinitely
