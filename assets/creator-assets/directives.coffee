@@ -1480,7 +1480,6 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
 		$scope.$on "editedNode.media.updated", (evt) ->
-			if $scope.editedNode.type isnt $scope.HOTSPOT
 				$scope.image = new Image()
 				$scope.image.src = $scope.editedNode.media.url
 				$scope.image.onload = ->

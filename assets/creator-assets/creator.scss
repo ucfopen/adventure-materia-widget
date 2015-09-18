@@ -1477,6 +1477,8 @@ node-creation-selection-dialog {
 				width: 698px;
 				height: 400px;
 
+				@include user-select-none();
+
 
 				ellipse, rect, polygon {
 					cursor: pointer;
