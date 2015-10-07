@@ -16,6 +16,7 @@ Adventure.directive "toast", ($timeout) ->
 		$scope.toast = (message, autoCancel = true) ->
 			$scope.toastMessage = message
 			$scope.showToast = true
+			$scope.showToastActionButton = false
 
 			if autoCancel
 				$timeout (() ->
@@ -538,6 +539,8 @@ Adventure.directive "treeTransforms", (treeSrv) ->
 		# flag for whether or not dragging is allowed (when tree extends beyond window in any direction)
 		$scope.dragFlag = false
 
+		hasMoved = false # flag for whether the tree actually moved after a selectTree/moveTree/deselectTree event cycle
+
 		originX = 0
 		originY = 0
 
@@ -608,11 +611,16 @@ Adventure.directive "treeTransforms", (treeSrv) ->
 
 				$scope.transformTree()
 
+				hasMoved = true
+
 				return false
 
 		# Mouseup behavior to turn off dragging
 		$scope.deselectTree = (evt) ->
 			$scope.offset.moving = false
+			if hasMoved
+				$scope.$broadcast "tree.repositioned"
+				hasMoved = false
 
 		# updates the matrix transform with new offset (translation) values & scale values
 		# translation combines the X/Y offsets from panning and adjustments made to center the SVG when scaled
@@ -637,6 +645,8 @@ Adventure.directive "treeTransforms", (treeSrv) ->
 			$scope.transformTree()
 			# Update the tree to get new bounds
 			$scope.render treeSrv.get()
+
+			$scope.$broadcast "tree.repositioned"
 
 		# Focus the selected node in the center of the window
 		$scope.$on "tree.nodeFocus", (evt) ->
@@ -713,7 +723,7 @@ Adventure.directive "nodeTooltips", (treeSrv) ->
 
 
 # Directive for the node modal dialog (edit the node, copy the node, reset the node, etc)
-Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
+Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -730,17 +740,51 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 		# When target for the dialog changes, update the position values based on where the new node is
 		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
+			updatePosition()
 
-			# Ensure the nodeTools dialog is positioned properly
+			# Reset the visibility of the warning flag
+			$scope.nodeTools.showResetWarning = false
+			$scope.nodeTools.showDeleteWarning = false
+			$scope.nodeTools.showConvertDialog = false
+
+		# update positioning whenever a dialog state changes
+		$scope.$watch "nodeTools.showResetWarning", (newVal, oldVal) ->
+				$scope.nodeTools.showDeleteWarning = false
+				$scope.nodeTools.showConvertDialog = false
+				updatePosition()
+
+		$scope.$watch "nodeTools.showDeleteWarning", (newVal, oldVal) ->
+				$scope.nodeTools.showResetWarning = false
+				$scope.nodeTools.showConvertDialog = false
+				updatePosition()
+
+		$scope.$watch "nodeTools.showConvertDialog", (newVal, oldVal) ->
+				$scope.nodeTools.showResetWarning = false
+				$scope.nodeTools.showDeleteWarning = false
+				updatePosition()
+
+		# nodeTools is repositioned fairly often due to changes in size (confirm/warning dialogs) & node repositioning
+		# note that the values here are static; I suspect there's an easier way of approaching the positioning logic,
+		# especially for repositioning due to resizing events
+		updatePosition = ->
 			# Crazy math is due to ensuring the dialog continues to position properly after panning and/or zooming the tree
 			xOffset = ($scope.nodeTools.x * $scope.treeOffset.scale) + $scope.treeOffset.x + $scope.treeOffset.scaleXOffset
 			yOffset = ($scope.nodeTools.y * $scope.treeOffset.scale) + $scope.treeOffset.y + $scope.treeOffset.scaleYOffset
 
+			# Can't rely on computed height of the element at the time this is called, so we have to set bounding box manually
 			xBound = xOffset + 200
 			yBound = yOffset + 127
 
+			# Adjust expected height of the bounds based on which dialog is open
+			if $scope.nodeTools.type isnt $scope.BLANK then yBound += 23
+
+			if $scope.nodeTools.showResetWarning then yBound += 128
+			else if $scope.nodeTools.showDeleteWarning then yBound += 143
+			else if $scope.nodeTools.showConvertDialog then yBound += 141
+
 			container = document.getElementById("tree-svg")
 
+			# Check for overflow
 			if yBound > container.offsetHeight
 				diffY = yBound - container.offsetHeight + 35
 				yOffset -= diffY
@@ -752,8 +796,9 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 			$attrs.$set "style", styles
 
-			# Reset the visibility of the warning flag
-			$scope.nodeTools.showResetWarning = false
+		# update nodeTools after tree reposition events
+		$scope.$on "tree.repositioned", (evt) ->
+			updatePosition()
 
 		$scope.copyNode = () ->
 
@@ -859,9 +904,10 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 				# Now, grab the parent's node so we can update its associated answer to point to the updated node
 				parentNode = treeSrv.findNode copyTree, parentId
 
+				if parentNode.pendingTarget then parentNode.pendingTarget = copy.id
+
 				angular.forEach parentNode.answers, (answer, index) ->
 					if answer.target is copy.formerId
-						console.log "Located answer pointing to former id " + copy.formerId + ", updating to " + copy.id
 						answer.target = copy.id
 						delete copy.formerId
 
@@ -899,7 +945,11 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 			# Remove each answer target
 			angular.forEach target.answers, (answer, index) ->
-				treeSrv.findAndRemove $scope.treeData, answer.target
+				removed = treeSrv.findAndRemove $scope.treeData, answer.target
+
+				# Recurse through all deleted IDs & fix answer targets for each deleted node
+				for id in removed
+					treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 			# Remove all properties of the node except those whitelisted below
 			angular.forEach target, (val, key) ->
@@ -920,7 +970,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 			treeSrv.findAndReplace $scope.treeData, target.id, target
 			treeSrv.set $scope.treeData
 
-			$scope.toast "Node " + target.name + " has been reset."
+			$scope.toast "Destination " + target.name + " has been reset."
 
 			$scope.nodeTools.showResetWarning = false
 			$scope.nodeTools.show = false
@@ -928,36 +978,66 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope) ->
 
 		# Delete the node, and the associated parent's answer
 		# Don't delete the node if it's a) a child of a narrative node or b) the associated node of a short answer's unmatched responses
+		# Stores the deleted node as a coldStorage object in case the user wants to undo the action
 		$scope.deleteNode = () ->
 
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 			parent = treeSrv.findNode $scope.treeData, target.parentId
 			targetAnswerIndex = null
+			targetIndexInParent = null
 
+			# Don't delete if it's a child of a narrative node
 			if parent.type is $scope.NARR
 				$scope.toast "Can't delete Destination " + target.name + "! Try linking " + parent.name + " to an existing destination instead."
 				$scope.nodeTools.showDeleteWarning = false
 				return
 
+			# Find reference to node in parent's answers
 			angular.forEach parent.answers, (answer, index) ->
 				if answer.target is target.id and answer.linkMode is $scope.NEW
 					targetAnswerIndex = index
 
 			if targetAnswerIndex isnt null
 
+				# Don't delete if it's referenced from an [Unmatched Response] answer of a short answer question.
 				if parent.answers[targetAnswerIndex].isDefault and parent.type is $scope.SHORTANS
 					$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
 					$scope.nodeTools.showDeleteWarning = false
 					return
 
-			treeSrv.findAndRemove $scope.treeData, target.id
+			# Prep node as a coldStorage object
+			coldStorage =
+				id: target.id
+				answerIndex: targetAnswerIndex
+				answer: parent.answers[targetAnswerIndex]
+				node: target
+				nodeIndex: parent.contents.indexOf target # node index may differ from answer index due to answers with non-traditional links
 
-			treeSrv.findAndFixAnswerTargets $scope.treeData, target.id
+			# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
+			unless parent.deletedCache then parent.deletedCache = []
+			parent.deletedCache.push coldStorage
+
+			# Remove the node & grab array of IDs representing deleted node & its children
+			removed = treeSrv.findAndRemove $scope.treeData, target.id
+
+			# Recurse through all deleted IDs & fix answer targets for each deleted node
+			for id in removed
+				treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 			treeSrv.set $scope.treeData
 
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
+
+			# Display the interactive toast that provides the Undo option
+			# Toast is displayed until clicked or until the node creation screen is closed
+			$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " was deleted.", "Undo", ->
+				$scope.restoreDeletedNode target.id, parent
+
+			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
+			$timeout (() ->
+				$scope.hideToast()
+			), 8000
 
 			$scope.nodeTools.showDeleteWarning = false
 			$scope.nodeTools.show = false
@@ -1098,7 +1178,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 				else i++
 
 			# Compare the prior link mode to the new one and deal with the changes
-			# if mode != $scope.newNodeManager.linkMode
 			switch mode
 				when "new"
 
@@ -1131,7 +1210,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					# Set updated linkMode flags
 					$scope.newNodeManager.linkMode = $scope.NEW
 					$scope.answers[i].linkMode = $scope.NEW
-					console.log "New mode selected: NEW"
 
 					# Create new node and update the answer's target
 					targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
@@ -1153,7 +1231,13 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					# Set the node selection mode so click events are handled differently than normal
 					$scope.existingNodeSelectionMode = true
 
-					$scope.toast "Select the point this answer should link to.", false
+					# Provide interactive toast to cancel the existing link selection mode
+					$scope.interactiveToast "Select the destination this answer should link to.", "Cancel", ->
+						$scope.existingNodeSelectionMode = false
+						$scope.newNodeManager.target = null
+						$scope.newNodeManager.answerId = null
+						$scope.displayNodeCreation = $scope.editedNode.type
+						$scope.showBackgroundCover = true
 
 					# All tasks are on hold until the user selects a node to link to
 					# Wait for the node to be selected
@@ -1168,6 +1252,12 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 								deregister()
 								return $scope.selectLinkMode $scope.SELF
 
+							# Slap the user on the hand if they try to link to the same node
+							if newVal.id is $scope.answers[i].target
+								$scope.toast "That's already the target destination for this answer!"
+								$scope.existingNodeSelectionMode = true
+								return
+
 							# Set the answer's new target to the newly selected node
 							$scope.answers[i].target = newVal.id
 
@@ -1176,7 +1266,11 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 								# Scrub the existing child node associated with this answer
 								childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
-								if childNode then treeSrv.findAndRemove $scope.treeData, childNode.id
+								if childNode
+									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
+									# Recurse through all deleted IDs & fix answer targets for each deleted node
+									for id in removed
+										treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 							## HANDLE PRIOR LINK MODE: SELF
 							if $scope.answers[i].linkMode is $scope.SELF
@@ -1193,9 +1287,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 							$scope.answers[i].linkMode = $scope.EXISTING
 
 							treeSrv.set $scope.treeData
-
-							# $scope.newNodeManager.linkMode = $scope.EXISTING
-							console.log "New mode selected: EXISTING"
 
 							# Deregister the watch listener now that it's not needed
 							deregister()
@@ -1230,7 +1321,11 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 						# Scrub the existing child node associated with this answer
 						childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
-						treeSrv.findAndRemove $scope.treeData, childNode.id
+						removed = treeSrv.findAndRemove $scope.treeData, childNode.id
+
+						# Recurse through all deleted IDs & fix answer targets for each deleted node
+						for id in removed
+							treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 					## HANDLE PRIOR LINK MODE: EXISTING
 					else if $scope.answers[i].linkMode is $scope.EXISTING
@@ -1249,7 +1344,6 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					treeSrv.set $scope.treeData
 
 					$scope.newNodeManager.linkMode = $scope.SELF
-					console.log "New mode selected: SELF"
 
 					$scope.newNodeManager.target = null
 					$scope.newNodeManager.answerId = null
@@ -1301,13 +1395,11 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 # The actual node creation screen
 # Functions related to features unique to individual node types (Short answer sets, hotspots, etc) are relegated to their own directives
 # The ones here are "universal" and apply to all new nodes
-Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
+Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
 		$scope.$on "editedNode.target.changed", (evt) ->
-
-			console.log "editedNode updated! Type is now: " + $scope.editedNode.type
 
 			if $scope.editedNode
 				# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
@@ -1339,12 +1431,10 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 							$scope.newAnswer()
 
 				if $scope.editedNode.media
-					# TODO add type check for media here
 					$scope.image = new Image()
 					$scope.image.src = $scope.editedNode.media.url
 					$scope.mediaReady = true
 					$scope.image.onload = ->
-						console.log "image upload via stored editedNode media data complete!"
 						# If the QSet is an old one, have to apply scaling to the hotspot only after the image is loaded
 						# This is due to the old hotspot coordinate system relying on the hotspot's original image dimensions
 						# Once the scaling is done, the flag is removed so the hotspot is "normal" from that point on
@@ -1354,6 +1444,9 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 							$scope.$apply()
 
 				else $scope.mediaReady = false
+
+				if $scope.editedNode.type is $scope.MC
+					unless $scope.editedNode.randomizeAnswers then $scope.editedNode.randomizeAnswers = false
 
 				if $scope.editedNode.type is $scope.HOTSPOT
 					unless $scope.editedNode.hotspotVisibility then $scope.editedNode.hotspotVisibility = "always"
@@ -1387,13 +1480,17 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
 		$scope.$on "editedNode.media.updated", (evt) ->
-			if $scope.editedNode.type isnt $scope.HOTSPOT
 				$scope.image = new Image()
 				$scope.image.src = $scope.editedNode.media.url
 				$scope.image.onload = ->
+
+					# Handle legacyScaleMode if it's a hotspot
+					if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
+						legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
+						delete $scope.editedNode.legacyScaleMode
+
 					$scope.$apply ->
 						$scope.mediaReady = true
-						console.log "image upload via media.updated broadcast complete!"
 
 		$scope.newAnswer = (text = null) ->
 
@@ -1408,7 +1505,9 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 				delete $scope.editedNode.pendingTarget
 
 				# manually redraw the tree, since the newly created node won't be updated otherwise
-				treeSrv.set $scope.treeData
+				# Have to call this in a $timeout to wait for $scope.answers' $watch cycle to complete
+				$timeout ->
+					treeSrv.set $scope.treeData
 			else
 				# We create the new node first, so we can grab the new node's generated id
 				targetId = $scope.addNode $scope.editedNode.id, $scope.BLANK
@@ -1475,12 +1574,16 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 				$scope.editedNode.deletedCache.push coldStorage
 
 				# Go ahead and actually remove the node
-				treeSrv.findAndRemove treeSrv.get(), targetId
+				removed = treeSrv.findAndRemove $scope.treeData, targetId
+
+				# Recurse through all deleted IDs & fix answer targets for each deleted node
+				for id in removed
+					treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 				# Display the interactive toast that provides the Undo option
 				# Toast is displayed until clicked or until the node creation screen is closed
-				$scope.interactiveToast "Node " + $scope.integerToLetters(targetId) + " was deleted.", "Undo", ->
-					$scope.restoreDeletedNode targetId
+				$scope.interactiveToast "Destination " + $scope.integerToLetters(targetId) + " was deleted.", "Undo", ->
+					$scope.restoreDeletedNode targetId, $scope.editedNode
 			else
 				# Just remove it from answers array, no further action required
 				$scope.answers.splice index, 1
@@ -1501,28 +1604,6 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
-
-		# Restores an answer/node pair that's been deleted, formatted as a "cold storage" object
-		# The anwer/node pair must be a child of the current editedNode
-		$scope.restoreDeletedNode = (target) ->
-
-			# Assume deletedCache exists on the editedNode - if not, something's wrong
-			unless $scope.editedNode.deletedCache then return
-
-			angular.forEach $scope.editedNode.deletedCache, (item, index) ->
-
-				if item.id is target
-					# Splice the answer and node back into their respective arrays at their previous index positions
-					$scope.answers.splice item.answerIndex, 0, item.answer
-					$scope.editedNode.contents.splice item.nodeIndex, 0, item.node
-					$scope.editedNode.deletedCache.splice index, 1
-
-					# Update the tree to display the restored node
-					treeSrv.set $scope.treeData
-
-					# Refresh all answerLinks references as some have changed
-					treeSrv.updateAllAnswerLinks $scope.treeData
-					return
 
 
 		$scope.manageNewNode = ($event, target, id, mode) ->
@@ -1563,7 +1644,7 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope) ->
 		$scope.saveAndClose = ->
 			$scope.hideCoverAndModals()
 			# auto-hide set to false here because the timer in the displayNodeCreation $watch will handle it
-			$scope.toast "Node " + $scope.editedNode.name + " saved!", false
+			$scope.toast "Destination " + $scope.editedNode.name + " saved!", false
 
 # Directive for each short answer set. Contains logic for adding and removing individual answer matches.
 Adventure.directive "shortAnswerSet", (treeSrv) ->
@@ -1651,26 +1732,7 @@ Adventure.directive "hotspotManager", (legacyQsetSrv) ->
 
 		$scope.visibilityManagerOpen = false
 
-		$scope.legacyScaleFactor = 1
-
-		# Listener for updating the hotspot node's image once it's ready
-		$scope.$on "editedNode.media.updated", (evt) ->
-
-			$scope.image = new Image()
-			$scope.image.src = $scope.editedNode.media.url
-			$scope.image.onload = ->
-				$scope.$apply ->
-					$scope.mediaReady = true
-					# If the QSet is an old one, have to apply scaling to the hotspot only after the image is loaded
-					# This is due to the old hotspot coordinate system relying on the hotspot's original image dimensions
-					# Once the scaling is done, the flag is removed so the hotspot is "normal" from that point on
-					if $scope.editedNode.legacyScaleMode
-						legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
-						delete $scope.editedNode.legacyScaleMode
-						$scope.$apply()
-
 		$scope.selectSVG = (evt) ->
-			# console.log "SELECTED"
 
 			# Update selectedSVG property with necessary event information
 			$scope.selectedSVG.selected = true
@@ -1796,7 +1858,6 @@ Adventure.directive "hotspotToolbar", () ->
 		# scaleYFactor: How much to scale SVG on the Y axis
 
 		$scope.startEllipticalHotspot = ->
-			console.log "Starting an elliptical hotspot!"
 			$scope.newAnswer()
 
 			answerIndex = $scope.answers.length - 1
@@ -1814,8 +1875,6 @@ Adventure.directive "hotspotToolbar", () ->
 				scaleYFactor: 0
 
 		$scope.startSquareHotspot = ->
-			console.log "Starting a square hotspot!"
-
 			$scope.newAnswer()
 
 			answerIndex = $scope.answers.length - 1
@@ -1836,7 +1895,6 @@ Adventure.directive "hotspotToolbar", () ->
 		# making a polygon is a little more complex, we don't actually create the new answer yet
 		# Instead, it activates the drawMode flag and enables the polygon drawing canvas
 		$scope.startPolygonHotspot = ->
-			console.log "Starting a polygonal hotspot!"
 			$scope.polygonDrawMode = true
 
 			$scope.toast "Click anywhere to start drawing a polygon."
@@ -2138,9 +2196,13 @@ Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv, $rootScope) ->
 		$scope.debugQset = ""
 
 		$scope.loadOldDebugQset = ->
-			console.log "OLD QSET DETECTED, ATTEMPTING CONVERSION"
-			$scope.debugQset = JSON.parse $scope.debugQset
-			$scope.debugQset = legacyQsetSrv.convertOldQset $scope.debugQset
+			try
+				$scope.debugQset = JSON.parse $scope.debugQset
+				$scope.debugQset = legacyQsetSrv.convertOldQset $scope.debugQset
+			catch err
+				alert "Uh oh! There was a problem loading this widget."
+				$scope.showQsetLoader = false
+				return
 
 			$scope.loadDebugQset()
 
@@ -2151,7 +2213,7 @@ Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv, $rootScope) ->
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 				console.log $scope.treeData
 			catch err
-				console.log err
+				alert "Uh oh! There was a problem loading this widget."
 				$scope.showQsetLoader = false
 				return
 

@@ -86,8 +86,6 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 			$scope.question.image = image_url
 
-		console.log "question type is: " + $scope.question.type
-
 		switch q_data.options.type
 			when $scope.OVER then _end() # Creator doesn't pass a value like this back yet / technically this shouldn't be called - the end call is made is _handleAnswerSelection
 			when $scope.NARR, $scope.END then handleTransitional q_data
@@ -174,6 +172,15 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
 
+
+	# Filter function called by ng-repeat to order answers randomly (or not)
+	$scope.mcAnswerOrdering = (answer) ->
+		if $scope.q_data.options.randomize
+			return Math.random()
+		else
+			return $scope.answers.indexOf answer
+
+
 	handleHotspot = (q_data) ->
 		$scope.type = $scope.HOTSPOT
 		$scope.question.layout = 1
@@ -223,9 +230,6 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 
 		if $scope.selectedAnswer isnt null # TODO is this check required??
 			Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer
-
-		# # if answer_index is -1 then answer_text = "N/A" else answer_text = question.answers[answer_index].text
-		# answer_text = null if answer_text == "[No Answer]"
 
 	_end = ->
 		Materia.Engine.end yes
@@ -358,6 +362,8 @@ Adventure.directive "labelManager", ($timeout) ->
 			if answer.text.length > 0 then $scope.hotspotLabelTarget.text = answer.text
 			else return false
 
+			container = document.getElementById "body"
+
 			svgBounds = angular.element($element)[0].getBoundingClientRect()
 
 			# Position the hotspot label just below the hotspot
@@ -366,11 +372,15 @@ Adventure.directive "labelManager", ($timeout) ->
 
 			# Need a timeout so the text is rendered within the label
 			# Once its rendered, we offset the X position by half the width so its centered
-			$timeout (() ->
+			# We also check to see if label is clipped by lower edge of iframe, if so move it so it's above the hotspot
+			$timeout ->
 				labelWidthOffset = hotspotLabelReference[0].getBoundingClientRect().width /2
 				$scope.hotspotLabelTarget.x -= labelWidthOffset
+
+				if hotspotLabelReference[0].getBoundingClientRect().bottom > container.offsetHeight
+					$scope.hotspotLabelTarget.y = (svgBounds.top + 5) - hotspotLabelReference[0].getBoundingClientRect().height - hotspotDivReference[0].getBoundingClientRect().top
+
 				$scope.hotspotLabelTarget.show = true
-			), 25
 
 		$scope.onHotspotHoverOut = (evt) ->
 			$scope.hotspotLabelTarget.show = false

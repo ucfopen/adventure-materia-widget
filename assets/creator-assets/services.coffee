@@ -3,7 +3,6 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 	# TreeData is being initialized in -two- places right now.
 	# This one may or may not be required.
-	# TODO: Find out if it's required.
 	treeData =
 		name: "Start"
 		type: "blank"
@@ -68,13 +67,13 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 	# tree: the tree structure to be iterated. Should initially reference the root node (treeData object)
 	# parentId: the ID of the node to append the new node to
 	# node: the data of the new node
-	findAndAdd = (tree, parentId, node) ->
+	findAndAdd = (tree, parentId, node, success=false) ->
 
 		if tree.id == parentId
 			tree.contents.push node
-			return tree
+			return success = true
 
-		if !tree.contents then return
+		if !tree.contents then return success
 
 		i = 0
 
@@ -84,12 +83,12 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 			if child.id == parentId
 				child.contents.push node
-				return tree
+				return success = true
 			else
-				findAndAdd tree.contents[i], parentId, node
+				success = findAndAdd tree.contents[i], parentId, node, success
 				i++
 
-		tree
+		success
 
 	# Recursive function for replacing a given node on a tree with another node
 	# tree: the tree structure to be iterated. Should initially reference the root node
@@ -166,21 +165,26 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 				if numExistingNodeLinks is 1 then delete tree.hasLinkToOther
 				if numExistingNodeLinks > 0 then return tree
 
-			# First, find reference to childId in list of parent's children
-			n = 0
-			while n < tree.contents.length
-
-				child = tree.contents[n]
+			# The link is a traditional one. Search parent's answers and update the right one
+			else
 
 				# If the tree doesn't have answers, it's assumed to be a blank node
 				# If we're adding a new child node underneath the blank, it should have a pending target
 				unless tree.answers
 					if tree.pendingTarget is childId then tree.pendingTarget = node.id
 
-				# Otherwise, business as usual
 				else
-					# Update the parent node's associated answer target with the new node ID
-					if tree.answers[n].target is childId then tree.answers[n].target = node.id
+					i = 0
+					while i < tree.answers.length
+						# Update the parent node's associated answer target with the new node ID
+						if tree.answers[i].target is childId and tree.answers[i].linkMode is "new" then tree.answers[i].target = node.id
+						i++
+
+			# First, find reference to childId in list of parent's children
+			n = 0
+			while n < tree.contents.length
+
+				child = tree.contents[n]
 
 				if child.id == childId # reference to childId found
 
@@ -211,9 +215,10 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 	# Recursive function for finding a node and removing it
 	# parent: the tree structure to be iterated. Should initially reference the root node (treeData object)
 	# id: the id the node to be removed
-	findAndRemove = (parent, id) ->
+	# Returns an array of IDs for all nodes deleted (the target node and all of its children)
+	findAndRemove = (parent, id, removed = null) ->
 
-		if !parent.contents then return
+		if !parent.contents then return removed
 
 		# iterator required instead of using angular.forEach
 		i = 0
@@ -235,12 +240,33 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 						else
 							j++
 
+				# If the parent of the deleted node is blank but still links to this node via pendingTarget, remove the flag
+				if parent.pendingTarget and parent.pendingTarget is id then delete parent.pendingTarget
+
 				parent.contents.splice i, 1
+				# Grab the array of IDs representing all deleted nodes (child + children of child)
+				removed = getIdsFromSubtree child
 			else
-				findAndRemove parent.contents[i], id
+				removed = findAndRemove parent.contents[i], id, removed
 				i++
 
-		parent
+		return removed
+
+	# Returns an array of IDs representing all nodes in a given tree
+	getIdsFromSubtree = (tree, ids = []) ->
+
+		ids.push tree.id
+
+		if !tree.contents then return ids
+
+		i = 0
+
+		while i < tree.contents.length
+
+			ids = getIdsFromSubtree tree.contents[i], ids
+			i++
+
+		ids
 
 	# This is a really circumstantial one that searches through answers in a tree that point to a given target
 	# If it finds an answer with that target, it resets the answer to a newly created node
@@ -432,6 +458,8 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					type: tree.media.type # right now just "image", will be expanded upon in the future
 
 			switch tree.type
+				when "mc"
+					itemData.options.randomize = tree.randomizeAnswers
 				when "hotspot"
 					itemData.options.visibility = tree.hotspotVisibility
 					if tree.legacyScaleMode then itemData.options.legacyScaleMode = true
@@ -479,6 +507,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 
 	createTreeDataFromQset = (qset) ->
 
+		orphans = []
 		tree = {}
 
 		if qset.options.nodeCount then setNodeCount qset.options.nodeCount
@@ -502,6 +531,8 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					type: item.options.asset.type
 
 			switch item.options.type
+				when "mc"
+					if item.options.randomize then node.randomizeAnswers = item.options.randomize
 				when "hotspot"
 					node.hotspotVisibility = item.options.visibility
 					if item.options.legacyScaleMode then node.legacyScaleMode = true
@@ -537,7 +568,23 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 			# Logic to append node to its intended position on the tree
 			if node.parentId is -1 then tree = node
 			else
-				tree = findAndAdd tree, node.parentId, node
+				# if a node isn't successfully added to the tree due to improper ordering, add it to the orphanage
+				unless findAndAdd(tree, node.parentId, node) then orphans.push node
+
+
+		# Now that all nodes that are in the "normal" arrangement are appended, work out appending all orphaned nodes
+		i = 0
+		previousCount = 0 # used to check whether the node count has changed every time i is reset to the max value (prevents infinite loops)
+
+		while i < orphans.length
+			if findAndAdd(tree, orphans[i].parentId, orphans[i]) then orphans.splice i, 1
+			i++
+
+			# If there are still nodes left, and i is -1, and the node array length has changed since the last reset, update i
+			# (Should never happen) but if previousCount matches, no new nodes are being pulled off the array & it'll recurse infinitely
+			if orphans.length and i >= orphans.length and orphans.length isnt previousCount
+				i = 0
+				previousCount = orphans.length
 
 		tree
 

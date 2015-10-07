@@ -44,8 +44,12 @@ $edit-popup-standard-question-width: 600px;
 
 $edit-popup-content-width-half: 340px;
 
-
 $misc-popup-width: 600px;
+
+$edit-popup-less-height: 600px;
+$edit-popup-standard-height: 620px;
+// $edit-popup-extra-height: 620px;
+// $edit-popup-less-height: 570px;
 
 html, body {
 	height: 100%;
@@ -138,14 +142,12 @@ header.title-header {
 	width: 100%;
 	@include calc(height, "100% - 70px");
 	min-width: $edit-popup-width;
-	// max-height: 700px;
-	min-height: 620px;
 
 	overflow-x: hidden;
 	overflow-y: hidden;
 	// overflow-y: auto;
 
-	border-bottom: solid 5px $color-accent;
+	// border-bottom: solid 5px $color-accent;
 }
 
 /* Tree Visualization Styles */
@@ -392,6 +394,8 @@ button {
 	top: 15px;
 	left: 15px;
 
+	@include user-select-none();
+
 	.zoom-status {
 		width: 100%;
 
@@ -435,7 +439,6 @@ button {
 	}
 
 	button {
-		@include user-select-none();
 		margin: 10px 0px 0px 0px;
 	}
 }
@@ -496,7 +499,7 @@ debug-qset-loader, debug-qset-generator {
 .intro-screen {
 	position: absolute;
 	width: 620px;
-	top: 15%;
+	top: 10%;
 	left: 50%;
 	z-index: 2;
 	margin-left: -325px;
@@ -545,14 +548,13 @@ debug-qset-loader, debug-qset-generator {
 }
 
 toast {
-	// position: absolute;
-	position: fixed;
+	position: absolute;
 	z-index: 90;
 
 	width: 600px;
 	min-height: 30px;
 
-	top: 660px;
+	bottom: 45px;
 	left: 50%;
 	margin-left: -300px;
 
@@ -805,7 +807,7 @@ node-creation-selection-dialog {
 	z-index: 40;
 
 	width: $misc-popup-width;
-	height: 600px;
+	height: $edit-popup-less-height;
 	margin: 5px 0px 0px -300px;
 	border-radius: 10px;
 	background: $color-primary;
@@ -813,6 +815,11 @@ node-creation-selection-dialog {
 	box-shadow: $shadow-dialog;
 
 	text-align: center;
+
+	@media screen and (max-height: $edit-popup-less-height + 69) {
+		// height: 300px;
+		height: auto;
+	}
 
 	h2 {
 		width: 100%;
@@ -832,6 +839,12 @@ node-creation-selection-dialog {
 		list-style-type: none;
 		margin: 0px;
 		padding: 0px;
+
+		@media screen and (max-height: $edit-popup-less-height + 69) {
+			display: block;
+
+			margin: 15px 0px 40px 0px;
+		}
 
 		li {
 			position: relative;
@@ -855,6 +868,13 @@ node-creation-selection-dialog {
 			-webkit-transition: top 0.5s;
 			transition: top 0.5s;
 
+			@media screen and (max-height: $edit-popup-less-height + 69) {
+				width: 100px;
+				height: 100px;
+
+				font-size: 12px;
+			}
+
 			&:hover {
 				top: -5px;
 				// -webkit-transition: top 1s;
@@ -865,6 +885,11 @@ node-creation-selection-dialog {
 
 			&:nth-child(odd) {
 				margin-right: 15px;
+
+				@media screen and (max-height: $edit-popup-less-height + 69) {
+					margin-left: 5px;
+					margin-right: 5px;
+				}
 			}
 
 			&:last-child {
@@ -890,6 +915,29 @@ node-creation-selection-dialog {
 					margin-top: 16px;
 					margin-bottom: 15px;
 				}
+
+				@media screen and (max-height: $edit-popup-standard-height + 69) {
+					width: 100px;
+					height: 100px;
+
+					text-align: center;
+
+					vertical-align: top;
+
+					margin: 25px 5px 0px 5px;
+
+					img {
+						display: block;
+						width: 50px;
+						height: 50px;
+
+						margin: 12px auto 7px auto;
+					}
+
+					span {
+						margin: 0px;
+					}
+				}
 			}
 
 			img {
@@ -898,6 +946,13 @@ node-creation-selection-dialog {
 				height: 100px;
 
 				margin: 25px auto 15px auto;
+
+				@media screen and (max-height: $edit-popup-less-height + 69) {
+					width: 50px;
+					height: 50px;
+
+					margin: 12px auto 7px auto;
+				}
 			}
 		}
 	}
@@ -910,7 +965,7 @@ node-creation-selection-dialog {
 	z-index: 50;
 
 	width: $edit-popup-width;
-	height: 570px;
+	height: $edit-popup-less-height - 30;
 	margin: 5px 0px 0px -400px;
 
 	border-radius: 10px;
@@ -920,10 +975,33 @@ node-creation-selection-dialog {
 
 	&.short {
 		height: 520px;
+
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			top: 10px;
+			height: 450px;
+		}
 	}
 
 	&.long {
 		height: 620px;
+
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			top: 10px;
+			height: 450px;
+		}
+	}
+
+	&.hotspot {
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			top: 10px;
+			width: $edit-popup-width + 15;
+			height: 535px;
+		}
+	}
+
+	@media screen and (max-height: $edit-popup-standard-height + 69) {
+		top: 10px;
+		height: 450px;
 	}
 
 	h2 {
@@ -955,6 +1033,10 @@ node-creation-selection-dialog {
 
 		&.expanded {
 			height: 350px;
+
+			@media screen and (max-height: $edit-popup-standard-height + 69) {
+				height: 250px;
+			}
 		}
 
 		&.tiny {
@@ -980,10 +1062,35 @@ node-creation-selection-dialog {
 			top: 306px;
 			width: $edit-popup-content-width-full;
 			height: 95px;
+
+			@media screen and (max-height: $edit-popup-standard-height + 69) {
+				top: 206px;
+			}
 		}
 
 		&.align-right {
 			margin: 20px 20px 30px 380px;
+		}
+
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			height: 100px;
+			font-size: 1em;
+
+			transition: all 0.1s ease;
+
+			&.tiny {
+				position: relative;
+				height: 22px;
+				font-size: 1em;
+
+				margin: 5px 20px 0px 20px;
+
+				&:focus {
+					position: absolute;
+					z-index: 150;
+					height: 50px;
+				}
+			}
 		}
 	}
 
@@ -998,6 +1105,10 @@ node-creation-selection-dialog {
 			display: block;
 			width: 100%;
 			font-size:48px;
+		}
+
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			top: 85px;
 		}
 	}
 
@@ -1043,6 +1154,10 @@ node-creation-selection-dialog {
 			}
 		}
 
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			height: 104px;
+		}
+
 		img {
 			max-width: 100%;
 			max-height: 100%;
@@ -1075,6 +1190,14 @@ node-creation-selection-dialog {
 
 		&.long {
 			height: 242px;
+
+			@media screen and (max-height: $edit-popup-standard-height + 69) {
+				height: 170px;
+			}
+		}
+
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			height: 170px;
 		}
 
 		ul {
@@ -1227,6 +1350,13 @@ node-creation-selection-dialog {
 		margin: 10px 0px 0px 20px;
 	}
 
+	div.random-select-container {
+		display: inline-block;
+		margin-left: 15px;
+
+		font-size: 0.8em;
+	}
+
 	button.save-button {
 		position: absolute;
 		bottom: 20px;
@@ -1236,6 +1366,11 @@ node-creation-selection-dialog {
 
 		&.lowered {
 			bottom: 10px;
+
+			@media screen and (max-height: $edit-popup-standard-height + 69) {
+				bottom: 16px;
+				right: 50px;
+			}
 		}
 	}
 
@@ -1300,6 +1435,11 @@ node-creation-selection-dialog {
 		display: block;
 		width: 100%;
 
+		@media screen and (max-height: $edit-popup-standard-height + 69) {
+			position: absolute;
+			bottom: -2px;
+		}
+
 		.image-container {
 			position: relative;
 			display: block;
@@ -1312,6 +1452,10 @@ node-creation-selection-dialog {
 			border: solid 1px $gray-lighter;
 
 			text-align: center;
+
+			@media screen and (max-height: $edit-popup-standard-height + 69) {
+				margin-top: 0px;
+			}
 
 			#uploadButton {
 				display: block;
@@ -1329,6 +1473,12 @@ node-creation-selection-dialog {
 
 				top: 0px;
 				left: 0px;
+
+				width: 698px;
+				height: 400px;
+
+				@include user-select-none();
+
 
 				ellipse, rect, polygon {
 					cursor: pointer;
