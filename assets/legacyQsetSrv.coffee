@@ -30,8 +30,6 @@ Adventure.service "legacyQsetSrv", () ->
 				when 5 then item.options.type = "end"
 				else item.options.type = "blank"
 
-			# TODO still need a catch for -1, e.g., blank
-
 			if item.options.asset
 				switch item.options.layout
 					when 0 then item.options.asset.align = "image-only"
@@ -41,8 +39,10 @@ Adventure.service "legacyQsetSrv", () ->
 					when 4 then item.options.asset.align = "bottom"
 					when 5 then item.options.asset.align = "top"
 
-				unless item.options.layout then item.options.asset.align = "right"
-				else delete item.options.layout
+				unless item.options.layout
+					item.options.asset.align = "right"
+				else
+					delete item.options.layout
 
 				item.options.asset.type ="image"
 
@@ -76,11 +76,15 @@ Adventure.service "legacyQsetSrv", () ->
 
 				if item.options.type is "shortanswer"
 					answer.options.matches = []
-					if answer.options.isDefault then answer.text = "[Unmatched Response]"
-					else answer.options.matches = answer.text.split ", "
+
+					if answer.options.isDefault
+						answer.text = "[Unmatched Response]"
+					else
+						answer.options.matches = answer.text.split ", "
 
 				if answer.options.hotspot
 
+					# The type of hotspot is determined by an integer prepended to the hotspot string
 					type = parseInt answer.options.hotspot.substring(0,1)
 
 					answer.options.svg = {}
@@ -100,6 +104,8 @@ Adventure.service "legacyQsetSrv", () ->
 
 							answer.options.svg.r = values[2]/2
 
+							# scaleXOffset and scaleYOffset values are computed when the hotspot image is loaded via handleLegacyScale
+							# These are just placeholder until then
 							answer.options.svg.scaleXOffset = 0
 							answer.options.svg.scaleYOffset = 0
 							answer.options.svg.scaleXFactor = 0
@@ -113,12 +119,17 @@ Adventure.service "legacyQsetSrv", () ->
 							answer.options.svg.y = Math.round values[1]
 							answer.options.svg.width = Math.round values[2]
 							answer.options.svg.height = Math.round values[3]
-							answer.options.svg.scaleXOffset = 90
-							answer.options.svg.scaleYOffset = 65
+							# scaleXOffset and scaleYOffset values are computed when the hotspot image is loaded via handleLegacyScale
+							# These are just placeholder until then
+							answer.options.svg.scaleXOffset = 0
+							answer.options.svg.scaleYOffset = 0
 							answer.options.svg.scaleXFactor = 0
 							answer.options.svg.scaleYFactor = 0
 
 						when 1 # polygon
+							# V1 qset polygons look like this:
+							# 1(x=43.5, y=93.75),(x=770.75, y=78.75),(x=530.85, y=933.35)
+							# Have to extract the coordinate pairs without the extra formatting.
 							pattern = /(?:\(x=)(-?[0-9]+\.*[0-9]*)(?:\,[ ]?y=)([0-9]+\.*[0-9]*)/g
 							string = answer.options.hotspot.substring 1
 							match = pattern.exec string
@@ -136,23 +147,25 @@ Adventure.service "legacyQsetSrv", () ->
 							answer.options.svg.points = coords
 
 					answer.options.svg.stroke = 2
-					unless answer.options.hotspotColor then answer.options.svg.fill = "#7698e2"
-					else answer.options.svg.fill = "#" + answer.options.hotspotColor
+					unless answer.options.hotspotColor
+						answer.options.svg.fill = "#7698e2"
+					else
+						answer.options.svg.fill = "#" + answer.options.hotspotColor
 
 					delete answer.options.hotspot
 
 			nodeCount++
 
 		angular.forEach items, (item, index) ->
-			if parentNodeRefs[item.options.id] isnt undefined then item.options.parentId = parentNodeRefs[item.options.id]
-			else if item.options.id is 0 then item.options.parentId = -1
+			if parentNodeRefs[item.options.id] isnt undefined
+				item.options.parentId = parentNodeRefs[item.options.id]
+			else if item.options.id is 0
+				item.options.parentId = -1
 
 		newQset =
 			items: items
 			options:
 				nodeCount: nodeCount
-
-		console.log newQset
 
 		return JSON.stringify newQset
 
@@ -176,8 +189,10 @@ Adventure.service "legacyQsetSrv", () ->
 			# The answer object is slightly different depending on whether this function is referenced from the creator or player
 			# Creator answer objects have the SVG as a first-level child of the answer object
 			# Player answer objects are copied direct from the Qset, so the SVG is nested in the options object of the answer object
-			if answer.options then convertSVGValues answer.options.svg
-			else convertSVGValues answer.svg
+			if answer.options
+				convertSVGValues answer.options.svg
+			else
+				convertSVGValues answer.svg
 
 	convertSVGValues = (svg) ->
 
@@ -191,7 +206,7 @@ Adventure.service "legacyQsetSrv", () ->
 				svg.r = Math.floor(svg.r * legacyScaleFactor)
 
 				svg.scaleYFactor = Math.floor(svg.scaleYFactor * legacyScaleFactor)
-				svg.scaleXOffset = svg.r * 0.8
+				svg.scaleXOffset = svg.r * 0.8 # Positions the scaling handle correctly for X and Y based on ellipse radius
 				svg.scaleYOffset = svg.r * 0.8
 
 			when "rect"
@@ -201,7 +216,7 @@ Adventure.service "legacyQsetSrv", () ->
 				svg.width = Math.floor(svg.width * legacyScaleFactor)
 				svg.height = Math.floor(svg.height * legacyScaleFactor)
 
-				svg.scaleXOffset = svg.width - 10
+				svg.scaleXOffset = svg.width - 10 # Positions the scaling handle correctly for X and Y based on rectangle width/height
 				svg.scaleYOffset = svg.height - 10
 
 			when "polygon"

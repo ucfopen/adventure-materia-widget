@@ -29,7 +29,7 @@
 		<script src="assets/creator-assets/controllers.js"></script>
 
 	</head>
-	<body ng-controller="AdventureCtrl">
+	<body ng-controller="AdventureCtrl" id="body">
 		<header class="title-header">
 			<div class="logo">
 			</div>
@@ -341,7 +341,7 @@
 				</ul>
 			</new-node-manager-dialog>
 			<node-creation class="node-creation-screen"
-				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT}"
+				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
 				<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
@@ -355,7 +355,7 @@
 						'align-top' : editedNode.media.align == 'top',
 						'align-bottom' : editedNode.media.align == 'bottom',
 						'shared' : (mediaReady && displayNodeCreation != HOTSPOT),
-						'align-right' : editedNode.media.align == 'left' }"
+						'align-right' : editedNode.media.align == 'left'}"
 					ng-model="question"
 					placeholder="{{questionPlaceholder}}"></textarea>
 				<div class="media-box"
@@ -537,8 +537,6 @@
 						</svg>
 						<!-- SVG canvas upon which all hotspots are drawn -->
 						<svg id="hotspot-canvas"
-							width="698"
-							height="400"
 							ng-show="mediaReady"
 							ng-click="closeManager($event)">
 							<g ng-repeat="answer in answers"
@@ -646,10 +644,15 @@
 					type="button"
 					ng-click="newAnswer()"
 					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
+				<div class="random-select-container" ng-if="displayNodeCreation == MC">
+				<input type="checkbox"
+					ng-model="editedNode.randomizeAnswers"
+					value="true" /> Randomize Answers
+				</div>
 				<button class="save-button important-button"
 					ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 					type="button"
-					ng-click="saveAndClose()">Save</button>
+					ng-click="saveAndClose()">Done</button>
 			</node-creation>
 			<node-tooltips ng-show="hoveredNode.showTooltips">
 				<div class="tooltip"

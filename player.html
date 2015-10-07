@@ -28,7 +28,7 @@
 		<script type="text/javascript" src="assets/legacyQsetSrv.js"></script>
 		<script type="text/javascript" src="assets/player-assets/player.js"></script>
 	</head>
-	<body ng-app="Adventure" ng-controller="AdventureController">
+	<body id="body" ng-app="Adventure" ng-controller="AdventureController">
 		<header class="header">
 			<h1>{{title}}</h1>
 		</header>
@@ -104,7 +104,7 @@
 				ng-show="type == MC">
 				<a href="#"
 					class="answer"
-					ng-repeat="answer in answers"
+					ng-repeat="answer in answers | orderBy: mcAnswerOrdering"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}">) {{answer.text}}</a>
