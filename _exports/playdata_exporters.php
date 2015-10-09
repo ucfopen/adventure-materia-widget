@@ -72,7 +72,14 @@ return [
 					$cur_csv['question_text'] = "";
 					foreach ($questions as $q)
 					{
-						$cur_csv['question_text'] .= $q->questions[0]['text'] . ', ';
+						$clean_str = str_replace(["\r","\n", ","], "", $q->questions[0]['text']);
+
+						if (strlen($clean_str) > 80)
+						{
+							$clean_str = substr($clean_str, 0, 80) . "...";
+						}
+
+						$cur_csv['question_text'] .= $clean_str . ', ';
 						$cur_csv['questions'][] = $q->id;
 					}
 
@@ -117,7 +124,7 @@ return [
 						if (array_search($r['item_id'], $cur_csv['questions']) !== FALSE)
 						{
 							$position = array_search($r['item_id'], $cur_csv['questions']);
-							$logs[5 + $position] = $r['text'];
+							$logs[5 + $position] = str_replace(["\r","\n", ","], "", $r['text']);
 						}
 					}
 				}

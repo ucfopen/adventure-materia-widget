@@ -120,7 +120,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 	# Do stuff when the user submits something in the SA answer box
 	$scope.handleShortAnswerInput = ->
 
-		answer = $scope.response.toLowerCase()
+		response = $scope.response.toLowerCase()
 		$scope.response = ""
 
 		# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
@@ -133,7 +133,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 			for j in [0...$scope.q_data.answers[i].options.matches.length]
 
 				# TODO make matching algo more robust
-				if $scope.q_data.answers[i].options.matches[j].toLowerCase().trim() is answer
+				if $scope.q_data.answers[i].options.matches[j].toLowerCase().trim() is response
 
 					link = ~~$scope.q_data.answers[i].options.link # is parsing required?
 
@@ -153,7 +153,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		for answer in $scope.q_data.answers
 			if answer.options.isDefault
 
-				$scope.selectedAnswer = $scope.q_data.answers[0].text
+				$scope.selectedAnswer = response
 				_logProgress() # Log the response
 
 				link = ~~answer.options.link
