@@ -56,7 +56,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		else $scope.layout = q_data.options.asset.align
 
 		$scope.question =
-			text : q_data.questions[0].text, # questions MUST be an array, always 1 index w/ single text property
+			text : micromarkdown.parse(q_data.questions[0].text), # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
 			layout: $scope.layout,
 			type : q_data.options.type,
 			id : q_data.options.id
