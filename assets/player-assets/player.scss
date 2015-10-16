@@ -107,7 +107,14 @@ h1 {
 
 		font-family: 'Open Sans', sans-serif;
 		font-size:22px;
+		font-weight: normal;
 		color:#363636;
+
+		white-space: pre-wrap;
+
+		b {
+			font-weight: bold;
+		}
 
 		&.left {
 			width:45%;
