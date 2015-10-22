@@ -33,6 +33,8 @@ class Score_Modules_Adventure extends Score_Module
 	public function check_answer($log)
 	{
 
+		\Log::debug(var_export($log, true));
+
 		if (strcmp($log->item_id, '0') == 0)
 		{
 			$items;
@@ -48,7 +50,14 @@ class Score_Modules_Adventure extends Score_Module
 
 			foreach ($items as $item)
 			{
-				if ($log->text == $item['questions'][0]['text'])
+				if ($item['options']['type'] != 'end')
+				{
+					continue;
+				}
+
+				\Log::debug(var_export($item, true));
+
+				if (trim($log->text) == trim($item['questions'][0]['text']))
 				{
 					return $item['options']['finalScore'];
 				}

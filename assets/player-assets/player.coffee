@@ -211,7 +211,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		link = null
 		if $scope.question.type is $scope.END
 			link = -1
-			Materia.Score.submitFinalScoreFromClient q_data.id, $scope.question.text, q_data.options.finalScore
+			Materia.Score.submitFinalScoreFromClient q_data.id, q_data.questions[0].text, q_data.options.finalScore
 		else
 			link = q_data.answers[0].options.link
 
@@ -223,7 +223,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		$scope.layout = "text-only"
 		$scope.question.text = "[Blank destination: click Continue to end the widget preview.]"
 		$scope.link = -1
-		Materia.Score.submitFinalScoreFromClient q_data.id, $scope.question.text, 100
+		Materia.Score.submitFinalScoreFromClient q_data.id, q_data.questions[0].text, 100
 
 	# Submit the user's response to the logs
 	_logProgress = ->
