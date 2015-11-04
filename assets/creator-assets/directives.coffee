@@ -1453,8 +1453,11 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 
 
 				if $scope.editedNode.type is $scope.END
-					if $scope.editedNode.finalScore then $scope.finalScore = $scope.editedNode.finalScore
-					else $scope.finalScore = 100
+					if $scope.editedNode.finalScore
+						$scope.finalScore = $scope.editedNode.finalScore
+					else
+						$scope.finalScore = 100
+						$scope.editedNode.finalScore = 100
 
 			# Update question placeholder text based on the node creation type.
 			# TODO should this be included in the DOM instead through ng-if or a conditional in the attribute?
