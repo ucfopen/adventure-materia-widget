@@ -538,6 +538,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					if item.options.legacyScaleMode then node.legacyScaleMode = true
 				when "end"
 					node.finalScore = item.options.finalScore
+					if node.finalScore is null then node.finalScore = 100 # default finalScore values of null are deprecated, new default is 100
 
 			if item.options.hasLinkToOther then node.hasLinkToOther = true
 			if item.options.hasLinkToSelf then node.hasLinkToSelf = true
