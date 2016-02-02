@@ -55,8 +55,11 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else $scope.layout = q_data.options.asset.align
 
+		# Micromarkdown is adding <br/> for empty strings, and some mysterious newline char for strings with length > 0
+		parsedQuestion = if q_data.questions[0].text.length then micromarkdown.parse(q_data.questions[0].text).substring(1) else ""
+
 		$scope.question =
-			text : micromarkdown.parse(q_data.questions[0].text), # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
+			text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
 			layout: $scope.layout,
 			type : q_data.options.type,
 			id : q_data.options.id
