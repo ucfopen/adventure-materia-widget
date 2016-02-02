@@ -95,7 +95,7 @@
 			<div ng-switch-when="hotspot">
 			<h2 class="text bottom"
 				ng-hide="question.text.length == 0"
-				auto-text-scale>{{ question.text }}</h2>
+				auto-text-scale ng-bind-html="question.text"></h2>
 			</div>
 		</section>
 		<section class="answers"
