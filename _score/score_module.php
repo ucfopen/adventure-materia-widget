@@ -33,7 +33,7 @@ class Score_Modules_Adventure extends Score_Module
 	public function check_answer($log)
 	{
 
-		if (strcmp($log->item_id, '0') == 0)
+		if (strcmp($log->type, Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT) == 0)
 		{
 			$items;
 
@@ -121,7 +121,8 @@ class Score_Modules_Adventure extends Score_Module
 			switch ($log->type)
 			{
 				case Session_Log::TYPE_QUESTION_ANSWERED:
-					if ( ! array_key_exists($log->item_id, $this->questions)){
+					if ( ! array_key_exists($log->item_id, $this->questions))
+					{
 					   	break; // contingency for empty nodes (due to previewing)
 					}
 					if (isset($this->questions[$log->item_id]))

@@ -10,138 +10,198 @@ class Test_Score_Modules_Adventure extends \Basetest
 	protected function _get_qset()
 	{
 		return json_decode('{
-			"items":[
-				{
-					"items":[
-						{
-							"name":"",
-							"type":"MC",
-							"assets":null,
-							"answers":[
-								{
-									"value":100,
-									"text":"Correct MC Answer",
-									"options":{
-										"feedback":null,
-										"link":1
-									},
-									"id":0
-								},
-								{
-									"value":0,
-									"text":"Wrong MC Answer",
-									"options":{
-											"feedback":null,
-											"link":1
-									},
-									"id":0
-								}
-							],
-							"questions":[
-								{
-									"text":"Multiple Choice Question"
-								}
-							],
-							"options":{
-								"randomize":1,
-								"type":2,
-								"layout":1,
-								"id":0
-							},
-							"id":0
-						},
-						{
-							"name":"",
-							"type":"MC",
-							"assets":null,
-							"answers":[
-								{
-									"value":0,
-									"text":"[All Other Answers]",
-									"options":{
-											"feedback":null,
-											"link":2,
-											"isDefault":1
-									},
-									"id":0
-								},
-								{
-									"value":100,
-									"text":"Correct Answer",
-									"options":{
-										"feedback":null,
-										"link":3,
-										"isShortcut":1
-									},
-									"id":0
-								}
-							],
-							"questions":[
-								{
-									"text":"Short Answer Question"
-								}
-							],
-							"options":{
-								"randomize":1,
-								"type":4,
-								"layout":1,
-								"id":0
-							},
-							"id":0
-						},
-						{
-							"name":"",
-							"type":"MC",
-							"assets":null,
-							"answers":[],
-							"questions":[
-								{
-									"text":"Full Credit"
-								}
-							],
-							"options":{
-								"finalScore":100,
-								"id":0,
-								"type":5,
-								"proceedText":"Continue",
-								"layout":1
-							},
-							"id":0
-						},
-						{
-							"name":"",
-							"type":"MC",
-							"assets":null,
-							"answers":[],
-							"questions":[
-								{
-									"text":"Half Credit"
-								}
-							],
-							"options":{
-								"finalScore":50,
-								"id":0,
-								"type":5,
-								"proceedText":"Continue",
-								"layout":1
-							},
-							"id":0
-						}
-
-					],
-					"name":"",
-					"options":{
-			     			"scoreStyle":2
-					},
-					"assets":[],
-					"rand":null
-				}
-			],
-			"name":"",
-			"options":{},
-			"assets":[],
-			"rand":null,
-			"id":0
+		  "items": [
+		    {
+		      "materiaType": "question",
+		      "id": 0,
+		      "nodeId": 0,
+		      "type": "Adventure",
+		      "questions": [
+		        {
+		          "text": "Multiple Choice Question"
+		        }
+		      ],
+		      "options": {
+		        "id": 0,
+		        "parentId": -1,
+		        "type": "mc",
+		        "randomize": true
+		      },
+		      "answers": [
+		        {
+		          "text": "Correct MC Answer",
+		          "value": 0,
+		          "options": {
+		            "link": 1,
+		            "linkMode": "new",
+		            "feedback": null
+		          }
+		        },
+		        {
+		          "text": "Wrong MC Answer",
+		          "value": 0,
+		          "options": {
+		            "link": 2,
+		            "linkMode": "new",
+		            "feedback": null
+		          }
+		        }
+		      ]
+		    },
+		    {
+		      "materiaType": "question",
+		      "id": 0,
+		      "nodeId": 1,
+		      "type": "Adventure",
+		      "questions": [
+		        {
+		          "text": "Short Answer Question"
+		        }
+		      ],
+		      "options": {
+		        "id": 1,
+		        "parentId": 0,
+		        "type": "shortanswer"
+		      },
+		      "answers": [
+		        {
+		          "text": "[Unmatched Response]",
+		          "value": 0,
+		          "options": {
+		            "link": 3,
+		            "linkMode": "new",
+		            "feedback": null,
+		            "matches": [],
+		            "isDefault": true
+		          }
+		        },
+		        {
+		          "text": "Correct Answer",
+		          "value": 0,
+		          "options": {
+		            "link": 4,
+		            "linkMode": "new",
+		            "feedback": null,
+		            "matches": [
+		              "Correct Answer"
+		            ]
+		          }
+		        }
+		      ]
+		    },
+		    {
+		      "materiaType": "question",
+		      "id": 0,
+		      "nodeId": 3,
+		      "type": "Adventure",
+		      "questions": [
+		        {
+		          "text": "You got 75%!"
+		        }
+		      ],
+		      "options": {
+		        "id": 3,
+		        "parentId": 1,
+		        "type": "end",
+		        "finalScore": 75
+		      },
+		      "answers": []
+		    },
+		    {
+		      "materiaType": "question",
+		      "id": 0,
+		      "nodeId": 4,
+		      "type": "Adventure",
+		      "questions": [
+		        {
+		          "text": "You got 100%!"
+		        }
+		      ],
+		      "options": {
+		        "id": 4,
+		        "parentId": 1,
+		        "type": "end",
+		        "finalScore": 100
+		      },
+		      "answers": []
+		    },
+		    {
+		      "materiaType": "question",
+		      "id": 0,
+		      "nodeId": 2,
+		      "type": "Adventure",
+		      "questions": [
+		        {
+		          "text": "MC Question after Wrong Answer"
+		        }
+		      ],
+		      "options": {
+		        "id": 2,
+		        "parentId": 0,
+		        "type": "mc",
+		        "randomize": true
+		      },
+		      "answers": [
+		        {
+		          "text": "Choose this answer for 0% credit",
+		          "value": 0,
+		          "options": {
+		            "link": 5,
+		            "linkMode": "new",
+		            "feedback": null
+		          }
+		        },
+		        {
+		          "text": "Choose this answer for 25% credit",
+		          "value": 0,
+		          "options": {
+		            "link": 6,
+		            "linkMode": "new",
+		            "feedback": null
+		          }
+		        }
+		      ]
+		    },
+		    {
+		      "materiaType": "question",
+		      "id": 0,
+		      "nodeId": 5,
+		      "type": "Adventure",
+		      "questions": [
+		        {
+		          "text": "You got 0%!"
+		        }
+		      ],
+		      "options": {
+		        "id": 5,
+		        "parentId": 2,
+		        "type": "end",
+		        "finalScore": 0
+		      },
+		      "answers": []
+		    },
+		    {
+		      "materiaType": "question",
+		      "id": 0,
+		      "nodeId": 6,
+		      "type": "Adventure",
+		      "questions": [
+		        {
+		          "text": "You got 25%!"
+		        }
+		      ],
+		      "options": {
+		        "id": 6,
+		        "parentId": 2,
+		        "type": "end",
+		        "finalScore": 25
+		      },
+		      "answers": []
+		    }
+		  ],
+		  "options": {
+		    "nodeCount": 8
+		  }
 		}');
 	}
 
@@ -153,7 +213,7 @@ class Test_Score_Modules_Adventure extends \Basetest
 		$widget_id = $this->_find_widget_id('Adventure');
 		$qset = null;
 
-		$qset = (object) ['version' => 1, 'data' => $this->_get_qset()];
+		$qset = (object) ['version' => 2, 'data' => $this->_get_qset()];
 
 		return \Materia\Api::widget_instance_save($widget_id, $title, $qset, false);
 	}
@@ -171,23 +231,23 @@ class Test_Score_Modules_Adventure extends \Basetest
 			"text":"Correct MC Answer",
 			"type":1004,
 			"value":0,
-			"item_id":"'.$qset->data['items'][0]['items'][0]['id'].'",
+			"item_id":"'.$qset->data['items'][0]['id'].'",
 			"game_time":11
 		}');
 
 		$logs[] = json_decode('{
-			"text":"[All Other Answers]",
+			"text":"[Unmatched Response]",
 			"type":1004,
 			"value":0,
-			"item_id":"'.$qset->data['items'][0]['items'][1]['id'].'",
+			"item_id":"'.$qset->data['items'][1]['id'].'",
 			"game_time":12
 		}');
 
 		$logs[] = json_decode('{
-			"text":"Half Credit",
+			"text":"You got 75%!",
 			"type":1002,
 			"value":0,
-			"item_id":"'.$qset->data['items'][0]['items'][2]['id'].'",
+			"item_id":"'.$qset->data['items'][2]['id'].'",
 			"game_time":13
 		}');
 
@@ -206,7 +266,6 @@ class Test_Score_Modules_Adventure extends \Basetest
 		$this_score = \Materia\Api::widget_instance_play_scores_get($play_session);
 
 		$this->assertInternalType('array', $this_score);
-		$this->assertEquals(50, $this_score[0]['overview']['score']);
+		$this->assertEquals(75, $this_score[0]['overview']['score']);
 	}
-
 }
