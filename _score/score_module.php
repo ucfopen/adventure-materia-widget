@@ -32,10 +32,12 @@ class Score_Modules_Adventure extends Score_Module
 	 */
 	public function check_answer($log)
 	{
+		# Adventure scores based on TYPE_FINAL_SCORE_FROM_CLIENT, ignore all other log types
 		if (strcmp($log->type, Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT) == 0)
 		{
 			$items;
 
+			# Populate items based on qset version
 			if ($this->inst->qset->version == 1) # ['items'][0]['items'] strikes again!
 			{
 				$items = $this->inst->qset->data['items'][0]['items'];
@@ -47,11 +49,13 @@ class Score_Modules_Adventure extends Score_Module
 
 			foreach ($items as $item)
 			{
-				if ($item['options']['type'] != 'end' && $item['options']['type'] != '5')
+				# ignore all qset items that aren't end nodes
+				if ($item['options']['type'] != 'end' && $item['options']['type'] != '5') # option->type = 'end' for v2 qsets, option->type = '5' for v1 qsets
 				{
 					continue;
 				}
 
+				# make sure we have the right qset item that matches the provided log, return associated finalScore
 				if (trim($log->text) == trim($item['questions'][0]['text']))
 				{
 					return $item['options']['finalScore'];
