@@ -32,7 +32,6 @@ class Score_Modules_Adventure extends Score_Module
 	 */
 	public function check_answer($log)
 	{
-
 		if (strcmp($log->type, Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT) == 0)
 		{
 			$items;
@@ -48,7 +47,7 @@ class Score_Modules_Adventure extends Score_Module
 
 			foreach ($items as $item)
 			{
-				if ($item['options']['type'] != 'end')
+				if ($item['options']['type'] != 'end' && $item['options']['type'] != '5')
 				{
 					continue;
 				}
