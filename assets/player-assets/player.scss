@@ -56,6 +56,15 @@ body {
 	background:$blue;
 	padding:10px 0px;
 	color:#ffffff;
+
+	-webkit-transition: all 0.5s ease;
+	transition: all 0.5s ease;
+
+	&.hidden-title {
+		height: 0px;
+		padding: 0px;
+		overflow-y: hidden;
+	}
 }
 
 .section {
@@ -73,11 +82,23 @@ h1 {
 	display: block;
 	background: #fff;
 
+	h2 {
+		overflow-x: hidden;
+	}
+
 	&.hotspot-mode {
-		max-height: 55px;
+		max-height: 65px;
 
 		h2 {
 			max-height: 65px;
+		}
+
+		&.hidden-title {
+			max-height: 115px;
+
+			h2 {
+				max-height: 115px;
+			}
 		}
 	}
 
@@ -89,12 +110,26 @@ h1 {
 
 	&.transitional-mode {
 		h2 {
-			max-height: 400px;
+			max-height: 428px;
 
 			&.top, &.bottom {
 				max-height: 170px;
 			}
 		}
+
+		&.hidden-title {
+			h2 {
+				max-height: 470px;
+
+				&.top, &.bottom {
+					max-height: 215px;
+				}
+			}
+		}
+	}
+
+	&.hidden-title {
+		padding-top: 35px;
 	}
 
 	h2 {
@@ -181,16 +216,15 @@ h1 {
 		&.no-question {
 			max-height: 440px;
 			bottom: 45px;
+
+			&.hidden-title {
+				max-height:485px;
+				bottom: 65px;
+				padding-top: 25px;
+			}
 		}
 	}
-
-	// .mc, .answers {
-	// 	.sa {
-	// 	}
-	// }
 	.mc {
-		// width:100%;
-		// height:100%;
 		max-height: 250px;
 
 		overflow-y: auto;

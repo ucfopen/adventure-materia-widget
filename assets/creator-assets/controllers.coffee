@@ -17,6 +17,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 	$scope.title = ""
 
+	$scope.hidePlayerTitle = false
+
 	# NodeTools is an object that holds the parameters for the nodeTools modal, works in tandem with the nodeToolsDialog directive
 	$scope.nodeTools =
 		show: false
@@ -163,6 +165,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				$scope.title = title
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 
+				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
+
 				# Check to make sure the tree doesn't have errors
 				validation = treeSrv.validateTreeOnStart $scope.treeData
 				if validation.length
@@ -185,6 +189,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			return Materia.CreatorCore.cancelSave ''
 		else
 			qset = treeSrv.createQSetFromTree $scope.treeData
+			qset.options.hidePlayerTitle = $scope.hidePlayerTitle
 			Materia.CreatorCore.save $scope.title, qset, 2
 
 	$scope.onSaveComplete = (title, widget, qset, version) -> true
@@ -360,6 +365,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 	$scope.generateDebugQset = ->
 		qset = treeSrv.createQSetFromTree $scope.treeData
+		qset.options.hidePlayerTitle = $scope.hidePlayerTitle
 
 		$scope.showQsetGenerator = true
 		$scope.generatedQset = JSON.stringify qset, null, 2
