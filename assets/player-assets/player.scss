@@ -51,19 +51,15 @@ body {
 }
 
 .header {
+	display: none; // default is display:none so header doesn't "flash" when the title is supposed to be hidden. Thanks Angular!
 	width:100%;
 	text-align:center;
 	background:$blue;
 	padding:10px 0px;
 	color:#ffffff;
 
-	-webkit-transition: all 0.5s ease;
-	transition: all 0.5s ease;
-
-	&.hidden-title {
-		height: 0px;
-		padding: 0px;
-		overflow-y: hidden;
+	&.show-title {
+		display: block;
 	}
 }
 

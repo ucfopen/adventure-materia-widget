@@ -20,7 +20,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 
 	$scope.title = ""
 	$scope.qset = null
-	$scope.hideTitle = false
+	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
 
 	$scope.engine =
 		start: (instance, qset, version = '1') ->
@@ -34,6 +34,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 
 				manageQuestionScreen(qset.items[0].options.id)
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
+				else $scope.hideTitle = false # default is to display title
 
 		manualResize: true
 
