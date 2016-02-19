@@ -20,6 +20,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 
 	$scope.title = ""
 	$scope.qset = null
+	$scope.hideTitle = false
 
 	$scope.engine =
 		start: (instance, qset, version = '1') ->
@@ -30,7 +31,10 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 			$scope.$apply ->
 				$scope.title = instance.name
 				$scope.qset = qset
+
 				manageQuestionScreen(qset.items[0].options.id)
+				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
+
 		manualResize: true
 
 	$scope.questionFormat =

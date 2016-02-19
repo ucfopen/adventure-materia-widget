@@ -135,6 +135,109 @@ header.title-header {
 
 		cursor: pointer;
 	}
+
+	div.header-options-box {
+
+		float: right;
+		margin-top: -6px;
+		margin-right: 25px;
+
+		color: $color-primary;
+		font-size: 12px;
+
+		input[type=checkbox] {
+			visibility: hidden;
+		}
+
+		.options-check-slide
+		{
+			position: relative;
+			width:80px;
+			height:26px;
+
+			margin: 3px auto 0px auto;
+
+			transform:scale(0.8);
+			-webkit-transform:scale(0.8);
+			-moz-transform:scale(0.8);
+
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+
+			-webkit-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
+			-moz-box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
+			box-shadow: inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,0.2);
+
+			background:$color-accent-highlight;
+
+		}
+
+		.options-check-slide:after
+		{
+			position: absolute;
+			right: 10px;
+			z-index: 0;
+
+			content: 'OFF';
+
+			font: 12px/26px Arial, sans-serif;
+			color: $gray-darker;
+			font-weight: bold;
+		}
+
+		.options-check-slide:before
+		{
+			position: absolute;
+			left: 10px;
+			z-index: 0;
+
+			content: 'ON';
+
+			font: 12px/26px Arial, sans-serif;
+			color: $color-primary;
+			font-weight: bold;
+		}
+
+		.options-check-slide label
+		{
+			position: absolute;
+			top: 3px;
+			left: 3px;
+			z-index: 1;
+
+			display: block;
+			width: 34px;
+			height: 20px;
+
+			-webkit-transition: all .2s ease;
+			-moz-transition: all .2s ease;
+			-o-transition: all .2s ease;
+			-ms-transition: all .2s ease;
+			transition: all .2s ease;
+			cursor: pointer;
+
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+
+			-webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
+			-moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
+			box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.3);
+			background: #fcfff4;
+
+			background: -webkit-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+			background: -moz-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+			background: -o-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+			background: -ms-linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+			background: linear-gradient(top, #fcfff4 0%, #dfe5d7 40%, #b3bead 100%);
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#b3bead',GradientType=0 );
+		}
+
+		.options-check-slide input[type=checkbox]:checked + label {
+			left: 43px;
+		}
+	}
 }
 
 #adventure-container {
