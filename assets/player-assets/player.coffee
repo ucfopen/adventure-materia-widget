@@ -56,10 +56,11 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		for n in [0...$scope.qset.items.length]
 			if $scope.qset.items[n].options.id is questionId
 				q_data = $scope.qset.items[n]
-
+				
 		unless q_data.options.asset then $scope.layout = "text-only"
-		else $scope.layout = q_data.options.asset.align
-
+		else if q_data.questions[0].text != "" then $scope.layout = q_data.options.asset.align
+		else $scope.layout = "image-only"
+		
 		# Micromarkdown is adding <br/> for empty strings, and some mysterious newline char for strings with length > 0
 		parsedQuestion = if q_data.questions[0].text.length then micromarkdown.parse(q_data.questions[0].text).substring(1) else ""
 
