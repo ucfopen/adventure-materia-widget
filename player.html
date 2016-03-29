@@ -38,9 +38,10 @@
 		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
 
 		<div class="feedback"
-			ng-class="{ show: feedback }"
-			style="z-index: {{ feedback ? 1000 : -1 }}">
-			{{feedback}}
+			ng-class="{ show: feedback }">
+			<div class="feedback-content">
+				{{feedback}}
+			</div>
 			<input class="feedback-button trans-button"
 				type="button"
 				value="OK"
