@@ -60,6 +60,8 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else $scope.layout = q_data.options.asset.align
 
+		# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
+		# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 		try
 			$sanitize q_data.questions[0].text
 		catch error
