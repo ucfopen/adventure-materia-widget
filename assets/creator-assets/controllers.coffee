@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $timeout, treeSrv, legacyQsetSrv) ->
+Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, legacyQsetSrv) ->
 
 	# Define constants for node screen types
 	$scope.BLANK = "blank"
@@ -121,9 +121,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 			console.log $scope.editedNode
 
-			if $scope.editedNode and $scope.editedNode.hasProblem
-				delete $scope.editedNode.hasProblem
-				treeSrv.set $scope.treeData
+			# If node had a problem, assume user has addressed it and remove the hasProblems flag
+			if $scope.editedNode and $scope.editedNode.hasProblem then delete $scope.editedNode.hasProblem
 
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
@@ -133,6 +132,19 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			if $scope.editedNode and $scope.editedNode.type is $scope.END
 				if $scope.editedNode.finalScore is null
 					$scope.toast "End Point " + $scope.editedNode.name + " is missing a valid final score!"
+					$scope.editedNode.hasProblem = true
+
+			# Run the question text through $sanitize to see if it contains invalid HTML
+			# If so, warn the user
+			if $scope.editedNode and $scope.editedNode.question
+				try
+					$sanitize $scope.editedNode.question
+				catch e
+					$scope.toast "WARNING! " + $scope.editedNode.name + "'s question contains malformed or dangerous HTML!"
+					$scope.editedNode.hasProblem = true
+
+			# Redraw tree (again) to address any post-edit changes
+			treeSrv.set $scope.treeData
 
 
 	$scope.hideCoverAndModals = ->

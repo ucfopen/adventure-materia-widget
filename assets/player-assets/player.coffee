@@ -1,7 +1,7 @@
 Adventure = angular.module "Adventure"
 
 ## CONTROLLER ##
-Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) ->
+Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, $sanitize) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -59,6 +59,13 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else $scope.layout = q_data.options.asset.align
+
+		try
+			$sanitize q_data.questions[0].text
+		catch error
+			console.log error
+			q_data.questions[0].text = "*Question text removed due to malformed or dangerous HTML content*"
+
 
 		# Micromarkdown is adding <br/> for empty strings, and some mysterious newline char for strings with length > 0
 		parsedQuestion = if q_data.questions[0].text.length then micromarkdown.parse(q_data.questions[0].text).substring(1) else ""
