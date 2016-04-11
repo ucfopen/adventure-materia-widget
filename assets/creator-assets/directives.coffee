@@ -782,15 +782,15 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			else if $scope.nodeTools.showDeleteWarning then yBound += 143
 			else if $scope.nodeTools.showConvertDialog then yBound += 141
 
-			container = document.getElementById("tree-svg")
+			container = document.getElementById("tree-svg").getBoundingClientRect()
 
 			# Check for overflow
-			if yBound > container.offsetHeight
-				diffY = yBound - container.offsetHeight + 35
+			if yBound > container.height
+				diffY = yBound - container.height + 35
 				yOffset -= diffY
 
-			if xBound > container.offsetWidth
-				diffX = (xBound - container.offsetWidth) + 35
+			if xBound > container.width
+				diffX = (xBound - container.width) + 35
 				xOffset -= diffX
 
 			styles = "left: " + xOffset + "px; top: " + yOffset + "px"
@@ -1157,10 +1157,10 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 				yBound = yOffset + 150
 
-				container = document.getElementById("tree-svg")
+				container = document.getElementById("tree-svg").getBoundingClientRect()
 
-				if yBound > container.offsetHeight
-					diffY = yBound - container.offsetHeight + 10
+				if yBound > container.height
+					diffY = yBound - container.height + 10
 					yOffset -= diffY
 
 				styles =  "left: " + xOffset + "px; top: " + yOffset + "px"
@@ -1368,14 +1368,14 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 				xBound = offsetX + 300
 				yBound = offsetY + 188
 
-				container = document.getElementById("tree-svg")
+				container = document.getElementById("tree-svg").getBoundingClientRect()
 
-				if yBound > container.offsetHeight
-					diffY = yBound - container.offsetHeight - 35
+				if yBound > container.height
+					diffY = yBound - container.height - 35
 					offsetY -= diffY
 
-				if xBound > container.offsetWidth
-					diffX = (xBound - container.offsetWidth) + 35
+				if xBound > container.width
+					diffX = (xBound - container.width) + 35
 					offsetX -= diffX
 
 				styles = "left: " + offsetX + "px; top: " + offsetY + "px"
@@ -1948,15 +1948,15 @@ Adventure.directive "hotspotAnswerManager", () ->
 
 				# Get bounds of the answerManager and the entire tree container to check if the manager is off-screen
 				bounds = angular.element($element)[0].getBoundingClientRect()
-				container = document.getElementById("tree-svg")
+				container = document.getElementById("tree-svg").getBoundingClientRect()
 
 				# Move the manager so its back into frame if it's out of bounds
-				if (yOffset + bounds.height) > container.offsetHeight
-					diffY = (yOffset + bounds.height) - container.offsetHeight - 5
+				if (yOffset + bounds.height) > container.height
+					diffY = (yOffset + bounds.height) - container.height - 5
 					yOffset -= diffY
 
-				if (xOffset + bounds.width) > container.offsetWidth
-					diffX = (xOffset + bounds.width) - container.offsetWidth - 5
+				if (xOffset + bounds.width) > container.width
+					diffX = (xOffset + bounds.width) - container.width - 5
 					xOffset -= diffX
 
 				# Finally, update the position of the manager so the X/Y coords properly align with the hotspot canvas
