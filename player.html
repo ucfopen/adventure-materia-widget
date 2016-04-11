@@ -58,7 +58,7 @@
 			<!-- just an image -->
 			<div ng-switch-when="image-only">
 				<figure class="asset">
-					<img src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" />
 				</figure>
 			</div>
 			<!-- just text; no image -->
@@ -69,20 +69,20 @@
 			<div ng-switch-when="right">
 				<h2 class="text left" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 				<figure class="asset right">
-					<img src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" />
 				</figure>
 			</div>
 			<!-- image on the left -->
 			<div ng-switch-when="left">
 				<figure class="asset left">
-					<img src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" />
 				</figure>
 				<h2 class="text right" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 			</div>
 			<!-- image on the bottom -->
 			<div ng-switch-when="bottom">
 				<figure class="asset center">
-					<img src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" />
 				</figure>
 				<h2 class="text bottom" auto-text-scale ng-bind-html="question.text"></h2>
 			</div>
@@ -90,7 +90,7 @@
 			<div ng-switch-when="top">
 				<h2 class="text top" auto-text-scale ng-bind-html="question.text"></h2>
 				<figure class="asset center">
-					<img src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" />
 				</figure>
 			</div>
 			<!-- hotspot mode. No image associated w/ question -->
@@ -145,6 +145,7 @@
 					xml:space="preserve">
 					<g ng-repeat="answer in answers"
 						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})"
+						data-label="{{answer.text}}"
 						visibility-manager
 						label-manager>
 						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
@@ -184,7 +185,7 @@
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
 					</g>
 				</svg>
-				<img src="{{question.image}}">
+				<img ng-src="{{question.image}}">
 			</div>
 			<div class="trans"ng-if="type == TRANS">
 				<input type="button"
