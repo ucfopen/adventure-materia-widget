@@ -2214,7 +2214,6 @@ Adventure.directive "debugQsetLoader", (treeSrv, legacyQsetSrv, $rootScope) ->
 			try
 				qset = JSON.parse $scope.debugQset
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
-				console.log $scope.treeData
 			catch err
 				alert "Uh oh! There was a problem loading this widget."
 				$scope.showQsetLoader = false
