@@ -146,7 +146,6 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 					link = ~~$scope.q_data.answers[i].options.link # is parsing required?
 
 					$scope.selectedAnswer = $scope.q_data.answers[i].options.matches[j]
-					console.log $scope.selectedAnswer
 					_logProgress()
 
 					if $scope.q_data.answers[i].options and $scope.q_data.answers[i].options.feedback
