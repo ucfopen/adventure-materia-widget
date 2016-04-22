@@ -147,7 +147,6 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 					link = ~~$scope.q_data.answers[i].options.link # is parsing required?
 
 					$scope.selectedAnswer = $scope.q_data.answers[i].options.matches[j]
-					console.log $scope.selectedAnswer
 					_logProgress()
 
 					if $scope.q_data.answers[i].options and $scope.q_data.answers[i].options.feedback
@@ -232,7 +231,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv) 
 		$scope.layout = "text-only"
 		$scope.question.text = "[Blank destination: click Continue to end the widget preview.]"
 		$scope.link = -1
-		Materia.Score.submitFinalScoreFromClient q_data.id, q_data.questions[0].text, 100
+		Materia.Score.submitFinalScoreFromClient null, "Blank Destination! Be sure to edit or remove this node before publishing.", 100
 
 	# Submit the user's response to the logs
 	_logProgress = ->
@@ -368,7 +367,7 @@ Adventure.directive "labelManager", ($timeout) ->
 
 		$scope.onHotspotHover = (answer, evt) ->
 
-			if answer.text.length > 0 then $scope.hotspotLabelTarget.text = answer.text
+			if answer.text then $scope.hotspotLabelTarget.text = answer.text
 			else return false
 
 			container = document.getElementById "body"

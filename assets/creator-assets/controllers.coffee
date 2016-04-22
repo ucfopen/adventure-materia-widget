@@ -119,8 +119,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 					$scope.hideToast()
 				), 5000
 
-			console.log $scope.editedNode
-
 			if $scope.editedNode and $scope.editedNode.hasProblem
 				delete $scope.editedNode.hasProblem
 				treeSrv.set $scope.treeData
@@ -351,9 +349,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	# we just update the editedNode object and kick off a broadcast that directives will listen for
 	$scope.onMediaImportComplete = (media) ->
 
-		unless $scope.editedNode
-			console.log "Uh oh, media import doesn't have a target node"
-			return
+		unless $scope.editedNode then return
 
 		$scope.editedNode.media =
 			type: "image"
