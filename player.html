@@ -8,7 +8,7 @@
 		<meta charset="utf-8" />
 
 		<!-- STYLESHEETS -->
-		<link href='http://fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+		<link href='//fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="assets/player-assets/player.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
@@ -57,8 +57,9 @@
 			ng-switch="layout">
 			<!-- just an image -->
 			<div ng-switch-when="image-only">
-				<figure class="asset imageOnly">
-					<img ng-src="{{ question.image }}" />
+
+				<figure class="asset image-only">
+					<img ng-src="{{ question.image }}" dynamic-image-scale />
 				</figure>
 			</div>
 			<!-- just text; no image -->
@@ -69,20 +70,20 @@
 			<div ng-switch-when="right">
 				<h2 class="text left" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 				<figure class="asset right">
-					<img ng-src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" dynamic-image-scale />
 				</figure>
 			</div>
 			<!-- image on the left -->
 			<div ng-switch-when="left">
 				<figure class="asset left">
-					<img ng-src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" dynamic-image-scale />
 				</figure>
 				<h2 class="text right" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 			</div>
 			<!-- image on the bottom -->
 			<div ng-switch-when="bottom">
 				<figure class="asset center">
-					<img ng-src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" dynamic-image-scale />
 				</figure>
 				<h2 class="text bottom" auto-text-scale ng-bind-html="question.text"></h2>
 			</div>
@@ -90,7 +91,7 @@
 			<div ng-switch-when="top">
 				<h2 class="text top" auto-text-scale ng-bind-html="question.text"></h2>
 				<figure class="asset center">
-					<img ng-src="{{ question.image }}" />
+					<img ng-src="{{ question.image }}" dynamic-image-scale />
 				</figure>
 			</div>
 			<!-- hotspot mode. No image associated w/ question -->
