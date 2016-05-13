@@ -78,10 +78,6 @@ h1 {
 	display: block;
 	background: #fff;
 
-	h2 {
-		overflow-x: hidden;
-	}
-
 	&.hotspot-mode {
 		max-height: 65px;
 
@@ -102,6 +98,12 @@ h1 {
 		h2 {
 			max-height: 380px;
 		}
+
+		&.hidden-title {
+			h2 {
+				max-height: 433px;
+			}
+		}
 	}
 
 	&.transitional-mode {
@@ -115,7 +117,7 @@ h1 {
 
 		&.hidden-title {
 			h2 {
-				max-height: 470px;
+				max-height: 472px;
 
 				&.top, &.bottom {
 					max-height: 215px;
@@ -129,8 +131,6 @@ h1 {
 	}
 
 	h2 {
-
-		// max-height: 220px;
 		margin: 0px;
 
 		overflow-y: auto;
@@ -148,16 +148,16 @@ h1 {
 		}
 
 		&.left {
-			width:45%;
+			max-width: 45%;
 			display:inline-block;
 		}
 		&.right {
 			position: absolute;
 			display:inline-block;
-			top: 15px;
+			top: 35px;
 			right: 20px;
 
-			width:45%;
+			max-width:45%;
 		}
 		&.top, &.bottom {
 			text-align: center;
@@ -167,23 +167,32 @@ h1 {
 
 .asset {
 	margin: 0px 40px;
-	width: 40%;
 
 	img {
-		max-width: 100%;
-		max-height: 222px;
+		border: solid 6px $white;
+		border-radius: 10px;
+		box-shadow: $shadow-small-highlight;
 	}
 
 	&.right {
 		display: inline-block;
 		margin-right: 40px;
+		float: right;
 
 		text-align: center;
 	}
 
 	&.center {
-		width: 90%;
 		margin: 15px auto;
+		text-align: center;
+	}
+
+	&.image-only
+	{
+		display: block;
+
+		margin: 0 auto;
+
 		text-align: center;
 	}
 }
