@@ -276,7 +276,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 			pre = newString.substring 0, start
 			post = newString.substring start + match[0].length
 
-			newString = pre + match[0] + " target=\"_blank\"" + post
+			newString = pre + match[0] + " target=\"_blank\" rel=\"noopener\"" + post
 
 		newString
 
