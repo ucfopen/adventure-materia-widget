@@ -69,8 +69,11 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 			q_data.questions[0].text = "*Question text removed due to malformed or dangerous HTML content*"
 
 
-		# Micromarkdown is adding <br/> for empty strings, and some mysterious newline char for strings with length > 0
-		parsedQuestion = if q_data.questions[0].text.length then micromarkdown.parse(q_data.questions[0].text).substring(1) else ""
+		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
+		if q_data.questions[0].text.length then parsedQuestion = micromarkdown.parse(q_data.questions[0].text) else parsedQuestion = ""
+
+		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
+		parsedQuestion = addTargetToHrefs parsedQuestion
 
 		$scope.question =
 			text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
@@ -261,6 +264,22 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 		else return "font-size:" + $scope.questionFormat.fontSize + "px;"
 
 	Materia.Engine.start($scope.engine)
+
+	# Small script that inserts " target="_blank"  " into a hrefs, preventing hyperlinks from displaying within the iframe.
+	addTargetToHrefs = (string) ->
+
+		pattern = /(?:<a\ [A-Za-z0-9\_\-\=\"\ \:\/\.\#\?\$]*)/g
+		newString = string
+
+		while (match = pattern.exec newString) isnt null
+			start = match['index']
+			pre = newString.substring 0, start
+			post = newString.substring start + match[0].length
+
+			newString = pre + match[0] + " target=\"_blank\"" + post
+
+		newString
+
 
 ## DIRECTIVES ##
 Adventure.directive('ngEnter', ->
