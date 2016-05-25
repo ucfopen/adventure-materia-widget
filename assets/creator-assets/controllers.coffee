@@ -119,8 +119,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 					$scope.hideToast()
 				), 5000
 
-			console.log $scope.editedNode
-
 			# If node had a problem, assume user has addressed it and remove the hasProblems flag
 			if $scope.editedNode and $scope.editedNode.hasProblem then delete $scope.editedNode.hasProblem
 
@@ -363,9 +361,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	# we just update the editedNode object and kick off a broadcast that directives will listen for
 	$scope.onMediaImportComplete = (media) ->
 
-		unless $scope.editedNode
-			console.log "Uh oh, media import doesn't have a target node"
-			return
+		unless $scope.editedNode then return
 
 		$scope.editedNode.media =
 			type: "image"
