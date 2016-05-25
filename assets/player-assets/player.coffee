@@ -58,7 +58,8 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 				q_data = $scope.qset.items[n]
 
 		unless q_data.options.asset then $scope.layout = "text-only"
-		else $scope.layout = q_data.options.asset.align
+		else if q_data.questions[0].text != "" then $scope.layout = q_data.options.asset.align
+		else $scope.layout = "image-only"
 
 		# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 		# Instead, parse in advance, catch the error, and warn the user that the text was nasty
@@ -158,7 +159,6 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 					link = ~~$scope.q_data.answers[i].options.link # is parsing required?
 
 					$scope.selectedAnswer = $scope.q_data.answers[i].options.matches[j]
-					console.log $scope.selectedAnswer
 					_logProgress()
 
 					if $scope.q_data.answers[i].options and $scope.q_data.answers[i].options.feedback
@@ -339,7 +339,10 @@ Adventure.directive "dynamicScale", () ->
 	link: ($scope, $element, $attrs) ->
 
 		minHeight = 220
-		maxHeight = 400
+		maxHeight = if $scope.hidePlayerTitle then 480 else 438
+
+		minAnswerHeight = 62 # Minimum height of the answer container, subtracted from the answersHeight so we only know the scaled amount
+		maxAnswerHeight = 250 # Max height of answer container, used to calculate diff
 
 		style = ""
 
@@ -352,14 +355,66 @@ Adventure.directive "dynamicScale", () ->
 				# min: 220
 				# max: 400
 
-			answersHeight = angular.element(".answers")[0].offsetHeight
+			answersHeight = angular.element(".answers")[0].getBoundingClientRect().height - minAnswerHeight
 
-			diff = 250 - answersHeight
+			diff = maxAnswerHeight - answersHeight
 
-			if (diff + minHeight) < 400 then $scope.questionFormat.height = diff + minHeight
-			else $scope.questionFormat.height = 400
+			if (diff + minHeight) < maxHeight then $scope.questionFormat.height = diff + minHeight
+			else $scope.questionFormat.height = maxHeight
 
 			$attrs.$set "style", $scope.formatQuestionStyles()
+
+# Images in the player are subject to a number of constraints that makes scaling them logically complicated
+# Scaling is dependent on width of accompanying text, available height (constrained by header & answer container), and horiz/vertical layout
+# Logic must be applied AFTER image has loaded in order to properly query width and height
+Adventure.directive "dynamicImageScale", () ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		# Constants
+		containerWidth = 800
+
+		maxHeightWithTitle = 380
+		maxHeightSansTitle = 440
+
+		verticalModeReduction = 210 # Reduction in useable height because the vertical area is taken up by the text content
+
+		$scope.$watch "question", (newVal, oldVal) ->
+
+			unless newVal.image then return
+
+			# Temporarily make image invisible while it loads (so it's not all wonky)
+			$attrs.$set "style", "display:none;"
+
+			img = new Image()
+			img.src = newVal.image
+
+			img.onload = ->
+				# Get width of text container (if it has any text)
+				unless document.getElementsByClassName("text")[0] then textWidth = 0
+				else textWidth = document.getElementsByClassName("text")[0].getBoundingClientRect().width
+
+				# Get height of answers container (min height is 62, so reduce by that value)
+				answersHeight = document.getElementsByClassName("answers")[0].getBoundingClientRect().height - 62
+
+				# Permutations based on whether or not the text/asset is aligned vertically
+				if $scope.layout is "top" or $scope.layout is "bottom" then maxWidth = textWidth
+				else maxWidth = containerWidth - textWidth - 160
+
+				# Adjust height based on whether the title header is taking up space
+				if $scope.hideTitle then maxHeight = maxHeightSansTitle - answersHeight
+				else maxHeight = maxHeightWithTitle - answersHeight
+
+				if $scope.layout is "top" or $scope.layout is "bottom" then maxHeight -= verticalModeReduction
+
+				# Determine scale ratio based on dimensions of the image asset
+				ratio = Math.min(maxWidth/img.width, maxHeight/img.height)
+
+				scaledWidth = img.width * ratio
+				scaledHeight = img.height * ratio
+
+				# Apply scaling
+				$attrs.$set "style", "width:"+scaledWidth+"px;height:"+scaledHeight+"px;"
 
 # Handles the visibility of individual hotspots
 Adventure.directive "visibilityManager", () ->

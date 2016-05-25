@@ -618,7 +618,7 @@
 									ng-mousemove="scaleSVG($index, $event)"
 									ng-mouseup="endSVGScale($event)"
 									ng-mouseenter="hoverScale = true"
-									ng-mouseleave="hoverScale = false">
+									ng-mouseleave="hoverScale = false; endSVGScale($event)">
 									<circle ng-attr-r="{{ hoverScale ? '40' : '20' }}"
 										ng-attr-cx="{{answer.svg.scaleXOffset + 8}}"
 										ng-attr-cy="{{answer.svg.scaleYOffset + 8}}"/
