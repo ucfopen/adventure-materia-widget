@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
+Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 
 	# TreeData is being initialized in -two- places right now.
 	# This one may or may not be required.
@@ -637,6 +637,17 @@ Adventure.service "treeSrv", ($rootScope, $filter, legacyQsetSrv) ->
 					type: "has_no_final_score"
 
 				errors.push error
+
+			else
+				if node.question and node.question.length > 0
+					try
+						$sanitize node.question
+					catch e
+						error =
+							node: node.id
+							type: "has_bad_html"
+
+						errors.push error
 
 		return errors
 
