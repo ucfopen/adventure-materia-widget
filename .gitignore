@@ -1,4 +1,6 @@
+.build
 .DS_Store
 .sass-cache
+node_modules
 com.adobe.flexbuilder.project.prefs
 build.local.properties
