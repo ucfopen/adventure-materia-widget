@@ -41,6 +41,10 @@
 					<label for="options-check-slide-input"></label>
 				</div>
 			</div>
+			<div class="header-options-box">
+				<p>Widget Scoring Mode</p>
+				<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
+			</div>
 
 			<!-- <button type="button" class="temp-qset-gen-button" ng-click="generateDebugQset()">Generate QSet</button>
 			<button type="button" class="temp-qset-gen-button" ng-click="showQsetLoader = true">Load QSet</button> -->
@@ -643,7 +647,7 @@
 						ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
 				</div>
 				<!-- container for selecting the destination for end nodes -->
-				<div class="continuity-container" ng-if="displayNodeCreation == END">
+				<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NORMAL">
 					<span>The user's path will conclude with this destination. Set the final score:</span>
 					<final-score-box
 						ng-form="finalScoreForm"
@@ -658,6 +662,9 @@
 							max="100" />
 					</final-score-box>
 					<span>%</span>
+				</div>
+				<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NONSCORING">
+					<span>End Points do not provide scores when the widget is in Non-Scoring mode.</span>
 				</div>
 				<button class="add-answer important-button"
 					type="button"
@@ -680,12 +687,24 @@
 				</div>
 			</node-tooltips>
 			<div class="intro-screen" ng-show="showIntroDialog">
-			<img src="assets/creator-assets/sample-tree.png" />
-			<h2>Create Your Own Adventure!</h2>
-			<p>Build a branching decision tree! Each point on the tree, or "destination", represents a screen the student interacts with.</p>
-			<p>Each interaction leads to another destination, until a student finds an end point.</p>
-			<p>Students are given a score based on the end point they reach.</p>
-			<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
+				<img src="assets/creator-assets/sample-tree.png" />
+				<h2>Create Your Own Adventure!</h2>
+				<p>Build a branching decision tree! Each point on the tree, or "destination", represents a screen the student interacts with.</p>
+				<p>Each interaction leads to another destination, until a student finds an end point.</p>
+				<p>Students are given a score based on the end point they reach.</p>
+				<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
+			</div>
+			<div class="score-mode-screen" ng-show="showScoreModeDialog">
+				<p>With <strong>Normal</strong> mode enabled, Choose Your Own Adventure will score the student based on the first End Point they reach. They will then be taken to the Materia score screen to see a breakdown of their journey.</p>
+				<p>With <strong>Non-Scoring</strong> mode enabled, the widget will not return a score to Materia, and if it's embedded as an LTI assignment in an LMS platform, it will only report that the widget was completed - it will not provide a score. The Materia score screen will not be displayed.</p>
+				<div class="score-mode-selection">
+					<button type="button"
+						ng-class="{ 'important-button' : scoreMode == NORMAL }"
+						ng-click="scoreMode = NORMAL">Normal Scoring Mode</button>
+					<button type="button"
+						ng-class="{ 'important-button' : scoreMode == NONSCORING }"
+						ng-click="scoreMode = NONSCORING">Non-Scoring Mode</button>
+				</div>
 			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
 			<tree-visualization data="treeData"

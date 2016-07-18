@@ -1455,7 +1455,7 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 				if $scope.editedNode.type is $scope.END
 
 					if typeof $scope.editedNode.finalScore is 'undefined'
-						$scope.finalScore = 100
+						$scope.editedNode.finalScore = $scope.finalScore = 100
 					else
 						$scope.finalScore = $scope.editedNode.finalScore
 

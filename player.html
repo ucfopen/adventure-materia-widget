@@ -105,7 +105,8 @@
 			ng-class="{
 				'hotspot-mode' : question.type == HOTSPOT,
 				'no-question' : question.text.length == 0,
-				'hidden-title' : hideTitle == true}">
+				'hidden-title' : hideTitle == true}"
+			ng-hide="question.type == OVER">
 			<div class="mc"
 				ng-show="type == MC">
 				<a href="#"
