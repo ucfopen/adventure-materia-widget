@@ -225,11 +225,18 @@ header.title-header {
 		margin-top: -6px;
 		margin-right: 25px;
 
+		text-align: center;
+
 		color: $color-primary;
 		font-size: 12px;
 
 		input[type=checkbox] {
 			visibility: hidden;
+		}
+
+		button.header-options-button {
+			width: 90%;
+			margin: 3px auto 0px auto;
 		}
 	}
 }
@@ -641,6 +648,43 @@ debug-qset-loader, debug-qset-generator {
 		padding: 10px 20px;
 		font-weight: 400;
 		font-size: 18px;
+	}
+}
+
+.score-mode-screen {
+	position: absolute;
+	width: 620px;
+	top: 10%;
+	left: 50%;
+	z-index: 2;
+	margin-left: -325px;
+
+	padding: 15px 15px 25px 20px;
+
+	border-radius: 5px;
+
+	background: $color-primary;
+
+	font-family: Verdana, Helvetica;
+	font-size: 15px;
+
+	p {
+		margin: 15px 0px 15px 0px;
+
+		font-weight: 100;
+	}
+
+	button {
+		padding: 15px 10px;
+		font-size:14px;
+	}
+
+	.score-mode-selection {
+		padding-top: 20px;
+
+		border-top: solid 1px $gray-lightest;
+
+		text-align: center;
 	}
 }
 
