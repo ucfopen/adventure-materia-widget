@@ -5,7 +5,7 @@ Adventure.service "legacyQsetSrv", () ->
 	imageOffsetX = null
 
 	# Converts the QSets used by Adventure 1.0 (the flash version) to ones usable by the Adventure 2.0 creator & player
-	# If used by the creator, once the widget is re-saved, it'll be saved as an Adventure 2.0 Qset and this won' be needed again for that instance
+	# If used by the creator, once the widget is re-saved, it'll be saved as an Adventure 2.0 Qset and this won't be needed again for that instance
 	# If used by the player, no manipulation is made to the actual QSet, so it must be referenced every time the 1.0 QSet is loaded
 	# Because the requirements of the player & creator are nearly identical, the QSet conversion code is located in its own independent service that's imported by both
 	convertOldQset = (qset) ->

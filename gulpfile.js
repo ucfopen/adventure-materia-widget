@@ -66,7 +66,7 @@ gulp.task('coffee', function()
 	gutil.log("Coffee Running");
 	// Engine
 	return gulp.src([sourceString + 'src/*.coffee'])
-		.pipe( coffee() )
+		.pipe( coffee({bare: true}) )
 		.on('error', function(msg) {console.log("coffee Fail Error: ", msg.toString());})
 		.pipe( print() )
 		.pipe(gulp.dest(sourceString + '.build/'));
@@ -77,7 +77,7 @@ gulp.task('coffee-assets', function()
 	gutil.log("Coffee Assets Running");
 	// Assets
 	return gulp.src([sourceString + 'src/assets/*.coffee', sourceString + 'src/assets/**/*.coffee'])
-		.pipe( coffee() )
+		.pipe( coffee({bare: true}) )
 		.on('error', function(msg) {console.log("coffee Fail Error: ", msg.toString());})
 		.pipe( print() )
 		.pipe(gulp.dest(sourceString + '.build/assets/'));
@@ -318,7 +318,7 @@ function minifyCss(htmlName)
 gulp.task('ngAnnotate', function()
 {
 	gutil.log("NgAnnotate Running");
-	return gulp.src([sourceString + '.build/*.js', '!' + sourceString + '.build/*.min.js', '!' + sourceString + '.build/*.pack.js'])
+	return gulp.src([sourceString + '.build/**/*.js', '!' + sourceString + '.build/**/*.min.js', '!' + sourceString + '.build/**/*.pack.js'])
 		.pipe(ngAnnotate())
 		.on('error', function(msg) {console.log("ngmin Fail Error: ", msg.toString());})
 		.pipe( print() )
