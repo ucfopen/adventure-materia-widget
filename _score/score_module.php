@@ -60,7 +60,7 @@ class Score_Modules_Adventure extends Score_Module
 				{
 					if ($this->inst->qset->data['options']['scoreMode'] && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
 					{
-						return 0;
+						return 100;
 					}
 					else
 					{

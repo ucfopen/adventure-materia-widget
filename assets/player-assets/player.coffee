@@ -260,7 +260,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 
 			$scope.question =
 				type: 'over'
-				text: 'Your experience has concluded. You may navigate away from this page.'
+				text: 'You have completed this experience and your progress has been recorded. You can close or navigate away from this page.'
 				layout: 'text-only'
 				id: -1
 			# alert "ended widget; will NOT navigate to score screen!"

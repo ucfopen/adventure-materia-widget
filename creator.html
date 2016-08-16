@@ -695,15 +695,16 @@
 				<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
 			</div>
 			<div class="score-mode-screen" ng-show="showScoreModeDialog">
+				<h4>Select a Score Mode</h4>
 				<p>With <strong>Normal</strong> mode enabled, the student will be scored based on the first End Point they reach. They will then be sent to the Materia score screen to see a breakdown of their journey.</p>
-				<p>With <strong>Non-Scoring</strong> mode enabled, the widget will not return a score to Materia, and if it's embedded as an LTI assignment in an LMS platform, it will only report that the widget was completed - it will not provide a score. The Materia score screen will not be displayed.</p>
+				<p>With <strong>Non-Scoring</strong> mode enabled, the widget will return a score of 100 regardless of the choices the student makes. When they reach an end point, students will be informed they have completed the widget and <strong>will not</strong> be sent to the Materia score screen.</p>
 				<div class="score-mode-selection">
 					<button type="button"
 						ng-class="{ 'important-button' : scoreMode == NORMAL }"
-						ng-click="scoreMode = NORMAL">Normal Scoring Mode</button>
+						ng-click="scoreMode = NORMAL; hideCoverAndModals()">Normal Scoring Mode</button>
 					<button type="button"
 						ng-class="{ 'important-button' : scoreMode == NONSCORING }"
-						ng-click="scoreMode = NONSCORING">Non-Scoring Mode</button>
+						ng-click="scoreMode = NONSCORING; hideCoverAndModals()">Non-Scoring Mode</button>
 				</div>
 			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
