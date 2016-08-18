@@ -377,8 +377,6 @@ Adventure.directive "dynamicImageScale", () ->
 		maxHeightWithTitle = 380
 		maxHeightSansTitle = 440
 
-		verticalModeReduction = 210 # Reduction in useable height because the vertical area is taken up by the text content
-
 		$scope.$watch "question", (newVal, oldVal) ->
 
 			unless newVal.image then return
@@ -405,7 +403,8 @@ Adventure.directive "dynamicImageScale", () ->
 				if $scope.hideTitle then maxHeight = maxHeightSansTitle - answersHeight
 				else maxHeight = maxHeightWithTitle - answersHeight
 
-				if $scope.layout is "top" or $scope.layout is "bottom" then maxHeight -= verticalModeReduction
+				# Final adjustment to height to compensate for space being used by text in vertical orientations
+				if $scope.layout is "top" or $scope.layout is "bottom" then maxHeight -= document.getElementsByClassName("text")[0].getBoundingClientRect().height + 20
 
 				# Determine scale ratio based on dimensions of the image asset
 				ratio = Math.min(maxWidth/img.width, maxHeight/img.height)
