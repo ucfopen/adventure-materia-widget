@@ -20,6 +20,11 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 	$scope.scoreMode = $scope.NORMAL
 
+	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
+	PRESANITIZE_CHARACTERS =
+		'>' : '&gt;',
+		'<' : '&lt;'
+
 	$scope.title = ""
 
 	$scope.hidePlayerTitle = false
@@ -141,7 +146,12 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 			# If so, warn the user
 			if $scope.editedNode and $scope.editedNode.question
 				try
-					$sanitize $scope.editedNode.question
+					# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
+					presanitized = $scope.editedNode.question
+					for k, v of PRESANITIZE_CHARACTERS
+						presanitized = presanitized.replace k, v
+
+					$sanitize presanitized
 				catch e
 					$scope.toast "WARNING! " + $scope.editedNode.name + "'s question contains malformed or dangerous HTML!"
 					$scope.editedNode.hasProblem = true
