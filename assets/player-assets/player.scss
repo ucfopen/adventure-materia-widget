@@ -130,6 +130,19 @@ h1 {
 		padding-top: 35px;
 	}
 
+	&.end-screen-mode {
+		h2 {
+			padding: 35px 0px 15px 0px;
+
+			border-bottom: solid 1px $gray-lightest;
+
+			font-size: 18px;
+			font-weight: bold;
+
+
+		}
+	}
+
 	h2 {
 		margin: 0px;
 
