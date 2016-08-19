@@ -18,6 +18,11 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 	CONTAINER_WIDTH = 730
 	CONTAINER_HEGIHT = 650
 
+	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
+	PRESANITIZE_CHARACTERS =
+		'>' : '&gt;',
+		'<' : '&lt;'
+
 	$scope.title = ""
 	$scope.qset = null
 	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
@@ -64,14 +69,18 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 		# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 		# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 		try
-			$sanitize q_data.questions[0].text
+			# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
+			presanitized = q_data.questions[0].text
+			for k, v of PRESANITIZE_CHARACTERS
+				presanitized = presanitized.replace k, v
+			$sanitize presanitized
+
 		catch error
 			console.log error
 			q_data.questions[0].text = "*Question text removed due to malformed or dangerous HTML content*"
 
-
 		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
-		if q_data.questions[0].text.length then parsedQuestion = micromarkdown.parse(q_data.questions[0].text) else parsedQuestion = ""
+		if presanitized.length then parsedQuestion = micromarkdown.parse(presanitized) else parsedQuestion = ""
 
 		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
 		parsedQuestion = addTargetToHrefs parsedQuestion
