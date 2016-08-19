@@ -15,6 +15,11 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	$scope.EXISTING = "existing"
 	$scope.SELF = "self"
 
+	$scope.NORMAL = "Normal"
+	$scope.NONSCORING = "Non-Scoring"
+
+	$scope.scoreMode = $scope.NORMAL
+
 	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
 	PRESANITIZE_CHARACTERS =
 		'>' : '&gt;',
@@ -163,6 +168,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		$scope.showDeleteWarning = false
 		$scope.showTitleEditor = false
 		$scope.validation.show = false
+		$scope.showScoreModeDialog = false
 
 		$scope.displayNodeCreation = "none"
 
@@ -187,6 +193,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
 
+				if qset.options.scoreMode then $scope.scoreMode = qset.options.scoreMode
+
 				# Check to make sure the tree doesn't have errors
 				validation = treeSrv.validateTreeOnStart $scope.treeData
 				if validation.length
@@ -210,6 +218,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		else
 			qset = treeSrv.createQSetFromTree $scope.treeData
 			qset.options.hidePlayerTitle = $scope.hidePlayerTitle
+			qset.options.scoreMode = $scope.scoreMode
 			Materia.CreatorCore.save $scope.title, qset, 2
 
 	$scope.onSaveComplete = (title, widget, qset, version) -> true
@@ -384,6 +393,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 	$scope.generateDebugQset = ->
 		qset = treeSrv.createQSetFromTree $scope.treeData
 		qset.options.hidePlayerTitle = $scope.hidePlayerTitle
+		qset.options.scoreMode = $scope.scoreMode
 
 		$scope.showQsetGenerator = true
 		$scope.generatedQset = JSON.stringify qset, null, 2
