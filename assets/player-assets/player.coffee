@@ -272,7 +272,8 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 				text: 'You have completed this experience and your progress has been recorded. You can close or navigate away from this page.'
 				layout: 'text-only'
 				id: -1
-			# alert "ended widget; will NOT navigate to score screen!"
+
+			$scope.layout = $scope.question.layout
 		else
 			Materia.Engine.end yes
 
