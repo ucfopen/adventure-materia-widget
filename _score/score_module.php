@@ -58,7 +58,7 @@ class Score_Modules_Adventure extends Score_Module
 				# make sure we have the right qset item that matches the provided log, return associated finalScore
 				if (trim($log->text) == trim($item['questions'][0]['text']))
 				{
-					if ($this->inst->qset->data['options']['scoreMode'] && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
+					if (isset($this->inst->qset->data['options']['scoreMode']) && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
 					{
 						return 100;
 					}
