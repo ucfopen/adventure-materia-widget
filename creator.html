@@ -704,7 +704,15 @@
 						ng-click="scoreMode = NORMAL; hideCoverAndModals()">Normal Scoring Mode</button>
 					<button type="button"
 						ng-class="{ 'important-button' : scoreMode == NONSCORING }"
-						ng-click="scoreMode = NONSCORING; hideCoverAndModals()">Non-Scoring Mode</button>
+						ng-click="scoreMode = NONSCORING">Non-Scoring Mode</button>
+				</div>
+				<div class="internal-score-screen-edit-shortcut"
+					ng-show="scoreMode == NONSCORING">
+					<p>You can choose to edit the message students will see when they have completed the widget (leave blank for default):</p>
+					<textarea ng-model="internalScoreMessage" placeholder="You have completed this experience and your progress has been recorded. You can close or navigate away from this page."></textarea>
+					<button type="button"
+						class="important-button"
+						ng-click="hideCoverAndModals()">Done</button>
 				</div>
 			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
