@@ -27,6 +27,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 	$scope.qset = null
 	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
 	$scope.scoringDisabled = false
+	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 
 	$scope.engine =
 		start: (instance, qset, version = '1') ->
@@ -42,7 +43,9 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
 
-				if qset.options.scoreMode and qset.options.scoreMode is "Non-Scoring" then $scope.scoringDisabled = true
+				if qset.options.scoreMode and qset.options.scoreMode is "Non-Scoring"
+					$scope.scoringDisabled = true
+					if qset.options.internalScoreMessage then $scope.customInternalScoreMessage = qset.options.internalScoreMessage
 
 		manualResize: true
 
@@ -269,7 +272,7 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 
 			$scope.question =
 				type: 'over'
-				text: 'You have completed this experience and your progress has been recorded. You can close or navigate away from this page.'
+				text: if $scope.customInternalScoreMessage.length then $scope.customInternalScoreMessage else 'You have completed this experience and your progress has been recorded. You can close or navigate away from this page.'
 				layout: 'text-only'
 				id: -1
 
