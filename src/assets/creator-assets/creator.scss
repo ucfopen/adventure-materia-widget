@@ -201,12 +201,9 @@ header.title-header {
 		cursor: pointer;
 	}
 
-	div.logo {
+	img.logo {
 		display: inline-block;
 		float: left;
-		background: url("materialogo.png") no-repeat;
-		width: 60px;
-		height: 50px;
 		margin-left:20px;
 	}
 
@@ -228,11 +225,18 @@ header.title-header {
 		margin-top: -6px;
 		margin-right: 25px;
 
+		text-align: center;
+
 		color: $color-primary;
 		font-size: 12px;
 
 		input[type=checkbox] {
 			visibility: hidden;
+		}
+
+		button.header-options-button {
+			width: 90%;
+			margin: 3px auto 0px auto;
 		}
 	}
 }
@@ -644,6 +648,86 @@ debug-qset-loader, debug-qset-generator {
 		padding: 10px 20px;
 		font-weight: 400;
 		font-size: 18px;
+	}
+}
+
+.score-mode-screen {
+	position: absolute;
+	width: 620px;
+	top: 10%;
+	left: 50%;
+	z-index: 2;
+	margin-left: -325px;
+
+	// padding: 15px 15px 25px 20px;
+	padding: 0px;
+
+	border-radius: 5px;
+
+	background: $color-primary;
+
+	font-family: Verdana, Helvetica;
+	font-size: 15px;
+
+	p {
+		margin: 15px 15px 15px 20px;
+
+		font-weight: 100;
+	}
+
+	button {
+		padding: 15px 10px;
+		font-size:14px;
+	}
+
+	h4 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+
+		color: $color-primary;
+		background: $color-accent;
+	}
+
+	.score-mode-selection {
+		padding: 20px 0px 25px 0px;
+
+		border-top: solid 1px $gray-lightest;
+
+		text-align: center;
+	}
+
+	.internal-score-screen-edit-shortcut {
+		position: relative;
+		width: 100%;
+		padding:10px 0px 25px 0px;
+		background: $gray-lightest;
+
+		border-bottom-left-radius: 5px;
+		border-bottom-right-radius: 5px;
+
+		textarea {
+			margin-left: 20px;
+			width: 80%;
+			height: 4em;
+
+			border: solid 1px #cccccc;
+			border-radius: 3px;
+			font-size: 13px;
+		}
+
+		button {
+			position: absolute;
+			bottom: 60px;
+			right: 25px;
+			padding: 5px 10px;
+			font-size: 12px;
+		}
 	}
 }
 

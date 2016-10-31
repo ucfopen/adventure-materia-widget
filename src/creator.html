@@ -31,8 +31,7 @@
 	</head>
 	<body ng-controller="AdventureCtrl" id="body">
 		<header class="title-header">
-			<div class="logo">
-			</div>
+			<img class="logo" src="assets/creator-assets/materialogo.png" alt="Materia Logo" />
 			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
 			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
 			<div class="header-options-box">
@@ -41,6 +40,10 @@
 					<input type="checkbox" ng-model="hidePlayerTitle" id="options-check-slide-input"/>
 					<label for="options-check-slide-input"></label>
 				</div>
+			</div>
+			<div class="header-options-box">
+				<p>Widget Scoring Mode</p>
+				<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
 			</div>
 
 			<!-- <button type="button" class="temp-qset-gen-button" ng-click="generateDebugQset()">Generate QSet</button>
@@ -644,7 +647,7 @@
 						ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
 				</div>
 				<!-- container for selecting the destination for end nodes -->
-				<div class="continuity-container" ng-if="displayNodeCreation == END">
+				<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NORMAL">
 					<span>The user's path will conclude with this destination. Set the final score:</span>
 					<final-score-box
 						ng-form="finalScoreForm"
@@ -659,6 +662,9 @@
 							max="100" />
 					</final-score-box>
 					<span>%</span>
+				</div>
+				<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NONSCORING">
+					<span>End Points do not provide scores when the widget is in Non-Scoring mode.</span>
 				</div>
 				<button class="add-answer important-button"
 					type="button"
@@ -681,12 +687,33 @@
 				</div>
 			</node-tooltips>
 			<div class="intro-screen" ng-show="showIntroDialog">
-			<img src="assets/creator-assets/sample-tree.png" />
-			<h2>Create Your Own Adventure!</h2>
-			<p>Build a branching decision tree! Each point on the tree, or "destination", represents a screen the student interacts with.</p>
-			<p>Each interaction leads to another destination, until a student finds an end point.</p>
-			<p>Students are given a score based on the end point they reach.</p>
-			<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
+				<img src="assets/creator-assets/sample-tree.png" />
+				<h2>Create Your Own Adventure!</h2>
+				<p>Build a branching decision tree! Each point on the tree, or "destination", represents a screen the student interacts with.</p>
+				<p>Each interaction leads to another destination, until a student finds an end point.</p>
+				<p>Students are given a score based on the end point they reach.</p>
+				<button type="button" class="important-button" ng-click="hideCoverAndModals()">Let's Go</button>
+			</div>
+			<div class="score-mode-screen" ng-show="showScoreModeDialog">
+				<h4>Select a Score Mode</h4>
+				<p>With <strong>Normal</strong> mode enabled, the student will be scored based on the first End Point they reach. They will then be sent to the Materia score screen to see a breakdown of their journey.</p>
+				<p>With <strong>Non-Scoring</strong> mode enabled, the widget will return a score of 100 regardless of the choices the student makes. When they reach an end point, students will be informed they have completed the widget and <strong>will not</strong> be sent to the Materia score screen.</p>
+				<div class="score-mode-selection">
+					<button type="button"
+						ng-class="{ 'important-button' : scoreMode == NORMAL }"
+						ng-click="scoreMode = NORMAL; hideCoverAndModals()">Normal Scoring Mode</button>
+					<button type="button"
+						ng-class="{ 'important-button' : scoreMode == NONSCORING }"
+						ng-click="scoreMode = NONSCORING">Non-Scoring Mode</button>
+				</div>
+				<div class="internal-score-screen-edit-shortcut"
+					ng-show="scoreMode == NONSCORING">
+					<p>You can choose to edit the message students will see when they have completed the widget (leave blank for default):</p>
+					<textarea ng-model="internalScoreMessage" placeholder="You have completed this experience and your progress has been recorded. You can close or navigate away from this page."></textarea>
+					<button type="button"
+						class="important-button"
+						ng-click="hideCoverAndModals()">Done</button>
+				</div>
 			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
 			<tree-visualization data="treeData"

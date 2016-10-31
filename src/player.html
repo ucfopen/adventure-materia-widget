@@ -53,7 +53,8 @@
 				'hotspot-mode' : question.type == HOTSPOT,
 				'shortans-mode' : question.type == SHORTANS,
 				'transitional-mode' : question.type == NARR || question.type == END,
-				'hidden-title' : hideTitle == true}"
+				'hidden-title' : hideTitle == true,
+				'end-screen-mode' : question.type == OVER}"
 			ng-switch="layout">
 			<!-- just an image -->
 			<div ng-switch-when="image-only">
@@ -105,7 +106,8 @@
 			ng-class="{
 				'hotspot-mode' : question.type == HOTSPOT,
 				'no-question' : question.text.length == 0,
-				'hidden-title' : hideTitle == true}">
+				'hidden-title' : hideTitle == true}"
+			ng-hide="question.type == OVER">
 			<div class="mc"
 				ng-show="type == MC">
 				<a href="#"
