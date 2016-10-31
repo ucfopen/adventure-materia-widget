@@ -18,9 +18,16 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 	CONTAINER_WIDTH = 730
 	CONTAINER_HEGIHT = 650
 
+	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
+	PRESANITIZE_CHARACTERS =
+		'>' : '&gt;',
+		'<' : '&lt;'
+
 	$scope.title = ""
 	$scope.qset = null
 	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
+	$scope.scoringDisabled = false
+	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 
 	$scope.engine =
 		start: (instance, qset, version = '1') ->
@@ -35,6 +42,10 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 				manageQuestionScreen(qset.items[0].options.id)
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
+
+				if qset.options.scoreMode and qset.options.scoreMode is "Non-Scoring"
+					$scope.scoringDisabled = true
+					if qset.options.internalScoreMessage then $scope.customInternalScoreMessage = qset.options.internalScoreMessage
 
 		manualResize: true
 
@@ -64,14 +75,18 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 		# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 		# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 		try
-			$sanitize q_data.questions[0].text
+			# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
+			presanitized = q_data.questions[0].text
+			for k, v of PRESANITIZE_CHARACTERS
+				presanitized = presanitized.replace k, v
+			$sanitize presanitized
+
 		catch error
 			console.log error
 			q_data.questions[0].text = "*Question text removed due to malformed or dangerous HTML content*"
 
-
 		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
-		if q_data.questions[0].text.length then parsedQuestion = micromarkdown.parse(q_data.questions[0].text) else parsedQuestion = ""
+		if presanitized.length then parsedQuestion = micromarkdown.parse(presanitized) else parsedQuestion = ""
 
 		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
 		parsedQuestion = addTargetToHrefs parsedQuestion
@@ -252,7 +267,18 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 			Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer
 
 	_end = ->
-		Materia.Engine.end yes
+		if $scope.scoringDisabled
+			Materia.Engine.end no
+
+			$scope.question =
+				type: 'over'
+				text: if $scope.customInternalScoreMessage.length then $scope.customInternalScoreMessage else 'You have completed this experience and your progress has been recorded. You can close or navigate away from this page.'
+				layout: 'text-only'
+				id: -1
+
+			$scope.layout = $scope.question.layout
+		else
+			Materia.Engine.end yes
 
 	# Kinda hackish, since both autoTextScale and dynamicScale directives update the "style" attribute,
 	# need to combine updated properties from both so they don't overwrite each other.
@@ -377,8 +403,6 @@ Adventure.directive "dynamicImageScale", () ->
 		maxHeightWithTitle = 380
 		maxHeightSansTitle = 440
 
-		verticalModeReduction = 210 # Reduction in useable height because the vertical area is taken up by the text content
-
 		$scope.$watch "question", (newVal, oldVal) ->
 
 			unless newVal.image then return
@@ -405,7 +429,8 @@ Adventure.directive "dynamicImageScale", () ->
 				if $scope.hideTitle then maxHeight = maxHeightSansTitle - answersHeight
 				else maxHeight = maxHeightWithTitle - answersHeight
 
-				if $scope.layout is "top" or $scope.layout is "bottom" then maxHeight -= verticalModeReduction
+				# Final adjustment to height to compensate for space being used by text in vertical orientations
+				if $scope.layout is "top" or $scope.layout is "bottom" then maxHeight -= document.getElementsByClassName("text")[0].getBoundingClientRect().height + 20
 
 				# Determine scale ratio based on dimensions of the image asset
 				ratio = Math.min(maxWidth/img.width, maxHeight/img.height)

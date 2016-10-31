@@ -10,6 +10,11 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 		parentId: -1
 		contents: []
 
+	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
+	PRESANITIZE_CHARACTERS =
+		'>' : '&gt;',
+		'<' : '&lt;'
+
 	# Iterator that generates node IDs
 	count = 1
 
@@ -641,7 +646,10 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 			else
 				if node.question and node.question.length > 0
 					try
-						$sanitize node.question
+						# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
+						presanitized = node.question
+						for k, v of PRESANITIZE_CHARACTERS
+							presanitized = presanitized.replace k, v
 					catch e
 						error =
 							node: node.id
