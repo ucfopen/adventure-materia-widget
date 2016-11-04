@@ -375,6 +375,27 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 				return
 
+	# A node that was reset still exists, so instead of splicing it into the answers and contents array of the parent, we simply overwrite the existing properties
+	$scope.restoreResetNode = (target, parent) ->
+
+		unless parent.deletedCache then return
+
+		angular.forEach parent.deletedCache, (item, index) ->
+
+			if item.id is target
+				# Replace the reset node with the original
+				parent.answers[item.answerIndex] = item.answer
+				parent.contents[item.nodeIndex] = item.node
+				parent.deletedCache.splice index, 1
+
+				# Update the tree to display the restored node
+				treeSrv.set $scope.treeData
+
+				# Refresh all answerLinks references as some have changed
+				treeSrv.updateAllAnswerLinks $scope.treeData
+
+				return
+
 	# Reference function so the integerToLetters function from treeSrv can be called using two-way data binding
 	$scope.integerToLetters = (val) ->
 		return treeSrv.integerToLetters(val)

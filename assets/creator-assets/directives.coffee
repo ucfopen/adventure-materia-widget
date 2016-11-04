@@ -923,6 +923,31 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 
 			return copy
 
+		# Builds a "cold storage" object for deleted nodes. These are added to a deletedCache object in the parent of the deleted node.
+		# cold storage objects include references to their associated answer, their original answer index, and a deep copy of the node itself
+		$scope.putNodeInColdStorage = (node) ->
+
+			parent = treeSrv.findNode $scope.treeData, node.parentId
+			nodeAnswerIndex = null
+			nodeIndexInParent = null
+
+			# Find reference to node in parent's answers
+			angular.forEach parent.answers, (answer, index) ->
+				if answer.target is node.id and answer.linkMode is $scope.NEW
+					nodeAnswerIndex = index
+
+			# Prep node as a coldStorage object
+			coldStorage =
+				id: node.id
+				answerIndex: nodeAnswerIndex
+				answer: parent.answers[nodeAnswerIndex]
+				node: angular.copy node # have to make a deep copy of the node to prevent it being skewered by changes elsewhere
+				nodeIndex: parent.contents.indexOf node # node index may differ from answer index due to answers with non-traditional links
+
+			# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
+			unless parent.deletedCache then parent.deletedCache = []
+			parent.deletedCache.push coldStorage
+
 		# Check to see if the node being reset has any children that aren't blank
 		# If so, we should warn the user that resetting the node will delete those children and their children etc
 		$scope.resetNodePreCheck = () ->
@@ -942,6 +967,10 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 		$scope.resetNode = () ->
 
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
+			parent = treeSrv.findNode $scope.treeData, target.parentId
+
+			# Store the node in cold storage in case the user wants to undo the reset
+			$scope.putNodeInColdStorage target
 
 			# Remove each answer target
 			angular.forEach target.answers, (answer, index) ->
@@ -970,7 +999,15 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			treeSrv.findAndReplace $scope.treeData, target.id, target
 			treeSrv.set $scope.treeData
 
-			$scope.toast "Destination " + target.name + " has been reset."
+			# Display the interactive toast that provides the Undo option
+			# Toast is displayed until clicked or until the node creation screen is closed
+			$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " has been reset.", "Undo", ->
+				$scope.restoreResetNode target.id, parent
+
+			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
+			$timeout (() ->
+				$scope.hideToast()
+			), 8000
 
 			$scope.nodeTools.showResetWarning = false
 			$scope.nodeTools.show = false
@@ -984,7 +1021,6 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 			parent = treeSrv.findNode $scope.treeData, target.parentId
 			targetAnswerIndex = null
-			targetIndexInParent = null
 
 			# Don't delete if it's a child of a narrative node
 			if parent.type is $scope.NARR
@@ -1005,17 +1041,8 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 					$scope.nodeTools.showDeleteWarning = false
 					return
 
-			# Prep node as a coldStorage object
-			coldStorage =
-				id: target.id
-				answerIndex: targetAnswerIndex
-				answer: parent.answers[targetAnswerIndex]
-				node: target
-				nodeIndex: parent.contents.indexOf target # node index may differ from answer index due to answers with non-traditional links
-
-			# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
-			unless parent.deletedCache then parent.deletedCache = []
-			parent.deletedCache.push coldStorage
+			# Put the node in "cold storage" in case the user wants to undo the deletion
+			$scope.putNodeInColdStorage target
 
 			# Remove the node & grab array of IDs representing deleted node & its children
 			removed = treeSrv.findAndRemove $scope.treeData, target.id
