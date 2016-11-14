@@ -925,20 +925,6 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 
 			return copy
 
-		# Check to see if the node being reset has any children that aren't blank
-		# If so, we should warn the user that resetting the node will delete those children and their children etc
-		$scope.resetNodePreCheck = () ->
-			hasChildrenFlag = false
-
-			node = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
-
-			angular.forEach node.contents, (child, index) ->
-				if child.contents.length > 0
-					hasChildrenFlag = true
-					$scope.nodeTools.showResetWarning = true
-
-			unless hasChildrenFlag then $scope.resetNode()
-
 		# Resetting the node wipes QSet-related data clean, but retains the tree properties relevant to D3
 		# The node is returned to a blank node type with no children
 		$scope.resetNode = () ->
