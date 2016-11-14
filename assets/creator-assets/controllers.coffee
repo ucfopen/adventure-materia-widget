@@ -126,7 +126,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 			# start a timer that makes toasts obsolete after 5 seconds
 			if $scope.showToast
-				$timeout (() ->
+				if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
+				$scope.toastRegister = $timeout (() ->
 					$scope.hideToast()
 				), 5000
 
@@ -351,6 +352,31 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 		treeSrv.updateAllAnswerLinks $scope.treeData
 
+	# Builds a "cold storage" object for deleted nodes. These are added to a deletedCache object in the parent of the deleted node.
+	# cold storage objects include references to their associated answer, their original answer index, and a deep copy of the node itself
+	$scope.putNodeInColdStorage = (node) ->
+
+		parent = treeSrv.findNode $scope.treeData, node.parentId
+		nodeAnswerIndex = null
+		nodeIndexInParent = null
+
+		# Find reference to node in parent's answers
+		angular.forEach parent.answers, (answer, index) ->
+			if answer.target is node.id and answer.linkMode is $scope.NEW
+				nodeAnswerIndex = index
+
+		# Prep node as a coldStorage object
+		coldStorage =
+			id: node.id
+			answerIndex: nodeAnswerIndex
+			answer: parent.answers[nodeAnswerIndex]
+			node: angular.copy node # have to make a deep copy of the node to prevent it being skewered by changes elsewhere
+			nodeIndex: parent.contents.indexOf node # node index may differ from answer index due to answers with non-traditional links
+
+		# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
+		unless parent.deletedCache then parent.deletedCache = []
+		parent.deletedCache.push coldStorage
+
 	# Restores an answer/node pair that's been deleted, formatted as a "cold storage" object
 	# target is the id of the node to be restored
 	# parent is a reference to the node that's storing the deleted node in its deletedCache array
@@ -395,6 +421,25 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				treeSrv.updateAllAnswerLinks $scope.treeData
 
 				return
+
+	# Changing an answer's target from a new node to an existing one removes the original hierarchical child. Restoring it requires unique logic relative to deleted or reset nodes
+	$scope.restoreUnlinkedNode = (target, answerIndex, originalAnswer, parent) ->
+
+		unless parent.deletedCache then return
+
+		angular.forEach parent.deletedCache, (item, index) ->
+
+			if item.id is target
+
+				parent.answers[answerIndex] = originalAnswer
+				parent.contents.splice answerIndex, 0, item.node
+				parent.deletedCache.splice index, 1
+
+				# Update the tree to display the restored node
+				treeSrv.set $scope.treeData
+
+				# Refresh all answerLinks references as some have changed
+				treeSrv.updateAllAnswerLinks $scope.treeData
 
 	# Reference function so the integerToLetters function from treeSrv can be called using two-way data binding
 	$scope.integerToLetters = (val) ->

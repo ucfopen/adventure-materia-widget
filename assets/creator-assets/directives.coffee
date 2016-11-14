@@ -9,6 +9,7 @@ Adventure.directive "toast", ($timeout) ->
 		$scope.toastActionText = ""
 		$scope.toastAction = null
 		$scope.showToastActionButton = false
+		$scope.toastRegister = null
 
 		# Displays a toast with the given message.
 		# The autoCancel flag determines if the toast should automatically expire after 5 seconds
@@ -19,7 +20,8 @@ Adventure.directive "toast", ($timeout) ->
 			$scope.showToastActionButton = false
 
 			if autoCancel
-				$timeout (() ->
+				if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
+				$scope.toastRegister = $timeout (() ->
 					$scope.hideToast()
 				), 5000
 
@@ -923,31 +925,6 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 
 			return copy
 
-		# Builds a "cold storage" object for deleted nodes. These are added to a deletedCache object in the parent of the deleted node.
-		# cold storage objects include references to their associated answer, their original answer index, and a deep copy of the node itself
-		$scope.putNodeInColdStorage = (node) ->
-
-			parent = treeSrv.findNode $scope.treeData, node.parentId
-			nodeAnswerIndex = null
-			nodeIndexInParent = null
-
-			# Find reference to node in parent's answers
-			angular.forEach parent.answers, (answer, index) ->
-				if answer.target is node.id and answer.linkMode is $scope.NEW
-					nodeAnswerIndex = index
-
-			# Prep node as a coldStorage object
-			coldStorage =
-				id: node.id
-				answerIndex: nodeAnswerIndex
-				answer: parent.answers[nodeAnswerIndex]
-				node: angular.copy node # have to make a deep copy of the node to prevent it being skewered by changes elsewhere
-				nodeIndex: parent.contents.indexOf node # node index may differ from answer index due to answers with non-traditional links
-
-			# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
-			unless parent.deletedCache then parent.deletedCache = []
-			parent.deletedCache.push coldStorage
-
 		# Check to see if the node being reset has any children that aren't blank
 		# If so, we should warn the user that resetting the node will delete those children and their children etc
 		$scope.resetNodePreCheck = () ->
@@ -1005,7 +982,8 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 				$scope.restoreResetNode target.id, parent
 
 			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
-			$timeout (() ->
+			if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
+			$scope.toastRegister = $timeout (() ->
 				$scope.hideToast()
 			), 8000
 
@@ -1062,7 +1040,8 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 				$scope.restoreDeletedNode target.id, parent
 
 			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
-			$timeout (() ->
+			if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
+			$scope.toastRegister = $timeout (() ->
 				$scope.hideToast()
 			), 8000
 
@@ -1169,7 +1148,7 @@ Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
 
 # Dialog for selecting what kind of node a given answer should target
 # e.g., "new", "existing", "self"
-Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
+Adventure.directive "newNodeManagerDialog", (treeSrv, $document, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1255,10 +1234,17 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 					$scope.nodeTools.show = false
 					$scope.displayNodeCreation = "suspended"
 
+					# variables to store original properties of soon-to-be-deleted child node
+					# due to 2-way binding, referencing their current values will not work
+					removedNodeId = null
+					removedNodeParent = null
+					removedNodeAnswer = null
+
 					# Set the node selection mode so click events are handled differently than normal
 					$scope.existingNodeSelectionMode = true
 
 					# Provide interactive toast to cancel the existing link selection mode
+					if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister # ensure no Toast cancellation timers are active that may cancel this toast prematurely
 					$scope.interactiveToast "Select the destination this answer should link to.", "Cancel", ->
 						$scope.existingNodeSelectionMode = false
 						$scope.newNodeManager.target = null
@@ -1285,6 +1271,9 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 								$scope.existingNodeSelectionMode = true
 								return
 
+							# Deep copy the original answer in case undo is needed
+							removedNodeAnswer = angular.copy $scope.answers[i]
+
 							# Set the answer's new target to the newly selected node
 							$scope.answers[i].target = newVal.id
 
@@ -1293,8 +1282,17 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 								# Scrub the existing child node associated with this answer
 								childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
+
 								if childNode
+									if childNode.type isnt $scope.BLANK
+										# Grab parent & ID of soon-to-be-removed child node for undo purposes
+										removedNodeId = childNode.id
+										removedNodeParent = treeSrv.findNode $scope.treeData, childNode.parentId
+
+									# store removed node
+									$scope.putNodeInColdStorage childNode
 									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
+
 									# Recurse through all deleted IDs & fix answer targets for each deleted node
 									for id in removed
 										treeSrv.findAndFixAnswerTargets $scope.treeData, id
@@ -1331,6 +1329,10 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 							# Refresh all answerLinks references as some have changed
 							treeSrv.updateAllAnswerLinks $scope.treeData
 
+							# if child node that was removed was not blank, provide a toast enabling the undo option
+							if removedNodeId
+								$scope.interactiveToast "By linking to " + $scope.integerToLetters(newVal.id) + ", Destination " + $scope.integerToLetters(removedNodeId) + " was removed.", "Undo", ->
+									$scope.restoreUnlinkedNode removedNodeId, i, removedNodeAnswer, removedNodeParent
 
 				when "self"
 
