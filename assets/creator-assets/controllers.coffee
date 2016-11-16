@@ -358,7 +358,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 		parent = treeSrv.findNode $scope.treeData, node.parentId
 		nodeAnswerIndex = null
-		nodeIndexInParent = null
 
 		# Find reference to node in parent's answers
 		angular.forEach parent.answers, (answer, index) ->

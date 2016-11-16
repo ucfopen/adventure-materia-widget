@@ -933,7 +933,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			parent = treeSrv.findNode $scope.treeData, target.parentId
 
 			# Store the node in cold storage in case the user wants to undo the reset
-			$scope.putNodeInColdStorage target
+			if parent isnt null then $scope.putNodeInColdStorage target
 
 			# Remove each answer target
 			angular.forEach target.answers, (answer, index) ->
@@ -962,10 +962,15 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			treeSrv.findAndReplace $scope.treeData, target.id, target
 			treeSrv.set $scope.treeData
 
-			# Display the interactive toast that provides the Undo option
-			# Toast is displayed until clicked or until the node creation screen is closed
-			$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " has been reset.", "Undo", ->
-				$scope.restoreResetNode target.id, parent
+			if parent is null
+				# Can't provide undo option for Start (Maybe overhaul storage/restoration so this is supported)
+				$scope.toast "Destination " + $scope.integerToLetters(target.id) + " has been reset."
+
+			else
+				# Display the interactive toast that provides the Undo option
+				# Toast is displayed until clicked or until the node creation screen is closed
+				$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " has been reset.", "Undo", ->
+					$scope.restoreResetNode target.id, parent
 
 			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
 			if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
