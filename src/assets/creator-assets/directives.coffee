@@ -81,6 +81,10 @@ Adventure.directive "treeVisualization", (treeSrv, $window, $compile, $rootScope
 
 		# Re-render tree whenever the nodes are updated
 		$scope.$on "tree.nodes.changed", (evt) ->
+
+			# tree = treeSrv.get()
+			# if $scope.treeData isnt undefined and tree.contents.length isnt $scope.treeData.contents.length then $scope.treeData = tree
+			# $scope.render tree
 			$scope.render treeSrv.get()
 
 		# Re-render the tree with copyMode enabled (highlights blank nodes)
@@ -713,7 +717,6 @@ Adventure.directive "nodeTooltips", (treeSrv) ->
 				yOffset = ($scope.hoveredNode.y * $scope.treeOffset.scale) + ($scope.treeOffset.y - 5) + $scope.treeOffset.scaleYOffset
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 				$attrs.$set "style", styles
-
 				node = treeSrv.findNode $scope.treeData, $scope.hoveredNode.target
 
 				$scope.hoveredNode.tooltips = []
@@ -725,7 +728,7 @@ Adventure.directive "nodeTooltips", (treeSrv) ->
 
 
 # Directive for the node modal dialog (edit the node, copy the node, reset the node, etc)
-Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
+Adventure.directive "nodeToolsDialog", (treeSrv, deleteAndRestoreSrv, $rootScope, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -933,15 +936,21 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			parent = treeSrv.findNode $scope.treeData, target.parentId
 
 			# Store the node in cold storage in case the user wants to undo the reset
-			if parent isnt null then $scope.putNodeInColdStorage target
+			if parent
+				deleteAndRestoreSrv.coldStorage target
+			else
+				deleteAndRestoreSrv.coldStorage target, 0, {}, {}, 0
 
-			# Remove each answer target
+			# Remove each answer target (but only if it's a hierarchical child)
 			angular.forEach target.answers, (answer, index) ->
-				removed = treeSrv.findAndRemove $scope.treeData, answer.target
 
-				# Recurse through all deleted IDs & fix answer targets for each deleted node
-				for id in removed
-					treeSrv.findAndFixAnswerTargets $scope.treeData, id
+				if answer.linkMode is $scope.NEW
+
+					removed = treeSrv.findAndRemove $scope.treeData, answer.target
+
+					# Recurse through all deleted IDs & fix answer targets for each deleted node
+					for id in removed
+						treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 			# Remove all properties of the node except those whitelisted below
 			angular.forEach target, (val, key) ->
@@ -962,15 +971,10 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			treeSrv.findAndReplace $scope.treeData, target.id, target
 			treeSrv.set $scope.treeData
 
-			if parent is null
-				# Can't provide undo option for Start (Maybe overhaul storage/restoration so this is supported)
-				$scope.toast "Destination " + $scope.integerToLetters(target.id) + " has been reset."
-
-			else
-				# Display the interactive toast that provides the Undo option
-				# Toast is displayed until clicked or until the node creation screen is closed
-				$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " has been reset.", "Undo", ->
-					$scope.restoreResetNode target.id, parent
+			# Display the interactive toast that provides the Undo option
+			# Toast is displayed until clicked or until the node creation screen is closed
+			$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " has been reset.", "Undo", ->
+				$scope.treeData = deleteAndRestoreSrv.restoreResetNode target.id, parent
 
 			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
 			if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
@@ -1011,7 +1015,8 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 					return
 
 			# Put the node in "cold storage" in case the user wants to undo the deletion
-			$scope.putNodeInColdStorage target
+			# $scope.putNodeInColdStorage target
+			deleteAndRestoreSrv.coldStorage target
 
 			# Remove the node & grab array of IDs representing deleted node & its children
 			removed = treeSrv.findAndRemove $scope.treeData, target.id
@@ -1028,7 +1033,7 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			# Display the interactive toast that provides the Undo option
 			# Toast is displayed until clicked or until the node creation screen is closed
 			$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " was deleted.", "Undo", ->
-				$scope.restoreDeletedNode target.id, parent
+				$scope.treeData = deleteAndRestoreSrv.restoreDeletedNode target.id, parent
 
 			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
 			if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
@@ -1139,7 +1144,7 @@ Adventure.directive "nodeCreationSelectionDialog", (treeSrv) ->
 
 # Dialog for selecting what kind of node a given answer should target
 # e.g., "new", "existing", "self"
-Adventure.directive "newNodeManagerDialog", (treeSrv, $document, $timeout) ->
+Adventure.directive "newNodeManagerDialog", (treeSrv, deleteAndRestoreSrv, $document, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1279,9 +1284,14 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document, $timeout) ->
 										# Grab parent & ID of soon-to-be-removed child node for undo purposes
 										removedNodeId = childNode.id
 										removedNodeParent = treeSrv.findNode $scope.treeData, childNode.parentId
+										removedNodeIndex = 0
 
-									# store removed node
-									$scope.putNodeInColdStorage childNode
+										angular.forEach removedNodeParent.contents, (node, index) ->
+											if node.id is childNode.id then removedNodeIndex = index
+
+										# store removed node
+										deleteAndRestoreSrv.coldStorage childNode, removedNodeIndex, removedNodeParent, removedNodeAnswer, i
+
 									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
 
 									# Recurse through all deleted IDs & fix answer targets for each deleted node
@@ -1323,7 +1333,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document, $timeout) ->
 							# if child node that was removed was not blank, provide a toast enabling the undo option
 							if removedNodeId
 								$scope.interactiveToast "By linking to " + $scope.integerToLetters(newVal.id) + ", Destination " + $scope.integerToLetters(removedNodeId) + " was removed.", "Undo", ->
-									$scope.restoreUnlinkedNode removedNodeId, i, removedNodeAnswer, removedNodeParent
+									deleteAndRestoreSrv.restoreUnlinkedNode removedNodeId, removedNodeParent
 
 				when "self"
 
@@ -1415,7 +1425,7 @@ Adventure.directive "deleteWarningDialog", (treeSrv) ->
 # The actual node creation screen
 # Functions related to features unique to individual node types (Short answer sets, hotspots, etc) are relegated to their own directives
 # The ones here are "universal" and apply to all new nodes
-Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeout) ->
+Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, deleteAndRestoreSrv, $rootScope, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1585,16 +1595,9 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 
 				# Grab the node associated with the answer being removed and prep it for cold storage
 				removedNode = treeSrv.findNode $scope.treeData, targetId
-				coldStorage =
-					id: targetId
-					answerIndex: index
-					answer: $scope.answers[index]
-					node: removedNode
-					nodeIndex: $scope.editedNode.contents.indexOf removedNode # node index may differ from answer index due to answers with non-traditional links
 
-				# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
-				unless $scope.editedNode.deletedCache then $scope.editedNode.deletedCache = []
-				$scope.editedNode.deletedCache.push coldStorage
+				# Place node in cryo
+				deleteAndRestoreSrv.coldStorage removedNode, $scope.editedNode.contents.indexOf(removedNode), $scope.editedNode, $scope.answers[index], index
 
 				# Go ahead and actually remove the node
 				removed = treeSrv.findAndRemove $scope.treeData, targetId
@@ -1606,7 +1609,8 @@ Adventure.directive "nodeCreation", (treeSrv, legacyQsetSrv, $rootScope, $timeou
 				# Display the interactive toast that provides the Undo option
 				# Toast is displayed until clicked or until the node creation screen is closed
 				$scope.interactiveToast "Destination " + $scope.integerToLetters(targetId) + " was deleted.", "Undo", ->
-					$scope.restoreDeletedNode targetId, $scope.editedNode
+					# $scope.treeData = deleteAndRestoreSrv.restoreDeletedNode targetId, $scope.editedNode
+					$scope.treeData = deleteAndRestoreSrv.restoreDeletedNode targetId, $scope.editedNode
 			else
 				# Just remove it from answers array, no further action required
 				$scope.answers.splice index, 1
