@@ -474,7 +474,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 			if tree.hasLinkToOther then itemData.options.hasLinkToOther = true
 			if tree.hasLinkToSelf then itemData.options.hasLinkToSelf = true
 			if tree.pendingTarget then itemData.options.pendingTarget = tree.pendingTarget
-			# TODO should deletedCache be included in QSet?
+			# TODO should cryo cache be included in QSet?
 
 			angular.forEach tree.answers, (answer, index) ->
 
@@ -737,3 +737,120 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 	validateTreeOnSave : validateTreeOnSave
 	integerToLetters : integerToLetters
 	generateAnswerHash : generateAnswerHash
+
+Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
+
+	cache = []
+
+	set = (existing) ->
+		cache = existing
+
+	add = (item) ->
+		cache[item.id] = item
+
+	# Builds a "cold storage" object for deleted nodes. These are added to the global cryo cache for future restoration
+	# Cold storage objects include references to their associated answer, their original answer index, and a deep copy of the node itself
+	# Aside from the node itself, all params are optional, allowing them to be overridden for special use cases
+	coldStorage = (node, nodeIndex = null, parent = null, answer = null, answerIndex = null) ->
+
+		tree = treeSrv.get()
+
+		# If any of the optional params are null, have to grab defaults
+		if parent is null then parent = treeSrv.findNode tree, node.parentId
+
+		# Find reference to node in parent's answers
+		if answerIndex is null
+			angular.forEach parent.answers, (answer, index) ->
+				if answer.target is node.id and answer.linkMode is "new"
+					answerIndex = index
+
+		if answer is null then answer = parent.answers[answerIndex]
+		if nodeIndex is null then nodeIndex = parent.contents.indexOf node # node index may differ from answer index due to answers with non-traditional links
+
+		# Prep node as a coldStorage object
+		cryo =
+			id: node.id
+			answerIndex: answerIndex
+			answer: answer
+			node: angular.copy node # have to make a deep copy of the node to prevent it being skewered by changes elsewhere
+			nodeIndex: nodeIndex
+
+		# Add to the global cryo cache
+		add cryo
+
+	# Node deletion occurs in two places: by deleting its associated answer in the editor of the node's hierarchical parent,
+	# or deleting the node directly via the nodeTools dialog
+	restoreDeletedNode = (target, parent) ->
+
+		unless cache[target] then return
+
+		item = cache[target]
+
+		# Splice the answer and node back into their respective arrays at their previous index positions
+		parent.answers.splice item.answerIndex, 0, item.answer
+		parent.contents.splice item.nodeIndex, 0, item.node
+		# Remove the node from the cryo cache
+		cache.splice target, 1
+
+		# Grab the tree to update answer links & manually refresh it
+		tree = treeSrv.get()
+
+		# Update the tree to display the restored node
+		treeSrv.set tree
+
+		# Refresh all answerLinks references as some have changed
+		treeSrv.updateAllAnswerLinks tree
+
+		return tree
+
+	# Reset nodes hold the original state of the node in cryo, but instead of appending data back into the contents[] and answers[] arrays of the parent,
+	# We overwrite the blank node that replaced it
+	restoreResetNode = (target, parent) ->
+
+		unless cache[target] then return
+
+		item = cache[target]
+		tree = treeSrv.get()
+
+		if parent
+			# Replace the reset node with the original
+			parent.answers[item.answerIndex] = item.answer
+			parent.contents[item.nodeIndex] = item.node
+			cache.splice target, 1
+
+		else
+			# Special case if the user reset the Start node, which has no parent
+			tree = treeSrv.findAndReplace tree, target, item.node
+
+		# Update the tree to display the restored node
+		treeSrv.set tree
+
+		# Refresh all answerLinks references as some have changed
+		treeSrv.updateAllAnswerLinks tree
+
+		return tree
+
+	# Changing an answer's target from a new node to an existing one removes the original hierarchical child. Restoring it requires unique logic relative to deleted or reset nodes
+	restoreUnlinkedNode = (target, parent) ->
+
+		unless cache[target] then return
+
+		item = cache[target]
+
+		parent.answers[item.answerIndex] = item.answer
+		parent.contents.splice item.nodeIndex, 0, item.node
+		cache.splice target, 1
+
+		# Grab tree object to update answer links & manually refresh it
+		tree = treeSrv.get()
+		treeSrv.set tree
+
+		# Refresh all answerLinks references as some have changed
+		treeSrv.updateAllAnswerLinks tree
+
+	set : set
+	add : add
+	coldStorage : coldStorage
+	restoreDeletedNode : restoreDeletedNode
+	restoreResetNode : restoreResetNode
+	restoreUnlinkedNode : restoreUnlinkedNode
