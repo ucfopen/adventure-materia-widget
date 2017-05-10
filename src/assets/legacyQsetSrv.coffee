@@ -44,7 +44,7 @@ Adventure.service "legacyQsetSrv", () ->
 				else
 					delete item.options.layout
 
-				item.options.asset.type ="image"
+				item.options.asset.type = "image"
 
 			if item.options.type is "hotspot"
 

@@ -304,7 +304,14 @@
 				<!-- extended dialog for delete warning -->
 				<div class="warning-dialog-section"
 					ng-show="nodeTools.showDeleteWarning">
-					<p>Careful! Deleting this destination will delete all child destinations, as well as its associated parent's answer. Are you sure?</p>
+					<p ng-show='!nodeTools.targetIsInBetween'>
+						Careful! Deleting this destination will delete all child destinations, as well as its associated parent's answer.
+						Are you sure?
+					</p>
+					<p ng-show='nodeTools.targetIsInBetween'>
+						Deleting this destination will restore the prior link between its parent and its child.
+						Are you sure?
+					</p>
 					<button type="button"
 						class="delete-button"
 						ng-click="deleteNode()">Delete</button>

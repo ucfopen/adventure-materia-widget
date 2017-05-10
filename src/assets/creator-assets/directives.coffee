@@ -984,13 +984,14 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 			parent = treeSrv.findNode $scope.treeData, target.parentId
 			targetAnswerIndex = null
-			targetIndexInParent = null
 
 			# Don't delete if it's a child of a narrative node
 			if parent.type is $scope.NARR
-				$scope.toast "Can't delete Destination " + target.name + "! Try linking " + parent.name + " to an existing destination instead."
-				$scope.nodeTools.showDeleteWarning = false
-				return
+				# Unless it's a blank node with one child
+				unless $scope.nodeTools.targetIsInBetween
+					$scope.toast "Can't delete Destination " + target.name + "! Try linking " + parent.name + " to an existing destination instead."
+					$scope.nodeTools.showDeleteWarning = false
+					return
 
 			# Find reference to node in parent's answers
 			angular.forEach parent.answers, (answer, index) ->
@@ -1001,38 +1002,52 @@ Adventure.directive "nodeToolsDialog", (treeSrv, $rootScope, $timeout) ->
 
 				# Don't delete if it's referenced from an [Unmatched Response] answer of a short answer question.
 				if parent.answers[targetAnswerIndex].isDefault and parent.type is $scope.SHORTANS
-					$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
-					$scope.nodeTools.showDeleteWarning = false
-					return
+					# Unless it's a blank node with one child
+					unless $scope.nodeTools.targetIsInBetween
+						$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
+						$scope.nodeTools.showDeleteWarning = false
+						return
 
-			# Prep node as a coldStorage object
-			coldStorage =
-				id: target.id
-				answerIndex: targetAnswerIndex
-				answer: parent.answers[targetAnswerIndex]
-				node: target
-				nodeIndex: parent.contents.indexOf target # node index may differ from answer index due to answers with non-traditional links
+			# We don't have to go through the full deletion process if we're just snipping a blank inbetween node
+			if $scope.nodeTools.targetIsInBetween
+				treeSrv.findAndRemoveInBetween parent, target, targetAnswerIndex
 
-			# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
-			unless parent.deletedCache then parent.deletedCache = []
-			parent.deletedCache.push coldStorage
+				treeSrv.set $scope.treeData
 
-			# Remove the node & grab array of IDs representing deleted node & its children
-			removed = treeSrv.findAndRemove $scope.treeData, target.id
+				# Refresh all answerLinks references as some have changed
+				treeSrv.updateAllAnswerLinks $scope.treeData
 
-			# Recurse through all deleted IDs & fix answer targets for each deleted node
-			for id in removed
-				treeSrv.findAndFixAnswerTargets $scope.treeData, id
+				$scope.toast "Destination " + $scope.integerToLetters(target.id) + " was deleted."
+			else
+				# Prep node as a coldStorage object
+				coldStorage =
+					id: target.id
+					answerIndex: targetAnswerIndex
+					answer: parent.answers[targetAnswerIndex]
+					node: target
+					nodeIndex: parent.contents.indexOf target # node index may differ from answer index due to answers with non-traditional links
 
-			treeSrv.set $scope.treeData
+				# The deletedCache array holds answer/node pairs that have been removed and can be recovered later
+				unless parent.deletedCache then parent.deletedCache = []
+				parent.deletedCache.push coldStorage
 
-			# Refresh all answerLinks references as some have changed
-			treeSrv.updateAllAnswerLinks $scope.treeData
+				# Remove the node & grab array of IDs representing deleted node & its children
+				removed = treeSrv.findAndRemove $scope.treeData, target.id
 
-			# Display the interactive toast that provides the Undo option
-			# Toast is displayed until clicked or until the node creation screen is closed
-			$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " was deleted.", "Undo", ->
-				$scope.restoreDeletedNode target.id, parent
+				# Recurse through all deleted IDs & fix answer targets for each deleted node
+				for id in removed
+					treeSrv.findAndFixAnswerTargets $scope.treeData, id
+
+				treeSrv.set $scope.treeData
+
+				# Refresh all answerLinks references as some have changed
+				treeSrv.updateAllAnswerLinks $scope.treeData
+
+
+				# Display the interactive toast that provides the Undo option
+				# Toast is displayed until clicked or until the node creation screen is closed
+				$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " was deleted.", "Undo", ->
+					$scope.restoreDeletedNode target.id, parent
 
 			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
 			$timeout (() ->

@@ -217,6 +217,10 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 
 		tree
 
+	findAndRemoveInBetween = (parent, target, targetAnswerIndex) ->
+		parent.contents[targetAnswerIndex] = target.children[0]
+		parent.answers[targetAnswerIndex].target = target.children[0].id
+
 	# Recursive function for finding a node and removing it
 	# parent: the tree structure to be iterated. Should initially reference the root node (treeData object)
 	# id: the id the node to be removed
@@ -717,23 +721,24 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 			return s.charAt Math.floor(Math.random() * s.length)
 		).join ''
 
-	get : get
-	set : set
-	getNodeCount : getNodeCount
-	setNodeCount : setNodeCount
-	incrementNodeCount : incrementNodeCount
-	getMaxDepth : getMaxDepth
-	findAnswersWithTarget : findAnswersWithTarget
-	updateAllAnswerLinks : updateAllAnswerLinks
-	findNode : findNode
-	findAndAdd : findAndAdd
-	findAndReplace : findAndReplace
-	findAndAddInBetween : findAndAddInBetween
-	findAndRemove : findAndRemove
+	get                     : get
+	set                     : set
+	getNodeCount            : getNodeCount
+	setNodeCount            : setNodeCount
+	incrementNodeCount      : incrementNodeCount
+	getMaxDepth             : getMaxDepth
+	findAnswersWithTarget   : findAnswersWithTarget
+	updateAllAnswerLinks    : updateAllAnswerLinks
+	findNode                : findNode
+	findAndAdd              : findAndAdd
+	findAndReplace          : findAndReplace
+	findAndAddInBetween     : findAndAddInBetween
+	findAndRemoveInBetween  : findAndRemoveInBetween
+	findAndRemove           : findAndRemove
 	findAndFixAnswerTargets : findAndFixAnswerTargets
-	createQSetFromTree : createQSetFromTree
-	createTreeDataFromQset : createTreeDataFromQset
-	validateTreeOnStart : validateTreeOnStart
-	validateTreeOnSave : validateTreeOnSave
-	integerToLetters : integerToLetters
-	generateAnswerHash : generateAnswerHash
+	createQSetFromTree      : createQSetFromTree
+	createTreeDataFromQset  : createTreeDataFromQset
+	validateTreeOnStart     : validateTreeOnStart
+	validateTreeOnSave      : validateTreeOnSave
+	integerToLetters        : integerToLetters
+	generateAnswerHash      : generateAnswerHash

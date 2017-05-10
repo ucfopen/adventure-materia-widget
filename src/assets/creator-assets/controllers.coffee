@@ -37,6 +37,7 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		type: null
 		x: 0
 		y: 0
+		targetIsInBetween: false
 		showResetWarning: false
 		showDeleteWarning: false
 		showConvertDialog: false
@@ -285,6 +286,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 		else # Default selection behavior
 			$scope.$apply () ->
+				target = treeSrv.findNode $scope.treeData, data.id
+				$scope.nodeTools.targetIsInBetween = target.type is $scope.BLANK and target.children?.length is 1
+
 				$scope.nodeTools.show = !$scope.nodeTools.show
 				$scope.nodeTools.x = data.x
 				$scope.nodeTools.y = data.y
