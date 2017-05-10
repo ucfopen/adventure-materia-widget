@@ -218,6 +218,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 		tree
 
 	findAndRemoveInBetween = (parent, target, targetAnswerIndex) ->
+
 		parent.contents[targetAnswerIndex] = target.children[0]
 		parent.answers[targetAnswerIndex].target = target.children[0].id
 
@@ -736,6 +737,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 	findAndRemoveInBetween  : findAndRemoveInBetween
 	findAndRemove           : findAndRemove
 	findAndFixAnswerTargets : findAndFixAnswerTargets
+	getIdsFromSubtree       : getIdsFromSubtree
 	createQSetFromTree      : createQSetFromTree
 	createTreeDataFromQset  : createTreeDataFromQset
 	validateTreeOnStart     : validateTreeOnStart

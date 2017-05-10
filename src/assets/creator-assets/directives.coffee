@@ -1260,6 +1260,9 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 						if newVal
 
+							# Keep track of whether we're targeting a descendant of the current child node
+							sameBranch = false
+
 							$scope.hideToast()
 
 							# If selected node is itself, switch link mode to SELF
@@ -1281,11 +1284,18 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 								# Scrub the existing child node associated with this answer
 								childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
+
 								if childNode
-									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
-									# Recurse through all deleted IDs & fix answer targets for each deleted node
-									for id in removed
-										treeSrv.findAndFixAnswerTargets $scope.treeData, id
+									# Don't destroy the child node's whole family tree if we're targeting one of its descendants
+									if newVal.id in treeSrv.getIdsFromSubtree childNode
+										sameBranch = true
+										parent = treeSrv.findNode $scope.treeData, childNode.parentId
+										parent.contents[i] = newVal
+									else
+										removed = treeSrv.findAndRemove $scope.treeData, childNode.id
+										# Recurse through all deleted IDs & fix answer targets for each deleted node
+										for id in removed
+											treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 							## HANDLE PRIOR LINK MODE: SELF
 							if $scope.answers[i].linkMode is $scope.SELF
@@ -1299,7 +1309,7 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, $document) ->
 
 							# Set updated linkMode flags and redraw tree
 							$scope.editedNode.hasLinkToOther = true
-							$scope.answers[i].linkMode = $scope.EXISTING
+							$scope.answers[i].linkMode = if sameBranch then $scope.NEW else $scope.EXISTING
 
 							treeSrv.set $scope.treeData
 
