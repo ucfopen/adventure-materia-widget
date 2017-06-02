@@ -953,3 +953,5 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 	restoreDeletedNode : restoreDeletedNode
 	restoreResetNode : restoreResetNode
 	restoreUnlinkedNode : restoreUnlinkedNode
+	cacheExistingLinks : cacheExistingLinks
+	restoreExistingLinks : restoreExistingLinks
