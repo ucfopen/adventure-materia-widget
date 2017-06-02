@@ -27,9 +27,9 @@ var minify = argv.minify;
 var mangle = argv.mangle;
 var embed = argv.embed;
 
-var Embedding = (embed === "true") ? true : false;
-var Mangling = (mangle === "true") ? true : false;
-var Minifying = (minify === "true") ? true : false;
+var Embedding = (embed === "true");
+var Mangling = (mangle === "true");
+var Minifying = (minify === "true") ;
 
 var sourceString = "";
 
