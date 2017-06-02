@@ -29,7 +29,7 @@ var embed = argv.embed;
 
 var Embedding = (embed === "true");
 var Mangling = (mangle === "true");
-var Minifying = (minify === "true") ;
+var Minifying = (minify === "true");
 
 var sourceString = "";
 

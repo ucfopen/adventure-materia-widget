@@ -870,7 +870,7 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 
 		otherLinks = []
 		for linkIndex, link of subtree.answerLinks
-			unless link.parent is parent.id
+			unless link.parent is subtree.parent
 				tree = treeSrv.get()
 
 				# Have to get the tree and identify the node that has the existing link pointing to this particular node
