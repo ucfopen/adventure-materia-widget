@@ -158,6 +158,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 					$scope.toast "WARNING! " + $scope.editedNode.name + "'s question contains malformed or dangerous HTML!"
 					$scope.editedNode.hasProblem = true
 
+			# Handy debugging statement here; keep it commented out unless necessary for testing
+			# console.log $scope.editedNode
+
 			# Redraw tree (again) to address any post-edit changes
 			treeSrv.set $scope.treeData
 
