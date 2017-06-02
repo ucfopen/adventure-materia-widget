@@ -772,7 +772,8 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 				if answer.target is node.id and answer.linkMode is "new"
 					answerIndex = index
 
-		if answer is null then answer = parent.answers[answerIndex]
+		if answer is null
+			answer = if parent.answers then parent.answers[answerIndex] else {} # handle exception case where parent is blank
 		if nodeIndex is null then nodeIndex = parent.contents.indexOf node # node index may differ from answer index due to answers with non-traditional links
 
 		cacheExistingLinks tree, node
@@ -797,7 +798,7 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 		item = cache[target]
 
 		# Splice the answer and node back into their respective arrays at their previous index positions
-		parent.answers.splice item.answerIndex, 0, item.answer
+		if parent.answers then parent.answers.splice item.answerIndex, 0, item.answer # !parent.answers only occurs if you're deleting a child of a blank [in-between] node
 		parent.contents.splice item.nodeIndex, 0, item.node
 		# Remove the node from the cryo cache
 		cache.splice target, 1
