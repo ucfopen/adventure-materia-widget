@@ -941,16 +941,20 @@ Adventure.directive "nodeToolsDialog", (treeSrv, deleteAndRestoreSrv, $rootScope
 			else
 				deleteAndRestoreSrv.coldStorage target, 0, {}, {}, 0
 
+			# Iterating through an array while also deleting elements in that array during iteration is a big no-no!!!!!
+			# Get a list of all the nodes, THEN remove them all afterwards
+			nodesToRemove = []
+
 			# Remove each answer target (but only if it's a hierarchical child)
 			angular.forEach target.answers, (answer, index) ->
+				if answer.linkMode is $scope.NEW then nodesToRemove.push answer.target
 
-				if answer.linkMode is $scope.NEW
+			for node in nodesToRemove
+				removed = treeSrv.findAndRemove $scope.treeData, node
 
-					removed = treeSrv.findAndRemove $scope.treeData, answer.target
-
-					# Recurse through all deleted IDs & fix answer targets for each deleted node
-					for id in removed
-						treeSrv.findAndFixAnswerTargets $scope.treeData, id
+				# Recurse through all deleted IDs & fix answer targets for each deleted node
+				for id in removed
+					treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 			# Remove all properties of the node except those whitelisted below
 			angular.forEach target, (val, key) ->

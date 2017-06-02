@@ -300,6 +300,7 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 						parentId: tree.id
 						type: "blank"
 						contents: []
+						replacementForTarget: targetId # This flag allows deleteAndRestoreSrv to identify this node as a replacement for an existing link whose target was removed
 
 					# Update the answer too
 					answer.target = newId
@@ -738,9 +739,16 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 	integerToLetters : integerToLetters
 	generateAnswerHash : generateAnswerHash
 
+# Handles the storage of deleted nodes in a global "cryo cache", where they can be restored at a later time
+# Currently, they can only be restored immediately after deletion, during the window of the undo prompt
+# I believe this solution is entirely over-engineered; rather than storing individual nodes, all their associated state information, AND implementing logic to restore them,
+# it is probably better to simply snapshot the entire tree pre-deletion, and allow the tree to simply "roll back" to the prior state if the undo option is selected.
 Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 
 	cache = []
+
+	get = () ->
+		return cache
 
 	set = (existing) ->
 		cache = existing
@@ -767,6 +775,8 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 		if answer is null then answer = parent.answers[answerIndex]
 		if nodeIndex is null then nodeIndex = parent.contents.indexOf node # node index may differ from answer index due to answers with non-traditional links
 
+		cacheExistingLinks tree, node
+
 		# Prep node as a coldStorage object
 		cryo =
 			id: node.id
@@ -791,6 +801,8 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 		parent.contents.splice item.nodeIndex, 0, item.node
 		# Remove the node from the cryo cache
 		cache.splice target, 1
+
+		restoreExistingLinks parent.contents[item.nodeIndex]
 
 		# Grab the tree to update answer links & manually refresh it
 		tree = treeSrv.get()
@@ -818,6 +830,8 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 			parent.contents[item.nodeIndex] = item.node
 			cache.splice target, 1
 
+			restoreExistingLinks parent.contents[item.nodeIndex]
+
 		else
 			# Special case if the user reset the Start node, which has no parent
 			tree = treeSrv.findAndReplace tree, target, item.node
@@ -841,6 +855,8 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 		parent.contents.splice item.nodeIndex, 0, item.node
 		cache.splice target, 1
 
+		restoreExistingLinks parent.contents[item.nodeIndex]
+
 		# Grab tree object to update answer links & manually refresh it
 		tree = treeSrv.get()
 		treeSrv.set tree
@@ -848,6 +864,89 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 		# Refresh all answerLinks references as some have changed
 		treeSrv.updateAllAnswerLinks tree
 
+	# Within the subtree that is going to be deleted, recurse through it and identify if an existing link is pointing to each node.
+	# If one is, add the "otherLinks" parameter which holds a record of this link for the purposes of restoring
+	cacheExistingLinks = (subtree) ->
+
+		otherLinks = []
+		for linkIndex, link of subtree.answerLinks
+			unless link.parent is parent.id
+				tree = treeSrv.get()
+
+				# Have to get the tree and identify the node that has the existing link pointing to this particular node
+				otherLink = treeSrv.findNode tree, link.parent
+				otherLinkAnswerIndex = null
+
+				# Identify the answer associated with that existing link and save its index position
+				angular.forEach otherLink.answers, (answer, index) ->
+					if answer.target is subtree.id and answer.linkMode is "existing"
+						otherLinkAnswerIndex = index
+
+				if otherLinkAnswerIndex isnt null
+					otherLinks.push
+						id :	otherLink.id
+						answerIndex: otherLinkAnswerIndex
+
+		if otherLinks.length
+			subtree.otherLinks = otherLinks # add the otherLinks parameter to this node
+
+		# Now recurse through the tree and apply this logic to all nodes in the subtree
+		if !subtree.contents then return
+
+		i = 0
+
+		while i < subtree.contents.length
+
+			child = subtree.contents[i]
+
+			cacheExistingLinks child
+
+			i++
+
+		return
+
+	# This recursive function does the opposite of cacheExistingLinks; now we recurse through the subtree that's being restored and re-implement all the existing links
+	# This requires removing the new, blank nodes that were made to replace them and re-applying the existing links
+	# A prerequisite not present in deleteAndRestoreSrv is found in treeSrv's findAndFixAnswerTargets: the replacementForTarget property is applied to all of these new, blank nodes that replaced existing links
+	restoreExistingLinks = (node) ->
+
+		if node.otherLinks
+
+			tree = treeSrv.get()
+
+			for index, link of node.otherLinks
+
+				otherNode = treeSrv.findNode tree, link.id
+
+				spliceTargetIndex = null
+
+				for child, childIndex in otherNode.contents
+					if child.replacementForTarget and child.replacementForTarget is node.id then spliceTargetIndex = childIndex
+
+				if typeof otherNode.contents[spliceTargetIndex] isnt 'undefined' then otherNode.contents.splice spliceTargetIndex, 1
+				otherNode.answers[link.answerIndex].target = node.id
+				otherNode.answers[link.answerIndex].linkMode = "existing"
+
+				otherNode.hasLinkToOther = true
+
+			delete node.otherLinks
+
+		# Recurse through the subtree and perform this action for all other nodes
+		if !node.contents then return
+
+		i = 0
+
+		while i < node.contents.length
+
+			child = node.contents[i]
+
+			restoreExistingLinks child
+
+			i++
+
+		return
+
+	get : get
 	set : set
 	add : add
 	coldStorage : coldStorage
