@@ -786,6 +786,9 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 			node: angular.copy node # have to make a deep copy of the node to prevent it being skewered by changes elsewhere
 			nodeIndex: nodeIndex
 
+		# Did we delete the child of a blank node? Make sure we add a flag in the cryo object to restore it
+		if parent.pendingTarget and parent.pendingTarget is node.id then cryo.parentHasPendingTarget = true
+
 		# Add to the global cryo cache
 		add cryo
 
@@ -804,6 +807,9 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 		cache.splice target, 1
 
 		restoreExistingLinks parent.contents[item.nodeIndex]
+
+		# Restore pendingTarget property to parent
+		if item.parentHasPendingTarget then parent.pendingTarget = target
 
 		# Grab the tree to update answer links & manually refresh it
 		tree = treeSrv.get()
