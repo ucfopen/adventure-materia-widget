@@ -1347,14 +1347,30 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, deleteAndRestoreSrv, $docu
 						$scope.newNodeManager.show = false
 						return
 
+					# variables to store original properties of soon-to-be-deleted child node
+					# due to 2-way binding, referencing their current values will not work
+					removedNodeAnswer = angular.copy $scope.answers[i]
+					removedNodeParent = null
+
 					# Set answer row's target to the node being edited
 					$scope.answers[i].target = $scope.editedNode.id
 
 					## HANDLE PRIOR LINK MODE: NEW
 					if $scope.answers[i].linkMode is $scope.NEW
 
-						# Scrub the existing child node associated with this answer
 						childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
+
+						if childNode.type isnt $scope.BLANK
+
+							childNodeIndex = 0
+							removedNodeParent = treeSrv.findNode $scope.treeData, childNode.parentId
+
+							angular.forEach $scope.editedNode.contents, (node, index) ->
+								if node.id is childNode.id then childNodeIndex = index
+
+							deleteAndRestoreSrv.coldStorage childNode, childNodeIndex, removedNodeParent, removedNodeAnswer, i
+
+						# Scrub the existing child node associated with this answer
 						removed = treeSrv.findAndRemove $scope.treeData, childNode.id
 
 						# Recurse through all deleted IDs & fix answer targets for each deleted node
@@ -1384,6 +1400,10 @@ Adventure.directive "newNodeManagerDialog", (treeSrv, deleteAndRestoreSrv, $docu
 
 					# Refresh all answerLinks references as some have changed
 					treeSrv.updateAllAnswerLinks $scope.treeData
+
+					if childNode and childNode.type isnt $scope.BLANK
+						$scope.interactiveToast "By linking Destination " + $scope.integerToLetters($scope.editedNode.id) + " back to itself, Destination " + $scope.integerToLetters(childNode.id) + " was removed.", "Undo", ->
+							deleteAndRestoreSrv.restoreUnlinkedNode childNode.id, removedNodeParent
 
 
 			$scope.newNodeManager.show = false

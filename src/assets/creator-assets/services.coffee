@@ -864,6 +864,21 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 
 		restoreExistingLinks parent.contents[item.nodeIndex]
 
+		# Check to see if we have to remove either the hasLinkToOther or hasLinkToSelf flags
+		# The parent node will have one or the other depending on the link type being undone
+		# However, the flag may be retained if other self/existing links exist
+		removeLinksToOtherFlag = true
+		removeLinksToSelfFlag = true
+		angular.forEach parent.answers, (answer, index) ->
+			if answer.linkMode is "existing"
+				removeLinksToOtherFlag = false
+
+			if answer.linkMode is "self"
+				removeLinksToSelfFlag = false
+
+		if parent.hasLinkToOther and removeLinksToOtherFlag then delete parent.hasLinkToOther
+		if parent.hasLinkToSelf and removeLinksToSelfFlag then delete parent.hasLinkToSelf
+
 		# Grab tree object to update answer links & manually refresh it
 		tree = treeSrv.get()
 		treeSrv.set tree
