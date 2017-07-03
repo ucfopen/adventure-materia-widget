@@ -776,7 +776,7 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 			answer = if parent.answers then parent.answers[answerIndex] else {} # handle exception case where parent is blank
 		if nodeIndex is null then nodeIndex = parent.contents.indexOf node # node index may differ from answer index due to answers with non-traditional links
 
-		cacheExistingLinks tree, node
+		cacheExistingLinks node
 
 		# Prep node as a coldStorage object
 		cryo =
@@ -897,17 +897,18 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 
 				# Have to get the tree and identify the node that has the existing link pointing to this particular node
 				otherLink = treeSrv.findNode tree, link.parent
-				otherLinkAnswerIndex = null
+				# otherLinkAnswerIndex = null
+
+				console.log "subtree id: " + subtree.id
 
 				# Identify the answer associated with that existing link and save its index position
 				angular.forEach otherLink.answers, (answer, index) ->
-					if answer.target is subtree.id and answer.linkMode is "existing"
-						otherLinkAnswerIndex = index
 
-				if otherLinkAnswerIndex isnt null
-					otherLinks.push
-						id :	otherLink.id
-						answerIndex: otherLinkAnswerIndex
+					if answer.target is subtree.id and answer.linkMode is "existing"
+
+						otherLinks.push
+							id :	otherLink.id
+							answerIndex: index
 
 		if otherLinks.length
 			subtree.otherLinks = otherLinks # add the otherLinks parameter to this node
