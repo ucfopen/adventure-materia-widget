@@ -283,7 +283,7 @@
 					ng-click="copyNode()">Copy</button>
 				<button type="button"
 					ng-disabled="nodeTools.type==BLANK"
-					ng-click="resetNodePreCheck()">Reset</button>
+					ng-click="nodeTools.showResetWarning = true">Reset</button>
 				<button type="button"
 					ng-hide="nodeTools.type==BLANK"
 					ng-click="nodeTools.showConvertDialog = true">Convert</button>

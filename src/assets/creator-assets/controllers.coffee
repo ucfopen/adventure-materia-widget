@@ -126,7 +126,8 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 			# start a timer that makes toasts obsolete after 5 seconds
 			if $scope.showToast
-				$timeout (() ->
+				if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
+				$scope.toastRegister = $timeout (() ->
 					$scope.hideToast()
 				), 5000
 
@@ -156,6 +157,9 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 				catch e
 					$scope.toast "WARNING! " + $scope.editedNode.name + "'s question contains malformed or dangerous HTML!"
 					$scope.editedNode.hasProblem = true
+
+			# Handy debugging statement here; keep it commented out unless necessary for testing
+			# console.log $scope.editedNode
 
 			# Redraw tree (again) to address any post-edit changes
 			treeSrv.set $scope.treeData
@@ -350,30 +354,6 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 		treeSrv.set $scope.treeData
 
 		treeSrv.updateAllAnswerLinks $scope.treeData
-
-	# Restores an answer/node pair that's been deleted, formatted as a "cold storage" object
-	# target is the id of the node to be restored
-	# parent is a reference to the node that's storing the deleted node in its deletedCache array
-	$scope.restoreDeletedNode = (target, parent) ->
-
-		# Assume deletedCache exists on the editedNode - if not, something's wrong
-		unless parent.deletedCache then return
-
-		angular.forEach parent.deletedCache, (item, index) ->
-
-			if item.id is target
-				# Splice the answer and node back into their respective arrays at their previous index positions
-				parent.answers.splice item.answerIndex, 0, item.answer
-				parent.contents.splice item.nodeIndex, 0, item.node
-				parent.deletedCache.splice index, 1
-
-				# Update the tree to display the restored node
-				treeSrv.set $scope.treeData
-
-				# Refresh all answerLinks references as some have changed
-				treeSrv.updateAllAnswerLinks $scope.treeData
-
-				return
 
 	# Reference function so the integerToLetters function from treeSrv can be called using two-way data binding
 	$scope.integerToLetters = (val) ->
