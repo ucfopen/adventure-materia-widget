@@ -27,9 +27,9 @@ var minify = argv.minify;
 var mangle = argv.mangle;
 var embed = argv.embed;
 
-var Embedding = (embed === "false") ? false : true;
-var Mangling = (mangle === "false") ? false : true;
-var Minifying = (minify === "false") ? false : true;
+var Embedding = (embed === "true");
+var Mangling = (mangle === "true");
+var Minifying = (minify === "true");
 
 var sourceString = "";
 
@@ -520,9 +520,9 @@ exports["gulp"] = function(widget, minify, mangle, embed, callback)
 
 	console.log("widget: ", widget, "\nEmbed: ", embed, "\nMangle: ", mangle, "\nMinify: ", minify);
 
-	Embedding = (embed === "false") ? false : true;
-	Mangling = (mangle === "false") ? false : true;
-	Minifying = (minify === "false") ? false : true;
+	var Embedding = (embed === "true") ? true : false;
+	var Mangling = (mangle === "true") ? true : false;
+	var Minifying = (minify === "true") ? true : false;
 
 	// One of the ways to make sure Gulp does it's tasks in the order specified (Otherwise race condtions can occur).
 	gulp.task('callback', function()
