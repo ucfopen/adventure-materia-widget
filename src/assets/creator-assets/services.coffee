@@ -897,9 +897,6 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 
 				# Have to get the tree and identify the node that has the existing link pointing to this particular node
 				otherLink = treeSrv.findNode tree, link.parent
-				# otherLinkAnswerIndex = null
-
-				console.log "subtree id: " + subtree.id
 
 				# Identify the answer associated with that existing link and save its index position
 				angular.forEach otherLink.answers, (answer, index) ->
