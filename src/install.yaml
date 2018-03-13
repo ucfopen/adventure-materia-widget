@@ -23,6 +23,7 @@ meta_data:
     - Customizable
     - Scorable
     - Media
+    - Fullscreen
   supported_data:
     - Question/Answer
     - Multiple Choice
