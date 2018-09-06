@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.service "legacyQsetSrv", () ->
+Adventure.service "legacyQsetSrv", [() ->
 
 	legacyScaleFactor = null
 	imageOffsetX = null
@@ -240,3 +240,4 @@ Adventure.service "legacyQsetSrv", () ->
 
 	convertOldQset : convertOldQset
 	handleLegacyScale : handleLegacyScale
+]

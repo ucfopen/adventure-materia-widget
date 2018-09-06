@@ -1,9 +1,3 @@
-const path = require('path')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-
-let srcPath = path.join(process.cwd(), 'src')
-let outputPath = path.join(process.cwd(), 'build')
-
 // load the reusable legacy webpack config from materia-widget-dev
 let webpackConfig = require('materia-widget-development-kit/webpack-widget').getLegacyWidgetBuildConfig()
 
