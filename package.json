@@ -9,27 +9,10 @@
   "dependencies": {
     "materia-widget-development-kit":"^1.2.2"
   },
-  "devDependencies": {
-    "jasmine-core": "^2.4.1",
-    "karma": "^0.13.22",
-    "karma-coverage": "^0.5.5",
-    "karma-jasmine": "^0.3.8",
-    "karma-json-fixtures-preprocessor": "0.0.6",
-    "karma-junit-reporter": "^0.4.1",
-    "karma-mocha-reporter": "^2.1.0",
-    "karma-phantomjs-launcher": "^1.0.2",
-    "extract-text-webpack-plugin":"^3.0.2"
-  },
   "scripts": {
     "start": "webpack-dev-server",
     "buildDev": "webpack",
     "build": "webpack -p",
-    "pretest": "npm run buildDev",
-    "test": "karma start ./karma.conf.js --no-auto-watch --single-run",
-    "pretestFull": "npm run buildDev",
-    "testFull": "karma start ./karma-full.conf.js",
-    "clientAssets:link": "cd ../materia-client-assets && yarn link && cd - && yarn link materia-client-assets",
-    "devKit:link": "cd ../materia-widget-development-kit && yarn link && cd - && yarn link materia-widget-development-kit"
   },
   "author": "New Media"
 }
