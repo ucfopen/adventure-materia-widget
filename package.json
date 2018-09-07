@@ -12,7 +12,7 @@
   "scripts": {
     "start": "webpack-dev-server",
     "buildDev": "webpack",
-    "build": "webpack -p",
+    "build": "webpack -p"
   },
   "author": "New Media"
 }
