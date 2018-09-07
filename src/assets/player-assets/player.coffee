@@ -201,8 +201,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				return false
 
 	$scope.closeFeedback = ->
-		$scope.feedback = ""
-		manageQuestionScreen $scope.next
+		if $scope.feedback.length > 0
+			$scope.feedback = ""
+			manageQuestionScreen $scope.next
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
