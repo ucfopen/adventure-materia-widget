@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
+Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv', ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 
 	# TreeData is being initialized in -two- places right now.
 	# This one may or may not be required.
@@ -738,12 +738,13 @@ Adventure.service "treeSrv", ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 	validateTreeOnSave : validateTreeOnSave
 	integerToLetters : integerToLetters
 	generateAnswerHash : generateAnswerHash
+]
 
 # Handles the storage of deleted nodes in a global "cryo cache", where they can be restored at a later time
 # Currently, they can only be restored immediately after deletion, during the window of the undo prompt
 # I believe this solution is entirely over-engineered; rather than storing individual nodes, all their associated state information, AND implementing logic to restore them,
 # it is probably better to simply snapshot the entire tree pre-deletion, and allow the tree to simply "roll back" to the prior state if the undo option is selected.
-Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
+Adventure.service "deleteAndRestoreSrv", ['$rootScope','treeSrv', ($rootScope, treeSrv) ->
 
 	cache = []
 
@@ -975,3 +976,4 @@ Adventure.service "deleteAndRestoreSrv", ($rootScope, treeSrv) ->
 	restoreUnlinkedNode : restoreUnlinkedNode
 	cacheExistingLinks : cacheExistingLinks
 	restoreExistingLinks : restoreExistingLinks
+]

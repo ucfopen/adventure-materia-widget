@@ -1,7 +1,7 @@
 Adventure = angular.module "Adventure"
 
 ## CONTROLLER ##
-Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, $sanitize) ->
+Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', ($scope, $rootScope, legacyQsetSrv, $sanitize) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -201,8 +201,9 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 				return false
 
 	$scope.closeFeedback = ->
-		$scope.feedback = ""
-		manageQuestionScreen $scope.next
+		if $scope.feedback.length > 0 # prevent multiple calls to manageQuestionScreen from firing due to the scope cycle not updating fast enough
+			$scope.feedback = ""
+			manageQuestionScreen $scope.next
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
@@ -305,10 +306,11 @@ Adventure.controller 'AdventureController', ($scope, $rootScope, legacyQsetSrv, 
 			newString = pre + match[0] + " target=\"_blank\" rel=\"noopener\"" + post
 
 		newString
+]
 
 
 ## DIRECTIVES ##
-Adventure.directive('ngEnter', ->
+Adventure.directive "ngEnter", [() ->
 	return (scope, element, attrs) ->
 		element.bind("keypress", (event) ->
 			if(event.which == 13 or event.which == 10)
@@ -317,10 +319,10 @@ Adventure.directive('ngEnter', ->
 				scope.$apply ->
 					scope.$eval(attrs.ngEnter)
 		)
-)
+]
 
 # Font will progressively step down from 22px to 12px depending on question length after a threshold is reached
-Adventure.directive "autoTextScale", () ->
+Adventure.directive "autoTextScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -356,11 +358,12 @@ Adventure.directive "autoTextScale", () ->
 					if $scope.questionFormat.fontSize < 12 then $scope.questionFormat.fontSize = 12
 
 				$attrs.$set "style", $scope.formatQuestionStyles()
+]
 
 # Scales the height of the question box dynamically based on the height of the answer box
 # Ensures the negative space is effectively filled up with question text
 # Only used for MC, since MC is the only node type with variable answer container heights
-Adventure.directive "dynamicScale", () ->
+Adventure.directive "dynamicScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -389,11 +392,12 @@ Adventure.directive "dynamicScale", () ->
 			else $scope.questionFormat.height = maxHeight
 
 			$attrs.$set "style", $scope.formatQuestionStyles()
+]
 
 # Images in the player are subject to a number of constraints that makes scaling them logically complicated
 # Scaling is dependent on width of accompanying text, available height (constrained by header & answer container), and horiz/vertical layout
 # Logic must be applied AFTER image has loaded in order to properly query width and height
-Adventure.directive "dynamicImageScale", () ->
+Adventure.directive "dynamicImageScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -440,9 +444,10 @@ Adventure.directive "dynamicImageScale", () ->
 
 				# Apply scaling
 				$attrs.$set "style", "width:"+scaledWidth+"px;height:"+scaledHeight+"px;"
+]
 
 # Handles the visibility of individual hotspots
-Adventure.directive "visibilityManager", () ->
+Adventure.directive "visibilityManager", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -463,8 +468,9 @@ Adventure.directive "visibilityManager", () ->
 					when "never"
 						style = "opacity: 0"
 						$attrs.$set "style", style
+]
 
-Adventure.directive "labelManager", ($timeout) ->
+Adventure.directive "labelManager", ['$timeout', ($timeout) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -502,6 +508,7 @@ Adventure.directive "labelManager", ($timeout) ->
 			$scope.hotspotLabelTarget.show = false
 			$scope.hotspotLabelTarget.x = null
 			$scope.hotspotLabelTarget.y = null
+]
 
 
 
