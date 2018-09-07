@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, legacyQsetSrv) ->
+Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sanitize', 'treeSrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, legacyQsetSrv) ->
 
 	# Define constants for node screen types
 	$scope.BLANK = "blank"
@@ -386,3 +386,5 @@ Adventure.controller "AdventureCtrl", ($scope, $filter, $compile, $rootScope, $t
 
 	# Start 'er up!
 	Materia.CreatorCore.start $scope
+
+]
