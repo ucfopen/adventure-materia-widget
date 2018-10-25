@@ -3,13 +3,13 @@
   "materia": {
     "cleanName": "adventure"
   },
-  "version": "2.0.0",
+  "version": "2.0.2",
   "main": "app.js",
   "dependencies": {
-    "materia-widget-development-kit":"2.0.0"
+    "materia-widget-development-kit": "2.0.0"
   },
   "devDependencies": {
-    "copy-webpack-plugin":"^4.5.2"
+    "copy-webpack-plugin": "^4.5.2"
   },
   "scripts": {
     "start": "webpack-dev-server",
