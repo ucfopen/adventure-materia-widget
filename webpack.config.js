@@ -1,5 +1,24 @@
-// load the reusable legacy webpack config from materia-widget-dev
-let webpackConfig = require('materia-widget-development-kit/webpack-widget').getLegacyWidgetBuildConfig()
+const path = require('path')
+const copyPlugin = require('copy-webpack-plugin')
+
+const srcPath = path.join(process.cwd(), 'src')
+const outputPath = path.join(process.cwd(), 'build')
+
+// grab original copyList - we're going to append to it and overwrite the default copyList
+let copyConfigList = require('materia-widget-development-kit/webpack-widget').getDefaultCopyList()
+// Append the new items we want copied
+copyConfigList.push({
+	flatten: true,
+	from: `${srcPath}/_exports/`,
+	to: `${outputPath}/_exports`,
+})
+// Create the extra config object and provide a new copyList key:value pair
+let extraCfg = {
+	copyList: copyConfigList
+}
+
+// load the reusable legacy webpack config from materia-widget-dev and provide the extra cfg
+let webpackConfig = require('materia-widget-development-kit/webpack-widget').getLegacyWidgetBuildConfig(extraCfg)
 
 webpackConfig.entry = {
 	"assets/legacyQsetSrv.js": ["./src/assets/legacyQsetSrv.coffee"],
