@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<!-- INJECTS IE CLASSES ONTO HTML TAG -->
-<!--[if IE 8 ]>    <html class="IE8"> <![endif]-->
-<!--[if IE 9 ]>    <html class="IE9"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--> <html class=""> <!--<![endif]-->
+<html>
 	<head>
 		<title>Adventure Widget Player</title>
 		<meta charset="utf-8" />
@@ -12,22 +9,16 @@
 		<link rel="stylesheet" type="text/css" href="assets/player-assets/player.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
-		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script type="text/javascript" src="materia.enginecore.js"></script>
-
-		<!-- OPTIONAL MATERIA JAVASCRIPT -->
-		<!-- <script type="text/javascript" src="/js/materia.storage.manager.js"></script> -->
-		<!-- <script type="text/javascript" src="/js/materia.storage.table.js"></script> -->
+		<script src="materia.enginecore.js"></script>
 
 		<!-- YOUR PREREQUISITES -->
-		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.15/angular.min.js"></script>
-		<script type="text/javascript" src="//code.angularjs.org/1.2.15/angular-sanitize.min.js"></script>
-		<script type="text/javascript" src="//simonwaldherr.github.io/micromarkdown.js/micromarkdown.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-sanitize.min.js"></script>
+		<script src="assets/micromarkdown.min.js"></script>
 
 		<!-- MAIN PLAYER SCRIPT -->
-		<script type="text/javascript" src="assets/player-assets/app.js"></script>
-		<script type="text/javascript" src="assets/legacyQsetSrv.js"></script>
-		<script type="text/javascript" src="assets/player-assets/player.js"></script>
+		<script src="assets/player-assets/player.js"></script>
+		<script src="assets/legacyQsetSrv.js"></script>
 	</head>
 	<body id="body" ng-app="Adventure" ng-controller="AdventureController">
 		<header class="header" ng-class="{'show-title' : !hideTitle}">
@@ -200,4 +191,3 @@
 		</section>
 	</body>
 </html>
-

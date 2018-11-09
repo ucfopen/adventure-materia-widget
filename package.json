@@ -6,7 +6,8 @@
   "version": "2.0.3",
   "main": "app.js",
   "dependencies": {
-    "materia-widget-development-kit": "2.0.0"
+    "materia-widget-development-kit": "2.0.0",
+    "micromarkdown": "^0.3.0"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^4.5.2"

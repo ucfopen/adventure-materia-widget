@@ -1,5 +1,6 @@
 Adventure = angular.module "Adventure"
 Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sanitize', 'treeSrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, legacyQsetSrv) ->
+	materiaCallbacks = {}
 
 	# Define constants for node screen types
 	$scope.BLANK = "blank"
@@ -177,14 +178,14 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 		$scope.displayNodeCreation = "none"
 
-	$scope.initNewWidget = (widget, baseUrl) ->
+	materiaCallbacks.initNewWidget = (widget, baseUrl) ->
 		$scope.$apply ->
 			$scope.title = "My Adventure Widget"
 
 			$scope.showIntroDialog = true
 			$scope.showBackgroundCover = true
 
-	$scope.initExistingWidget = (title,widget,qset,version,baseUrl) ->
+	materiaCallbacks.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 
 		showIntroDialog = false
 
@@ -211,7 +212,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				treeSrv.set $scope.treeData
 				treeSrv.updateAllAnswerLinks $scope.treeData
 
-	$scope.onSaveClicked = (mode = 'save') ->
+	materiaCallbacks.onSaveClicked = (mode = 'save') ->
 		if mode is "publish" then validation = treeSrv.validateTreeOnSave $scope.treeData
 		else validation = []
 
@@ -229,7 +230,22 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			qset.options.internalScoreMessage = $scope.internalScoreMessage
 			Materia.CreatorCore.save $scope.title, qset, 2
 
-	$scope.onSaveComplete = (title, widget, qset, version) -> true
+	materiaCallbacks.onSaveComplete = (title, widget, qset, version) -> true
+
+	# onMediaImportComplete is required by the creator core
+	# Since it's not intrinsically tied to any one dom element, and does no dom manipulation,
+	# we just update the editedNode object and kick off a broadcast that directives will listen for
+	materiaCallbacks.onMediaImportComplete = (media) ->
+
+		unless $scope.editedNode then return
+
+		$scope.editedNode.media =
+			type: "image"
+			url: Materia.CreatorCore.getMediaUrl media[0].id
+			id: media[0].id
+			align: "right"
+
+		$rootScope.$broadcast "editedNode.media.updated"
 
 	# handles hover behavior of associated tooltips
 	# (associated answer & validation warnings)
@@ -359,21 +375,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	$scope.integerToLetters = (val) ->
 		return treeSrv.integerToLetters(val)
 
-	# onMediaImportComplete is required by the creator core
-	# Since it's not intrinsically tied to any one dom element, and does no dom manipulation,
-	# we just update the editedNode object and kick off a broadcast that directives will listen for
-	$scope.onMediaImportComplete = (media) ->
-
-		unless $scope.editedNode then return
-
-		$scope.editedNode.media =
-			type: "image"
-			url: Materia.CreatorCore.getMediaUrl media[0].id
-			id: media[0].id
-			align: "right"
-
-		$rootScope.$broadcast "editedNode.media.updated"
-
 	$scope.generateDebugQset = ->
 		qset = treeSrv.createQSetFromTree $scope.treeData
 		qset.options.hidePlayerTitle = $scope.hidePlayerTitle
@@ -385,6 +386,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 
 	# Start 'er up!
-	Materia.CreatorCore.start $scope
+	Materia.CreatorCore.start materiaCallbacks
 
 ]

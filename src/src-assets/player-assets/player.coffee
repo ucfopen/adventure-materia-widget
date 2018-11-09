@@ -29,7 +29,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.scoringDisabled = false
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 
-	$scope.engine =
+	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
 
 			#Convert an old qset prior to running the widget
@@ -290,7 +290,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			return "font-size:" + $scope.questionFormat.fontSize + "px; height:" + $scope.questionFormat.height + "px;"
 		else return "font-size:" + $scope.questionFormat.fontSize + "px;"
 
-	Materia.Engine.start($scope.engine)
+	Materia.Engine.start(materiaCallbacks)
 
 	# Small script that inserts " target="_blank"  " into a hrefs, preventing hyperlinks from displaying within the iframe.
 	addTargetToHrefs = (string) ->
@@ -384,7 +384,7 @@ Adventure.directive "dynamicScale", [() ->
 				# min: 220
 				# max: 400
 
-			answersHeight = angular.element(".answers")[0].getBoundingClientRect().height - minAnswerHeight
+			answersHeight = document.getElementsByClassName("answers")[0].getBoundingClientRect().height - minAnswerHeight
 
 			diff = maxAnswerHeight - answersHeight
 
