@@ -102,7 +102,7 @@
 				ng-show="type == MC">
 				<a href="#"
 					class="answer"
-					ng-repeat="answer in answers | orderBy: mcAnswerOrdering"
+					ng-repeat="answer in answers"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}">) {{answer.text}}</a>
