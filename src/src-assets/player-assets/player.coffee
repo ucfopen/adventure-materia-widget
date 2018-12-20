@@ -112,6 +112,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					options : q_data.answers[i].options
 				$scope.answers.push answer
 
+		# shuffle answer order if asked to do so
+		if q_data.options.randomize then $scope.answers = _shuffleIndices $scope.answers
+
 		$scope.q_data = q_data
 
 		# TODO Add back in with Layout support
@@ -208,15 +211,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
 
-
-	# Filter function called by ng-repeat to order answers randomly (or not)
-	$scope.mcAnswerOrdering = (answer) ->
-		if $scope.q_data.options.randomize
-			return Math.random()
-		else
-			return $scope.answers.indexOf answer
-
-
 	handleHotspot = (q_data) ->
 		$scope.type = $scope.HOTSPOT
 		$scope.question.layout = 1
@@ -306,6 +300,16 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			newString = pre + match[0] + " target=\"_blank\" rel=\"noopener\"" + post
 
 		newString
+
+	# Shuffles an array using the Fisher-Yates sorting algorithm. Used to randomize answer arrays.
+	_shuffleIndices = (a) ->
+		i = a.length
+		while --i > 0
+			j = ~~(Math.random() * (i + 1))
+			t = a[j]
+			a[j] = a[i]
+			a[i] = t
+		a
 ]
 
 
