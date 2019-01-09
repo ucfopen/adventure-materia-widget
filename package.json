@@ -13,7 +13,7 @@
     "build": "webpack -p",
     "build-dev": "webpack",
     "test": "echo 'tests not implemented",
-    "test-ci": "echo 'tests not implemented"
+    "test-ci": "echo 'tests not implemented'"
   },
   "license": "AGPL-3.0",
   "description": "An advanced, flexible scenario-building tool. Build branching decision trees where your student's choices lead them down different paths. For use in Materia.",
