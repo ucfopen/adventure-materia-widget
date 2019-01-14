@@ -1,0 +1,27 @@
+language: node_js
+node_js:
+  - '6'
+cache:
+  yarn: true
+  directories:
+    - node_modules
+before_install:
+  - npm config set spin false
+  - npm install -g npm@^5
+script:
+  - yarn test-ci
+  - yarn build
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: "qO7TIOkrFzaO7tS/TfpFKVF3RLC8sutyrW5WxFtpkpmz5TJY81W7lG4YWCsYJmdRtdtGbn3FwKExOT+46jK2qZVDl33tNMkCBM+D8qO2U6VP2tLoNE4uCIBWwkpDZlffpMKsjRyijhqeAPyJAT98jQ9qbJuGKp5Ai25dwOnHKcXRlhRp8C7iark9ALYbb4sHVvVFdn2aignoXqszXkndcz61oJaZV+TwPcjWOKD/j8irzseeYAxtKDky1LbM590mlpBT11Fycf0dg/nH4UAcUoZYWFQTLFCyoh/DImbzK3aU4txcaUSeRjFr4BBkb9qf81EKGMiJueNh1u6yjFGhLUSFY736TVt0BjeLMPrq/MPKyTEQUznN3/fpJTiiHrbEAj5edYjAgeYYkT6L5xEsYJqUTIMNGk2ua6cPpXXlDQJYfWudTmSnbzQg38lo8hIZQ1MZvEis8iWae3Vc7kMWGN/FEiwHm1mD4a8Ho6+uO6vt605jn4+xj1SQ06m3rVftHEKKOGpcjnHmjw6NtotsG+j4bePKMbXlxtD2Zk3NEs6ZvMHjHdnbQFRfB9IgQwFaGZKdxgNMIkvagtl8jE7d/QkTlCa0y860wBmOqgxlRtMgs5OO1eWeWHpgAWIMJp0Y4YZNwC6wVr9fPEU4aHR6JxZKfAJU0xzm9NRc6hrlAfA="
+  file:
+    - build/_output/adventure.wigt
+    - build/_output/adventure-build-info.yml
+  on:
+    tags: true
+    repo: ucfopen/adventure-materia-widget
+notifications:
+  slack:
+    secure: "sjMlpe8NlywGMqtpXZ10nsqTyHLZQP07knTCV3k1/3U/m/bN+SoMCiOoMyxHVnWlHRTnMAgCuP/qaMbvyS0KhJHlCsIsg0VNdPt7DHP2RqzshaozMvF0+vSwVHcA38BqD74eGIKZho0kGZYi1/qz0xNIBbKRpUSjrEAum9JLEF810WfsRKjmkrjxfzailAEAiwgWqOLRePIdK3ApJ5uw0u24t+We0MJporLl6KlUyW6z3t53ovUsc7qc89+U5EDXkfT4GuWGs+R01EQEc53LBJw0wa8a4sX1hlWkVjzZZRkpcGqVklTTwUxvC64w38gnn/9Z6rp05aLzuFezdgR0/UGtgruqkcHi004ifHfM/HrwuAkwLTH1N/3+DwxpYv2E1jDiWMM9uCr3WW9Rk2yZZQdlrv+LtVHN80ApHbgxqeFG/6gDhqyIi4dsuaS5sl5wZGw18o+EvXdE+OtAD0JCcHswZmUmjcSK1fNEyKF58/S0s8yjDw7pOlIJj6yDYKD7/3J1gnnHibSzveC1ZjT98CpO7xKqPiODtvUHti1idhFSJJNbM36F9NrmRRPy8eiTjH1dun5JnG3WB+VJlhDbjp7hq1l2MFOSNz6ODdX9Xc9g2PX4Xtm8r5pvlPV69Cf5wAPDo0GWtB5hFu9XdbYFGxIyKTJfZmqpwINbJMugxx0="
