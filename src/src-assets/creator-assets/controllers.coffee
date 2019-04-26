@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sanitize', 'treeSrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, legacyQsetSrv) ->
+Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sanitize', 'treeSrv', 'treeHistorySrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, treeHistorySrv, legacyQsetSrv) ->
 	materiaCallbacks = {}
 
 	# Define constants for node screen types
@@ -100,6 +100,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	$scope.validation =
 		show: false
 		errors: []
+
+	historyActions = treeHistorySrv.getActions()
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 
@@ -348,6 +350,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	# Function that explicitly adds a node between an existing parent and child
 	$scope.addNodeInBetween = (data) ->
+
+		treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_ADDED_IN_BETWEEN, "Destination created between " + treeSrv.integerToLetters(data.source) + " and " + treeSrv.integerToLetters(data.target)
 
 		newId = treeSrv.getNodeCount()
 		newName = treeSrv.integerToLetters newId
