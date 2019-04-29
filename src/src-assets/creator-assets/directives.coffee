@@ -751,7 +751,12 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 					timestamp: item.timestamp
 
 		$scope.rollBackToSnapshot = (index) ->
-			$scope.treeData = treeHistorySrv.applySnapshot(index)
+			snapshot = treeHistorySrv.retrieveSnapshot index
+			tree = JSON.parse snapshot.tree
+			$scope.treeData = tree
+			treeSrv.set tree
+			treeSrv.setNodeCount snapshot.nodeCount
+
 
 		$scope.dumpHistory = () ->
 			console.log treeHistorySrv.getHistory()
@@ -773,6 +778,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 		sourceTree = null
 		copyTree = null
 		targetNode = null
+
+		historyActions = treeHistorySrv.getActions()
 
 		# When target for the dialog changes, update the position values based on where the new node is
 		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
@@ -879,6 +886,9 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 					# Update the tree
 					treeSrv.set $scope.treeData
 
+					# Snapshot the tree
+					treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_COPIED, "Destination " + $scope.integerToLetters($scope.nodeTools.target) + " copied"
+
 					# Reset all values
 					$scope.copyNodeTarget = null
 					sourceTree = null
@@ -965,9 +975,6 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 			
-			historyActions = treeHistorySrv.getActions()
-			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_RESET, "Destination " + $scope.integerToLetters(target.id) + " reset"
-
 			# Iterating through an array while also deleting elements in that array during iteration is a big no-no!!!!!
 			# Get a list of all the nodes, THEN remove them all afterwards
 			nodesToRemove = []
@@ -1001,6 +1008,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 			# Go ahead and actually replace the existing node on the tree with the blank version
 			treeSrv.findAndReplace $scope.treeData, target.id, target
 			treeSrv.set $scope.treeData
+
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REST, "Destination " + $scope.integerToLetters(target.id) + " reset"
 
 			# Display the interactive toast that provides the Undo option
 			# Toast is displayed until clicked or until the node creation screen is closed
@@ -1044,9 +1053,6 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 					$scope.nodeTools.showDeleteWarning = false
 					return
 
-			historyActions = treeHistorySrv.getActions()
-			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_DELETED, "Destination " + $scope.integerToLetters(target.id) + " deleted"
-
 			# Remove the node & grab array of IDs representing deleted node & its children
 			removed = treeSrv.findAndRemove $scope.treeData, target.id
 
@@ -1062,6 +1068,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 			# Display the interactive toast that provides the Undo option
 			# Toast is displayed until clicked or until the node creation screen is closed
 			$scope.toast "Destination " + $scope.integerToLetters(target.id) + " was deleted."
+
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_DELETED, "Destination " + $scope.integerToLetters(target.id) + " deleted"
 
 			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
 			# if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
@@ -1114,7 +1122,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 					treeSrv.set $scope.treeData
 
-			# Buncha bullshit required to add the default [Unmatched Response] required for shortans
+			# Buncha nonsense required to add the default [Unmatched Response] required for shortans
 			if type is $scope.SHORTANS
 
 				# Add special matches property for each answer
@@ -1150,6 +1158,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
+
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_CONVERTED, "Destination " + $scope.integerToLetters(node.id) + " converted"
 ]
 
 # The "What kind of node do you want to create?" dialog
@@ -1177,6 +1187,8 @@ Adventure.directive "nodeCreationSelectionDialog", ['treeSrv', (treeSrv) ->
 Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$document', '$timeout', (treeSrv, treeHistorySrv, $document, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
+
+		historyActions = treeHistorySrv.getActions()
 
 		# Watch the newNodeManager target and kick off associated logic when it updates
 		# Similar in functionality to the nodeTools dialog
@@ -1209,9 +1221,6 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 				if $scope.answers[i].id is $scope.newNodeManager.answerId then break
 				else i++
 			
-			# snapshot the tree BEFORE any changes are made
-			pristineTreeSnapshot = angular.copy $scope.treeData
-
 			# Compare the prior link mode to the new one and deal with the changes
 			switch mode
 				when "new"
@@ -1311,9 +1320,8 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 								childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
 
 								if childNode
-									if childNode.type isnt $scope.BLANK
-										historyActions = treeHistorySrv.getActions()
-										treeHistorySrv.addToHistory pristineTreeSnapshot, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters($scope.newNodeManager.target) + " replaced with existing destination"
+									# if childNode.type isnt $scope.BLANK
+									removedNodeId = childNode.id
 
 									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
 
@@ -1353,9 +1361,10 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 
 							# Refresh all answerLinks references as some have changed
 							treeSrv.updateAllAnswerLinks $scope.treeData
-
+							
 							# if child node that was removed was not blank, provide a toast enabling the undo option
 							if removedNodeId
+								treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters(removedNodeId) + " replaced with existing destination"
 								$scope.toast "By linking to " + $scope.integerToLetters(newVal.id) + ", Destination " + $scope.integerToLetters(removedNodeId) + " was removed."
 
 				when "self"
@@ -1382,10 +1391,6 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 						if childNode.type isnt $scope.BLANK
 							removedNodeParent = treeSrv.findNode $scope.treeData, childNode.parentId
 
-							historyActions = treeHistorySrv.getActions()
-							treeHistorySrv.addToHistory pristineTreeSnapshot, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters($scope.newNodeManager.target) + " replaced with existing destination" 
-
-
 						# Scrub the existing child node associated with this answer
 						removed = treeSrv.findAndRemove $scope.treeData, childNode.id
 
@@ -1411,11 +1416,13 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 
 					$scope.newNodeManager.linkMode = $scope.SELF
 
-					$scope.newNodeManager.target = null
-					$scope.newNodeManager.answerId = null
-
 					# Refresh all answerLinks references as some have changed
 					treeSrv.updateAllAnswerLinks $scope.treeData
+
+					treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters($scope.newNodeManager.target) + " replaced with existing destination" 
+
+					$scope.newNodeManager.target = null
+					$scope.newNodeManager.answerId = null
 
 					if childNode and childNode.type isnt $scope.BLANK
 						$scope.toast "By linking Destination " + $scope.integerToLetters($scope.editedNode.id) + " back to itself, Destination " + $scope.integerToLetters(childNode.id) + " was removed."

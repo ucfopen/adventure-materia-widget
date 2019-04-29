@@ -712,7 +712,7 @@
 			</div>
 			<tree-history ng-class="{ 'minimized':minimized }">
 				<header ng-click="minimized = !minimized">Action History</header>
-				<div ng-click="dumpHistory()">Dump History</div>
+				<!-- <div ng-click="dumpHistory()">Dump History</div> -->
 				<div ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)">
 					{{item.context}}
 				</div>

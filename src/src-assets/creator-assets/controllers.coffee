@@ -166,6 +166,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 			# Redraw tree (again) to address any post-edit changes
 			treeSrv.set $scope.treeData
+			
+			if $scope.editedNode then treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_EDITED, "Destination " + $scope.integerToLetters($scope.editedNode.id) + " edited"
 
 
 	$scope.hideCoverAndModals = ->
@@ -351,8 +353,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	# Function that explicitly adds a node between an existing parent and child
 	$scope.addNodeInBetween = (data) ->
 
-		treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_ADDED_IN_BETWEEN, "Destination created between " + treeSrv.integerToLetters(data.source) + " and " + treeSrv.integerToLetters(data.target)
-
 		newId = treeSrv.getNodeCount()
 		newName = treeSrv.integerToLetters newId
 
@@ -374,6 +374,9 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		treeSrv.set $scope.treeData
 
 		treeSrv.updateAllAnswerLinks $scope.treeData
+
+		treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_ADDED_IN_BETWEEN, "Destination created between " + treeSrv.integerToLetters(data.source) + " and " + treeSrv.integerToLetters(data.target)
+
 
 	# Reference function so the integerToLetters function from treeSrv can be called using two-way data binding
 	$scope.integerToLetters = (val) ->

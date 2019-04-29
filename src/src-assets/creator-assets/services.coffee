@@ -748,6 +748,10 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		NODE_ANSWER_REMOVED: "NODE_ANSWER_REMOVED"
 		NODE_PARENT_REMOVED: "NODE_PARENT_REMOVED"
 		NODE_REPLACED_WITH_EXISTING: "NODE_REPLACED_WITH_EXISTING"
+		NODE_ADDED_IN_BETWEEN: "NODE_ADDED_IN_BETWEEN"
+		NODE_EDITED: "NODE_EDITED"
+		NODE_COPIED: "NODE_COPIED"
+		NODE_CONVERTED : "NODE_CONVERTED"
 
 	getActions = () ->
 		return actions
@@ -761,6 +765,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 			context: context ? context : ""
 			timestamp : Date.now()
 			tree: JSON.stringify(tree)
+			nodeCount : treeSrv.getNodeCount()
 
 	addToHistory = (tree, action, context) ->
 		snapshot = createSnapshot tree, action, context
@@ -771,13 +776,16 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		history.splice(index, 1)
 		$rootScope.$broadcast "tree.history.updated"
 
-	applySnapshot = (index) ->
-		snappedTree = JSON.parse history[index].tree
-		treeSrv.set snappedTree
+	retrieveSnapshot = (index) ->
+		# snappedTree = JSON.parse history[index].tree
+		# treeSrv.set snappedTree
 		
-		if history.length > 10 then history.splice 10, 1
+		# if history.length > 10 then history.splice 10, 1
 		
-		return snappedTree
+		# return snappedTree
+		snapshot = history[index]
+		if history.length > 40 then history.splice 40, 1
+		return snapshot
 
 
 	getActions : getActions
@@ -785,6 +793,6 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 	createSnapshot : createSnapshot
 	addToHistory : addToHistory
 	removeFromHistory : removeFromHistory
-	applySnapshot : applySnapshot
+	retrieveSnapshot : retrieveSnapshot
 
 ]
