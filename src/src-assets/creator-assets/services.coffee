@@ -537,7 +537,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 			switch item.options.type
 				when "mc"
-					if item.options.randomize then node.randomizeAnswers = item.options.randomize
+					if item.options.randomize then node.randomizeAnswers = item.options.randomize else node.randomizeAnswers = false
 				when "hotspot"
 					node.hotspotVisibility = item.options.visibility
 					if item.options.legacyScaleMode then node.legacyScaleMode = true
@@ -741,6 +741,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
 
+	HISTORY_LIMIT = 20
+
 	history = []
 	actions =
 		NODE_RESET: "NODE_RESET"
@@ -759,17 +761,22 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 	getHistory = () ->
 		return history
 
+	getHistorySize = () ->
+		return history.length
+
 	createSnapshot = (tree, action, context) ->
 		snapshot =
 			action : action
 			context: context ? context : ""
 			timestamp : Date.now()
-			tree: JSON.stringify(tree)
+			tree: JSON.stringify treeSrv.createQSetFromTree tree # snapshots are converted into the equivalent Qset structure to remove unnecessary D3 info. Also reduces complexity for compareTrees below
 			nodeCount : treeSrv.getNodeCount()
 
 	addToHistory = (tree, action, context) ->
 		snapshot = createSnapshot tree, action, context
 		history.push snapshot
+
+		if history.length > HISTORY_LIMIT then history.splice HISTORY_LIMIT, 1
 		$rootScope.$broadcast "tree.history.updated"
 
 	removeFromHistory = (index) ->
@@ -777,22 +784,21 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		$rootScope.$broadcast "tree.history.updated"
 
 	retrieveSnapshot = (index) ->
-		# snappedTree = JSON.parse history[index].tree
-		# treeSrv.set snappedTree
-		
-		# if history.length > 10 then history.splice 10, 1
-		
-		# return snappedTree
-		snapshot = history[index]
-		if history.length > 40 then history.splice 40, 1
-		return snapshot
+		return history[index]
 
+	compareTrees = (source, diff) ->
+		# SOURCE is a tree from a snapshot (string)
+		# DIFF is the raw tree to be compared (must be converted to a Qset object and stringified before comparison)
+		diff = JSON.stringify treeSrv.createQSetFromTree diff
+
+		return source == diff
 
 	getActions : getActions
 	getHistory : getHistory
+	getHistorySize : getHistorySize
 	createSnapshot : createSnapshot
 	addToHistory : addToHistory
 	removeFromHistory : removeFromHistory
 	retrieveSnapshot : retrieveSnapshot
-
+	compareTrees : compareTrees
 ]

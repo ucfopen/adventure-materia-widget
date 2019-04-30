@@ -166,8 +166,15 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 			# Redraw tree (again) to address any post-edit changes
 			treeSrv.set $scope.treeData
-			
-			if $scope.editedNode then treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_EDITED, "Destination " + $scope.integerToLetters($scope.editedNode.id) + " edited"
+						
+			# prevents polluting the action history by comparing the current tree to to the latest snapshot
+			# only add the current tree as a snapshot if the tree was actually edited
+			if $scope.editedNode
+				lastIndex = treeHistorySrv.getHistorySize() - 1
+				if lastIndex is -1 then treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_EDITED, "Destination " + $scope.integerToLetters($scope.editedNode.id) + " edited"
+				else
+					peek = treeHistorySrv.retrieveSnapshot(lastIndex)
+					unless treeHistorySrv.compareTrees(peek.tree, $scope.treeData) then treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_EDITED, "Destination " + $scope.integerToLetters($scope.editedNode.id) + " edited"
 
 
 	$scope.hideCoverAndModals = ->

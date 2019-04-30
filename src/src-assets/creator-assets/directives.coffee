@@ -752,7 +752,7 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 
 		$scope.rollBackToSnapshot = (index) ->
 			snapshot = treeHistorySrv.retrieveSnapshot index
-			tree = JSON.parse snapshot.tree
+			tree = treeSrv.createTreeDataFromQset JSON.parse snapshot.tree
 			$scope.treeData = tree
 			treeSrv.set tree
 			treeSrv.setNodeCount snapshot.nodeCount
@@ -881,13 +881,13 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 						# Update the original tree target with the copy
 						result = treeSrv.findAndReplace $scope.treeData, targetNode.id, copyTree
 
+						# Snapshot the tree
+						treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_COPIED, "Destination " + $scope.integerToLetters($scope.nodeTools.target) + " copied to " + $scope.integerToLetters(targetNode.id)
+
 					deregister()
 
 					# Update the tree
 					treeSrv.set $scope.treeData
-
-					# Snapshot the tree
-					treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_COPIED, "Destination " + $scope.integerToLetters($scope.nodeTools.target) + " copied"
 
 					# Reset all values
 					$scope.copyNodeTarget = null

@@ -854,7 +854,6 @@ tree-history {
 
 	header {
 		display: block;
-		margin-bottom: 1px;
 		padding-top: 5px;
 		padding-bottom: 5px;
 		font-size: 1.1em;
@@ -869,6 +868,7 @@ tree-history {
 
 		border-top-left-radius: 3px;
 		border-top-right-radius: 3px;
+		border-bottom: solid 1px $white;
 	}
 
 	div {
