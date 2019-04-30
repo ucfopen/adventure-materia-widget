@@ -1307,9 +1307,6 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 								$scope.existingNodeSelectionMode = true
 								return
 
-							# Deep copy the original answer in case undo is needed
-							# removedNodeAnswer = angular.copy $scope.answers[i]
-
 							# Set the answer's new target to the newly selected node
 							$scope.answers[i].target = newVal.id
 
@@ -1320,7 +1317,6 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 								childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
 
 								if childNode
-									# if childNode.type isnt $scope.BLANK
 									removedNodeId = childNode.id
 
 									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
@@ -1352,7 +1348,6 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 							# Cancel out the answer tooltip, or it persists
 							$scope.hoveredNode.showTooltips = false
 							$scope.hoveredNode.target = null
-							# $scope.hoveredNode.targetParent = null
 
 							$scope.existingNodeSelected = null
 							$scope.newNodeManager.target = null
@@ -2268,7 +2263,7 @@ Adventure.directive "validationDialog", ['treeSrv','$rootScope', (treeSrv, $root
 
 
 # MEANT FOR DEBUG PURPOSES ONLY
-Adventure.directive "debugQsetLoader", ['treeSrv','legacyQsetSrv','$rootScope', (treeSrv, legacyQsetSrv, $rootScope) ->
+Adventure.directive "debugQsetLoader", ['treeSrv', 'treeHistorySrv', 'legacyQsetSrv','$rootScope', (treeSrv, treeHistorySrv, legacyQsetSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -2303,6 +2298,9 @@ Adventure.directive "debugQsetLoader", ['treeSrv','legacyQsetSrv','$rootScope', 
 			treeSrv.set $scope.treeData
 			treeSrv.updateAllAnswerLinks $scope.treeData
 			$scope.showQsetLoader = false
+
+			historyActions = treeHistorySrv.getActions()
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.EXISTING_WIDGET_INIT, "Existing Widget Initialized"
 ]
 
 

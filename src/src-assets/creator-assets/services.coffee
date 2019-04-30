@@ -745,6 +745,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 
 	history = []
 	actions =
+		EXISTING_WIDGET_INIT: "EXISTING_WIDGET_INIT"
 		NODE_RESET: "NODE_RESET"
 		NODE_DELETED: "NODE_DELETED"
 		NODE_ANSWER_REMOVED: "NODE_ANSWER_REMOVED"

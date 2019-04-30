@@ -223,6 +223,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				treeSrv.set $scope.treeData
 				treeSrv.updateAllAnswerLinks $scope.treeData
 
+				treeHistorySrv.addToHistory $scope.treeData, historyActions.EXISTING_WIDGET_INIT, "Existing Widget Initialized"
+
 	materiaCallbacks.onSaveClicked = (mode = 'save') ->
 		if mode is "publish" then validation = treeSrv.validateTreeOnSave $scope.treeData
 		else validation = []
