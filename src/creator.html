@@ -711,9 +711,13 @@
 				</div>
 			</div>
 			<tree-history ng-class="{ 'minimized':minimized }">
+				<div class="undo-redo-options">
+					<button ng-click="undoAction()" ng-disabled="historyPosition <= 0">Undo</button>
+					<button ng-click="redoAction()" ng-disabled="historyPosition >= historySize-1">Redo</button>
+				</div>
 				<header ng-click="minimized = !minimized">Action History</header>
 				<!-- <div ng-click="dumpHistory()">Dump History</div> -->
-				<div ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)">
+				<div class="action-history" ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)">
 					{{item.context}}
 				</div>
 			</tree-history>

@@ -741,14 +741,42 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 
 		$scope.treeHistoryItems = []
 
-		$scope.minimized = false
+		$scope.minimized = true
 
-		$scope.$on "tree.history.updated", (evt) ->
+		$scope.historyPosition = -1
+		$scope.historySize = 0
+
+		$scope.$on "tree.history.added", (evt) ->
+			
+			# Have to get initial size of history stack
+			$scope.historySize = treeHistorySrv.getHistorySize()
+
+			# If most recent addition was performed earlier than the top of the stack, remove items on top of it (but not the top-most, which was just added)
+			if $scope.historyPosition < $scope.historySize - 2
+				top = $scope.historySize - 1
+				dist = top - ($scope.historyPosition + 1)
+				treeHistorySrv.spliceHistory $scope.historyPosition + 1, dist
+
+			# once stack is spliced, get new history stack and apply the change
 			$scope.treeHistoryItems = treeHistorySrv.getHistory().map (item, index) ->
 				reduced =
 					index: index
 					context: item.context
 					timestamp: item.timestamp
+
+			# update history size once it's been (potentially) changed again
+			$scope.historySize = treeHistorySrv.getHistorySize()
+
+			# update history cursor to top of stack
+			$scope.historyPosition = $scope.historySize - 1
+
+		$scope.undoAction = () ->
+			$scope.historyPosition--
+			$scope.rollBackToSnapshot $scope.historyPosition
+
+		$scope.redoAction = () ->
+			$scope.historyPosition++
+			$scope.rollBackToSnapshot $scope.historyPosition
 
 		$scope.rollBackToSnapshot = (index) ->
 			snapshot = treeHistorySrv.retrieveSnapshot index
@@ -757,6 +785,7 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 			treeSrv.set tree
 			treeSrv.setNodeCount snapshot.nodeCount
 
+			$scope.historyPosition = index
 
 		$scope.dumpHistory = () ->
 			console.log treeHistorySrv.getHistory()

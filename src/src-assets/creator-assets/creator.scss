@@ -467,6 +467,10 @@ button {
 
 	&:hover {
 		color: $color-accent;
+
+		&:disabled {
+			color: $gray-lighter;
+		}
 	}
 
 	&.delete-button {
@@ -849,15 +853,37 @@ tree-history {
 	// border: solid 1px $gray-darker
 
 	&.minimized {
-		top: calc(100% - 25px);
+		top: calc(100% - 55px);
+	}
+
+	div.undo-redo-options {
+		position: relative;
+		top: 0px;
+		width: 100%;
+		margin-bottom: 5px;
+
+		button {
+			width: 40%;
+			font-size:1.1em;
+			// background: $color-accent;
+			// color: $white;
+
+			@include user-select-none();
+
+			cursor: pointer;
+
+			&:first-child {
+				margin-right: 5%;
+			}
+		}
 	}
 
 	header {
 		display: block;
-		padding-top: 5px;
+		padding-top: 3px;
 		padding-bottom: 5px;
-		font-size: 1.1em;
-		font-weight: bold;
+		// font-size: 1.1em;
+		// font-weight: bold;
 		
 		background: $color-accent;
 		color: $white;
@@ -871,7 +897,7 @@ tree-history {
 		border-bottom: solid 1px $white;
 	}
 
-	div {
+	div.action-history {
 		width: 240px;
 		min-height: 10px;
 

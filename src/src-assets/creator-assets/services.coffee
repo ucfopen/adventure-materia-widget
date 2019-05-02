@@ -778,11 +778,11 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		history.push snapshot
 
 		if history.length > HISTORY_LIMIT then history.splice HISTORY_LIMIT, 1
-		$rootScope.$broadcast "tree.history.updated"
+		$rootScope.$broadcast "tree.history.added"
 
-	removeFromHistory = (index) ->
-		history.splice(index, 1)
-		$rootScope.$broadcast "tree.history.updated"
+	spliceHistory = (index, distance = 1) ->
+		history.splice(index, distance)
+		$rootScope.$broadcast "tree.history.removed"
 
 	retrieveSnapshot = (index) ->
 		return history[index]
@@ -799,7 +799,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 	getHistorySize : getHistorySize
 	createSnapshot : createSnapshot
 	addToHistory : addToHistory
-	removeFromHistory : removeFromHistory
+	spliceHistory : spliceHistory
 	retrieveSnapshot : retrieveSnapshot
 	compareTrees : compareTrees
 ]
