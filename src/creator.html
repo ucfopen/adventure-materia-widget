@@ -715,7 +715,10 @@
 					<button ng-click="undoAction()" ng-disabled="historyPosition <= 0">Undo</button>
 					<button ng-click="redoAction()" ng-disabled="historyPosition >= historySize-1">Redo</button>
 				</div>
-				<header ng-click="minimized = !minimized">Action History</header>
+				<header ng-click="minimized = !minimized">
+					<img src="assets/creator-assets/drawer-arrow.svg" />
+					Action History
+				</header>
 				<!-- <div ng-click="dumpHistory()">Dump History</div> -->
 				<div class="action-history" ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)">
 					{{item.context}}

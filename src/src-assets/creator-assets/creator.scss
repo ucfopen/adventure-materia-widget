@@ -50,6 +50,15 @@ $edit-popup-less-height: 600px;
 $edit-popup-standard-height: 620px;
 // $edit-popup-extra-height: 620px;
 // $edit-popup-less-height: 570px;
+ 
+$z-index-default: 0;
+$z-index-behind-cover: 5;
+$z-index-background-cover: 10;
+$z-index-modal-low-priority: 25;
+$z-index-modal: 50;
+$z-index-modal-svg: 75;
+$z-index-modal-dialog: 100;
+$z-index-very-important: 1000;
 
 html, body {
 	height: 100%;
@@ -101,7 +110,7 @@ div.fancy-toggle {
 	&:after {
 		position: absolute;
 		right: 10px;
-		z-index: 0;
+		z-index: $z-index-default;
 
 		content: 'OFF';
 
@@ -113,7 +122,7 @@ div.fancy-toggle {
 	&:before {
 		position: absolute;
 		left: 10px;
-		z-index: 0;
+		z-index: $z-index-default;
 
 		content: 'ON';
 
@@ -126,7 +135,7 @@ div.fancy-toggle {
 		position: absolute;
 		top: 3px;
 		left: 3px;
-		z-index: 1;
+		z-index: $z-index-behind-cover;
 
 		display: block;
 		width: 34px;
@@ -165,7 +174,6 @@ div.fancy-toggle {
 
 #backgroundcover {
 	position: fixed;
-	z-index: 1;
 	top: 0px;
 	right: 0px;
 	bottom: 0px;
@@ -175,7 +183,7 @@ div.fancy-toggle {
 	opacity: 0;
 	transition: all 0.5s ease;
 	&.show {
-		z-index: 1;
+		z-index: $z-index-background-cover;
 		opacity: 0.3;
 		transition: opacity 0.5s ease;
 	}
@@ -470,6 +478,7 @@ button {
 
 		&:disabled {
 			color: $gray-lighter;
+			cursor: auto;
 		}
 	}
 
@@ -567,7 +576,7 @@ debug-qset-loader, debug-qset-generator {
 	margin-left: -175px;
 	padding-bottom: 25px;
 
-	z-index: 5;
+	z-index: $z-index-modal;
 
 	background: $color-primary;
 	border-radius: 5px;
@@ -610,7 +619,8 @@ debug-qset-loader, debug-qset-generator {
 	width: 620px;
 	top: 10%;
 	left: 50%;
-	z-index: 2;
+	z-index: $z-index-modal;
+
 	margin-left: -325px;
 
 	padding: 15px 15px 25px 20px;
@@ -661,7 +671,7 @@ debug-qset-loader, debug-qset-generator {
 	width: 620px;
 	top: 10%;
 	left: 50%;
-	z-index: 2;
+	z-index: $z-index-modal;
 	margin-left: -325px;
 
 	// padding: 15px 15px 25px 20px;
@@ -738,7 +748,7 @@ debug-qset-loader, debug-qset-generator {
 
 toast {
 	position: absolute;
-	z-index: 90;
+	z-index: $z-index-very-important;
 
 	width: 600px;
 	min-height: 30px;
@@ -808,7 +818,7 @@ title-editor {
 	margin-left: -200px;
 	padding-bottom: 25px;
 
-	z-index: 5;
+	z-index: $z-index-modal;
 
 	background: $color-primary;
 	border-radius: 5px;
@@ -843,7 +853,7 @@ tree-history {
 	position: absolute;
 	right: 5px;
 	bottom: 0px;
-	z-index: 10;
+	z-index: $z-index-behind-cover;
 
 	width: 240px;
 	font-size: 0.8em;
@@ -854,6 +864,11 @@ tree-history {
 
 	&.minimized {
 		top: calc(100% - 55px);
+
+		header img {
+			top: 5px;
+			transform: rotate(180deg);
+		}
 	}
 
 	div.undo-redo-options {
@@ -879,6 +894,7 @@ tree-history {
 	}
 
 	header {
+		position: relative;
 		display: block;
 		padding-top: 3px;
 		padding-bottom: 5px;
@@ -895,6 +911,21 @@ tree-history {
 		border-top-left-radius: 3px;
 		border-top-right-radius: 3px;
 		border-bottom: solid 1px $white;
+
+		&:hover {
+			background: $color-accent-highlight;
+		}
+
+		img {
+			position: absolute;
+			top: 8px;
+			left: 10px;
+			width: 12px;
+			height: 12px;
+
+			transform: rotate(0deg);
+			transition: 250ms all;
+		}
 	}
 
 	div.action-history {
@@ -916,7 +947,7 @@ tree-history {
 
 node-tools-dialog {
 	position: absolute;
-	z-index: 30;
+	z-index: $z-index-modal-low-priority;
 
 	width: 200px;
 	// height: 85px;
@@ -967,7 +998,7 @@ node-tools-dialog {
 
 new-node-manager-dialog {
 	position: fixed;
-	z-index: 1000;
+	z-index: $z-index-very-important;
 	width: 400px;
 	height: 150px;
 
@@ -1029,7 +1060,7 @@ delete-warning-dialog {
 	position: fixed;
 	width: 300px;
 
-	z-index: 1050;
+	z-index: $z-index-very-important;
 
 	background: $color-primary;
 
@@ -1067,7 +1098,7 @@ node-creation-selection-dialog {
 	// position: absolute;
 	position: fixed;
 	left: 50%;
-	z-index: 40;
+	z-index: $z-index-modal;
 
 	width: $misc-popup-width;
 	height: $edit-popup-less-height;
@@ -1225,7 +1256,7 @@ node-creation-selection-dialog {
 	// position: absolute;
 	position: fixed;
 	left: 50%;
-	z-index: 50;
+	z-index: $z-index-modal;
 
 	width: $edit-popup-width;
 	height: $edit-popup-less-height - 30;
@@ -1350,7 +1381,7 @@ node-creation-selection-dialog {
 
 				&:focus {
 					position: absolute;
-					z-index: 150;
+					z-index: $z-index-modal;
 					height: 50px;
 				}
 			}
@@ -1732,7 +1763,7 @@ node-creation-selection-dialog {
 
 			svg#hotspot-canvas {
 				position: absolute;
-				z-index: 100;
+				z-index: $z-index-modal-svg;
 
 				top: 0px;
 				left: 0px;
@@ -1775,7 +1806,7 @@ node-creation-selection-dialog {
 			img {
 				position: relative;
 
-				z-index: 60;
+				z-index: $z-index-modal + 1;
 				max-width: 100%;
 				max-height: 100%;
 			}
@@ -1817,7 +1848,7 @@ node-creation-selection-dialog {
 			margin-left: -150px;
 			bottom: 40px;
 
-			z-index: 160;
+			z-index: $z-index-modal-dialog;
 
 			background: $color-primary;
 
@@ -1870,7 +1901,7 @@ node-creation-selection-dialog {
 			display: none;
 			width: 0px;
 
-			z-index: 150;
+			z-index: $z-index-modal-dialog;
 
 			padding-bottom: 52px;
 
@@ -2043,7 +2074,7 @@ node-creation-selection-dialog {
 			position: absolute;
 			width: 698px;
 			height: 400px;
-			z-index: 200;
+			z-index: $z-index-modal-svg + 1;
 
 			background: $white;
 			opacity: 0.7;
@@ -2054,7 +2085,7 @@ node-creation-selection-dialog {
 validation-dialog {
 	position: fixed;
 	left: 50%;
-	z-index: 60;
+	z-index: $z-index-modal;
 
 	width: $misc-popup-width;
 	// height: 600px;
