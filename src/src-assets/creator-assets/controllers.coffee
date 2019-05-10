@@ -196,6 +196,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			$scope.showIntroDialog = true
 			$scope.showBackgroundCover = true
 
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.WIDGET_INIT, "Widget Initialized"
+
 	materiaCallbacks.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 
 		showIntroDialog = false

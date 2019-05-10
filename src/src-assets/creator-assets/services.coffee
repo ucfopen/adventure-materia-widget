@@ -745,6 +745,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 
 	history = []
 	actions =
+		WIDGET_INIT: "WIDGET_INIT"
 		EXISTING_WIDGET_INIT: "EXISTING_WIDGET_INIT"
 		NODE_RESET: "NODE_RESET"
 		NODE_DELETED: "NODE_DELETED"
@@ -777,7 +778,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		snapshot = createSnapshot tree, action, context
 		history.push snapshot
 
-		if history.length > HISTORY_LIMIT then history.splice HISTORY_LIMIT, 1
+		if history.length > HISTORY_LIMIT then history.splice 0, 1
 		$rootScope.$broadcast "tree.history.added"
 
 	spliceHistory = (index, distance = 1) ->
