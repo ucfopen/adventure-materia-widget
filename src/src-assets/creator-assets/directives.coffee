@@ -791,6 +791,7 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 			treeSrv.setNodeCount snapshot.nodeCount
 
 			$scope.historyPosition = index
+]
 
 
 # Directive for the node modal dialog (edit the node, copy the node, reset the node, etc)
