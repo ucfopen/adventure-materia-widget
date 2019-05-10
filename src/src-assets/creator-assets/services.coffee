@@ -739,6 +739,11 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	generateAnswerHash : generateAnswerHash
 ]
 
+# The service in charge of managing Action History, replacing the clunky "deleteAndRestoreSrv" service
+# The history array contains entire snapshots of the tree, up to the limit determined by HISTORY_LIMIT
+# action constants have no direct application currently, but are implemented for potential future features
+# various user actions result in addToHistory being called to store the tree AFTER the action has been performed, with some contextual information
+# note that the action history is not stored to the qset and is lost if the creator is reloaded or upon exit
 Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
 
 	HISTORY_LIMIT = 20
@@ -778,7 +783,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		snapshot = createSnapshot tree, action, context
 		history.push snapshot
 
-		if history.length > HISTORY_LIMIT then history.splice 0, 1
+		if history.length > HISTORY_LIMIT then history.splice 0, 1 # not using spliceHistory here to avoid broadcasting tree.history.removed
 		$rootScope.$broadcast "tree.history.added"
 
 	spliceHistory = (index, distance = 1) ->

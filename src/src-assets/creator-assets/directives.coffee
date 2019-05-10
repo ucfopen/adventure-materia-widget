@@ -735,6 +735,8 @@ Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 				$scope.hoveredNode.showTooltips = true
 ]
 
+# Directive in charge of managing the Action History, in conjunction with the treeHistorySrv service
+# for more information see the comment for treeHistorySrv in services
 Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (treeSrv, treeHistorySrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
@@ -743,9 +745,12 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 
 		$scope.minimized = true
 
-		$scope.historyPosition = -1
+		$scope.historyPosition = -1 # this is the history "cursor". By default it's updated to point to the top-most action, but changes with undo/redo actions or selecting an earlier action
 		$scope.historySize = 0
 
+		# the history stack is evaluated every time a new history action is added
+		# if the history "cursor" is not at the top of the stack (they've clicked undo or have selected an earlier action),
+		# and a new action is performed, all actions between the cursor and the top of the stack are discarded
 		$scope.$on "tree.history.added", (evt) ->
 			
 			# Have to get initial size of history stack
@@ -786,10 +791,6 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 			treeSrv.setNodeCount snapshot.nodeCount
 
 			$scope.historyPosition = index
-
-		$scope.dumpHistory = () ->
-			console.log treeHistorySrv.getHistory()
-		]
 
 
 # Directive for the node modal dialog (edit the node, copy the node, reset the node, etc)

@@ -40,9 +40,6 @@
 				<p>Widget Scoring Mode</p>
 				<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
 			</div>
-
-			<button type="button" class="temp-qset-gen-button" ng-click="generateDebugQset()">Generate QSet</button>
-			<button type="button" class="temp-qset-gen-button" ng-click="showQsetLoader = true">Load QSet</button>
 			<!-- <button type="button" class="temp-qset-gen-button" ng-click="onSaveClicked('publish')">Simulate Publish</button> -->
 		</header>
 		<div id="adventure-container">
@@ -719,7 +716,6 @@
 					<img src="assets/creator-assets/drawer-arrow.svg" />
 					Action History
 				</header>
-				<!-- <div ng-click="dumpHistory()">Dump History</div> -->
 				<div class="action-history" ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)">
 					{{item.context}}
 				</div>
