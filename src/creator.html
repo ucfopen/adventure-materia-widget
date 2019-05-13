@@ -553,6 +553,11 @@
 								stroke="black"
 								ng-attr-points="{{polygonPoints}}" />
 						</svg>
+						<div id="hotspot-label"
+							ng-class="{'hidden':!hotspotLabelTarget.show}"
+							ng-style="{'opacity': hotspotLabelTarget.show ? '1' : '0', 'top': hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px' }">
+								{{ hotspotLabelTarget.text }}
+						</div>
 						<!-- SVG canvas upon which all hotspots are drawn -->
 						<svg id="hotspot-canvas"
 							ng-show="mediaReady"
@@ -587,10 +592,10 @@
 									stroke="{{answer.svg.fill}}"
 									stroke-width="{{answer.svg.stroke}}"
 									fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
-									ng-mouseenter="highlightSVG = true"
+									ng-mouseenter="highlightSVG = true; attachLabel($index, $event)"
 									ng-mousedown="selectSVG($event)"
 									ng-mouseup="deselectSVG($event)"
-									ng-mouseleave="deselectSVG($event); highlightSVG = false"
+									ng-mouseleave="deselectSVG($event); highlightSVG = false; detachLabel()"
 									ng-mousemove="moveSVG($index, $event)"
 									ng-click="manageSVG($index, $event)" />
 

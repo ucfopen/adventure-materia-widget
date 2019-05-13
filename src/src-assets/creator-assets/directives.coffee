@@ -1759,7 +1759,7 @@ Adventure.directive "finalScoreBox", [() ->
 				$scope.editedNode.finalScore = newVal
 ]
 
-Adventure.directive "hotspotManager", ['legacyQsetSrv', (legacyQsetSrv) ->
+Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', (legacyQsetSrv, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1799,13 +1799,40 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv', (legacyQsetSrv) ->
 
 		$scope.visibilityManagerOpen = false
 
-		$scope.selectSVG = (evt) ->
+		$scope.hotspotLabelTarget =
+			text: null
+			x: null
+			y: null
+			show: false
 
+		$scope.attachLabel = (index, evt) ->
+
+			labelReference = angular.element(document.getElementById("hotspot-label"))
+			parentDivReference = angular.element(evt.target).parent().parent()
+
+			$scope.hotspotLabelTarget.text = if $scope.answers[index].text then $scope.answers[index].text else "Click this hotspot to add a label."
+			bounds = angular.element(evt.target)[0].getBoundingClientRect()
+
+			$scope.hotspotLabelTarget.x = (bounds.left + (bounds.width/2)) - parentDivReference[0].getBoundingClientRect().left
+			$scope.hotspotLabelTarget.y = (bounds.bottom + 5) - parentDivReference[0].getBoundingClientRect().top
+
+			$timeout ->
+				$scope.hotspotLabelTarget.x -= labelReference[0].getBoundingClientRect().width/2
+				$scope.hotspotLabelTarget.show = true
+
+			
+		$scope.detachLabel = () ->
+			$scope.hotspotLabelTarget.show = false
+
+		$scope.selectSVG = (evt) ->
+			
 			# Update selectedSVG property with necessary event information
 			$scope.selectedSVG.selected = true
 			$scope.selectedSVG.target = angular.element(evt.target).parent() # wrap event target in jqLite (targets g node, parent of svg)
 			$scope.selectedSVG.originX = evt.clientX
 			$scope.selectedSVG.originY = evt.clientY
+
+			$scope.detachLabel()
 
 		# If SVG is deselected (or mouse moves away from SVG), clear the object
 		$scope.deselectSVG = (evt) ->
@@ -1816,6 +1843,8 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv', (legacyQsetSrv) ->
 			hasMoved : $scope.selectedSVG.hasMoved # carry hasMoved value over, since the click event needs to know what it is
 			originX: null
 			originY: null
+
+			$scope.detachLabel()
 
 		# Update selected SVG's position information as it moves based on cursor position
 		$scope.moveSVG = (index, evt) ->
