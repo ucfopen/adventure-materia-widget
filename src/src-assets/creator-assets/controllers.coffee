@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sanitize', 'treeSrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, legacyQsetSrv) ->
+Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sanitize', 'treeSrv', 'treeHistorySrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, treeHistorySrv, legacyQsetSrv) ->
 	materiaCallbacks = {}
 
 	# Define constants for node screen types
@@ -101,6 +101,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		show: false
 		errors: []
 
+	historyActions = treeHistorySrv.getActions()
+
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 
 		# Returning from a suspended node creation screen, don't do anything
@@ -164,6 +166,15 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 			# Redraw tree (again) to address any post-edit changes
 			treeSrv.set $scope.treeData
+						
+			# prevents polluting the action history by comparing the current tree to to the latest snapshot
+			# only add the current tree as a snapshot if the tree was actually edited
+			if $scope.editedNode
+				lastIndex = treeHistorySrv.getHistorySize() - 1
+				if lastIndex is -1 then treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_EDITED, "Destination " + $scope.integerToLetters($scope.editedNode.id) + " edited"
+				else
+					peek = treeHistorySrv.retrieveSnapshot(lastIndex)
+					unless treeHistorySrv.compareTrees(peek.tree, $scope.treeData) then treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_EDITED, "Destination " + $scope.integerToLetters($scope.editedNode.id) + " edited"
 
 
 	$scope.hideCoverAndModals = ->
@@ -184,6 +195,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 			$scope.showIntroDialog = true
 			$scope.showBackgroundCover = true
+
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.WIDGET_INIT, "Widget Initialized"
 
 	materiaCallbacks.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 
@@ -211,6 +224,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 				treeSrv.set $scope.treeData
 				treeSrv.updateAllAnswerLinks $scope.treeData
+
+				treeHistorySrv.addToHistory $scope.treeData, historyActions.EXISTING_WIDGET_INIT, "Existing Widget Initialized"
 
 	materiaCallbacks.onSaveClicked = (mode = 'save') ->
 		if mode is "publish" then validation = treeSrv.validateTreeOnSave $scope.treeData
@@ -370,6 +385,9 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		treeSrv.set $scope.treeData
 
 		treeSrv.updateAllAnswerLinks $scope.treeData
+
+		treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_ADDED_IN_BETWEEN, "Destination created between " + treeSrv.integerToLetters(data.source) + " and " + treeSrv.integerToLetters(data.target)
+
 
 	# Reference function so the integerToLetters function from treeSrv can be called using two-way data binding
 	$scope.integerToLetters = (val) ->
