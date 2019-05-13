@@ -1046,12 +1046,6 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 			# Toast is displayed until clicked or until the node creation screen is closed
 			$scope.toast "Destination " + $scope.integerToLetters(target.id) + " has been reset."
 
-			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
-			# if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
-			# $scope.toastRegister = $timeout (() ->
-			# 	$scope.hideToast()
-			# ), 8000
-
 			$scope.nodeTools.showResetWarning = false
 			$scope.nodeTools.show = false
 			$scope.nodeTools.target = null
@@ -1101,12 +1095,6 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 			$scope.toast "Destination " + $scope.integerToLetters(target.id) + " was deleted."
 
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_DELETED, "Destination " + $scope.integerToLetters(target.id) + " deleted"
-
-			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
-			# if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
-			# $scope.toastRegister = $timeout (() ->
-			# 	$scope.hideToast()
-			# ), 8000
 
 			$scope.nodeTools.showDeleteWarning = false
 			$scope.nodeTools.show = false
