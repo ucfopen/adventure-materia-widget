@@ -2283,7 +2283,7 @@ Adventure.directive "validationDialog", ['treeSrv','$rootScope', (treeSrv, $root
 							error.correctedTarget = newTarget
 
 						# For other error types, simply indicate there's a problem
-						when "blank_node", "has_no_answers", "has_no_final_score", "has_bad_html"
+						when "blank_node", "has_no_answers", "has_no_final_score", "has_bad_html", "no_hotspot_label"
 							node = treeSrv.findNode $scope.treeData, error.node
 
 							node.hasProblem = true
