@@ -162,7 +162,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 					$scope.editedNode.hasProblem = true
 
 			# Handy debugging statement here; keep it commented out unless necessary for testing
-			# console.log $scope.editedNode
+			console.log $scope.editedNode
 
 			# Redraw tree (again) to address any post-edit changes
 			treeSrv.set $scope.treeData

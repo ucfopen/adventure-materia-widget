@@ -43,6 +43,9 @@
 			<!-- <button type="button" class="temp-qset-gen-button" ng-click="onSaveClicked('publish')">Simulate Publish</button> -->
 		</header>
 		<div id="adventure-container">
+			<div class="mode-header" ng-show="showModeManager">
+				{{modeHeaderText}}
+			</div>
 			<div class="zoom-buttons" zoom-buttons>
 				<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
 				<svg class="zoom-button"
@@ -254,13 +257,15 @@
 					ng-click="hideCoverAndModals()">Got It!</button>
 			</validation-dialog>
 			<toast ng-hide="!showToast"
-				ng-click="hideToast()"
-				class="fadeable">
+				ng-click="hideToast()">
 				{{toastMessage}}
-				<button type="button"
-					ng-show="showToastActionButton"
-					ng-click="toastAction()">{{toastActionText}}</button>
 			</toast>
+			<mode-manager
+				ng-show="showModeManager">
+				{{modeManagerMessage}}
+				<button type="button"
+					ng-click="modeManagerAction()">{{modeManagerActionText}}</button>
+			</mode-manager>
 			<node-tools-dialog
 				id="nodeTools"
 				ng-show="nodeTools.show"
@@ -707,7 +712,7 @@
 						ng-click="hideCoverAndModals()">Done</button>
 				</div>
 			</div>
-			<tree-history ng-class="{ 'minimized':minimized }">
+			<tree-history ng-class="{ 'minimized':minimized, 'disabled': (existingNodeSelectionMode || copyNodeMode)}" ng-disabled="existingNodeSelectionMode || copyNodeMode">
 				<div class="undo-redo-options">
 					<button ng-click="undoAction()" ng-disabled="historyPosition <= 0">Undo</button>
 					<button ng-click="redoAction()" ng-disabled="historyPosition >= historySize-1">Redo</button>

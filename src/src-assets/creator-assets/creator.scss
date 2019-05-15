@@ -507,6 +507,19 @@ button {
 	}
 }
 
+.mode-header {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	padding: 6px 15px;
+
+	background: $blue-lighter;
+	color: $color-primary;
+
+	text-align: right;
+	border-bottom-left-radius: 5px;
+}
+
 .zoom-buttons {
 	position: absolute;
 	top: 15px;
@@ -753,7 +766,7 @@ toast {
 	width: 600px;
 	min-height: 30px;
 
-	bottom: 45px;
+	bottom: 80px;
 	left: 50%;
 	margin-left: -300px;
 
@@ -767,6 +780,29 @@ toast {
 
 	background: $gray-darker;
 	box-shadow: $shadow-small;
+}
+
+mode-manager {
+	position: absolute;
+	z-index: $z-index-very-important;
+
+	width: 600px;
+	min-height: 30px;
+
+	bottom: 35px;
+	left: 50%;
+	margin-left: -300px;
+
+	padding-top: 5px;
+
+	border-radius: 5px;
+
+	text-align: center;
+
+	color: $color-primary;
+
+	background: $color-accent;
+	box-shadow: $shadow-small;
 
 	button {
 		position: absolute;
@@ -776,14 +812,6 @@ toast {
 
 		font-size: 14px;
 	}
-
-	// &.fadeable {
-	// 	transition: 0.5s linear all;
-	// 	opacity: 1;
-	// 	&.ng-hide {
-	// 		opacity: 0;
-	// 	}
-	// }
 }
 
 node-tooltips {
@@ -945,6 +973,34 @@ tree-history {
 			transition: background 500ms;
 			cursor: pointer;
 		}
+	}
+
+	&.disabled {
+		div.undo-redo-options {
+			button {
+				color: $gray-lightest;
+
+				&:hover {
+					color: $gray-lightest;
+				}
+			}
+		}
+		header {
+			background: $gray;
+			cursor: default;
+
+			&:hover {
+				background: $gray;
+			}
+		}
+
+		div.action-history {
+			color: $gray;
+			&:hover {
+				background: $gray-lightest;
+			}
+		}
+		
 	}
 }
 
