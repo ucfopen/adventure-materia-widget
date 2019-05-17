@@ -14,6 +14,8 @@ $blue: #3d90b1;
 $blue-lighter: #49afd7;
 $blue-lightest: #bdecff;
 
+$tealish: #61a47f;
+
 $gray-darker: #333333;
 $gray: #888888;
 $gray-lighter: #cccccc;
@@ -25,6 +27,7 @@ $color-primary: $white;
 $color-accent: $blue;
 $color-accent-highlight: $blue-lighter;
 $color-selection-hover: $blue-lightest;
+$color-mode-accent: $tealish;
 
 $color-blank: #ADADAD;
 $color-mc: #60b973;
@@ -378,6 +381,14 @@ g.node {
 		}
 	}
 
+	&.ineligible {
+		circle.node-dot {
+			fill: $red-lightest;
+			stroke: $red !important;
+			stroke-width: 3px !important;
+		}
+	}
+
 	rect {
 		fill: $white;
 		stroke: $gray-lightest;
@@ -513,7 +524,7 @@ button {
 	right: 0px;
 	padding: 6px 15px;
 
-	background: $blue-lighter;
+	background: $color-mode-accent;
 	color: $color-primary;
 
 	text-align: right;
@@ -801,7 +812,7 @@ mode-manager {
 
 	color: $color-primary;
 
-	background: $color-accent;
+	background: $color-mode-accent;
 	box-shadow: $shadow-small;
 
 	button {

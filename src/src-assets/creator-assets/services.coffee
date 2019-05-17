@@ -731,6 +731,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	findAndAddInBetween : findAndAddInBetween
 	findAndRemove : findAndRemove
 	findAndFixAnswerTargets : findAndFixAnswerTargets
+	getIdsFromSubtree : getIdsFromSubtree
 	createQSetFromTree : createQSetFromTree
 	createTreeDataFromQset : createTreeDataFromQset
 	validateTreeOnStart : validateTreeOnStart

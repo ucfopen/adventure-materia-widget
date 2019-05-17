@@ -81,6 +81,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 		$scope.svg = null
 		$scope.copyMode = false
+		$scope.existingLinkMode = false
 
 		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
 		$scope.windowHeight = document.getElementById("adventure-container").offsetHeight
@@ -97,6 +98,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 		# Re-render the tree with copyMode enabled (highlights blank nodes)
 		$scope.$on "mode.copy", (evt) ->
 			$scope.copyMode = true
+			$scope.render treeSrv.get()
+
+		$scope.$on "mode.existingLink", (evt) ->
+			$scope.existingLinkMode = true
+			$scope.render treeSrv.get()
+
+		$scope.$on "mode.existingLink.complete", (evt) ->
+			$scope.existingLinkMode = false
 			$scope.render treeSrv.get()
 
 		$scope.render = (data) ->
@@ -135,6 +144,9 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				# the parent attribute isn't needed, and causes deep copy methods to fail since they recurse infinitely
 				# best to remove it
 				if node.parent then delete node.parent
+
+				# remove ineligibleTarget flag if it was previously added and existingLinkMode is no longer enabled
+				unless $scope.existingLinkMode and node.ineligibleTarget then delete node.ineligibleTarget
 
 				# If the node has any non-hierarchical links, have to process them
 				# And generate new links that d3 won't create by default
@@ -406,6 +418,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						delete d.hasTemporaryFocus
 						return "node focused #{d.type}"
 					else if $scope.copyMode and d.type is "blank" then return "node copyMode #{d.type}"
+					else if $scope.existingLinkMode and d.ineligibleTarget then return "node ineligible #{d.type}"
 					else return "node #{d.type}"
 				)
 				.on("mouseover", (d, i) ->
@@ -1221,7 +1234,7 @@ Adventure.directive "nodeCreationSelectionDialog", ['treeSrv', (treeSrv) ->
 
 # Dialog for selecting what kind of node a given answer should target
 # e.g., "new", "existing", "self"
-Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$document', '$timeout', (treeSrv, treeHistorySrv, $document, $timeout) ->
+Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$document', '$timeout', '$rootScope', (treeSrv, treeHistorySrv, $document, $timeout, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1320,7 +1333,20 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 					# Set the node selection mode so click events are handled differently than normal
 					$scope.existingNodeSelectionMode = true
 
+					# Recurse through the original node and its children to apply the "ineligible target" flag. This is used by the treeViz directive
+					# to apply the ineligible style to those nodes, indicating they cannot be selected in existing link selection mode
+					subtree = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
+					ineligibleIDs = treeSrv.getIdsFromSubtree subtree, []
+					for id in ineligibleIDs
+						node = treeSrv.findNode subtree, id
+						node.ineligibleTarget = true
+					
+					# Notify the treeViz directive to redraw the tree in the new mode
+					$rootScope.$broadcast "mode.existingLink"
+					treeSrv.set $scope.treeData
+
 					$scope.displayModeManager "Existing Answer Selection Mode", "Select the destination this answer should link to.", "Cancel", ->
+						$rootScope.$broadcast "mode.existingLink.complete"
 						$scope.existingNodeSelectionMode = false
 						$scope.displayNodeCreation = $scope.editedNode.type
 						$scope.showBackgroundCover = true
@@ -1341,6 +1367,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 								deregister()
 								$scope.existingNodeSelected = null
 								$scope.displayNodeCreation = "none"
+								$rootScope.$broadcast "mode.existingLink.complete"
 								$scope.cancelModeManager()								
 								$scope.selectLinkMode $scope.SELF
 								return false
@@ -1394,7 +1421,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 							$scope.editedNode.hasLinkToOther = true
 							$scope.answers[i].linkMode = $scope.EXISTING
 
-							treeSrv.set $scope.treeData
+							$rootScope.$broadcast "mode.existingLink.complete"
 
 							# Deregister the watch listener now that it's not needed
 							deregister()
