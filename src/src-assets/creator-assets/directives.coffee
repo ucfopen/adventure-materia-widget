@@ -800,7 +800,7 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 			$scope.rollBackToSnapshot $scope.historyPosition
 
 		$scope.rollBackToSnapshot = (index) ->
-			if $scope.existingNodeSelectionMode or $scope.copyMode then return false
+			if $scope.existingNodeSelectionMode or $scope.copyNodeMode then return false
 
 			snapshot = treeHistorySrv.retrieveSnapshot index
 			tree = treeSrv.createTreeDataFromQset JSON.parse snapshot.tree
@@ -827,6 +827,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 		sourceTree = null
 		copyTree = null
 		targetNode = null
+		deregister = null
+
 
 		historyActions = treeHistorySrv.getActions()
 
@@ -901,18 +903,28 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 			$rootScope.$broadcast "mode.copy"
 
-			$scope.toast "Select a blank node to copy this node to.", false
+			$scope.displayModeManager "Copy Destination Mode", "Select an appropriate blank destination as your copy target.", "Cancel", ->
+				$scope.cancelModeManager()
+				$scope.copyNodeMode = false
+				$scope.copyNodeTarget = null
+				sourceTree = null
+				copyTree = null
+				targetNode = null
+				deregister()
+
+				treeSrv.set $scope.treeData
 
 			# Listen for the event associated with the user selecting a node to copy to
 			# copyNodeTarget is updated from the nodeSelected method in the controller
 			deregister = $scope.$watch "copyNodeTarget", (newVal, oldVal) ->
 
-				$scope.hideToast()
-
 				if newVal
 					# Don't copy to the same node, or a not-blank node
 					if newVal.type isnt $scope.BLANK or newVal.id is $scope.nodeTools.target
-						$scope.toast "Target destination should be blank!"
+						$scope.toast "Target destination must be blank!"
+						$scope.copyNodeTarget = null
+						$scope.copyNodeMode = true
+						return false
 
 					else
 						# First, grab node to be copied
@@ -934,6 +946,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 						treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_COPIED, "Destination " + $scope.integerToLetters($scope.nodeTools.target) + " copied to " + $scope.integerToLetters(targetNode.id)
 
 					deregister()
+
+					$scope.cancelModeManager()
 
 					# Update the tree
 					treeSrv.set $scope.treeData
@@ -1015,6 +1029,9 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 				$scope.recursiveCopy copy.contents[i], copy.id
 				i++
+			
+			# Manually rebuild the children array to prevent certain future events from going terribly, horribly wrong
+			copy.children = copy.contents.slice(0)
 
 			return copy
 
@@ -1060,8 +1077,6 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REST, "Destination " + $scope.integerToLetters(target.id) + " reset"
 
-			# Display the interactive toast that provides the Undo option
-			# Toast is displayed until clicked or until the node creation screen is closed
 			$scope.toast "Destination " + $scope.integerToLetters(target.id) + " has been reset."
 
 			$scope.nodeTools.showResetWarning = false
@@ -1070,7 +1085,6 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 		# Delete the node, and the associated parent's answer
 		# Don't delete the node if it's a) a child of a narrative node or b) the associated node of a short answer's unmatched responses
-		# Stores the deleted node as a coldStorage object in case the user wants to undo the action
 		$scope.deleteNode = () ->
 
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
@@ -1121,8 +1135,6 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
 
-			# Display the interactive toast that provides the Undo option
-			# Toast is displayed until clicked or until the node creation screen is closed
 			$scope.toast "Destination " + $scope.integerToLetters(target.id) + " was deleted."
 
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_DELETED, "Destination " + $scope.integerToLetters(target.id) + " deleted"
@@ -1326,7 +1338,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 					$scope.nodeTools.show = false
 					$scope.displayNodeCreation = "suspended"
 
-					# variables to store original properties of soon-to-be-deleted child node
+					# variable to store original properties of soon-to-be-deleted child node
 					# due to 2-way binding, referencing their current values will not work
 					removedNodeId = null
 
