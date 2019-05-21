@@ -122,9 +122,7 @@
 				<div class="hotspot-label"
 					id="hotspot-label"
 					ng-click="handleAnswerSelection(answer.link,answer.index)"
-					style="top:{{ hotspotLabelTarget.y }}px;
-						left:{{ hotspotLabelTarget.x }}px;
-						opacity:{{ hotspotLabelTarget.show ? 1 : 0 }}">
+					ng-style="{'top':hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px','opacity':hotspotLabelTarget.show? '1' : '0'}">
 					{{hotspotLabelTarget.text}}
 				</div>
 
