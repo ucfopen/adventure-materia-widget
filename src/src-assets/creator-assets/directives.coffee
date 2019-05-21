@@ -48,7 +48,6 @@ Adventure.directive "modeManager", [() ->
 			$scope.showModeManager = false
 			$scope.modeManagerMessage = ""
 			$scope.modeManagerActionText = ""
-			$scope.modeManagerActionText = actionText
 			$scope.modeManagerAction = null
 ]
 
@@ -225,7 +224,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 				# Right now, we're disabling bridge nodes on loopbacks
 				# Might add them back in later
-				if link.specialCase is "loopBack" then return
+				if link.specialCase is "loopBack" or $scope.copyMode or $scope.existingLinkMode then return
 				else
 					intermediate =
 						x: source.x + (target.x - source.x)/2
