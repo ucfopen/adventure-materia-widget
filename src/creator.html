@@ -25,6 +25,12 @@
 
 	</head>
 	<body ng-controller="AdventureCtrl" id="body">
+		<mode-manager-overlay
+			ng-class="{'enabled':showModeManager}">
+			{{modeManagerMessage}}
+			<button type="button"
+				ng-click="modeManagerAction()">{{modeManagerActionText}}</button>
+		</mode-manager-overlay>	
 		<header class="title-header">
 			<img class="logo" src="assets/creator-assets/materialogo.png" alt="Materia Logo" />
 			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
@@ -43,9 +49,6 @@
 			<!-- <button type="button" class="temp-qset-gen-button" ng-click="onSaveClicked('publish')">Simulate Publish</button> -->
 		</header>
 		<div id="adventure-container">
-			<div class="mode-header" ng-show="showModeManager">
-				{{modeHeaderText}}
-			</div>
 			<div class="zoom-buttons" zoom-buttons>
 				<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
 				<svg class="zoom-button"
@@ -299,12 +302,6 @@
 				ng-click="hideToast()">
 				{{toastMessage}}
 			</toast>
-			<mode-manager
-				ng-show="showModeManager">
-				{{modeManagerMessage}}
-				<button type="button"
-					ng-click="modeManagerAction()">{{modeManagerActionText}}</button>
-			</mode-manager>
 			<node-tools-dialog
 				id="nodeTools"
 				ng-show="nodeTools.show"

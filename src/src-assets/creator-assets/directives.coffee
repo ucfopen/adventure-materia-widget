@@ -26,18 +26,15 @@ Adventure.directive "toast", ['$timeout', ($timeout) ->
 			$scope.toastMessage = ""
 ]
 
-Adventure.directive "modeManager", [() ->
+Adventure.directive "modeManagerOverlay", [() ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
-
-		$scope.modeHeaderText = false
 
 		$scope.showModeManager = false
 		$scope.modeManagerMessage = ""
 		$scope.modeManagerActionText = ""
 
-		$scope.displayModeManager = (header, message, actionText, action) ->
-			$scope.modeHeaderText = header
+		$scope.displayModeManager = (message, actionText, action) ->
 			$scope.modeManagerMessage = message
 			$scope.modeManagerActionText = actionText
 			$scope.modeManagerAction = action
@@ -907,7 +904,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 			$rootScope.$broadcast "mode.copy"
 
-			$scope.displayModeManager "Copy Destination Mode", "Select an appropriate blank destination as your copy target.", "Cancel", ->
+			$scope.displayModeManager "Select an appropriate blank destination as your copy target.", "Cancel", ->
 				$scope.cancelModeManager()
 				$scope.copyNodeMode = false
 				$scope.copyNodeTarget = null
@@ -1369,7 +1366,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 					$rootScope.$broadcast "mode.existingLink"
 					treeSrv.set $scope.treeData
 
-					$scope.displayModeManager "Existing Answer Selection Mode", "Select the destination this answer should link to.", "Cancel", ->
+					$scope.displayModeManager "Select the destination this answer should link to.", "Cancel", ->
 						$rootScope.$broadcast "mode.existingLink.complete"
 						$scope.existingNodeSelectionMode = false
 						$scope.displayNodeCreation = $scope.editedNode.type

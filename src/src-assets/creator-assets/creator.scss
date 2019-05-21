@@ -194,6 +194,40 @@ div.fancy-toggle {
 	}
 }
 
+mode-manager-overlay {
+	position: absolute;
+	z-index: $z-index-very-important;
+	
+	top: -60px;
+	left: 0;
+	width: 90%;
+	height: 42px;
+
+	padding-top: 18px;
+	padding-left: 10%;	
+
+	color: $color-primary;
+	background: $color-mode-accent;
+
+	font-size: 1.1em;
+
+	transition: all 0.5s;
+
+	&.enabled {
+		top:0;
+	}
+
+	button {
+		position: absolute;
+		top: 15px;
+		right: 25%;
+		padding: 6px 18px;
+		text-align: center;
+
+		font-size: 15px;
+	}
+}
+
 header.title-header {
 	display: block;
 	width: 100%;
@@ -779,7 +813,7 @@ toast {
 	width: 600px;
 	min-height: 30px;
 
-	bottom: 80px;
+	bottom: 35px;
 	left: 50%;
 	margin-left: -300px;
 
@@ -793,38 +827,6 @@ toast {
 
 	background: $gray-darker;
 	box-shadow: $shadow-small;
-}
-
-mode-manager {
-	position: absolute;
-	z-index: $z-index-very-important;
-
-	width: 600px;
-	min-height: 30px;
-
-	bottom: 35px;
-	left: 50%;
-	margin-left: -300px;
-
-	padding-top: 5px;
-
-	border-radius: 5px;
-
-	text-align: center;
-
-	color: $color-primary;
-
-	background: $color-mode-accent;
-	box-shadow: $shadow-small;
-
-	button {
-		position: absolute;
-		right: 5px;
-		height:24px;
-		text-align: center;
-
-		font-size: 14px;
-	}
 }
 
 node-tooltips {
