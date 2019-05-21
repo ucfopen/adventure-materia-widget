@@ -543,11 +543,14 @@
 							ng-mousemove="updateCursorPoint($event)"
 							polygon-artboard>
 							<!-- Guide line for indicating where next section of the polyline will be drawn -->
-							<line ng-attr-x1="{{lastClicked.x}}"
+							<line
+								ng-if="polygonPoints"
+								ng-attr-x1="{{lastClicked.x}}"
 								ng-attr-y1="{{lastClicked.y}}"
 								ng-attr-x2="{{cursorPoint.x}}"
 								ng-attr-y2="{{cursorPoint.y}}"
-								stroke="black" />
+								stroke="black"
+							/>
 							<!-- Open polygon, points will be converted to final polygon on the main hotspot svg -->
 							<polyline fill="none"
 								stroke="black"
