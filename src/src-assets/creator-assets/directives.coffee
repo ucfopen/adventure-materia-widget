@@ -1117,9 +1117,17 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 				newTargetNode.parentId = parent.id
 
-				treeSrv.findAndReplace $scope.treeData, $scope.nodeTools.target, newTargetNode
+				if targetAnswerIndex is null and parent.pendingTarget then parent.pendingTarget = newTargetNode.id # super duper edge case in case the parent is ALSO a blank in-between node
+				else parent.answers[targetAnswerIndex].target = newTargetNode.id # set the parent's answer target back to the correct node id
 
-				parent.answers[targetAnswerIndex].target = newTargetNode.id
+				# Handle resolution different depending on whether or not the in-between node has an existing link or normal link to its pendingTarget
+				if target.hasLinkToOther
+					parent.hasLinkToOther = true
+					if targetAnswerIndex isnt null then parent.answers[targetAnswerIndex].linkMode = $scope.EXISTING
+					treeSrv.findAndRemove $scope.treeData, $scope.nodeTools.target
+				else
+					treeSrv.findAndReplace $scope.treeData, $scope.nodeTools.target, newTargetNode
+					
 
 			else # default behavior
 
@@ -1736,8 +1744,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				for id in removed
 					treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
-				# Display the interactive toast that provides the Undo option
-				# Toast is displayed until clicked or until the node creation screen is closed
 				$scope.toast "Destination " + $scope.integerToLetters(targetId) + " was deleted."
 			else
 				# Just remove it from answers array, no further action required
