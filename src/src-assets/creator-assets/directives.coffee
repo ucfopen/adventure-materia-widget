@@ -909,7 +909,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 			$rootScope.$broadcast "mode.copy"
 
-			$scope.displayModeManager "Select an appropriate blank destination as your copy target.", "Cancel", ->
+			$scope.displayModeManager "Select a blank destination as your copy target.", "Cancel", ->
 				$scope.cancelModeManager()
 				$scope.copyNodeMode = false
 				$scope.copyNodeTarget = null
