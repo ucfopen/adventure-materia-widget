@@ -216,12 +216,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
+				# Don't create bridge nodes if copyMode or existingLinkMode are enabled
+				if $scope.copyMode or $scope.existingLinkMode then return
+
 				source = link.source
 				target = link.target
 
-				# Right now, we're disabling bridge nodes on loopbacks
-				# Might add them back in later
-				if link.specialCase is "loopBack" or $scope.copyMode or $scope.existingLinkMode then return
+				# Disable bridge nodes on loopbacks
+				if link.specialCase is "loopBack" then return
 				else
 					intermediate =
 						x: source.x + (target.x - source.x)/2
@@ -357,6 +359,9 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y
 					)
+
+					# don't attempt the following calculations if in copyMode or existingLinkMode! These nodes will not exist
+					if $scope.copyMode or $scope.existingLinkMode then return
 
 					# Do some fancy math to find the midpoint of the curve once it's been computed
 					# This must happen AFTER the path is generated for the link
