@@ -23,6 +23,7 @@ Adventure.directive "toast", ['$timeout', ($timeout) ->
 
 		$scope.hideToast = () ->
 			$scope.showToast = false
+			$scope.toastMessage = ""
 ]
 
 Adventure.directive "modeManager", [() ->
@@ -45,6 +46,10 @@ Adventure.directive "modeManager", [() ->
 
 		$scope.cancelModeManager = () ->
 			$scope.showModeManager = false
+			$scope.modeManagerMessage = ""
+			$scope.modeManagerActionText = ""
+			$scope.modeManagerActionText = actionText
+			$scope.modeManagerAction = null
 ]
 
 Adventure.directive "enterSubmit", ['$compile', ($compile) ->
