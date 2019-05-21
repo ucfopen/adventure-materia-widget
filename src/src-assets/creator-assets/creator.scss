@@ -54,6 +54,8 @@ $edit-popup-standard-height: 620px;
 // $edit-popup-extra-height: 620px;
 // $edit-popup-less-height: 570px;
  
+
+$z-index-hidden: -1;
 $z-index-default: 0;
 $z-index-behind-cover: 5;
 $z-index-background-cover: 10;
@@ -2138,6 +2140,27 @@ node-creation-selection-dialog {
 				}
 			}
 		}
+
+		#hotspot-label {
+			position:absolute;
+			z-index: $z-index-modal-dialog - 1;
+
+			max-width: 180px;
+
+			padding: 8px;
+
+			border-radius: 5px;
+			color: #fff;
+			background: rgba(0,0,0,0.8);
+			font-weight: normal;
+			font-size:0.8em;
+
+			cursor: pointer;
+
+			&.hidden {
+				z-index: $z-index-hidden;
+			}
+		}		
 
 		svg#polygon-svg-artboard {
 			display: block;

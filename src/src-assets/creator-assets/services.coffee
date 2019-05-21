@@ -656,6 +656,16 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 						errors.push error
 
+			if node.type is "hotspot"
+				angular.forEach node.answers, (answer, index) ->
+					if answer.text is null or answer.text.length is 0
+						error =
+							node: node.id
+							type: "no_hotspot_label"
+							target: answer.target
+
+						errors.push error
+
 		return errors
 
 

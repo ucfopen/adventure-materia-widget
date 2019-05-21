@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="35" height="35" xmlns="http://www.w3.org/2000/svg">
+    <rect id="svg_8" height="11.66667" width="11.66667" y="6.07292" x="2.58333" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" stroke="#000" fill="#fff"/>
+    <ellipse ry="6" rx="6" id="svg_6" cy="9.40625" cx="25.75" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" stroke="#000" fill="#fff"/>
+    <path stroke="#000" id="svg_5" d="m7.24208,20.25965l10.0583,-7.31796l10.05833,7.31796l-3.84192,11.84076l-12.43278,0l-3.84193,-11.84076z" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" fill="#fff"/>
+    <circle cx="17.3004" cy="28.3" r="1.7" id="svg_2"/>
+    <path fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="m16.94909,25.96667l0,-2.1c0,0 2.8,0 2.7,-2.5c-0.1,-2.6 -2.7,-2.3 -2.7,-2.3s-2,0.1 -2,2.5" id="svg_3"/>
+</svg>
