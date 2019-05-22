@@ -1097,26 +1097,13 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 			parent = treeSrv.findNode $scope.treeData, target.parentId
 			targetAnswerIndex = null
 
-			# Don't delete if it's a child of a narrative node
-			if parent.type is $scope.NARR
-				$scope.toast "Can't delete Destination " + target.name + "! Try linking " + parent.name + " to an existing destination instead."
-				$scope.nodeTools.showDeleteWarning = false
-				return
-
 			# Find reference to node in parent's answers
 			angular.forEach parent.answers, (answer, index) ->
 				if answer.target is target.id and answer.linkMode is $scope.NEW
 					targetAnswerIndex = index
 
-			if targetAnswerIndex isnt null
-
-				# Don't delete if it's referenced from an [Unmatched Response] answer of a short answer question.
-				if parent.answers[targetAnswerIndex].isDefault and parent.type is $scope.SHORTANS
-					$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
-					$scope.nodeTools.showDeleteWarning = false
-					return
-
 			# if we're deleting an in-between node, instead of removing the subtree, restore the original node as a child of the parent
+			# this condition is prioritized first because the narrative and short answer restrictions shouldn't apply (there will still be a child node)
 			if target.pendingTarget and target.type is $scope.BLANK
 				newTarget = target.pendingTarget
 				newTargetNode = angular.copy treeSrv.findNode $scope.treeData, newTarget
@@ -1133,7 +1120,18 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 					treeSrv.findAndRemove $scope.treeData, $scope.nodeTools.target
 				else
 					treeSrv.findAndReplace $scope.treeData, $scope.nodeTools.target, newTargetNode
-					
+
+			# Don't delete if it's a child of a narrative node
+			else if parent.type is $scope.NARR
+				$scope.toast "Can't delete Destination " + target.name + "! Try linking " + parent.name + " to an existing destination instead."
+				$scope.nodeTools.showDeleteWarning = false
+				return
+
+			# Don't delete if it's referenced from an [Unmatched Response] answer of a short answer question.
+			else if targetAnswerIndex isnt null and parent.answers[targetAnswerIndex].isDefault and parent.type is $scope.SHORTANS
+				$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
+				$scope.nodeTools.showDeleteWarning = false
+				return			
 
 			else # default behavior
 
