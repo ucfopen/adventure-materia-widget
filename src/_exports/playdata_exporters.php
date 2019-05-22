@@ -108,7 +108,7 @@ return [
 				// Array for the current row. Initialize with empty strings so when it is
 				// concatenated later it takes in account empty spots.
 				$logs = array_fill(0, $num_slots, '');
-				$logs[0] = $playlog[0]['user_id'];
+				$logs[0] = $playlog[0]['username'];
 				$logs[1] = $playlog[0]['last_name'];
 				$logs[2] = $playlog[0]['first_name'];
 				$logs[3] = $playlog[0]['semester'];
