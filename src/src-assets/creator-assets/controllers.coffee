@@ -187,6 +187,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		$scope.validation.show = false
 		$scope.showScoreModeDialog = false
 
+		$scope.resetNewNodeManager()
+
 		$scope.displayNodeCreation = "none"
 
 	materiaCallbacks.initNewWidget = (widget, baseUrl) ->

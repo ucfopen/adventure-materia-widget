@@ -14,6 +14,8 @@ $blue: #3d90b1;
 $blue-lighter: #49afd7;
 $blue-lightest: #bdecff;
 
+$tealish: #61a47f;
+
 $gray-darker: #333333;
 $gray: #888888;
 $gray-lighter: #cccccc;
@@ -25,6 +27,7 @@ $color-primary: $white;
 $color-accent: $blue;
 $color-accent-highlight: $blue-lighter;
 $color-selection-hover: $blue-lightest;
+$color-mode-accent: $tealish;
 
 $color-blank: #ADADAD;
 $color-mc: #60b973;
@@ -188,6 +191,41 @@ div.fancy-toggle {
 		z-index: $z-index-background-cover;
 		opacity: 0.3;
 		transition: opacity 0.5s ease;
+	}
+}
+
+mode-manager-overlay {
+	position: absolute;
+	z-index: $z-index-very-important;
+	
+	top: -60px;
+	left: 0;
+	width: 100%;
+	height: 42px;
+
+	padding-top: 18px;
+
+	color: $color-primary;
+	background: $color-mode-accent;
+
+	text-align: center;
+
+	font-size: 1.1em;
+
+	transition: all 0.5s;
+
+	&.enabled {
+		top:0;
+	}
+
+	button {
+		position: absolute;
+		top: 15px;
+		right: 20%;
+		padding: 6px 18px;
+		text-align: center;
+
+		font-size: 15px;
 	}
 }
 
@@ -380,6 +418,14 @@ g.node {
 		}
 	}
 
+	&.ineligible {
+		circle.node-dot {
+			fill: $red-lightest;
+			stroke: $red !important;
+			stroke-width: 3px !important;
+		}
+	}
+
 	rect {
 		fill: $white;
 		stroke: $gray-lightest;
@@ -507,6 +553,19 @@ button {
 			background: $color-accent-highlight;
 		}
 	}
+}
+
+.mode-header {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	padding: 6px 15px;
+
+	background: $color-mode-accent;
+	color: $color-primary;
+
+	text-align: right;
+	border-bottom-left-radius: 5px;
 }
 
 .zoom-buttons {
@@ -755,7 +814,7 @@ toast {
 	width: 600px;
 	min-height: 30px;
 
-	bottom: 45px;
+	bottom: 35px;
 	left: 50%;
 	margin-left: -300px;
 
@@ -769,23 +828,6 @@ toast {
 
 	background: $gray-darker;
 	box-shadow: $shadow-small;
-
-	button {
-		position: absolute;
-		right: 5px;
-		height:24px;
-		text-align: center;
-
-		font-size: 14px;
-	}
-
-	// &.fadeable {
-	// 	transition: 0.5s linear all;
-	// 	opacity: 1;
-	// 	&.ng-hide {
-	// 		opacity: 0;
-	// 	}
-	// }
 }
 
 node-tooltips {
@@ -947,6 +989,34 @@ tree-history {
 			transition: background 500ms;
 			cursor: pointer;
 		}
+	}
+
+	&.disabled {
+		div.undo-redo-options {
+			button {
+				color: $gray-lightest;
+
+				&:hover {
+					color: $gray-lightest;
+				}
+			}
+		}
+		header {
+			background: $gray;
+			cursor: default;
+
+			&:hover {
+				background: $gray;
+			}
+		}
+
+		div.action-history {
+			color: $gray;
+			&:hover {
+				background: $gray-lightest;
+			}
+		}
+		
 	}
 }
 

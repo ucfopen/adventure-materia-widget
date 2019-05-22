@@ -474,7 +474,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if tree.hasLinkToOther then itemData.options.hasLinkToOther = true
 			if tree.hasLinkToSelf then itemData.options.hasLinkToSelf = true
 			if tree.pendingTarget then itemData.options.pendingTarget = tree.pendingTarget
-			# TODO should cryo cache be included in QSet?
 
 			angular.forEach tree.answers, (answer, index) ->
 
@@ -503,7 +502,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		i = 0
 
 		while i < tree.children.length
-
+			
 			child = tree.children[i]
 			items = formatTreeDataForQset child, items
 			i++
@@ -741,6 +740,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	findAndAddInBetween : findAndAddInBetween
 	findAndRemove : findAndRemove
 	findAndFixAnswerTargets : findAndFixAnswerTargets
+	getIdsFromSubtree : getIdsFromSubtree
 	createQSetFromTree : createQSetFromTree
 	createTreeDataFromQset : createTreeDataFromQset
 	validateTreeOnStart : validateTreeOnStart
