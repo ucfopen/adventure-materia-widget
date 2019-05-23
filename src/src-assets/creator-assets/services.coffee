@@ -300,7 +300,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						parentId: tree.id
 						type: "blank"
 						contents: []
-						replacementForTarget: targetId # This flag allows deleteAndRestoreSrv to identify this node as a replacement for an existing link whose target was removed
 
 					# Update the answer too
 					answer.target = newId
@@ -475,7 +474,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if tree.hasLinkToOther then itemData.options.hasLinkToOther = true
 			if tree.hasLinkToSelf then itemData.options.hasLinkToSelf = true
 			if tree.pendingTarget then itemData.options.pendingTarget = tree.pendingTarget
-			# TODO should cryo cache be included in QSet?
 
 			angular.forEach tree.answers, (answer, index) ->
 
@@ -504,7 +502,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		i = 0
 
 		while i < tree.children.length
-
+			
 			child = tree.children[i]
 			items = formatTreeDataForQset child, items
 			i++
@@ -538,7 +536,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 			switch item.options.type
 				when "mc"
-					if item.options.randomize then node.randomizeAnswers = item.options.randomize
+					if item.options.randomize then node.randomizeAnswers = item.options.randomize else node.randomizeAnswers = false
 				when "hotspot"
 					node.hotspotVisibility = item.options.visibility
 					if item.options.legacyScaleMode then node.legacyScaleMode = true
@@ -658,6 +656,16 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 						errors.push error
 
+			if node.type is "hotspot"
+				angular.forEach node.answers, (answer, index) ->
+					if answer.text is null or answer.text.length is 0
+						error =
+							node: node.id
+							type: "no_hotspot_label"
+							target: answer.target
+
+						errors.push error
+
 		return errors
 
 
@@ -732,6 +740,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	findAndAddInBetween : findAndAddInBetween
 	findAndRemove : findAndRemove
 	findAndFixAnswerTargets : findAndFixAnswerTargets
+	getIdsFromSubtree : getIdsFromSubtree
 	createQSetFromTree : createQSetFromTree
 	createTreeDataFromQset : createTreeDataFromQset
 	validateTreeOnStart : validateTreeOnStart
@@ -740,240 +749,73 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	generateAnswerHash : generateAnswerHash
 ]
 
-# Handles the storage of deleted nodes in a global "cryo cache", where they can be restored at a later time
-# Currently, they can only be restored immediately after deletion, during the window of the undo prompt
-# I believe this solution is entirely over-engineered; rather than storing individual nodes, all their associated state information, AND implementing logic to restore them,
-# it is probably better to simply snapshot the entire tree pre-deletion, and allow the tree to simply "roll back" to the prior state if the undo option is selected.
-Adventure.service "deleteAndRestoreSrv", ['$rootScope','treeSrv', ($rootScope, treeSrv) ->
-
-	cache = []
-
-	get = () ->
-		return cache
-
-	set = (existing) ->
-		cache = existing
-
-	add = (item) ->
-		cache[item.id] = item
-
-	# Builds a "cold storage" object for deleted nodes. These are added to the global cryo cache for future restoration
-	# Cold storage objects include references to their associated answer, their original answer index, and a deep copy of the node itself
-	# Aside from the node itself, all params are optional, allowing them to be overridden for special use cases
-	coldStorage = (node, nodeIndex = null, parent = null, answer = null, answerIndex = null) ->
-
-		tree = treeSrv.get()
-
-		# If any of the optional params are null, have to grab defaults
-		if parent is null then parent = treeSrv.findNode tree, node.parentId
-
-		# Find reference to node in parent's answers
-		if answerIndex is null
-			angular.forEach parent.answers, (answer, index) ->
-				if answer.target is node.id and answer.linkMode is "new"
-					answerIndex = index
-
-		if answer is null
-			answer = if parent.answers then parent.answers[answerIndex] else {} # handle exception case where parent is blank
-		if nodeIndex is null then nodeIndex = parent.contents.indexOf node # node index may differ from answer index due to answers with non-traditional links
-
-		cacheExistingLinks node
-
-		# Prep node as a coldStorage object
-		cryo =
-			id: node.id
-			answerIndex: answerIndex
-			answer: answer
-			node: angular.copy node # have to make a deep copy of the node to prevent it being skewered by changes elsewhere
-			nodeIndex: nodeIndex
-
-		# Did we delete the child of a blank node? Make sure we add a flag in the cryo object to restore it
-		if parent.pendingTarget and parent.pendingTarget is node.id then cryo.parentHasPendingTarget = true
-
-		# Add to the global cryo cache
-		add cryo
-
-	# Node deletion occurs in two places: by deleting its associated answer in the editor of the node's hierarchical parent,
-	# or deleting the node directly via the nodeTools dialog
-	restoreDeletedNode = (target, parent) ->
-
-		unless cache[target] then return
-
-		item = cache[target]
-
-		# Splice the answer and node back into their respective arrays at their previous index positions
-		if parent.answers then parent.answers.splice item.answerIndex, 0, item.answer # !parent.answers only occurs if you're deleting a child of a blank [in-between] node
-		parent.contents.splice item.nodeIndex, 0, item.node
-		# Remove the node from the cryo cache
-		cache.splice target, 1
-
-		restoreExistingLinks parent.contents[item.nodeIndex]
-
-		# Restore pendingTarget property to parent
-		if item.parentHasPendingTarget then parent.pendingTarget = target
-
-		# Grab the tree to update answer links & manually refresh it
-		tree = treeSrv.get()
-
-		# Update the tree to display the restored node
-		treeSrv.set tree
-
-		# Refresh all answerLinks references as some have changed
-		treeSrv.updateAllAnswerLinks tree
-
-		return tree
-
-	# Reset nodes hold the original state of the node in cryo, but instead of appending data back into the contents[] and answers[] arrays of the parent,
-	# We overwrite the blank node that replaced it
-	restoreResetNode = (target, parent) ->
-
-		unless cache[target] then return
-
-		item = cache[target]
-		tree = treeSrv.get()
-
-		if parent
-			# Replace the reset node with the original
-			parent.answers[item.answerIndex] = item.answer
-			parent.contents[item.nodeIndex] = item.node
-			cache.splice target, 1
-
-			restoreExistingLinks parent.contents[item.nodeIndex]
-
-		else
-			# Special case if the user reset the Start node, which has no parent
-			tree = treeSrv.findAndReplace tree, target, item.node
-
-		# Update the tree to display the restored node
-		treeSrv.set tree
-
-		# Refresh all answerLinks references as some have changed
-		treeSrv.updateAllAnswerLinks tree
-
-		return tree
-
-	# Changing an answer's target from a new node to an existing one removes the original hierarchical child. Restoring it requires unique logic relative to deleted or reset nodes
-	restoreUnlinkedNode = (target, parent) ->
-
-		unless cache[target] then return
-
-		item = cache[target]
-
-		parent.answers[item.answerIndex] = item.answer
-		parent.contents.splice item.nodeIndex, 0, item.node
-		cache.splice target, 1
-
-		restoreExistingLinks parent.contents[item.nodeIndex]
-
-		# Check to see if we have to remove either the hasLinkToOther or hasLinkToSelf flags
-		# The parent node will have one or the other depending on the link type being undone
-		# However, the flag may be retained if other self/existing links exist
-		removeLinksToOtherFlag = true
-		removeLinksToSelfFlag = true
-		angular.forEach parent.answers, (answer, index) ->
-			if answer.linkMode is "existing"
-				removeLinksToOtherFlag = false
-
-			if answer.linkMode is "self"
-				removeLinksToSelfFlag = false
-
-		if parent.hasLinkToOther and removeLinksToOtherFlag then delete parent.hasLinkToOther
-		if parent.hasLinkToSelf and removeLinksToSelfFlag then delete parent.hasLinkToSelf
-
-		# Grab tree object to update answer links & manually refresh it
-		tree = treeSrv.get()
-		treeSrv.set tree
-
-		# Refresh all answerLinks references as some have changed
-		treeSrv.updateAllAnswerLinks tree
-
-	# Within the subtree that is going to be deleted, recurse through it and identify if an existing link is pointing to each node.
-	# If one is, add the "otherLinks" parameter which holds a record of this link for the purposes of restoring
-	cacheExistingLinks = (subtree) ->
-
-		otherLinks = []
-		for linkIndex, link of subtree.answerLinks
-			unless link.parent is subtree.parent
-				tree = treeSrv.get()
-
-				# Have to get the tree and identify the node that has the existing link pointing to this particular node
-				otherLink = treeSrv.findNode tree, link.parent
-
-				# Identify the answer associated with that existing link and save its index position
-				angular.forEach otherLink.answers, (answer, index) ->
-
-					if answer.target is subtree.id and answer.linkMode is "existing"
-
-						otherLinks.push
-							id :	otherLink.id
-							answerIndex: index
-
-		if otherLinks.length
-			subtree.otherLinks = otherLinks # add the otherLinks parameter to this node
-
-		# Now recurse through the tree and apply this logic to all nodes in the subtree
-		if !subtree.contents then return
-
-		i = 0
-
-		while i < subtree.contents.length
-
-			child = subtree.contents[i]
-
-			cacheExistingLinks child
-
-			i++
-
-		return
-
-	# This recursive function does the opposite of cacheExistingLinks; now we recurse through the subtree that's being restored and re-implement all the existing links
-	# This requires removing the new, blank nodes that were made to replace them and re-applying the existing links
-	# A prerequisite not present in deleteAndRestoreSrv is found in treeSrv's findAndFixAnswerTargets: the replacementForTarget property is applied to all of these new, blank nodes that replaced existing links
-	restoreExistingLinks = (node) ->
-
-		if node.otherLinks
-
-			tree = treeSrv.get()
-
-			for index, link of node.otherLinks
-
-				otherNode = treeSrv.findNode tree, link.id
-
-				spliceTargetIndex = null
-
-				for child, childIndex in otherNode.contents
-					if child.replacementForTarget and child.replacementForTarget is node.id then spliceTargetIndex = childIndex
-
-				if typeof otherNode.contents[spliceTargetIndex] isnt 'undefined' then otherNode.contents.splice spliceTargetIndex, 1
-				otherNode.answers[link.answerIndex].target = node.id
-				otherNode.answers[link.answerIndex].linkMode = "existing"
-
-				otherNode.hasLinkToOther = true
-
-			delete node.otherLinks
-
-		# Recurse through the subtree and perform this action for all other nodes
-		if !node.contents then return
-
-		i = 0
-
-		while i < node.contents.length
-
-			child = node.contents[i]
-
-			restoreExistingLinks child
-
-			i++
-
-		return
-
-	get : get
-	set : set
-	add : add
-	coldStorage : coldStorage
-	restoreDeletedNode : restoreDeletedNode
-	restoreResetNode : restoreResetNode
-	restoreUnlinkedNode : restoreUnlinkedNode
-	cacheExistingLinks : cacheExistingLinks
-	restoreExistingLinks : restoreExistingLinks
+# The service in charge of managing Action History, replacing the clunky "deleteAndRestoreSrv" service
+# The history array contains entire snapshots of the tree, up to the limit determined by HISTORY_LIMIT
+# action constants have no direct application currently, but are implemented for potential future features
+# various user actions result in addToHistory being called to store the tree AFTER the action has been performed, with some contextual information
+# note that the action history is not stored to the qset and is lost if the creator is reloaded or upon exit
+Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
+
+	HISTORY_LIMIT = 20
+
+	history = []
+	actions =
+		WIDGET_INIT: "WIDGET_INIT"
+		EXISTING_WIDGET_INIT: "EXISTING_WIDGET_INIT"
+		NODE_RESET: "NODE_RESET"
+		NODE_DELETED: "NODE_DELETED"
+		NODE_ANSWER_REMOVED: "NODE_ANSWER_REMOVED"
+		NODE_PARENT_REMOVED: "NODE_PARENT_REMOVED"
+		NODE_REPLACED_WITH_EXISTING: "NODE_REPLACED_WITH_EXISTING"
+		NODE_ADDED_IN_BETWEEN: "NODE_ADDED_IN_BETWEEN"
+		NODE_EDITED: "NODE_EDITED"
+		NODE_COPIED: "NODE_COPIED"
+		NODE_CONVERTED : "NODE_CONVERTED"
+
+	getActions = () ->
+		return actions
+
+	getHistory = () ->
+		return history
+
+	getHistorySize = () ->
+		return history.length
+
+	createSnapshot = (tree, action, context) ->
+		snapshot =
+			action : action
+			context: context ? context : ""
+			timestamp : Date.now()
+			tree: JSON.stringify treeSrv.createQSetFromTree tree # snapshots are converted into the equivalent Qset structure to remove unnecessary D3 info. Also reduces complexity for compareTrees below
+			nodeCount : treeSrv.getNodeCount()
+
+	addToHistory = (tree, action, context) ->
+		snapshot = createSnapshot tree, action, context
+		history.push snapshot
+
+		if history.length > HISTORY_LIMIT then history.splice 0, 1 # not using spliceHistory here to avoid broadcasting tree.history.removed
+		$rootScope.$broadcast "tree.history.added"
+
+	spliceHistory = (index, distance = 1) ->
+		history.splice(index, distance)
+		$rootScope.$broadcast "tree.history.removed"
+
+	retrieveSnapshot = (index) ->
+		return history[index]
+
+	compareTrees = (source, diff) ->
+		# SOURCE is a tree from a snapshot (string)
+		# DIFF is the raw tree to be compared (must be converted to a Qset object and stringified before comparison)
+		diff = JSON.stringify treeSrv.createQSetFromTree diff
+
+		return source == diff
+
+	getActions : getActions
+	getHistory : getHistory
+	getHistorySize : getHistorySize
+	createSnapshot : createSnapshot
+	addToHistory : addToHistory
+	spliceHistory : spliceHistory
+	retrieveSnapshot : retrieveSnapshot
+	compareTrees : compareTrees
 ]

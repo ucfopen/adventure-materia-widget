@@ -14,6 +14,8 @@ $blue: #3d90b1;
 $blue-lighter: #49afd7;
 $blue-lightest: #bdecff;
 
+$tealish: #61a47f;
+
 $gray-darker: #333333;
 $gray: #888888;
 $gray-lighter: #cccccc;
@@ -25,6 +27,7 @@ $color-primary: $white;
 $color-accent: $blue;
 $color-accent-highlight: $blue-lighter;
 $color-selection-hover: $blue-lightest;
+$color-mode-accent: $tealish;
 
 $color-blank: #ADADAD;
 $color-mc: #60b973;
@@ -50,6 +53,17 @@ $edit-popup-less-height: 600px;
 $edit-popup-standard-height: 620px;
 // $edit-popup-extra-height: 620px;
 // $edit-popup-less-height: 570px;
+ 
+
+$z-index-hidden: -1;
+$z-index-default: 0;
+$z-index-behind-cover: 5;
+$z-index-background-cover: 10;
+$z-index-modal-low-priority: 25;
+$z-index-modal: 50;
+$z-index-modal-svg: 75;
+$z-index-modal-dialog: 100;
+$z-index-very-important: 1000;
 
 html, body {
 	height: 100%;
@@ -101,7 +115,7 @@ div.fancy-toggle {
 	&:after {
 		position: absolute;
 		right: 10px;
-		z-index: 0;
+		z-index: $z-index-default;
 
 		content: 'OFF';
 
@@ -113,7 +127,7 @@ div.fancy-toggle {
 	&:before {
 		position: absolute;
 		left: 10px;
-		z-index: 0;
+		z-index: $z-index-default;
 
 		content: 'ON';
 
@@ -126,7 +140,7 @@ div.fancy-toggle {
 		position: absolute;
 		top: 3px;
 		left: 3px;
-		z-index: 1;
+		z-index: $z-index-behind-cover;
 
 		display: block;
 		width: 34px;
@@ -165,7 +179,6 @@ div.fancy-toggle {
 
 #backgroundcover {
 	position: fixed;
-	z-index: 1;
 	top: 0px;
 	right: 0px;
 	bottom: 0px;
@@ -175,9 +188,44 @@ div.fancy-toggle {
 	opacity: 0;
 	transition: all 0.5s ease;
 	&.show {
-		z-index: 1;
+		z-index: $z-index-background-cover;
 		opacity: 0.3;
 		transition: opacity 0.5s ease;
+	}
+}
+
+mode-manager-overlay {
+	position: absolute;
+	z-index: $z-index-very-important;
+	
+	top: -60px;
+	left: 0;
+	width: 100%;
+	height: 42px;
+
+	padding-top: 18px;
+
+	color: $color-primary;
+	background: $color-mode-accent;
+
+	text-align: center;
+
+	font-size: 1.1em;
+
+	transition: all 0.5s;
+
+	&.enabled {
+		top:0;
+	}
+
+	button {
+		position: absolute;
+		top: 15px;
+		right: 20%;
+		padding: 6px 18px;
+		text-align: center;
+
+		font-size: 15px;
 	}
 }
 
@@ -252,7 +300,7 @@ header.title-header {
 	overflow-y: hidden;
 	// overflow-y: auto;
 
-	// border-bottom: solid 5px $color-accent;
+	border-bottom: solid 1px $gray-lighter;
 }
 
 /* Tree Visualization Styles */
@@ -370,6 +418,14 @@ g.node {
 		}
 	}
 
+	&.ineligible {
+		circle.node-dot {
+			fill: $red-lightest;
+			stroke: $red !important;
+			stroke-width: 3px !important;
+		}
+	}
+
 	rect {
 		fill: $white;
 		stroke: $gray-lightest;
@@ -467,6 +523,11 @@ button {
 
 	&:hover {
 		color: $color-accent;
+
+		&:disabled {
+			color: $gray-lighter;
+			cursor: auto;
+		}
 	}
 
 	&.delete-button {
@@ -492,6 +553,19 @@ button {
 			background: $color-accent-highlight;
 		}
 	}
+}
+
+.mode-header {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	padding: 6px 15px;
+
+	background: $color-mode-accent;
+	color: $color-primary;
+
+	text-align: right;
+	border-bottom-left-radius: 5px;
 }
 
 .zoom-buttons {
@@ -563,7 +637,7 @@ debug-qset-loader, debug-qset-generator {
 	margin-left: -175px;
 	padding-bottom: 25px;
 
-	z-index: 5;
+	z-index: $z-index-modal;
 
 	background: $color-primary;
 	border-radius: 5px;
@@ -606,7 +680,8 @@ debug-qset-loader, debug-qset-generator {
 	width: 620px;
 	top: 10%;
 	left: 50%;
-	z-index: 2;
+	z-index: $z-index-modal;
+
 	margin-left: -325px;
 
 	padding: 15px 15px 25px 20px;
@@ -657,7 +732,7 @@ debug-qset-loader, debug-qset-generator {
 	width: 620px;
 	top: 10%;
 	left: 50%;
-	z-index: 2;
+	z-index: $z-index-modal;
 	margin-left: -325px;
 
 	// padding: 15px 15px 25px 20px;
@@ -734,12 +809,12 @@ debug-qset-loader, debug-qset-generator {
 
 toast {
 	position: absolute;
-	z-index: 90;
+	z-index: $z-index-very-important;
 
 	width: 600px;
 	min-height: 30px;
 
-	bottom: 45px;
+	bottom: 35px;
 	left: 50%;
 	margin-left: -300px;
 
@@ -753,23 +828,6 @@ toast {
 
 	background: $gray-darker;
 	box-shadow: $shadow-small;
-
-	button {
-		position: absolute;
-		right: 5px;
-		height:24px;
-		text-align: center;
-
-		font-size: 14px;
-	}
-
-	// &.fadeable {
-	// 	transition: 0.5s linear all;
-	// 	opacity: 1;
-	// 	&.ng-hide {
-	// 		opacity: 0;
-	// 	}
-	// }
 }
 
 node-tooltips {
@@ -804,7 +862,7 @@ title-editor {
 	margin-left: -200px;
 	padding-bottom: 25px;
 
-	z-index: 5;
+	z-index: $z-index-modal;
 
 	background: $color-primary;
 	border-radius: 5px;
@@ -835,10 +893,136 @@ title-editor {
 	}
 }
 
+tree-history {
+	position: absolute;
+	right: 5px;
+	bottom: 0px;
+	z-index: $z-index-behind-cover;
+
+	width: 240px;
+	font-size: 0.8em;
+
+	text-align: center;
+
+	// border: solid 1px $gray-darker
+
+	&.minimized {
+		top: calc(100% - 55px);
+
+		header img {
+			top: 5px;
+			transform: rotate(180deg);
+		}
+	}
+
+	div.undo-redo-options {
+		position: relative;
+		top: 0px;
+		width: 100%;
+		margin-bottom: 5px;
+
+		button {
+			width: 40%;
+			font-size:1.1em;
+			// background: $color-accent;
+			// color: $white;
+
+			@include user-select-none();
+
+			cursor: pointer;
+
+			&:first-child {
+				margin-right: 5%;
+			}
+		}
+	}
+
+	header {
+		position: relative;
+		display: block;
+		padding-top: 3px;
+		padding-bottom: 5px;
+		// font-size: 1.1em;
+		// font-weight: bold;
+		
+		background: $color-accent;
+		color: $white;
+
+		user-select: none;
+
+		cursor: pointer;
+
+		border-top-left-radius: 3px;
+		border-top-right-radius: 3px;
+		// border-bottom: solid 1px $white;
+
+		&:hover {
+			background: $color-accent-highlight;
+		}
+
+		img {
+			position: absolute;
+			top: 11px;
+			left: 10px;
+			width: 9px;
+			height: 9px;
+
+			transform: rotate(0deg);
+			transition: 250ms all;
+		}
+	}
+
+	div.action-history {
+		width: 238px;
+		min-height: 10px;
+
+		padding: 3px 0px 3px 0px;
+
+		background: $white;
+
+		border-left: solid 1px $gray-lighter;
+		border-right: solid 1px $gray-lighter;
+
+		&:hover {
+			background: $color-accent;
+			color: #ffffff;
+			transition: background 500ms;
+			cursor: pointer;
+		}
+	}
+
+	&.disabled {
+		div.undo-redo-options {
+			button {
+				color: $gray-lightest;
+
+				&:hover {
+					color: $gray-lightest;
+				}
+			}
+		}
+		header {
+			background: $gray;
+			cursor: default;
+
+			&:hover {
+				background: $gray;
+			}
+		}
+
+		div.action-history {
+			color: $gray;
+			&:hover {
+				background: $gray-lightest;
+			}
+		}
+		
+	}
+}
 
 node-tools-dialog {
 	position: absolute;
-	z-index: 30;
+	z-index: $z-index-modal-low-priority;
 
 	width: 200px;
 	// height: 85px;
@@ -889,7 +1073,7 @@ node-tools-dialog {
 
 new-node-manager-dialog {
 	position: fixed;
-	z-index: 1000;
+	z-index: $z-index-very-important;
 	width: 400px;
 	height: 150px;
 
@@ -951,7 +1135,7 @@ delete-warning-dialog {
 	position: fixed;
 	width: 300px;
 
-	z-index: 1050;
+	z-index: $z-index-very-important;
 
 	background: $color-primary;
 
@@ -989,7 +1173,7 @@ node-creation-selection-dialog {
 	// position: absolute;
 	position: fixed;
 	left: 50%;
-	z-index: 40;
+	z-index: $z-index-modal;
 
 	width: $misc-popup-width;
 	height: $edit-popup-less-height;
@@ -1147,7 +1331,7 @@ node-creation-selection-dialog {
 	// position: absolute;
 	position: fixed;
 	left: 50%;
-	z-index: 50;
+	z-index: $z-index-modal;
 
 	width: $edit-popup-width;
 	height: $edit-popup-less-height - 30;
@@ -1272,7 +1456,7 @@ node-creation-selection-dialog {
 
 				&:focus {
 					position: absolute;
-					z-index: 150;
+					z-index: $z-index-modal;
 					height: 50px;
 				}
 			}
@@ -1654,7 +1838,7 @@ node-creation-selection-dialog {
 
 			svg#hotspot-canvas {
 				position: absolute;
-				z-index: 100;
+				z-index: $z-index-modal-svg;
 
 				top: 0px;
 				left: 0px;
@@ -1697,7 +1881,7 @@ node-creation-selection-dialog {
 			img {
 				position: relative;
 
-				z-index: 60;
+				z-index: $z-index-modal + 1;
 				max-width: 100%;
 				max-height: 100%;
 			}
@@ -1739,7 +1923,7 @@ node-creation-selection-dialog {
 			margin-left: -150px;
 			bottom: 40px;
 
-			z-index: 160;
+			z-index: $z-index-modal-dialog;
 
 			background: $color-primary;
 
@@ -1792,7 +1976,7 @@ node-creation-selection-dialog {
 			display: none;
 			width: 0px;
 
-			z-index: 150;
+			z-index: $z-index-modal-dialog;
 
 			padding-bottom: 52px;
 
@@ -1960,12 +2144,33 @@ node-creation-selection-dialog {
 			}
 		}
 
+		#hotspot-label {
+			position:absolute;
+			z-index: $z-index-modal-dialog - 1;
+
+			max-width: 180px;
+
+			padding: 8px;
+
+			border-radius: 5px;
+			color: #fff;
+			background: rgba(0,0,0,0.8);
+			font-weight: normal;
+			font-size:0.8em;
+
+			cursor: pointer;
+
+			&.hidden {
+				z-index: $z-index-hidden;
+			}
+		}		
+
 		svg#polygon-svg-artboard {
 			display: block;
 			position: absolute;
 			width: 698px;
 			height: 400px;
-			z-index: 200;
+			z-index: $z-index-modal-svg + 1;
 
 			background: $white;
 			opacity: 0.7;
@@ -1976,7 +2181,7 @@ node-creation-selection-dialog {
 validation-dialog {
 	position: fixed;
 	left: 50%;
-	z-index: 60;
+	z-index: $z-index-modal;
 
 	width: $misc-popup-width;
 	// height: 600px;

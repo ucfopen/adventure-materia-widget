@@ -6,9 +6,6 @@ Adventure.directive "toast", ['$timeout', ($timeout) ->
 
 		$scope.toastMessage = ""
 		$scope.showToast = false
-		$scope.toastActionText = ""
-		$scope.toastAction = null
-		$scope.showToastActionButton = false
 		$scope.toastRegister = null
 
 		# Displays a toast with the given message.
@@ -17,7 +14,6 @@ Adventure.directive "toast", ['$timeout', ($timeout) ->
 		$scope.toast = (message, autoCancel = true) ->
 			$scope.toastMessage = message
 			$scope.showToast = true
-			$scope.showToastActionButton = false
 
 			if autoCancel
 				if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
@@ -25,24 +21,32 @@ Adventure.directive "toast", ['$timeout', ($timeout) ->
 					$scope.hideToast()
 				), 5000
 
-		# Displays a toast with an action button
-		# The action button is bound to an anonymous function that's passed as the action parameter
-		# Interactive toasts won't time out, so be sure to make a hideToast() call when you no longer need it
-		# hideToast() is automaticalfly called when editedNode is reset, when a node creation interface is closed
-		$scope.interactiveToast = (message, actionText, action) ->
-			$scope.toastMessage = message
-			$scope.toastActionText = actionText
-			$scope.toastAction = action
-
-			$scope.showToast = true
-			$scope.showToastActionButton = true
-
 		$scope.hideToast = () ->
 			$scope.showToast = false
-			$scope.showToastActionButton = false
-
+			$scope.toastMessage = ""
 ]
 
+Adventure.directive "modeManagerOverlay", [() ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.showModeManager = false
+		$scope.modeManagerMessage = ""
+		$scope.modeManagerActionText = ""
+
+		$scope.displayModeManager = (message, actionText, action) ->
+			$scope.modeManagerMessage = message
+			$scope.modeManagerActionText = actionText
+			$scope.modeManagerAction = action
+
+			$scope.showModeManager = true	
+
+		$scope.cancelModeManager = () ->
+			$scope.showModeManager = false
+			$scope.modeManagerMessage = ""
+			$scope.modeManagerActionText = ""
+			$scope.modeManagerAction = null
+]
 
 Adventure.directive "enterSubmit", ['$compile', ($compile) ->
 	($scope, $element, $attrs) ->
@@ -78,9 +82,10 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 		$scope.svg = null
 		$scope.copyMode = false
+		$scope.existingLinkMode = false
 
 		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
-		$scope.windowHeight = document.getElementById("adventure-container").offsetHeight - 60
+		$scope.windowHeight = document.getElementById("adventure-container").offsetHeight
 		$scope.treeContainerWidth = null
 
 		# Re-render tree whenever the nodes are updated
@@ -94,6 +99,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 		# Re-render the tree with copyMode enabled (highlights blank nodes)
 		$scope.$on "mode.copy", (evt) ->
 			$scope.copyMode = true
+			$scope.render treeSrv.get()
+
+		$scope.$on "mode.existingLink", (evt) ->
+			$scope.existingLinkMode = true
+			$scope.render treeSrv.get()
+
+		$scope.$on "mode.existingLink.complete", (evt) ->
+			$scope.existingLinkMode = false
 			$scope.render treeSrv.get()
 
 		$scope.render = (data) ->
@@ -132,6 +145,9 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				# the parent attribute isn't needed, and causes deep copy methods to fail since they recurse infinitely
 				# best to remove it
 				if node.parent then delete node.parent
+
+				# remove ineligibleTarget flag if it was previously added and existingLinkMode is no longer enabled
+				unless $scope.existingLinkMode and node.ineligibleTarget then delete node.ineligibleTarget
 
 				# If the node has any non-hierarchical links, have to process them
 				# And generate new links that d3 won't create by default
@@ -200,11 +216,13 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
+				# Don't create bridge nodes if copyMode or existingLinkMode are enabled
+				if $scope.copyMode or $scope.existingLinkMode then return
+
 				source = link.source
 				target = link.target
 
-				# Right now, we're disabling bridge nodes on loopbacks
-				# Might add them back in later
+				# Disable bridge nodes on loopbacks
 				if link.specialCase is "loopBack" then return
 				else
 					intermediate =
@@ -342,6 +360,9 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y
 					)
 
+					# don't attempt the following calculations if in copyMode or existingLinkMode! These nodes will not exist
+					if $scope.copyMode or $scope.existingLinkMode then return
+
 					# Do some fancy math to find the midpoint of the curve once it's been computed
 					# This must happen AFTER the path is generated for the link
 					pathNode = path.node()
@@ -403,6 +424,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						delete d.hasTemporaryFocus
 						return "node focused #{d.type}"
 					else if $scope.copyMode and d.type is "blank" then return "node copyMode #{d.type}"
+					else if $scope.existingLinkMode and d.ineligibleTarget then return "node ineligible #{d.type}"
 					else return "node #{d.type}"
 				)
 				.on("mouseover", (d, i) ->
@@ -735,9 +757,69 @@ Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 				$scope.hoveredNode.showTooltips = true
 ]
 
+# Directive in charge of managing the Action History, in conjunction with the treeHistorySrv service
+# for more information see the comment for treeHistorySrv in services
+Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (treeSrv, treeHistorySrv, $rootScope) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.treeHistoryItems = []
+
+		$scope.minimized = true
+
+		$scope.historyPosition = -1 # this is the history "cursor". By default it's updated to point to the top-most action, but changes with undo/redo actions or selecting an earlier action
+		$scope.historySize = 0
+
+		# the history stack is evaluated every time a new history action is added
+		# if the history "cursor" is not at the top of the stack (they've clicked undo or have selected an earlier action),
+		# and a new action is performed, all actions between the cursor and the top of the stack are discarded
+		$scope.$on "tree.history.added", (evt) ->
+			
+			# Have to get initial size of history stack
+			$scope.historySize = treeHistorySrv.getHistorySize()
+
+			# If most recent addition was performed earlier than the top of the stack, remove items on top of it (but not the top-most, which was just added)
+			if $scope.historyPosition < $scope.historySize - 2
+				top = $scope.historySize - 1
+				dist = top - ($scope.historyPosition + 1)
+				treeHistorySrv.spliceHistory $scope.historyPosition + 1, dist
+
+			# once stack is spliced, get new history stack and apply the change
+			$scope.treeHistoryItems = treeHistorySrv.getHistory().map (item, index) ->
+				reduced =
+					index: index
+					context: item.context
+					timestamp: item.timestamp
+
+			# update history size once it's been (potentially) changed again
+			$scope.historySize = treeHistorySrv.getHistorySize()
+
+			# update history cursor to top of stack
+			$scope.historyPosition = $scope.historySize - 1
+
+		$scope.undoAction = () ->
+			$scope.historyPosition--
+			$scope.rollBackToSnapshot $scope.historyPosition
+
+		$scope.redoAction = () ->
+			$scope.historyPosition++
+			$scope.rollBackToSnapshot $scope.historyPosition
+
+		$scope.rollBackToSnapshot = (index) ->
+			if $scope.existingNodeSelectionMode or $scope.copyNodeMode then return false
+
+			snapshot = treeHistorySrv.retrieveSnapshot index
+			tree = treeSrv.createTreeDataFromQset JSON.parse snapshot.tree
+			$scope.treeData = tree
+			treeSrv.set tree
+			treeSrv.setNodeCount snapshot.nodeCount
+
+			$scope.historyPosition = index
+]
+
 
 # Directive for the node modal dialog (edit the node, copy the node, reset the node, etc)
-Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$rootScope', '$timeout', (treeSrv, deleteAndRestoreSrv, $rootScope, $timeout) ->
+Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope', '$timeout', (treeSrv, treeHistorySrv, $rootScope, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -751,6 +833,10 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 		sourceTree = null
 		copyTree = null
 		targetNode = null
+		deregister = null
+
+
+		historyActions = treeHistorySrv.getActions()
 
 		# When target for the dialog changes, update the position values based on where the new node is
 		$scope.$watch "nodeTools.target", (newVals, oldVals) ->
@@ -823,18 +909,28 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 
 			$rootScope.$broadcast "mode.copy"
 
-			$scope.toast "Select a blank node to copy this node to.", false
+			$scope.displayModeManager "Select a blank destination as your copy target.", "Cancel", ->
+				$scope.cancelModeManager()
+				$scope.copyNodeMode = false
+				$scope.copyNodeTarget = null
+				sourceTree = null
+				copyTree = null
+				targetNode = null
+				deregister()
+
+				treeSrv.set $scope.treeData
 
 			# Listen for the event associated with the user selecting a node to copy to
 			# copyNodeTarget is updated from the nodeSelected method in the controller
 			deregister = $scope.$watch "copyNodeTarget", (newVal, oldVal) ->
 
-				$scope.hideToast()
-
 				if newVal
 					# Don't copy to the same node, or a not-blank node
 					if newVal.type isnt $scope.BLANK or newVal.id is $scope.nodeTools.target
-						$scope.toast "Target destination should be blank!"
+						$scope.toast "Target destination must be blank!"
+						$scope.copyNodeTarget = null
+						$scope.copyNodeMode = true
+						return false
 
 					else
 						# First, grab node to be copied
@@ -852,7 +948,12 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 						# Update the original tree target with the copy
 						result = treeSrv.findAndReplace $scope.treeData, targetNode.id, copyTree
 
+						# Snapshot the tree
+						treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_COPIED, "Destination " + $scope.integerToLetters($scope.nodeTools.target) + " copied to " + $scope.integerToLetters(targetNode.id)
+
 					deregister()
+
+					$scope.cancelModeManager()
 
 					# Update the tree
 					treeSrv.set $scope.treeData
@@ -934,6 +1035,9 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 
 				$scope.recursiveCopy copy.contents[i], copy.id
 				i++
+			
+			# Manually rebuild the children array to prevent certain future events from going terribly, horribly wrong
+			copy.children = copy.contents.slice(0)
 
 			return copy
 
@@ -942,14 +1046,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 		$scope.resetNode = () ->
 
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
-			parent = treeSrv.findNode $scope.treeData, target.parentId
-
-			# Store the node in cold storage in case the user wants to undo the reset
-			if parent
-				deleteAndRestoreSrv.coldStorage target
-			else
-				deleteAndRestoreSrv.coldStorage target, 0, {}, {}, 0
-
+			
 			# Iterating through an array while also deleting elements in that array during iteration is a big no-no!!!!!
 			# Get a list of all the nodes, THEN remove them all afterwards
 			nodesToRemove = []
@@ -984,16 +1081,9 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 			treeSrv.findAndReplace $scope.treeData, target.id, target
 			treeSrv.set $scope.treeData
 
-			# Display the interactive toast that provides the Undo option
-			# Toast is displayed until clicked or until the node creation screen is closed
-			$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " has been reset.", "Undo", ->
-				$scope.treeData = deleteAndRestoreSrv.restoreResetNode target.id, parent
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REST, "Destination " + $scope.integerToLetters(target.id) + " reset"
 
-			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
-			if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
-			$scope.toastRegister = $timeout (() ->
-				$scope.hideToast()
-			), 8000
+			$scope.toast "Destination " + $scope.integerToLetters(target.id) + " has been reset."
 
 			$scope.nodeTools.showResetWarning = false
 			$scope.nodeTools.show = false
@@ -1001,58 +1091,65 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 
 		# Delete the node, and the associated parent's answer
 		# Don't delete the node if it's a) a child of a narrative node or b) the associated node of a short answer's unmatched responses
-		# Stores the deleted node as a coldStorage object in case the user wants to undo the action
 		$scope.deleteNode = () ->
 
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
 			parent = treeSrv.findNode $scope.treeData, target.parentId
 			targetAnswerIndex = null
 
-			# Don't delete if it's a child of a narrative node
-			if parent.type is $scope.NARR
-				$scope.toast "Can't delete Destination " + target.name + "! Try linking " + parent.name + " to an existing destination instead."
-				$scope.nodeTools.showDeleteWarning = false
-				return
-
 			# Find reference to node in parent's answers
 			angular.forEach parent.answers, (answer, index) ->
 				if answer.target is target.id and answer.linkMode is $scope.NEW
 					targetAnswerIndex = index
 
-			if targetAnswerIndex isnt null
+			# if we're deleting an in-between node, instead of removing the subtree, restore the original node as a child of the parent
+			# this condition is prioritized first because the narrative and short answer restrictions shouldn't apply (there will still be a child node)
+			if target.pendingTarget and target.type is $scope.BLANK
+				newTarget = target.pendingTarget
+				newTargetNode = angular.copy treeSrv.findNode $scope.treeData, newTarget
 
-				# Don't delete if it's referenced from an [Unmatched Response] answer of a short answer question.
-				if parent.answers[targetAnswerIndex].isDefault and parent.type is $scope.SHORTANS
-					$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
-					$scope.nodeTools.showDeleteWarning = false
-					return
+				newTargetNode.parentId = parent.id
 
-			# Put the node in "cold storage" in case the user wants to undo the deletion
-			# $scope.putNodeInColdStorage target
-			deleteAndRestoreSrv.coldStorage target
+				if targetAnswerIndex is null and parent.pendingTarget then parent.pendingTarget = newTargetNode.id # super duper edge case in case the parent is ALSO a blank in-between node
+				else parent.answers[targetAnswerIndex].target = newTargetNode.id # set the parent's answer target back to the correct node id
 
-			# Remove the node & grab array of IDs representing deleted node & its children
-			removed = treeSrv.findAndRemove $scope.treeData, target.id
+				# Handle resolution different depending on whether or not the in-between node has an existing link or normal link to its pendingTarget
+				if target.hasLinkToOther
+					parent.hasLinkToOther = true
+					if targetAnswerIndex isnt null then parent.answers[targetAnswerIndex].linkMode = $scope.EXISTING
+					treeSrv.findAndRemove $scope.treeData, $scope.nodeTools.target
+				else
+					treeSrv.findAndReplace $scope.treeData, $scope.nodeTools.target, newTargetNode
 
-			# Recurse through all deleted IDs & fix answer targets for each deleted node
-			for id in removed
-				treeSrv.findAndFixAnswerTargets $scope.treeData, id
+			# Don't delete if it's a child of a narrative node
+			else if parent.type is $scope.NARR
+				$scope.toast "Can't delete Destination " + target.name + "! Try linking " + parent.name + " to an existing destination instead."
+				$scope.nodeTools.showDeleteWarning = false
+				return
+
+			# Don't delete if it's referenced from an [Unmatched Response] answer of a short answer question.
+			else if targetAnswerIndex isnt null and parent.answers[targetAnswerIndex].isDefault and parent.type is $scope.SHORTANS
+				$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
+				$scope.nodeTools.showDeleteWarning = false
+				return			
+
+			else # default behavior
+
+				# Remove the node & grab array of IDs representing deleted node & its children
+				removed = treeSrv.findAndRemove $scope.treeData, target.id
+
+				# Recurse through all deleted IDs & fix answer targets for each deleted node
+				for id in removed
+					treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
 			treeSrv.set $scope.treeData
 
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
 
-			# Display the interactive toast that provides the Undo option
-			# Toast is displayed until clicked or until the node creation screen is closed
-			$scope.interactiveToast "Destination " + $scope.integerToLetters(target.id) + " was deleted.", "Undo", ->
-				$scope.treeData = deleteAndRestoreSrv.restoreDeletedNode target.id, parent
+			$scope.toast "Destination " + $scope.integerToLetters(target.id) + " was deleted."
 
-			# Cancel out the toast after 8 seconds, enough time for someone to decide they made a mistake hopefully
-			if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister
-			$scope.toastRegister = $timeout (() ->
-				$scope.hideToast()
-			), 8000
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_DELETED, "Destination " + $scope.integerToLetters(target.id) + " deleted"
 
 			$scope.nodeTools.showDeleteWarning = false
 			$scope.nodeTools.show = false
@@ -1099,7 +1196,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 
 					treeSrv.set $scope.treeData
 
-			# Buncha bullshit required to add the default [Unmatched Response] required for shortans
+			# Buncha nonsense required to add the default [Unmatched Response] required for shortans
 			if type is $scope.SHORTANS
 
 				# Add special matches property for each answer
@@ -1135,6 +1232,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'deleteAndRestoreSrv', '$root
 
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
+
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_CONVERTED, "Destination " + $scope.integerToLetters(node.id) + " converted"
 ]
 
 # The "What kind of node do you want to create?" dialog
@@ -1159,9 +1258,12 @@ Adventure.directive "nodeCreationSelectionDialog", ['treeSrv', (treeSrv) ->
 
 # Dialog for selecting what kind of node a given answer should target
 # e.g., "new", "existing", "self"
-Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '$document', '$timeout', (treeSrv, deleteAndRestoreSrv, $document, $timeout) ->
+Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$document', '$timeout', '$rootScope', (treeSrv, treeHistorySrv, $document, $timeout, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
+
+		historyActions = treeHistorySrv.getActions()
+		deregister = null # hopefully allows for better management of $watch
 
 		# Watch the newNodeManager target and kick off associated logic when it updates
 		# Similar in functionality to the nodeTools dialog
@@ -1184,6 +1286,11 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '
 
 				$attrs.$set "style", styles
 
+		$scope.resetNewNodeManager = () ->
+			$scope.newNodeManager.target = null
+			$scope.newNodeManager.answerId = null
+			$scope.newNodeManager.show = false
+
 		$scope.selectLinkMode = (mode) ->
 
 			answer = {}
@@ -1193,15 +1300,13 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '
 			while i < $scope.answers.length
 				if $scope.answers[i].id is $scope.newNodeManager.answerId then break
 				else i++
-
+			
 			# Compare the prior link mode to the new one and deal with the changes
 			switch mode
 				when "new"
 
 					if $scope.newNodeManager.linkMode is $scope.NEW
-						$scope.newNodeManager.target = null
-						$scope.newNodeManager.answerId = null
-						$scope.newNodeManager.show = false
+						$scope.resetNewNodeManager()
 						return
 
 					## HANDLE PRIOR LINK MODE: SELF
@@ -1245,45 +1350,58 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '
 					$scope.nodeTools.show = false
 					$scope.displayNodeCreation = "suspended"
 
-					# variables to store original properties of soon-to-be-deleted child node
+					# variable to store original properties of soon-to-be-deleted child node
 					# due to 2-way binding, referencing their current values will not work
 					removedNodeId = null
-					removedNodeParent = null
-					removedNodeAnswer = null
 
 					# Set the node selection mode so click events are handled differently than normal
 					$scope.existingNodeSelectionMode = true
 
-					# Provide interactive toast to cancel the existing link selection mode
-					if $scope.toastRegister isnt null then $timeout.cancel $scope.toastRegister # ensure no Toast cancellation timers are active that may cancel this toast prematurely
-					$scope.interactiveToast "Select the destination this answer should link to.", "Cancel", ->
+					# Recurse through the original node and its children to apply the "ineligible target" flag. This is used by the treeViz directive
+					# to apply the ineligible style to those nodes, indicating they cannot be selected in existing link selection mode
+					subtree = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
+					ineligibleIDs = treeSrv.getIdsFromSubtree subtree, []
+					for id in ineligibleIDs
+						node = treeSrv.findNode subtree, id
+						node.ineligibleTarget = true
+					
+					# Notify the treeViz directive to redraw the tree in the new mode
+					$rootScope.$broadcast "mode.existingLink"
+					treeSrv.set $scope.treeData
+
+					$scope.displayModeManager "Select the destination this answer should link to.", "Cancel", ->
+						$rootScope.$broadcast "mode.existingLink.complete"
 						$scope.existingNodeSelectionMode = false
-						$scope.newNodeManager.target = null
-						$scope.newNodeManager.answerId = null
 						$scope.displayNodeCreation = $scope.editedNode.type
 						$scope.showBackgroundCover = true
+						$scope.cancelModeManager()
+						$scope.resetNewNodeManager()
+						deregister()
 
 					# All tasks are on hold until the user selects a node to link to
 					# Wait for the node to be selected
+					if deregister then deregister()
 					deregister = $scope.$watch "existingNodeSelected", (newVal, oldVal) ->
 
 						if newVal
 
-							$scope.hideToast()
-
 							# If selected node is itself, switch link mode to SELF
 							if newVal.id is $scope.editedNode.id
+								# first ensure that the existing selection mode behavior is resolved properly before calling selectLinkMode again
 								deregister()
-								return $scope.selectLinkMode $scope.SELF
+								$scope.existingNodeSelected = null
+								$scope.displayNodeCreation = "none"
+								$rootScope.$broadcast "mode.existingLink.complete"
+								$scope.cancelModeManager()								
+								$scope.selectLinkMode $scope.SELF
+								return false
 
 							# Slap the user on the hand if they try to link to the same node
 							if newVal.id is $scope.answers[i].target
 								$scope.toast "That's already the target destination for this answer!"
 								$scope.existingNodeSelectionMode = true
-								return
-
-							# Deep copy the original answer in case undo is needed
-							removedNodeAnswer = angular.copy $scope.answers[i]
+								$scope.existingNodeSelected = null
+								return false
 
 							# Set the answer's new target to the newly selected node
 							$scope.answers[i].target = newVal.id
@@ -1291,30 +1409,30 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '
 							## HANDLE PRIOR LINK MODE: NEW
 							if $scope.answers[i].linkMode is $scope.NEW
 
-								# Scrub the existing child node associated with this answer
+								# get subtree of original answer target
 								childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
 
 								if childNode
-									if childNode.type isnt $scope.BLANK
-										# Grab parent & ID of soon-to-be-removed child node for undo purposes
-										removedNodeId = childNode.id
-										removedNodeParent = treeSrv.findNode $scope.treeData, childNode.parentId
-										removedNodeIndex = 0
-
-										angular.forEach removedNodeParent.contents, (node, index) ->
-											if node.id is childNode.id then removedNodeIndex = index
-
-										# store removed node
-										deleteAndRestoreSrv.coldStorage childNode, removedNodeIndex, removedNodeParent, removedNodeAnswer, i
-
+									# Disallow selecting a node that's part of the childNode's subtree
+									unless treeSrv.findNode(childNode, newVal.id) is null
+										$scope.toast "Cannot select a destination that's a child of the destination which will be replaced."
+										$scope.existingNodeSelectionMode = true
+										$scope.existingNodeSelected = null
+										# Revert ineligible answer target
+										$scope.answers[i].target = childNode.id
+										return false
+									
+									# Scrub the existing child node associated with this answer
+									removedNodeId = childNode.id
 									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
 
 									# Recurse through all deleted IDs & fix answer targets for each deleted node
 									for id in removed
 										treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
+
 							## HANDLE PRIOR LINK MODE: SELF
-							if $scope.answers[i].linkMode is $scope.SELF
+							else if $scope.answers[i].linkMode is $scope.SELF
 
 								numSelfLinks = 0
 
@@ -1327,7 +1445,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '
 							$scope.editedNode.hasLinkToOther = true
 							$scope.answers[i].linkMode = $scope.EXISTING
 
-							treeSrv.set $scope.treeData
+							$rootScope.$broadcast "mode.existingLink.complete"
 
 							# Deregister the watch listener now that it's not needed
 							deregister()
@@ -1335,27 +1453,24 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '
 							# Cancel out the answer tooltip, or it persists
 							$scope.hoveredNode.showTooltips = false
 							$scope.hoveredNode.target = null
-							# $scope.hoveredNode.targetParent = null
 
+							$scope.cancelModeManager()
+							$scope.resetNewNodeManager()
 							$scope.existingNodeSelected = null
-							$scope.newNodeManager.target = null
-							$scope.newNodeManager.answerId = null
 							$scope.displayNodeCreation = "none" # displayNodeCreation should be updated from "suspended"
 
 							# Refresh all answerLinks references as some have changed
 							treeSrv.updateAllAnswerLinks $scope.treeData
-
+							
 							# if child node that was removed was not blank, provide a toast enabling the undo option
 							if removedNodeId
-								$scope.interactiveToast "By linking to " + $scope.integerToLetters(newVal.id) + ", Destination " + $scope.integerToLetters(removedNodeId) + " was removed.", "Undo", ->
-									deleteAndRestoreSrv.restoreUnlinkedNode removedNodeId, removedNodeParent
+								treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters(removedNodeId) + " replaced with existing destination"
+								$scope.toast "By linking to " + $scope.integerToLetters(newVal.id) + ", Destination " + $scope.integerToLetters(removedNodeId) + " was removed."
 
 				when "self"
 
 					if $scope.newNodeManager.linkMode is $scope.SELF
-						$scope.newNodeManager.target = null
-						$scope.newNodeManager.answerId = null
-						$scope.newNodeManager.show = false
+						$scope.resetNewNodeManager()
 						return
 
 					# variables to store original properties of soon-to-be-deleted child node
@@ -1372,14 +1487,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '
 						childNode = treeSrv.findNode $scope.treeData, $scope.newNodeManager.target
 
 						if childNode.type isnt $scope.BLANK
-
-							childNodeIndex = 0
 							removedNodeParent = treeSrv.findNode $scope.treeData, childNode.parentId
-
-							angular.forEach $scope.editedNode.contents, (node, index) ->
-								if node.id is childNode.id then childNodeIndex = index
-
-							deleteAndRestoreSrv.coldStorage childNode, childNodeIndex, removedNodeParent, removedNodeAnswer, i
 
 						# Scrub the existing child node associated with this answer
 						removed = treeSrv.findAndRemove $scope.treeData, childNode.id
@@ -1406,15 +1514,15 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'deleteAndRestoreSrv', '
 
 					$scope.newNodeManager.linkMode = $scope.SELF
 
-					$scope.newNodeManager.target = null
-					$scope.newNodeManager.answerId = null
-
 					# Refresh all answerLinks references as some have changed
 					treeSrv.updateAllAnswerLinks $scope.treeData
 
+					treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters($scope.newNodeManager.target) + " replaced with existing destination" 
+
+					$scope.resetNewNodeManager()
+
 					if childNode and childNode.type isnt $scope.BLANK
-						$scope.interactiveToast "By linking Destination " + $scope.integerToLetters($scope.editedNode.id) + " back to itself, Destination " + $scope.integerToLetters(childNode.id) + " was removed.", "Undo", ->
-							deleteAndRestoreSrv.restoreUnlinkedNode childNode.id, removedNodeParent
+						$scope.toast "By linking Destination " + $scope.integerToLetters($scope.editedNode.id) + " back to itself, Destination " + $scope.integerToLetters(childNode.id) + " was removed."
 
 
 			$scope.newNodeManager.show = false
@@ -1462,7 +1570,7 @@ Adventure.directive "deleteWarningDialog", ['treeSrv', (treeSrv) ->
 # The actual node creation screen
 # Functions related to features unique to individual node types (Short answer sets, hotspots, etc) are relegated to their own directives
 # The ones here are "universal" and apply to all new nodes
-Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv','deleteAndRestoreSrv','$rootScope','$timeout', (treeSrv, legacyQsetSrv, deleteAndRestoreSrv, $rootScope, $timeout) ->
+Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1630,11 +1738,8 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv','deleteAndRestore
 			# Remove the answer's associated node if it's an actual child of the parent
 			if $scope.answers[index].linkMode is $scope.NEW
 
-				# Grab the node associated with the answer being removed and prep it for cold storage
-				removedNode = treeSrv.findNode $scope.treeData, targetId
-
-				# Place node in cryo
-				deleteAndRestoreSrv.coldStorage removedNode, $scope.editedNode.contents.indexOf(removedNode), $scope.editedNode, $scope.answers[index], index
+				historyActions = treeHistorySrv.getActions
+				treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_ANSWER_REMOVED, "Destination " + $scope.integerToLetters(targetId) + "'s associated answer removed"
 
 				# Go ahead and actually remove the node
 				removed = treeSrv.findAndRemove $scope.treeData, targetId
@@ -1643,11 +1748,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv','deleteAndRestore
 				for id in removed
 					treeSrv.findAndFixAnswerTargets $scope.treeData, id
 
-				# Display the interactive toast that provides the Undo option
-				# Toast is displayed until clicked or until the node creation screen is closed
-				$scope.interactiveToast "Destination " + $scope.integerToLetters(targetId) + " was deleted.", "Undo", ->
-					# $scope.treeData = deleteAndRestoreSrv.restoreDeletedNode targetId, $scope.editedNode
-					$scope.treeData = deleteAndRestoreSrv.restoreDeletedNode targetId, $scope.editedNode
+				$scope.toast "Destination " + $scope.integerToLetters(targetId) + " was deleted."
 			else
 				# Just remove it from answers array, no further action required
 				$scope.answers.splice index, 1
@@ -1759,7 +1860,7 @@ Adventure.directive "finalScoreBox", [() ->
 				$scope.editedNode.finalScore = newVal
 ]
 
-Adventure.directive "hotspotManager", ['legacyQsetSrv', (legacyQsetSrv) ->
+Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', (legacyQsetSrv, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1799,13 +1900,40 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv', (legacyQsetSrv) ->
 
 		$scope.visibilityManagerOpen = false
 
-		$scope.selectSVG = (evt) ->
+		$scope.hotspotLabelTarget =
+			text: null
+			x: null
+			y: null
+			show: false
 
+		$scope.attachLabel = (index, evt) ->
+
+			labelReference = angular.element(document.getElementById("hotspot-label"))
+			parentDivReference = angular.element(evt.target).parent().parent()
+
+			$scope.hotspotLabelTarget.text = if $scope.answers[index].text then $scope.answers[index].text else "Click this hotspot to add a label."
+			bounds = angular.element(evt.target)[0].getBoundingClientRect()
+
+			$scope.hotspotLabelTarget.x = (bounds.left + (bounds.width/2)) - parentDivReference[0].getBoundingClientRect().left
+			$scope.hotspotLabelTarget.y = (bounds.bottom + 5) - parentDivReference[0].getBoundingClientRect().top
+
+			$timeout ->
+				$scope.hotspotLabelTarget.x -= labelReference[0].getBoundingClientRect().width/2
+				$scope.hotspotLabelTarget.show = true
+
+			
+		$scope.detachLabel = () ->
+			$scope.hotspotLabelTarget.show = false
+
+		$scope.selectSVG = (evt) ->
+			
 			# Update selectedSVG property with necessary event information
 			$scope.selectedSVG.selected = true
 			$scope.selectedSVG.target = angular.element(evt.target).parent() # wrap event target in jqLite (targets g node, parent of svg)
 			$scope.selectedSVG.originX = evt.clientX
 			$scope.selectedSVG.originY = evt.clientY
+
+			$scope.detachLabel()
 
 		# If SVG is deselected (or mouse moves away from SVG), clear the object
 		$scope.deselectSVG = (evt) ->
@@ -1816,6 +1944,8 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv', (legacyQsetSrv) ->
 			hasMoved : $scope.selectedSVG.hasMoved # carry hasMoved value over, since the click event needs to know what it is
 			originX: null
 			originY: null
+
+			$scope.detachLabel()
 
 		# Update selected SVG's position information as it moves based on cursor position
 		$scope.moveSVG = (index, evt) ->
@@ -2234,7 +2364,7 @@ Adventure.directive "validationDialog", ['treeSrv','$rootScope', (treeSrv, $root
 							error.correctedTarget = newTarget
 
 						# For other error types, simply indicate there's a problem
-						when "blank_node", "has_no_answers", "has_no_final_score", "has_bad_html"
+						when "blank_node", "has_no_answers", "has_no_final_score", "has_bad_html", "no_hotspot_label"
 							node = treeSrv.findNode $scope.treeData, error.node
 
 							node.hasProblem = true
@@ -2262,7 +2392,7 @@ Adventure.directive "validationDialog", ['treeSrv','$rootScope', (treeSrv, $root
 
 
 # MEANT FOR DEBUG PURPOSES ONLY
-Adventure.directive "debugQsetLoader", ['treeSrv','legacyQsetSrv','$rootScope', (treeSrv, legacyQsetSrv, $rootScope) ->
+Adventure.directive "debugQsetLoader", ['treeSrv', 'treeHistorySrv', 'legacyQsetSrv','$rootScope', (treeSrv, treeHistorySrv, legacyQsetSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -2297,6 +2427,9 @@ Adventure.directive "debugQsetLoader", ['treeSrv','legacyQsetSrv','$rootScope', 
 			treeSrv.set $scope.treeData
 			treeSrv.updateAllAnswerLinks $scope.treeData
 			$scope.showQsetLoader = false
+
+			historyActions = treeHistorySrv.getActions()
+			treeHistorySrv.addToHistory $scope.treeData, historyActions.EXISTING_WIDGET_INIT, "Existing Widget Initialized"
 ]
 
 
