@@ -54,6 +54,12 @@ const entries = {
 	],
 	"guides/guideStyles.css": [
 		srcPath+"_helper-docs/guideStyles.scss"
+	],
+	"guides/player.temp.html": [
+		srcPath+"_helper-docs/player.md"
+	],
+	"guides/creator.temp.html": [
+		srcPath+"_helper-docs/creator.md"
 	]
 }
 
@@ -82,10 +88,11 @@ const babelLoaderWithPolyfillRule = {
 const moduleRules = [
 	rules.loaderCompileCoffee,
 	babelLoaderWithPolyfillRule,
+	rules.loadAndCompileMarkdown,
 	rules.copyImages,
 	rules.loadHTMLAndReplaceMateriaScripts,
 	rules.loadAndPrefixCSS,
-	rules.loadAndPrefixSASS,
+	rules.loadAndPrefixSASS	
 ]
 
 let options = {
@@ -94,22 +101,22 @@ let options = {
 	moduleRules
 }
 
-const generateHelperPlugin = name => {
-	const file = fs.readFileSync(path.join(__dirname, 'src', '_helper-docs', name+'.md'), 'utf8')
-	const content = marked(file)
+// const generateHelperPlugin = name => {
+// 	const file = fs.readFileSync(path.join(__dirname, 'src', '_helper-docs', name+'.md'), 'utf8')
+// 	const content = marked(file)
 
-	return new HtmlWebpackPlugin({
-		template: path.join(__dirname, 'src', '_helper-docs', 'helperTemplate'),
-		filename: path.join(outputPath, 'guides', name+'.html'),
-		title: name.charAt(0).toUpperCase() + name.slice(1),
-		chunks: ['guides'],
-		content: content.html
-	})
-}
+// 	return new HtmlWebpackPlugin({
+// 		template: path.join(__dirname, 'src', '_helper-docs', 'helperTemplate'),
+// 		filename: path.join(outputPath, 'guides', name+'.html'),
+// 		title: name.charAt(0).toUpperCase() + name.slice(1),
+// 		chunks: ['guides'],
+// 		content: content.html
+// 	})
+// }
 
 let build = widgetWebpack.getLegacyWidgetBuildConfig(options)
-build.plugins.unshift(generateHelperPlugin('creator'))
-build.plugins.unshift(generateHelperPlugin('player'))
+// build.plugins.unshift(generateHelperPlugin('creator'))
+// build.plugins.unshift(generateHelperPlugin('player'))
 
 // load the reusable legacy webpack config from materia-widget-dev
 module.exports = build
