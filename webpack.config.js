@@ -3,8 +3,6 @@ const path = require('path')
 const srcPath = path.join(process.cwd(), 'src') + path.sep
 const outputPath = path.join(process.cwd(), 'build') + path.sep
 const widgetWebpack = require('materia-widget-development-kit/webpack-widget')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const marked = require('meta-marked')
 
 // grab original copyList - we're going to append to it and overwrite the default copyList
 let copyList = widgetWebpack.getDefaultCopyList()
