@@ -50,9 +50,6 @@ const entries = {
 		srcPath+"player.html",
 		srcPath+"src-assets/player-assets/player.scss"
 	],
-	"guides/guideStyles.css": [
-		srcPath+"_guides/guideStyles.scss"
-	],
 	"guides/player.temp.html": [
 		srcPath+"_guides/player.md"
 	],

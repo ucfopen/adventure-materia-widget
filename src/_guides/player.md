@@ -2,10 +2,10 @@
 
 Choose Your Own Adventure is a powerful widget that allows for the creation of branching decision trees. Students are scored based on where they end up.
 
-PLAYER SCREENSHOT HERE
+![adventure player multiple choice example](assets/play_widget_adventure_mc.png "adventure player multiple choice example")
 
-0. Narrative text or question
-0. Response selection
+1. Narrative text or question
+2. Response selection
 
 ## Details ##
 
@@ -15,12 +15,11 @@ Each destination, or point on the decision tree, is represented by a screen such
 
 The hotspot screen is the one significant exception to the Adventure widget's layout. Hover your cursor over the image to identify and select a hotspot, based on the (optional) instructions provided. The proceeding destination may depend upon the hotspot you select.
 
-HOTSPOT SCREENSHOT HERE
+![adventure player hotspot example](assets/play_widget_adventure_hotspot.png "adventure player hotspot example")
 
-0. Optional instructions
-0. Hotspot image
-0. Example hotspot
-0. Hotspot on mouse over, with associated label
+1. Optional instructions
+2. Hotspot image
+3. Example hotspot
 
 ### Your Choices Determine Your Score ###
 
