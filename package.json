@@ -5,8 +5,9 @@
   },
   "version": "2.1.0",
   "dependencies": {
-    "materia-widget-development-kit": "^2.3.0",
-    "micromarkdown": "^0.3.0"
+    "materia-widget-development-kit": "2.4.2",
+    "micromarkdown": "^0.3.0",
+    "markdown-loader": "^5.0.0"
   },
   "scripts": {
     "start": "webpack-dev-server",
