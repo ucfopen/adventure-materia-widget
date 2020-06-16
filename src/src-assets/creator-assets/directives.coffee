@@ -1194,6 +1194,10 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 					delete node.children
 					delete node.answers
 
+					# if the answer was an existing link or loopback link (you jerk!) and not a regular one, this flag must also be removed
+					if node.hasLinkToOther then delete node.hasLinkToOther
+					if node.hasLinkToSelf then delete node.hasLinkToSelf
+
 					treeSrv.set $scope.treeData
 
 			# Buncha nonsense required to add the default [Unmatched Response] required for shortans

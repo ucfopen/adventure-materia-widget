@@ -612,6 +612,23 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 					errors.push error
 
+			if node.hasLinkToOther or node.hasLinkToSelf
+
+				existingCount = 0
+				selfCount = 0
+
+				angular.forEach node.answers, (answer, answerIndex) ->
+
+					if answer.linkMode is "existing" then existingCount++
+					else if answer.linkMode is "self" then selfCount++
+
+				if existingCount is 0 and node.hasLinkToOther
+					delete node.hasLinkToOther
+					console.warn "Warning: Node " + node.name + " retained the hasLinkToOther flag but no existing links existed. The flag was removed."
+				if selfCount is 0 and node.hasLinkToSelf
+					delete node.hasLinkToSelf
+					console.warn "Warning: Node " + node.name + " retained the hasLinkToSelf flag but no self links existed. The flag was removed."
+
 		return errors
 
 	validateTreeOnSave = (tree) ->
