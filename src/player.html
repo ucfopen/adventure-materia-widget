@@ -39,7 +39,8 @@
 				value="OK"
 				ng-click="closeFeedback()"
 				tabindex="-1"
-				aria-label="{{feedback}}. Return to Widget">
+				aria-label="{{feedback}}. Return to Widget"
+				aria-live="assertive">
 		</div>
 
 		<section class="question clearfix"
@@ -51,6 +52,7 @@
 				'end-screen-mode' : question.type == OVER}"
 			ng-switch="layout"
 			focus-manager
+			aria-live="assertive"
 			tabindex="-1">
 			<!-- just an image -->
 			<div ng-switch-when="image-only">
