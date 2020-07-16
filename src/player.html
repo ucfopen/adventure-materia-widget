@@ -172,7 +172,8 @@
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
 							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
 							tabindex="0"
-							aria-hidden="true" />
+							aria-label="{{answer.text}}"
+							aria-hidden="true"/>
 
 						<rect ng-if="answer.options.svg.type == 'rect'"
 							ng-attr-x="0"
@@ -190,6 +191,7 @@
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
 							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
 							tabindex="0"
+							aria-label="{{answer.text}}"
 							aria-hidden="true" />
 
 						<polygon ng-if="answer.options.svg.type == 'polygon'"
@@ -205,6 +207,7 @@
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
 							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
 							tabindex="0"
+							aria-label="{{answer.text}}"
 							aria-hidden="true" />
 					</g>
 				</svg>
