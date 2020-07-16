@@ -28,14 +28,18 @@
 		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
 
 		<div class="feedback"
-			ng-class="{ show: feedback }">
-			<div class="feedback-content">
+			ng-class="{ show: feedback }"
+			aria-hidden="true"
+			tabindex="-1">
+			<div class="feedback-content" tabindex="-1">
 				{{feedback}}
 			</div>
 			<input class="feedback-button trans-button"
 				type="button"
 				value="OK"
-				ng-click="closeFeedback()">
+				ng-click="closeFeedback()"
+				tabindex="-1"
+				aria-label="{{feedback}}. Return to Widget">
 		</div>
 
 		<section class="question clearfix"
@@ -45,7 +49,9 @@
 				'transitional-mode' : question.type == NARR || question.type == END,
 				'hidden-title' : hideTitle == true,
 				'end-screen-mode' : question.type == OVER}"
-			ng-switch="layout">
+			ng-switch="layout"
+			focus-manager
+			tabindex="-1">
 			<!-- just an image -->
 			<div ng-switch-when="image-only">
 
@@ -61,20 +67,20 @@
 			<div ng-switch-when="right">
 				<h2 class="text left" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 				<figure class="asset right">
-					<img ng-src="{{ question.image }}" dynamic-image-scale />
+					<img ng-src="{{ question.image }}" aria-hidden="true" dynamic-image-scale />
 				</figure>
 			</div>
 			<!-- image on the left -->
 			<div ng-switch-when="left">
 				<figure class="asset left">
-					<img ng-src="{{ question.image }}" dynamic-image-scale />
+					<img ng-src="{{ question.image }}" aria-hidden="true" dynamic-image-scale />
 				</figure>
 				<h2 class="text right" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 			</div>
 			<!-- image on the bottom -->
 			<div ng-switch-when="bottom">
 				<figure class="asset center">
-					<img ng-src="{{ question.image }}" dynamic-image-scale />
+					<img ng-src="{{ question.image }}" aria-hidden="true" dynamic-image-scale />
 				</figure>
 				<h2 class="text bottom" auto-text-scale ng-bind-html="question.text"></h2>
 			</div>
@@ -82,7 +88,7 @@
 			<div ng-switch-when="top">
 				<h2 class="text top" auto-text-scale ng-bind-html="question.text"></h2>
 				<figure class="asset center">
-					<img ng-src="{{ question.image }}" dynamic-image-scale />
+					<img ng-src="{{ question.image }}" aria-hidden="true" dynamic-image-scale />
 				</figure>
 			</div>
 			<!-- hotspot mode. No image associated w/ question -->
@@ -104,8 +110,10 @@
 					class="answer"
 					ng-repeat="answer in answers"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
+					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
 					data-index="{{answer.index}}"
-					data-link="{{answer.link}}">) {{answer.text}}</a>
+					data-link="{{answer.link}}"
+					tabindex="0">) {{answer.text}}</a>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"
@@ -115,14 +123,17 @@
 				<input type="button"
 					class="trans-button"
 					value="Submit"
-					ng-click="handleShortAnswerInput()"/>
+					ng-click="handleShortAnswerInput()"
+					tabindex="0" />
 			</div>
 			<div class="hotspot" ng-if="type == HOTSPOT">
 				<!-- label element for the hotspot label text, if it exists -->
 				<div class="hotspot-label"
 					id="hotspot-label"
 					ng-click="handleAnswerSelection(answer.link,answer.index)"
-					ng-style="{'top':hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px','opacity':hotspotLabelTarget.show? '1' : '0'}">
+					ng-style="{'top':hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px','opacity':hotspotLabelTarget.show? '1' : '0'}"
+					aria-hidden="true"
+					>
 					{{hotspotLabelTarget.text}}
 				</div>
 
@@ -139,6 +150,9 @@
 						data-label="{{answer.text}}"
 						visibility-manager
 						label-manager
+						tabindex="-1"
+						ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+						aria-label="{{answer.text}}"
 						>
 						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
 							ng-attr-cx="0"
@@ -151,7 +165,12 @@
 							fill-opacity="0.5"
 							ng-mouseover='onHotspotHover(answer, $event)'
 							ng-mouseout='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+							ng-focus='onHotspotHover(answer, $event)'
+							ng-blue='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
+							tabindex="0"
+							aria-hidden="true" />
 
 						<rect ng-if="answer.options.svg.type == 'rect'"
 							ng-attr-x="0"
@@ -164,7 +183,12 @@
 							fill-opacity="0.5"
 							ng-mouseover='onHotspotHover(answer, $event)'
 							ng-mouseout='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+							ng-focus='onHotspotHover(answer, $event)'
+							ng-blue='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
+							tabindex="0"
+							aria-hidden="true" />
 
 						<polygon ng-if="answer.options.svg.type == 'polygon'"
 							ng-attr-points="{{answer.options.svg.points}}"
@@ -174,17 +198,23 @@
 							fill-opacity="0.5"
 							ng-mouseover='onHotspotHover(answer, $event)'
 							ng-mouseout='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+							ng-focus='onHotspotHover(answer, $event)'
+							ng-blue='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
+							tabindex="0"
+							aria-hidden="true" />
 					</g>
 				</svg>
-				<img ng-src="{{question.image}}">
+				<img aria-hidden="true" ng-src="{{question.image}}">
 			</div>
 			<div class="trans"ng-if="type == TRANS">
 				<input type="button"
 					class="trans-button"
 					ng-class='{ left: question.layout == 2, right: question.layout == 3 }'
 					value="Continue"
-					ng-click="handleAnswerSelection(link,0)"/>
+					ng-click="handleAnswerSelection(link,0)"
+					tabindex="0" />
 			</div>
 		</section>
 	</body>
