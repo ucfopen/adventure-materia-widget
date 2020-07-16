@@ -152,9 +152,7 @@
 						data-label="{{answer.text}}"
 						visibility-manager
 						label-manager
-						tabindex="-1"
 						ng-click="handleAnswerSelection(answer.options.link,answer.index)"
-						aria-label="{{answer.text}}"
 						>
 						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
 							ng-attr-cx="0"
@@ -172,8 +170,7 @@
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
 							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
 							tabindex="0"
-							aria-label="{{answer.text}}"
-							aria-hidden="true"/>
+							aria-label="{{answer.text}}"/>
 
 						<rect ng-if="answer.options.svg.type == 'rect'"
 							ng-attr-x="0"
@@ -191,8 +188,7 @@
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
 							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
 							tabindex="0"
-							aria-label="{{answer.text}}"
-							aria-hidden="true" />
+							aria-label="{{answer.text}}"/>
 
 						<polygon ng-if="answer.options.svg.type == 'polygon'"
 							ng-attr-points="{{answer.options.svg.points}}"
@@ -207,8 +203,7 @@
 							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
 							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
 							tabindex="0"
-							aria-label="{{answer.text}}"
-							aria-hidden="true" />
+							aria-label="{{answer.text}}"/>
 					</g>
 				</svg>
 				<img aria-hidden="true" ng-src="{{question.image}}">
