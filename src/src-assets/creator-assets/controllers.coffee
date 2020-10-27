@@ -1,5 +1,5 @@
 Adventure = angular.module "Adventure"
-Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sanitize', 'treeSrv', 'treeHistorySrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sanitize, treeSrv, treeHistorySrv, legacyQsetSrv) ->
+Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sce', '$sanitize', 'treeSrv', 'treeHistorySrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sce, $sanitize, treeSrv, treeHistorySrv, legacyQsetSrv) ->
 	materiaCallbacks = {}
 
 	# Define constants for node screen types
@@ -21,6 +21,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	$scope.scoreMode = $scope.NORMAL
 	$scope.internalScoreMessage = ""
+	$scope.showImportTypeSelection = false
+	$scope.showImage = true;
 
 	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
 	PRESANITIZE_CHARACTERS =
@@ -166,7 +168,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 			# Redraw tree (again) to address any post-edit changes
 			treeSrv.set $scope.treeData
-						
+
 			# prevents polluting the action history by comparing the current tree to to the latest snapshot
 			# only add the current tree as a snapshot if the tree was actually edited
 			if $scope.editedNode
@@ -186,6 +188,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		$scope.showTitleEditor = false
 		$scope.validation.show = false
 		$scope.showScoreModeDialog = false
+		$scope.showImportTypeSelection = false
 
 		$scope.resetNewNodeManager()
 

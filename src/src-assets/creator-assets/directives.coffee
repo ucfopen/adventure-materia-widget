@@ -39,7 +39,7 @@ Adventure.directive "modeManagerOverlay", [() ->
 			$scope.modeManagerActionText = actionText
 			$scope.modeManagerAction = action
 
-			$scope.showModeManager = true	
+			$scope.showModeManager = true
 
 		$scope.cancelModeManager = () ->
 			$scope.showModeManager = false
@@ -774,7 +774,7 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 		# if the history "cursor" is not at the top of the stack (they've clicked undo or have selected an earlier action),
 		# and a new action is performed, all actions between the cursor and the top of the stack are discarded
 		$scope.$on "tree.history.added", (evt) ->
-			
+
 			# Have to get initial size of history stack
 			$scope.historySize = treeHistorySrv.getHistorySize()
 
@@ -1035,7 +1035,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 
 				$scope.recursiveCopy copy.contents[i], copy.id
 				i++
-			
+
 			# Manually rebuild the children array to prevent certain future events from going terribly, horribly wrong
 			copy.children = copy.contents.slice(0)
 
@@ -1046,7 +1046,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 		$scope.resetNode = () ->
 
 			target = treeSrv.findNode $scope.treeData, $scope.nodeTools.target
-			
+
 			# Iterating through an array while also deleting elements in that array during iteration is a big no-no!!!!!
 			# Get a list of all the nodes, THEN remove them all afterwards
 			nodesToRemove = []
@@ -1131,7 +1131,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 			else if targetAnswerIndex isnt null and parent.answers[targetAnswerIndex].isDefault and parent.type is $scope.SHORTANS
 				$scope.toast "Can't delete Destination " + target.name + "! Unmatched responses need to go somewhere!"
 				$scope.nodeTools.showDeleteWarning = false
-				return			
+				return
 
 			else # default behavior
 
@@ -1304,7 +1304,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 			while i < $scope.answers.length
 				if $scope.answers[i].id is $scope.newNodeManager.answerId then break
 				else i++
-			
+
 			# Compare the prior link mode to the new one and deal with the changes
 			switch mode
 				when "new"
@@ -1368,7 +1368,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 					for id in ineligibleIDs
 						node = treeSrv.findNode subtree, id
 						node.ineligibleTarget = true
-					
+
 					# Notify the treeViz directive to redraw the tree in the new mode
 					$rootScope.$broadcast "mode.existingLink"
 					treeSrv.set $scope.treeData
@@ -1396,7 +1396,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 								$scope.existingNodeSelected = null
 								$scope.displayNodeCreation = "none"
 								$rootScope.$broadcast "mode.existingLink.complete"
-								$scope.cancelModeManager()								
+								$scope.cancelModeManager()
 								$scope.selectLinkMode $scope.SELF
 								return false
 
@@ -1425,7 +1425,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 										# Revert ineligible answer target
 										$scope.answers[i].target = childNode.id
 										return false
-									
+
 									# Scrub the existing child node associated with this answer
 									removedNodeId = childNode.id
 									removed = treeSrv.findAndRemove $scope.treeData, childNode.id
@@ -1465,7 +1465,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 
 							# Refresh all answerLinks references as some have changed
 							treeSrv.updateAllAnswerLinks $scope.treeData
-							
+
 							# if child node that was removed was not blank, provide a toast enabling the undo option
 							if removedNodeId
 								treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters(removedNodeId) + " replaced with existing destination"
@@ -1521,7 +1521,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 					# Refresh all answerLinks references as some have changed
 					treeSrv.updateAllAnswerLinks $scope.treeData
 
-					treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters($scope.newNodeManager.target) + " replaced with existing destination" 
+					treeHistorySrv.addToHistory $scope.treeData, historyActions.NODE_REPLACED_WITH_EXISTING, "Destination " + $scope.integerToLetters($scope.newNodeManager.target) + " replaced with existing destination"
 
 					$scope.resetNewNodeManager()
 
@@ -1574,7 +1574,7 @@ Adventure.directive "deleteWarningDialog", ['treeSrv', (treeSrv) ->
 # The actual node creation screen
 # Functions related to features unique to individual node types (Short answer sets, hotspots, etc) are relegated to their own directives
 # The ones here are "universal" and apply to all new nodes
-Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout) ->
+Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', '$sce', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout, $sce) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1610,17 +1610,24 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 							$scope.newAnswer()
 
 				if $scope.editedNode.media
-					$scope.image = new Image()
-					$scope.image.src = $scope.editedNode.media.url
-					$scope.mediaReady = true
-					$scope.image.onload = ->
-						# If the QSet is an old one, have to apply scaling to the hotspot only after the image is loaded
-						# This is due to the old hotspot coordinate system relying on the hotspot's original image dimensions
-						# Once the scaling is done, the flag is removed so the hotspot is "normal" from that point on
-						if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
-							legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
-							delete $scope.editedNode.legacyScaleMode
-							$scope.$apply()
+					if $scope.editedNode.media.type is "image"
+						$scope.showImage = true
+						$scope.image = new Image()
+						$scope.image.src = $scope.editedNode.media.url
+						$scope.mediaReady = true
+						$scope.image.onload = ->
+							# If the QSet is an old one, have to apply scaling to the hotspot only after the image is loaded
+							# This is due to the old hotspot coordinate system relying on the hotspot's original image dimensions
+							# Once the scaling is done, the flag is removed so the hotspot is "normal" from that point on
+							if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
+								legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
+								delete $scope.editedNode.legacyScaleMode
+								$scope.$apply()
+
+					else
+						$scope.showImage = false
+						$scope.url = $sce.trustAsResourceUrl($scope.editedNode.media.url)
+						$scope.mediaReady = true
 
 				else $scope.mediaReady = false
 
@@ -1662,17 +1669,20 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
 		$scope.$on "editedNode.media.updated", (evt) ->
-				$scope.image = new Image()
-				$scope.image.src = $scope.editedNode.media.url
-				$scope.image.onload = ->
+			$scope.image = new Image()
+			$scope.image.src = $scope.editedNode.media.url
+			$scope.image.onload = ->
 
-					# Handle legacyScaleMode if it's a hotspot
-					if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
-						legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
-						delete $scope.editedNode.legacyScaleMode
+				# Handle legacyScaleMode if it's a hotspot
+				if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
+					legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
+					delete $scope.editedNode.legacyScaleMode
 
-					$scope.$apply ->
-						$scope.mediaReady = true
+				$scope.$apply ->
+					$scope.mediaReady = true
+
+		$scope.showPopup = () ->
+			$scope.showImportTypeSelection = true
 
 		$scope.newAnswer = (text = null) ->
 
@@ -1789,11 +1799,14 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.newNodeManager.answerId = id
 
 		$scope.beginMediaImport = () ->
+			$scope.mediaReady = true
+			$scope.showImage = true;
 			Materia.CreatorCore.showMediaImporter()
 
 		$scope.removeMedia = ->
 			$scope.mediaReady = false
 			$scope.image = null
+			$scope.url = null
 			delete $scope.editedNode.media
 
 		$scope.changeMedia = ->
@@ -1864,9 +1877,68 @@ Adventure.directive "finalScoreBox", [() ->
 				$scope.editedNode.finalScore = newVal
 ]
 
-Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', (legacyQsetSrv, $timeout) ->
+Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', '$sce', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout, $sce) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
+
+		$scope.beginMediaImport = () ->
+			$scope.mediaReady = true
+			$scope.showImage = true;
+			Materia.CreatorCore.showMediaImporter()
+			$scope.showImportTypeSelection = false;
+
+		$scope.formatUrl = (e) ->
+			embedUrl = ''
+			if $scope.inputUrl.includes('youtu')
+				embedUrl = 'https://www.youtube.com/embed/' + $scope.inputUrl.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/)[1] || $scope.inputUrl unless $scope.inputUrl.includes('/embed/')
+			else if $scope.inputUrl.includes('vimeo')
+				embedUrl = 'https://player.vimeo.com/video/' + $scope.inputUrl.match(/(?:vimeo)\.com.*(?:videos|video|channels|)\/([\d]+)/i)[1] || $scope.inputUrl;
+
+			$scope.url = $sce.trustAsResourceUrl(embedUrl)
+
+			$scope.mediaReady = true
+			$scope.showImportTypeSelection = false;
+			$scope.showImage = false;
+
+			unless $scope.editedNode then return
+
+			$scope.editedNode.media =
+				type: "video"
+				url: embedUrl
+				id: embedUrl
+				align: "right"
+
+			$rootScope.$broadcast "editedNode.media.updated"
+]
+
+Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (legacyQsetSrv, $timeout, $sce) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.beginMediaImport = () ->
+			$scope.mediaReady = true
+			$scope.showImage = true;
+			Materia.CreatorCore.showMediaImporter()
+
+		$scope.formatUrl = (e) ->
+			embedUrl = ''
+			if $scope.inputUrl.includes('youtu')
+				embedUrl = 'https://www.youtube.com/embed/' + $scope.inputUrl.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/)[1] || $scope.inputUrl unless $scope.inputUrl.includes('/embed/')
+			else if $scope.inputUrl.includes('vimeo')
+				embedUrl = 'https://player.vimeo.com/video/' + $scope.inputUrl.match(/(?:vimeo)\.com.*(?:videos|video|channels|)\/([\d]+)/i)[1] || $scope.inputUrl;
+
+			$scope.url = $sce.trustAsResourceUrl(embedUrl)
+
+			$scope.mediaReady = true
+			$scope.showImage = false;
+
+			unless $scope.editedNode then return
+
+			$scope.editedNode.media =
+				type: "video"
+				url: embedUrl
+				id: embedUrl
+				align: "right"
 
 		$scope.ALWAYS = "always"
 		$scope.MOUSEOVER = "mouseover"
@@ -1925,12 +1997,11 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', (legacyQsetSr
 				$scope.hotspotLabelTarget.x -= labelReference[0].getBoundingClientRect().width/2
 				$scope.hotspotLabelTarget.show = true
 
-			
 		$scope.detachLabel = () ->
 			$scope.hotspotLabelTarget.show = false
 
 		$scope.selectSVG = (evt) ->
-			
+
 			# Update selectedSVG property with necessary event information
 			$scope.selectedSVG.selected = true
 			$scope.selectedSVG.target = angular.element(evt.target).parent() # wrap event target in jqLite (targets g node, parent of svg)
@@ -2043,6 +2114,12 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', (legacyQsetSr
 Adventure.directive "hotspotToolbar", [() ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
+
+		$scope.removeMedia = ->
+			$scope.mediaReady = false
+			delete $scope.image
+			$scope.url = null
+			delete $scope.editedNode.media
 
 		# Notes on SVG properties..
 		# -------------------------

@@ -433,7 +433,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				nodeCount: count
 
 
-
 	formatTreeDataForQset = (tree, items) ->
 
 		if !tree.children or (($filter('filter')(items, {nodeId : tree.id}, true)).length is 0)
@@ -502,7 +501,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		i = 0
 
 		while i < tree.children.length
-			
+
 			child = tree.children[i]
 			items = formatTreeDataForQset child, items
 			i++
