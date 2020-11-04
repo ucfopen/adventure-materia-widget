@@ -23,6 +23,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	$scope.internalScoreMessage = ""
 	$scope.showImportTypeSelection = false
 	$scope.showImage = true;
+	$scope.urlError = '　';
 
 	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
 	PRESANITIZE_CHARACTERS =
@@ -256,7 +257,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	# Since it's not intrinsically tied to any one dom element, and does no dom manipulation,
 	# we just update the editedNode object and kick off a broadcast that directives will listen for
 	materiaCallbacks.onMediaImportComplete = (media) ->
-
 		unless $scope.editedNode then return
 
 		$scope.editedNode.media =
@@ -264,6 +264,9 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			url: Materia.CreatorCore.getMediaUrl media[0].id
 			id: media[0].id
 			align: "right"
+
+		$scope.mediaReady = true
+		$scope.showImage = true;
 
 		$rootScope.$broadcast "editedNode.media.updated"
 

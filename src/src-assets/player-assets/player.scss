@@ -181,7 +181,7 @@ h1 {
 .asset {
 	margin: 0px 40px;
 
-	img {
+	img, iframe {
 		border: solid 6px $white;
 		border-radius: 10px;
 		box-shadow: $shadow-small-highlight;

@@ -1681,7 +1681,12 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.$apply ->
 					$scope.mediaReady = true
 
+		$scope.hidePopup = () ->
+			$scope.showImportTypeSelection = false
+
 		$scope.showPopup = () ->
+			$scope.urlError = '　'
+			$scope.inputUrl = ''
 			$scope.showImportTypeSelection = true
 
 		$scope.newAnswer = (text = null) ->
@@ -1799,18 +1804,23 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.newNodeManager.answerId = id
 
 		$scope.beginMediaImport = () ->
-			$scope.mediaReady = true
-			$scope.showImage = true;
+			$scope.image = null
+			$scope.inputUrl = null
+			$scope.url = null
+			delete $scope.editedNode.media
+
 			Materia.CreatorCore.showMediaImporter()
 
 		$scope.removeMedia = ->
 			$scope.mediaReady = false
 			$scope.image = null
+			$scope.inputUrl = null
 			$scope.url = null
 			delete $scope.editedNode.media
 
 		$scope.changeMedia = ->
-			$scope.beginMediaImport()
+			$scope.removeMedia()
+			$scope.showPopup()
 
 		$scope.swapMediaAndQuestion = ->
 			switch $scope.editedNode.media.align
@@ -1882,17 +1892,28 @@ Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHist
 	link: ($scope, $element, $attrs) ->
 
 		$scope.beginMediaImport = () ->
-			$scope.mediaReady = true
-			$scope.showImage = true;
+			$scope.image = null
+			$scope.inputUrl = null
+			$scope.url = null
+			delete $scope.editedNode.media
+
 			Materia.CreatorCore.showMediaImporter()
 			$scope.showImportTypeSelection = false;
 
-		$scope.formatUrl = (e) ->
-			embedUrl = ''
-			if $scope.inputUrl.includes('youtu')
-				embedUrl = 'https://www.youtube.com/embed/' + $scope.inputUrl.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/)[1] || $scope.inputUrl unless $scope.inputUrl.includes('/embed/')
-			else if $scope.inputUrl.includes('vimeo')
-				embedUrl = 'https://player.vimeo.com/video/' + $scope.inputUrl.match(/(?:vimeo)\.com.*(?:videos|video|channels|)\/([\d]+)/i)[1] || $scope.inputUrl;
+		$scope.formatUrl = () ->
+			try
+				embedUrl = ''
+				if $scope.inputUrl.includes('youtu')
+					embedUrl = 'https://www.youtube.com/embed/' + $scope.inputUrl.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/)[1] || $scope.inputUrl unless $scope.inputUrl.includes('/embed/')
+				else if $scope.inputUrl.includes('vimeo')
+					embedUrl = 'https://player.vimeo.com/video/' + $scope.inputUrl.match(/(?:vimeo)\.com.*(?:videos|video|channels|)\/([\d]+)/i)[1] || $scope.inputUrl;
+				else
+					$scope.urlError = 'Please enter a YouTube or Vimeo URL.'
+					return
+
+			catch e
+				$scope.urlError = 'Please enter a YouTube or Vimeo URL.'
+				return
 
 			$scope.url = $sce.trustAsResourceUrl(embedUrl)
 
@@ -1914,31 +1935,6 @@ Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHist
 Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (legacyQsetSrv, $timeout, $sce) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
-
-		$scope.beginMediaImport = () ->
-			$scope.mediaReady = true
-			$scope.showImage = true;
-			Materia.CreatorCore.showMediaImporter()
-
-		$scope.formatUrl = (e) ->
-			embedUrl = ''
-			if $scope.inputUrl.includes('youtu')
-				embedUrl = 'https://www.youtube.com/embed/' + $scope.inputUrl.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/)[1] || $scope.inputUrl unless $scope.inputUrl.includes('/embed/')
-			else if $scope.inputUrl.includes('vimeo')
-				embedUrl = 'https://player.vimeo.com/video/' + $scope.inputUrl.match(/(?:vimeo)\.com.*(?:videos|video|channels|)\/([\d]+)/i)[1] || $scope.inputUrl;
-
-			$scope.url = $sce.trustAsResourceUrl(embedUrl)
-
-			$scope.mediaReady = true
-			$scope.showImage = false;
-
-			unless $scope.editedNode then return
-
-			$scope.editedNode.media =
-				type: "video"
-				url: embedUrl
-				id: embedUrl
-				align: "right"
 
 		$scope.ALWAYS = "always"
 		$scope.MOUSEOVER = "mouseover"
@@ -2114,12 +2110,6 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (lega
 Adventure.directive "hotspotToolbar", [() ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
-
-		$scope.removeMedia = ->
-			$scope.mediaReady = false
-			delete $scope.image
-			$scope.url = null
-			delete $scope.editedNode.media
 
 		# Notes on SVG properties..
 		# -------------------------

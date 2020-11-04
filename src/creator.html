@@ -397,6 +397,7 @@
 				</ul>
 			</new-node-manager-dialog>
 			<node-creation class="node-creation-screen"
+				ng-click="hidePopup"
 				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
 				<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
@@ -426,7 +427,7 @@
 					<div class="media-toolbar">
 						<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
 						<button type="button" ng-show="displayNodeCreation == NARR || displayNodeCreation == END" ng-click="swapMediaOrientation()">Change Orientation: {{ (editedNode.media.align == 'top' || editedNode.media.align == 'bottom') ? "Horizontal" : "Vertical" }}</button>
-						<button type="button" ng-click="showPopup()">Change Media</button>
+						<button type="button" ng-click="changeMedia()">Change Media</button>
 						<button type="button" class="delete-button" ng-click="removeMedia()">Remove</button>
 					</div>
 				</div>
@@ -505,25 +506,11 @@
 					id="hotspot-manager"
 					ng-if="displayNodeCreation == HOTSPOT">
 					<div class="image-container">
-						<div ng-show="!mediaReady" class="import-type-selection">
-							<div>
-								<button type="button"
-									ng-click="beginMediaImport(); showImage = true">
-									Upload Image
-								</button>
-							</div>
-							<div>
-								<form class="video-form">
-									<input type="text"
-										class="video-input"
-										required
-										ng-model="inputUrl"
-									>
-									</input>
-									<button ng-click="formatUrl(); showImage = false">Embed Video</button>
-								</form>
-							</div>
-						</div>
+						<button type="button"
+						id="uploadButton"
+						class="important-button"
+						ng-show="!mediaReady"
+						ng-click="beginMediaImport()">Upload an Image</button>
 						<!-- bottom toolbar with buttons for adding and managing hotspots -->
 						<hotspot-toolbar ng-show="mediaReady">
 							<ul>
@@ -744,23 +731,33 @@
 				</div>
 			</node-tooltips>
 			<import-type-selection ng-show="showImportTypeSelection">
-				<div>
-					<button type="button"
-						id="big-upload-button"
-						ng-click="beginMediaImport(); showImage = true">
-						Upload Image
-					</button>
-				</div>
-				<div>
-					<form class="video-form">
-						<input type="text"
-							class="video-input"
-							required
-							ng-model="inputUrl"
-						>
-						</input>
-						<button ng-click="formatUrl(); showImage = false">Embed Video</button>
-					</form>
+				<h2>
+					<span>Choose Type of Media</span>
+					<span
+						class="hide-popup"
+						ng-click="showImportTypeSelection = false"
+					>X</span>
+				</h2>
+				<div class="import-type-selection">
+					<div>
+						<button type="button"
+							id="big-upload-button"
+							ng-click="beginMediaImport(); showImage = true">
+							Upload Image
+						</button>
+					</div>
+					<div>
+						<form class="video-form">
+							<input type="text"
+								class="video-input"
+								required
+								ng-model="inputUrl"
+							>
+							</input>
+							<button ng-click="formatUrl(); showImage = false">Embed Video</button>
+						</form>
+						<span class="error-message">{{urlError}}</span>
+					</div>
 				</div>
 			</import-type-selection>
 			<div class="intro-screen" ng-show="showIntroDialog">

@@ -430,7 +430,7 @@ Adventure.directive "dynamicMediaScale", [() ->
 			# Determine scale ratio based on dimensions of the image asset
 			ratio = Math.min(maxWidth/width, maxHeight/height)
 
-			scaledWidth = width * ratio
+			scaledWidth = if ($scope.layout is "image-only") or ((width * ratio) < (containerWidth / 2)) then (width * ratio) else (containerWidth / 2)
 			scaledHeight = height * ratio
 
 			# Apply scaling
