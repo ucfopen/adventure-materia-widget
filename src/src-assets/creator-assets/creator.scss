@@ -1837,7 +1837,6 @@ node-creation-selection-dialog {
 			}
 
 			svg#hotspot-canvas {
-				pointer-events: none;
 				position: absolute;
 				z-index: $z-index-modal-svg;
 
@@ -1851,7 +1850,6 @@ node-creation-selection-dialog {
 
 
 				ellipse, rect, polygon {
-					pointer-events: auto;
 					cursor: pointer;
 
 					&.moving {
