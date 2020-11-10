@@ -736,6 +736,8 @@
 					<span
 						class="hide-popup"
 						ng-click="showImportTypeSelection = false"
+						ng-keypress="$event.keyCode === 13 ? showImportTypeSelection = false : ''"
+						tabindex="0"
 					>X</span>
 				</h2>
 				<div class="import-type-selection">
