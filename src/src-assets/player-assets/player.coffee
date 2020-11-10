@@ -408,6 +408,7 @@ Adventure.directive "dynamicMediaScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
+
 		calcMediaSize = (width, height) ->
 			# Get width of text container (if it has any text)
 			unless document.getElementsByClassName("text")[0] then textWidth = 0
@@ -430,11 +431,11 @@ Adventure.directive "dynamicMediaScale", [() ->
 			# Determine scale ratio based on dimensions of the image asset
 			ratio = Math.min(maxWidth/width, maxHeight/height)
 
-			scaledWidth = if ($scope.layout is "image-only") or ((width * ratio) < (containerWidth / 2)) then (width * ratio) else (containerWidth / 2)
-			scaledHeight = height * ratio
+			scaledWidth = if ($scope.layout is "image-only") or ((width * ratio) < (containerWidth / 2)) then (width * ratio) else (containerWidth * 2 / 5)
+			scaledHeight = if ($scope.question.options.asset.type is "video") then ((height * ratio) + "px") else "auto"
 
 			# Apply scaling
-			$attrs.$set "style", "width:"+scaledWidth+"px;height:"+scaledHeight+"px;"
+			$attrs.$set "style", "width:"+scaledWidth+"px;height:"+scaledHeight+";"
 
 		# Constants
 		containerWidth = 800
