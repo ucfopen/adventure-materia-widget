@@ -742,6 +742,7 @@
 				</h2>
 				<div class="import-type-selection">
 					<div>
+						<p>Select <span class="bold">Upload Image</span> to bring up the Materia image uploader. Alternatively, you can provide a <span class="bold">YouTube</span> or <span class="bold">Vimeo</span> URL to embed a video.</p>
 						<button type="button"
 							id="big-upload-button"
 							ng-click="beginMediaImport(); showImage = true">
@@ -754,7 +755,7 @@
 								class="video-input"
 								required
 								ng-model="inputUrl"
-							>
+								placeholder="Enter a YouTube or Vimeo URL">
 							</input>
 							<button ng-click="formatUrl(); showImage = false">Embed Video</button>
 						</form>

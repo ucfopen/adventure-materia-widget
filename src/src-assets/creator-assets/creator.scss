@@ -2275,16 +2275,78 @@ validation-dialog {
 import-type-selection {
 	position: fixed;
 	left: 50%;
-	top: 15%;
+	top: 20%;
 	z-index: $z-index-modal;
 
 	width: $misc-popup-width;
-	// height: 600px;
 	margin: 5px 0px 0px -300px;
 	border-radius: 10px;
 	background: $color-primary;
 
 	box-shadow: $shadow-dialog;
+
+	.import-type-selection {
+		position: relative;
+		display: flex;
+		flex-direction: row;
+
+		padding: 15px;
+		border-radius: 5px;
+		
+		div {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+			align-items: center;
+
+			width: calc(60% - 20px);
+			height: 200px;
+			padding: 10px;
+			
+			font-size:0.8em;
+			
+			p {
+				margin: 0;
+				padding: 0;
+			}
+
+			button {
+				position: absolute;
+				bottom: 20px;
+				left: 50%;
+				width: 166px;
+				height: 3em;
+				margin-top: 20px;
+				margin-left: -83px;
+
+				background: $color-accent;
+				color: $color-primary;
+
+				&:hover {
+					background: $color-accent-highlight;
+				}
+			}
+	
+			&:first-child {
+				width: 40%;
+				border-right: 1px solid gainsboro;
+			}
+			
+			.video-form {
+				width: 100%;
+
+				.video-input {
+					width: 92%;
+					height: 2em;
+					padding: 0 2%;
+					margin: 0 2%;
+					border: solid 1px $gray-lighter;
+					border-radius: 3px;
+				}
+			}
+		}
+	}
 
 	.import-tab {
 		display: flex;
@@ -2320,42 +2382,9 @@ import-type-selection {
 	}
 
 	.error-message {
-		color: red;
+		margin-top: 10px;
+		color: $red;
 		font-weight: 700;
-	}
-}
-
-.import-type-selection {
-	padding: 15px;
-	border-radius: 5px;
-	position: relative;
-	display: flex;
-	flex-direction: row;
-
-	div {
-		width: 50%;
-		height: 200px;
-		display: flex;
-		flex-direction: column;
-		text-align: center;
-    justify-content: center;
-		align-items: center;
-
-		&:first-child {
-			border-right: 1px solid gainsboro;
-		}
-	}
-}
-
-.video-input {
-	width: 95%;
-}
-
-.video-form {
-	width: 100%;
-
-	button {
-		margin: 8px 0;
 	}
 }
 
