@@ -51,7 +51,7 @@
 
 				<figure class="asset image-only">
 					<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
-					<iframe ng-if="question.options.asset.type === 'video'" id="hotspotImage" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
+					<iframe ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
 				</figure>
 			</div>
 			<!-- just text; no image -->
@@ -63,14 +63,14 @@
 				<h2 class="text left" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 				<figure class="asset right">
 					<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
-					<iframe ng-if="question.options.asset.type === 'video'" id="hotspotImage" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
+					<iframe ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
 				</figure>
 			</div>
 			<!-- image on the left -->
 			<div ng-switch-when="left">
 				<figure class="asset left">
 					<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
-					<iframe ng-if="question.options.asset.type === 'video'" id="hotspotImage" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
+					<iframe ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
 				</figure>
 				<h2 class="text right" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 			</div>
@@ -78,7 +78,7 @@
 			<div ng-switch-when="bottom">
 				<figure class="asset center">
 					<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
-					<iframe ng-if="question.options.asset.type === 'video'" id="hotspotImage" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
+					<iframe ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
 				</figure>
 				<h2 class="text bottom" auto-text-scale ng-bind-html="question.text"></h2>
 			</div>
@@ -87,7 +87,7 @@
 				<h2 class="text top" auto-text-scale ng-bind-html="question.text"></h2>
 				<figure class="asset center">
 					<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
-					<iframe ng-if="question.options.asset.type === 'video'" id="hotspotImage" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
+					<iframe ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
 				</figure>
 			</div>
 			<!-- hotspot mode. No image associated w/ question -->
@@ -183,7 +183,6 @@
 					</g>
 				</svg>
 				<img ng-if="question.options.asset.type === 'image'" ng-src="{{question.image}}">
-				<iframe ng-if="question.options.asset.type === 'video'" id="hotspotImage" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 			</div>
 			<div class="trans"ng-if="type == TRANS">
 				<input type="button"

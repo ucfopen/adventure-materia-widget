@@ -678,8 +678,7 @@
 						<!-- Background image placed behind the hotspot's SVG canvas -->
 						<img id="hotspotImage"
 							ng-src="{{image.src}}"
-							ng-show="mediaReady && showImage" />
-						<iframe ng-show="mediaReady && !showImage" width="100%" height="100%" id="hotspotImage" ng-src="{{url}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+							ng-show="mediaReady" />
 					</div>
 				</hotspot-manager>
 				<!-- container for selecting the destination for narrative nodes -->
