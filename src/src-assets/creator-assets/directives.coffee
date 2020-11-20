@@ -1925,8 +1925,7 @@ Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHist
 
 			$scope.editedNode.media =
 				type: "video"
-				url: embedUrl
-				id: embedUrl
+				videoUrl: embedUrl
 				align: "right"
 
 			$rootScope.$broadcast "editedNode.media.updated"

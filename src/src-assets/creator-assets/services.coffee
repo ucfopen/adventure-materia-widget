@@ -459,6 +459,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					materiaType: "asset"
 					align: tree.media.align # replacement of "layout" parameter
 					id: tree.media.id # URL likely needs conversion?
+					videoUrl: tree.media.videoUrl
 					type: tree.media.type # right now just "image", will be expanded upon in the future
 
 			switch tree.type

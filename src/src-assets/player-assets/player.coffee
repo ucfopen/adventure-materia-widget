@@ -126,7 +126,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
 				$scope.question.image = image_url
 			else
-				$scope.question.video = $sce.trustAsResourceUrl($scope.question.options.asset.id)
+				$scope.question.video = $sce.trustAsResourceUrl($scope.question.options.asset.videoUrl)
 
 		switch q_data.options.type
 			when $scope.OVER then _end() # Creator doesn't pass a value like this back yet / technically this shouldn't be called - the end call is made is _handleAnswerSelection
