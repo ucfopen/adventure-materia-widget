@@ -1669,16 +1669,24 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
 		$scope.$on "editedNode.media.updated", (evt) ->
-			$scope.image = new Image()
-			$scope.image.src = $scope.editedNode.media.url
-			$scope.image.onload = ->
+			console.log($scope.editedNode.media)
+			if $scope.editedNode.media.type is 'image'
+				$scope.showImage = true
+				$scope.image = new Image()
+				$scope.image.src =  $scope.editedNode.media.url
+				$scope.image.onload = ->
 
-				# Handle legacyScaleMode if it's a hotspot
-				if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
-					legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
-					delete $scope.editedNode.legacyScaleMode
+					# Handle legacyScaleMode if it's a hotspot
+					if $scope.editedNode.type is $scope.HOTSPOT and $scope.editedNode.legacyScaleMode
+						legacyQsetSrv.handleLegacyScale $scope.answers, $scope.image
+						delete $scope.editedNode.legacyScaleMode
 
-				$scope.$apply ->
+					$scope.$apply ->
+						$scope.mediaReady = true
+
+			else
+					$scope.showImage = false
+					$scope.url = $sce.trustAsResourceUrl($scope.editedNode.media.url)
 					$scope.mediaReady = true
 
 		$scope.hidePopup = () ->
@@ -1925,7 +1933,7 @@ Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHist
 
 			$scope.editedNode.media =
 				type: "video"
-				videoUrl: embedUrl
+				url: embedUrl
 				align: "right"
 
 			$rootScope.$broadcast "editedNode.media.updated"
