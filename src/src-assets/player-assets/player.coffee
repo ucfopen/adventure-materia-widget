@@ -1,7 +1,7 @@
 Adventure = angular.module "Adventure"
 
 ## CONTROLLER ##
-Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', ($scope, $rootScope, legacyQsetSrv, $sanitize) ->
+Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -122,8 +122,11 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		# if $scope.question.type is $scope.HOTSPOT then $scope.question.layout = LAYOUT_VERT_TEXT
 		if $scope.question.type is $scope.HOTSPOT then $scope.layout = "hotspot"
 		if $scope.question.layout isnt "text-only"
-			image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
-			$scope.question.image = image_url
+			if $scope.question.options.asset.type is "image"
+				image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
+				$scope.question.image = image_url
+			else
+				$scope.question.video = $sce.trustAsResourceUrl($scope.question.options.asset.url)
 
 		switch q_data.options.type
 			when $scope.OVER then _end() # Creator doesn't pass a value like this back yet / technically this shouldn't be called - the end call is made is _handleAnswerSelection
@@ -401,9 +404,38 @@ Adventure.directive "dynamicScale", [() ->
 # Images in the player are subject to a number of constraints that makes scaling them logically complicated
 # Scaling is dependent on width of accompanying text, available height (constrained by header & answer container), and horiz/vertical layout
 # Logic must be applied AFTER image has loaded in order to properly query width and height
-Adventure.directive "dynamicImageScale", [() ->
+Adventure.directive "dynamicMediaScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
+
+
+		calcMediaSize = (width, height) ->
+			# Get width of text container (if it has any text)
+			unless document.getElementsByClassName("text")[0] then textWidth = 0
+			else textWidth = document.getElementsByClassName("text")[0].getBoundingClientRect().width
+
+			# Get height of answers container (min height is 62, so reduce by that value)
+			answersHeight = document.getElementsByClassName("answers")[0].getBoundingClientRect().height - 62
+
+			# Permutations based on whether or not the text/asset is aligned vertically
+			if $scope.layout is "top" or $scope.layout is "bottom" then maxWidth = textWidth
+			else maxWidth = containerWidth - textWidth - 160
+
+			# Adjust height based on whether the title header is taking up space
+			if $scope.hideTitle then maxHeight = maxHeightSansTitle - answersHeight
+			else maxHeight = maxHeightWithTitle - answersHeight
+
+			# Final adjustment to height to compensate for space being used by text in vertical orientations
+			if $scope.layout is "top" or $scope.layout is "bottom" then maxHeight -= document.getElementsByClassName("text")[0].getBoundingClientRect().height + 20
+
+			# Determine scale ratio based on dimensions of the image asset
+			ratio = Math.min(maxWidth/width, maxHeight/height)
+
+			scaledWidth = if ($scope.layout is "image-only") or ((width * ratio) < (containerWidth / 2)) then (width * ratio) else (containerWidth * 2 / 5)
+			scaledHeight = if ($scope.question.options.asset.type is "video") then ((height * ratio) + "px") else "auto"
+
+			# Apply scaling
+			$attrs.$set "style", "width:"+scaledWidth+"px;height:"+scaledHeight+";"
 
 		# Constants
 		containerWidth = 800
@@ -413,41 +445,17 @@ Adventure.directive "dynamicImageScale", [() ->
 
 		$scope.$watch "question", (newVal, oldVal) ->
 
-			unless newVal.image then return
+			if newVal.image
+				# Temporarily make image invisible while it loads (so it's not all wonky)
+				$attrs.$set "style", "display:none;"
 
-			# Temporarily make image invisible while it loads (so it's not all wonky)
-			$attrs.$set "style", "display:none;"
+				img = new Image()
+				img.src = newVal.image
 
-			img = new Image()
-			img.src = newVal.image
-
-			img.onload = ->
-				# Get width of text container (if it has any text)
-				unless document.getElementsByClassName("text")[0] then textWidth = 0
-				else textWidth = document.getElementsByClassName("text")[0].getBoundingClientRect().width
-
-				# Get height of answers container (min height is 62, so reduce by that value)
-				answersHeight = document.getElementsByClassName("answers")[0].getBoundingClientRect().height - 62
-
-				# Permutations based on whether or not the text/asset is aligned vertically
-				if $scope.layout is "top" or $scope.layout is "bottom" then maxWidth = textWidth
-				else maxWidth = containerWidth - textWidth - 160
-
-				# Adjust height based on whether the title header is taking up space
-				if $scope.hideTitle then maxHeight = maxHeightSansTitle - answersHeight
-				else maxHeight = maxHeightWithTitle - answersHeight
-
-				# Final adjustment to height to compensate for space being used by text in vertical orientations
-				if $scope.layout is "top" or $scope.layout is "bottom" then maxHeight -= document.getElementsByClassName("text")[0].getBoundingClientRect().height + 20
-
-				# Determine scale ratio based on dimensions of the image asset
-				ratio = Math.min(maxWidth/img.width, maxHeight/img.height)
-
-				scaledWidth = img.width * ratio
-				scaledHeight = img.height * ratio
-
-				# Apply scaling
-				$attrs.$set "style", "width:"+scaledWidth+"px;height:"+scaledHeight+"px;"
+				img.onload = ->
+					calcMediaSize(img.width, img.height)
+			else
+				calcMediaSize(1280, 720)
 ]
 
 # Handles the visibility of individual hotspots

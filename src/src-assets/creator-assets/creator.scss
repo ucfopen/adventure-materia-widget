@@ -53,7 +53,7 @@ $edit-popup-less-height: 600px;
 $edit-popup-standard-height: 620px;
 // $edit-popup-extra-height: 620px;
 // $edit-popup-less-height: 570px;
- 
+
 
 $z-index-hidden: -1;
 $z-index-default: 0;
@@ -197,7 +197,7 @@ div.fancy-toggle {
 mode-manager-overlay {
 	position: absolute;
 	z-index: $z-index-very-important;
-	
+
 	top: -60px;
 	left: 0;
 	width: 100%;
@@ -944,7 +944,7 @@ tree-history {
 		padding-bottom: 5px;
 		// font-size: 1.1em;
 		// font-weight: bold;
-		
+
 		background: $color-accent;
 		color: $white;
 
@@ -1016,7 +1016,7 @@ tree-history {
 				background: $gray-lightest;
 			}
 		}
-		
+
 	}
 }
 
@@ -2163,7 +2163,7 @@ node-creation-selection-dialog {
 			&.hidden {
 				z-index: $z-index-hidden;
 			}
-		}		
+		}
 
 		svg#polygon-svg-artboard {
 			display: block;
@@ -2225,7 +2225,7 @@ validation-dialog {
 		padding: 25px 0px 0px 0px;
 
 		li {
-			display: box;
+			display: flex;
 			min-height: 35px;
 			margin: 0px 15px 0px 15px;
 			padding: 10px 0px;
@@ -2270,4 +2270,124 @@ validation-dialog {
 
 		padding: 10px 15px;
 	}
+}
+
+import-type-selection {
+	position: fixed;
+	left: 50%;
+	top: 20%;
+	z-index: $z-index-modal;
+
+	width: $misc-popup-width;
+	margin: 5px 0px 0px -300px;
+	border-radius: 10px;
+	background: $color-primary;
+
+	box-shadow: $shadow-dialog;
+
+	.import-type-selection {
+		position: relative;
+		display: flex;
+		flex-direction: row;
+
+		padding: 15px;
+		border-radius: 5px;
+		
+		div {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+			align-items: center;
+
+			width: calc(60% - 20px);
+			height: 200px;
+			padding: 10px;
+			
+			font-size:0.8em;
+			
+			p {
+				margin: 0;
+				padding: 0;
+			}
+
+			button {
+				position: absolute;
+				bottom: 20px;
+				left: 50%;
+				width: 166px;
+				height: 3em;
+				margin-top: 20px;
+				margin-left: -83px;
+
+				background: $color-accent;
+				color: $color-primary;
+
+				&:hover {
+					background: $color-accent-highlight;
+				}
+			}
+	
+			&:first-child {
+				width: 40%;
+				border-right: 1px solid gainsboro;
+			}
+			
+			.video-form {
+				width: 100%;
+
+				.video-input {
+					width: 92%;
+					height: 2em;
+					padding: 0 2%;
+					margin: 0 2%;
+					border: solid 1px $gray-lighter;
+					border-radius: 3px;
+				}
+			}
+		}
+	}
+
+	.import-tab {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-evenly;
+
+		div {
+			border: 1px solid $gray-lighter;
+			width: 100%;
+			text-align: center;
+		}
+	}
+
+	h2 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+
+		color: $color-primary;
+		background: $color-accent;
+
+		display: flex;
+		justify-content: space-between;
+
+		.hide-popup {
+			cursor: pointer;
+		}
+	}
+
+	.error-message {
+		margin-top: 10px;
+		color: $red;
+		font-weight: 700;
+	}
+}
+
+.hidden {
+	z-index: $z-index-hidden;
 }

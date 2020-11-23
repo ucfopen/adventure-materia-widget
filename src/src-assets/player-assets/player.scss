@@ -181,7 +181,7 @@ h1 {
 .asset {
 	margin: 0px 40px;
 
-	img {
+	img, iframe {
 		border: solid 6px $white;
 		border-radius: 10px;
 		box-shadow: $shadow-small-highlight;
@@ -409,7 +409,8 @@ h1 {
 	position: relative;
 	text-align: center;
 
-	img {
+	img,
+	iframe {
 		position: relative;
 
 		max-width: 698px;
@@ -419,7 +420,13 @@ h1 {
 		margin-right: auto;
 	}
 
+	iframe {
+		height: 400px;
+		width: 100%;
+	}
+
 	svg.hotarea {
+		pointer-events: none;
 		position: absolute;
 		display: block;
 
@@ -429,6 +436,10 @@ h1 {
 
 		left: 50%;
 		margin-left: -349px;
+
+		g {
+			pointer-events: auto;
+		}
 	}
 
 	.hotspot-label {

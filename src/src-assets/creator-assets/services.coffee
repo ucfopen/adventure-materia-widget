@@ -433,7 +433,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				nodeCount: count
 
 
-
 	formatTreeDataForQset = (tree, items) ->
 
 		if !tree.children or (($filter('filter')(items, {nodeId : tree.id}, true)).length is 0)
@@ -460,6 +459,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					materiaType: "asset"
 					align: tree.media.align # replacement of "layout" parameter
 					id: tree.media.id # URL likely needs conversion?
+					url: tree.media.url
 					type: tree.media.type # right now just "image", will be expanded upon in the future
 
 			switch tree.type
@@ -502,7 +502,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		i = 0
 
 		while i < tree.children.length
-			
+
 			child = tree.children[i]
 			items = formatTreeDataForQset child, items
 			i++
@@ -528,11 +528,18 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if item.questions[0].text then node.question = item.questions[0].text
 
 			if item.options.asset
-				node.media =
-					id: item.options.asset.id
-					url: Materia.CreatorCore.getMediaUrl item.options.asset.id
-					align: item.options.asset.align
-					type: item.options.asset.type
+				if item.options.asset.type is 'image'
+					node.media =
+						id: item.options.asset.id
+						url: Materia.CreatorCore.getMediaUrl item.options.asset.id
+						align: item.options.asset.align
+						type: item.options.asset.type
+				else
+					node.media =
+						id: item.options.asset.id
+						url: item.options.asset.url
+						align: item.options.asset.align
+						type: item.options.asset.type
 
 			switch item.options.type
 				when "mc"
