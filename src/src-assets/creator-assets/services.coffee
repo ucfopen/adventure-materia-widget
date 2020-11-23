@@ -462,8 +462,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					url: tree.media.url
 					type: tree.media.type # right now just "image", will be expanded upon in the future
 
-			console.log('tree.media', tree.media)
-
 			switch tree.type
 				when "mc"
 					itemData.options.randomize = tree.randomizeAnswers

@@ -1669,7 +1669,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
 		$scope.$on "editedNode.media.updated", (evt) ->
-			console.log($scope.editedNode.media)
 			if $scope.editedNode.media.type is 'image'
 				$scope.showImage = true
 				$scope.image = new Image()
