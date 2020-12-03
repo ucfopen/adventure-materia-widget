@@ -162,9 +162,13 @@ Endings are functionally identical to Narrative Destinations. Instead of selecti
 	Remember that regardless of the path a user takes through your widget, every path must terminate in an end point. Take care in the design of your widget to ensure every route ends in a sensible and logical manner.
 </aside>
 
-### Adding Images to Destinations ###
+### Adding Images or Video to Destinations ###
 
-For any destination type, selecting the **Add Media** button changes the layout of the destination to associate an image with the destination's text. You can upload images from your computer, or select an image you've previously uploaded to Materia. Once you've selected an image, you can use the **Swap with Question** button below the image to switch the arrangement of the image and question text. Narrative and End Point destinations allow you to choose between vertical as well as horizontal arrangements.
+For any destination type besides Hotspot, selecting the **Add Media** button changes the layout of the destination to associate an image or video with the destination's text. The dialog option provides you with a choice between uploading an image or linking a **YouTube** or **Vimeo** video URL.
+
+![adventure media uploader](assets/create_widget_adventure_media_upload.png "adventure media uploader")
+
+If you choose to upload an image, the image uploader will be displayed, where you can upload images from your computer, or select an image you've previously uploaded to Materia. Once you've selected an image or video, you can use the **Swap with Question** button below the media to switch the arrangement of the image and question text. Narrative and End Point destinations allow you to choose between vertical as well as horizontal arrangements. Select **Change Media** to choose a different image or video.
 
 ## Action History ##
 
