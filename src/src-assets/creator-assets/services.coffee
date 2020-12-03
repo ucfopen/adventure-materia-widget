@@ -458,7 +458,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				itemData.options.asset =
 					materiaType: "asset"
 					align: tree.media.align # replacement of "layout" parameter
-					id: tree.media.id # URL likely needs conversion?
+					id: if tree.media.id then tree.media.id else undefined # video assets will NOT have an ID!
 					url: tree.media.url
 					type: tree.media.type # right now just "image", will be expanded upon in the future
 
