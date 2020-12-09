@@ -211,11 +211,7 @@
 							aria-label="{{answer.text}}"/>
 					</g>
 				</svg>
-<<<<<<< HEAD
-				<img aria-hidden="true" ng-src="{{question.image}}">
-=======
-				<img ng-if="question.options.asset.type === 'image'" ng-src="{{question.image}}">
->>>>>>> ucf/master
+				<img ng-if="question.options.asset.type === 'image'" aria-hidden="true" ng-src="{{question.image}}">
 			</div>
 			<div class="trans"ng-if="type == TRANS">
 				<input type="button"
