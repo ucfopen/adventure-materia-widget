@@ -12,8 +12,9 @@
 		<script src="materia.enginecore.js"></script>
 
 		<!-- YOUR PREREQUISITES -->
-		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular.min.js"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-sanitize.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.8.2/angular-sanitize.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-aria/1.8.2/angular-aria.min.js"></script>
 		<script src="assets/micromarkdown.min.js"></script>
 
 		<!-- MAIN PLAYER SCRIPT -->
@@ -29,7 +30,7 @@
 
 		<div class="feedback"
 			ng-class="{ show: feedback }"
-			aria-hidden="true"
+			ng-attr-aria-hidden="{{ !(feedback.length > 0) }}"
 			tabindex="-1">
 			<div class="feedback-content" tabindex="-1">
 				{{feedback}}
@@ -38,9 +39,10 @@
 				type="button"
 				value="OK"
 				ng-click="closeFeedback()"
-				tabindex="-1"
+				ng-attr-tabindex="{{feedback.length > 0 ? 0 : -1}}"
 				aria-label="{{feedback}}. Return to Widget"
-				aria-live="assertive">
+				aria-live="assertive"
+				feedback-focus-manager>
 		</div>
 
 		<section class="question clearfix"

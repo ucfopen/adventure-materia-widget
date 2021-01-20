@@ -1,4 +1,4 @@
-Adventure = angular.module "Adventure"
+Adventure = angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 ## CONTROLLER ##
 Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce) ->
@@ -156,10 +156,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if $scope.q_data.answers[index].options.feedback
 			$scope.feedback = $scope.q_data.answers[index].options.feedback
 			$scope.next = link
-			# Accessability for feedback
-			document.getElementsByClassName("feedback")[0].setAttribute('aria-hidden', 'false')
-			document.getElementsByClassName("feedback-button")[0].setAttribute('tabindex', '0')
-			document.getElementsByClassName("feedback-button")[0].focus()
 		else
 			manageQuestionScreen link
 
@@ -189,10 +185,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					if $scope.q_data.answers[i].options and $scope.q_data.answers[i].options.feedback
 						$scope.feedback = $scope.q_data.answers[i].options.feedback
 						$scope.next = link
-						# Accessability for feedback
-						document.getElementsByClassName("feedback")[0].setAttribute('aria-hidden', 'false')
-						document.getElementsByClassName("feedback-button")[0].setAttribute('tabindex', '0')
-						document.getElementsByClassName("feedback-button")[0].focus()
 					else
 						manageQuestionScreen link
 
@@ -209,10 +201,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				if answer.options.feedback
 					$scope.feedback = answer.options.feedback
 					$scope.next = link
-					# Accessability for feedback
-					document.getElementsByClassName("feedback")[0].setAttribute('aria-hidden', 'false')
-					document.getElementsByClassName("feedback-button")[0].setAttribute('tabindex', '0')
-					document.getElementsByClassName("feedback-button")[0].focus()
 				else
 					manageQuestionScreen link
 
@@ -222,22 +210,11 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if $scope.feedback.length > 0 # prevent multiple calls to manageQuestionScreen from firing due to the scope cycle not updating fast enough
 			$scope.feedback = ""
 			manageQuestionScreen $scope.next
-			# Accessability for feedback
-			document.getElementsByClassName("feedback")[0].setAttribute('aria-hidden', 'true')
-			document.getElementsByClassName("feedback-button")[0].setAttribute('tabindex', '-1')
 
 	handleMultipleChoice = (q_data) ->
-
 		$scope.type = $scope.MC
 
-		texts = document.getElementsByClassName("text")
-
-		#alert("MC: " + texts[0].innerHTML)
-
 	handleHotspot = (q_data) ->
-		texts = document.getElementsByClassName("text")
-
-		#alert("HS: " + texts.length)
 		$scope.type = $scope.HOTSPOT
 		$scope.question.layout = 1
 
@@ -258,17 +235,11 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				delete $scope.q_data.options.legacyScaleMode
 
 	handleShortAnswer = (q_data) ->
-		texts = document.getElementsByClassName("text")
-
-		#alert("SA: " + texts.length)
 		$scope.type = $scope.SHORTANS
 		$scope.response = ""
 
 	# Transitional questions are the ones that don't require answers - i.e., narrative and end node
 	handleTransitional = (q_data) ->
-		texts = document.getElementsByClassName("text")
-
-		#alert("Tran: " + texts.length)
 		# Set the link based on the node type - for end screens, the link is -1 (score screen) and submit the final score
 		link = null
 		if $scope.question.type is $scope.END
@@ -560,6 +531,15 @@ Adventure.directive "focusManager", [() ->
 			# Focuses on the text after each answer has been given so screen reader users
 			# don't have to go back in the order of the widget
 			$element[0].focus()
+]
+
+Adventure.directive "feedbackFocusManager", [() ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		# Auto-focus feedback close button when visible
+		$scope.$watch "feedback", (newVal, oldVal) ->
+			if newVal and newVal.length > 0 then $element[0].focus()
 ]
 
 
