@@ -49,10 +49,10 @@
 			<!-- just an image -->
 			<div ng-switch-when="image-only">
 				<figure class="asset image-only">
-					<div class="asset-container" ng-mouseover="setHoveringAsset(1)" ng-mouseleave="setHoveringAsset(0)">
+					<div class="asset-container">
 						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="video-expand-btn" ng-show="hoveringAsset" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
+						<button class="expand-btn" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
 					</div>
 				</figure>
 			</div>
@@ -64,20 +64,20 @@
 			<div ng-switch-when="right">
 				<h2 class="text left" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 				<figure class="asset right">
-					<div class="asset-container" ng-mouseover="setHoveringAsset(1)" ng-mouseleave="setHoveringAsset(0)">
+					<div class="asset-container">
 						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="video-expand-btn" ng-show="hoveringAsset" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
+						<button class="expand-btn" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
 					</div>
 				</figure>
 			</div>
 			<!-- image on the left -->
 			<div ng-switch-when="left">
 				<figure class="asset left">
-					<div class="asset-container" ng-mouseover="setHoveringAsset(1)" ng-mouseleave="setHoveringAsset(0)">
+					<div class="asset-container">
 						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="video-expand-btn" ng-show="hoveringAsset" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
+						<button class="expand-btn" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
 					</div>
 				</figure>
 				<h2 class="text right" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
@@ -85,10 +85,10 @@
 			<!-- image on the bottom -->
 			<div ng-switch-when="bottom">
 				<figure class="asset center">
-					<div class="asset-container" ng-mouseover="setHoveringAsset(1)" ng-mouseleave="setHoveringAsset(0)">
+					<div class="asset-container" >
 						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="video-expand-btn" ng-show="hoveringAsset" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
+						<button class="expand-btn" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
 					</div>
 				</figure>
 				<h2 class="text bottom" auto-text-scale ng-bind-html="question.text"></h2>
@@ -97,10 +97,10 @@
 			<div ng-switch-when="top">
 				<h2 class="text top" auto-text-scale ng-bind-html="question.text"></h2>
 				<figure class="asset center">
-					<div class="asset-container" ng-mouseenter="setHoveringAsset(1)" ng-mouseleave="setHoveringAsset(0)">
+					<div class="asset-container" >
 						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="video-expand-btn" ng-show="hoveringAsset" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
+						<button class="expand-btn" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)">Expand</button>
 					</div>
 				</figure>
 			</div>

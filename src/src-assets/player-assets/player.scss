@@ -267,7 +267,7 @@ h1 {
 			counter-increment: q;
 			vertical-align: middle;
 
-			&:hover {
+			&:hover, &:focus {
 				color: $blue;
 			}
 
@@ -327,7 +327,7 @@ h1 {
 	color:#ffffff;
 	cursor: pointer;
 
-	&:hover {
+	&:hover, &:hover {
 		background: $blue-lighter;
 	}
 	&.left {
@@ -474,7 +474,7 @@ rect, ellipse, polygon {
 	}
 }
 
-.video-expand-btn {
+.expand-btn {
 	padding: 6px 10px;
 	margin: 10px auto;
 
@@ -491,7 +491,7 @@ rect, ellipse, polygon {
 	right: 10px;
 	top: 0;
 
-	&:hover {
+	&:hover, &:focus {
 		background: $blue-lighter;
 	}
 }
@@ -527,6 +527,7 @@ rect, ellipse, polygon {
 			position: absolute;
 			top: 5px;
 			right: 5px;
+			z-index: 1;
 
 			width: 30px;
 			height: 30px;
@@ -544,7 +545,7 @@ rect, ellipse, polygon {
 
 			cursor: pointer;
 
-			&:hover {
+			&:hover, &:focus {
 				background: #6c6c6c;
 			}
 		}
