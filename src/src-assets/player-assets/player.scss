@@ -489,10 +489,6 @@ rect, ellipse, polygon {
 	right: 10px;
 	top: 0;
 
-	.icon {
-		font-size: 0.9em;
-	}
-
 	&:hover, &:focus {
 		background: $blue-lighter;
 	}
