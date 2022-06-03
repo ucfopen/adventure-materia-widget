@@ -2508,5 +2508,3 @@ Adventure.directive "debugQsetLoader", ['treeSrv', 'treeHistorySrv', 'legacyQset
 			historyActions = treeHistorySrv.getActions()
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.EXISTING_WIDGET_INIT, "Existing Widget Initialized"
 ]
-
-

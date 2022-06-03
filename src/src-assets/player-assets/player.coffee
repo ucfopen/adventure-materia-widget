@@ -53,6 +53,22 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		fontSize: 22
 		height: 220
 
+	# Lightbox
+	$scope.lightboxTarget = -1
+
+	$scope.setLightboxTarget = (val) ->
+		$scope.lightboxTarget = val
+
+	$scope.lightboxZoom = 0
+
+	$scope.setLightboxZoom = (val) ->
+		$scope.lightboxZoom = val
+
+	$scope.hoveringAsset = 0
+
+	$scope.setHoveringAsset = (val) ->
+		$scope.hoveringAsset = val
+
 	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
 		text: null

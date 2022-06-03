@@ -1,5 +1,7 @@
 /* Adventure 2.0 Player Styles */
 
+@import '../../assets/icomoon.css';
+
 /* Variable definitions */
 
 $black: #000000;
@@ -209,6 +211,12 @@ h1 {
 
 		text-align: center;
 	}
+
+}
+
+.asset-container {
+	position: relative;
+	width: fit-content;
 }
 
 .answers {
@@ -260,7 +268,7 @@ h1 {
 			counter-increment: q;
 			vertical-align: middle;
 
-			&:hover {
+			&:hover, &:focus {
 				color: $blue;
 			}
 
@@ -501,3 +509,115 @@ rect, ellipse, polygon {
 
 }
 
+.expand-btn {
+	padding: 8px 8px;
+
+	font-size:16px;
+	font-weight:bold;
+	background:$blue;
+	border:solid 1px #d3d3d3;
+	border-radius:5px;
+	color:#ffffff;
+
+	cursor: pointer;
+
+	position: absolute;
+	right: 8px;
+	top: 8px;
+
+	&:hover, &:focus {
+		background: $blue-lighter;
+	}
+}
+
+/** Copied from this-or-that-widget **/
+
+.lightbox {
+	position: absolute;
+	z-index: -500;
+	width: 100%;
+	height: 100%;
+	top: 0%;
+	left: 0%;
+
+	background: rgba(55,55,55,0.75);
+
+	cursor: pointer;
+
+	&.show {
+		z-index: 500;
+	}
+
+	.lightbox-content {
+		position: relative;
+		width: 80%;
+		height: 80%;
+		margin: 10%;
+		background: rgba(45,45,45,1);
+
+		cursor: default;
+
+		.lightbox-close {
+			position: absolute;
+			top: 5px;
+			right: 5px;
+			z-index: 1;
+
+			width: 30px;
+			height: 30px;
+
+			border: none;
+			border-radius: 5px;
+
+			color: #fff;
+			background: #e42b20;
+			box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+
+			font-size: 18px;
+			font-weight: bold;
+			text-align: center;
+
+			cursor: pointer;
+
+			&:hover, &:focus {
+				background: #6c6c6c;
+			}
+		}
+
+		.lightbox-video {
+			width: calc(100% - 20px);
+			height: calc(100% - 20px);
+			margin-top: 10px;
+			margin-left: 10px;
+		}
+
+		.lightbox-image-container {
+			height: calc(100% - 20px);
+			margin-top: 10px;
+			margin-left: 10px;
+			overflow: auto;
+		}
+
+		.lightbox-image {
+			height: calc(100% - 20px);
+			position: relative;
+			display: block;
+			margin: 20px auto 0 auto;
+		}
+
+		.lightbox-image:hover {
+			cursor: zoom-in;
+		}
+
+		.lightbox-image-zoom {
+			width: calc(100% - 20px);
+			height: auto;
+			object-fit: cover;
+			overflow: auto;
+		}
+
+		.lightbox-image-zoom:hover {
+			cursor: zoom-out;
+		}
+	}
+}
