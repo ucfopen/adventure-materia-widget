@@ -5,7 +5,7 @@
   },
   "version": "2.3.0",
   "dependencies": {
-    "materia-widget-development-kit": "2.5.0",
+    "materia-widget-development-kit": "^2.5.2",
     "micromarkdown": "^0.3.0"
   },
   "scripts": {

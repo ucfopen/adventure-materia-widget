@@ -2292,7 +2292,7 @@ import-type-selection {
 
 		padding: 15px;
 		border-radius: 5px;
-		
+
 		div {
 			position: relative;
 			display: flex;
@@ -2303,9 +2303,9 @@ import-type-selection {
 			width: calc(60% - 20px);
 			height: 200px;
 			padding: 10px;
-			
+
 			font-size:0.8em;
-			
+
 			p {
 				margin: 0;
 				padding: 0;
@@ -2327,12 +2327,12 @@ import-type-selection {
 					background: $color-accent-highlight;
 				}
 			}
-	
+
 			&:first-child {
 				width: 40%;
 				border-right: 1px solid gainsboro;
 			}
-			
+
 			.video-form {
 				width: 100%;
 
