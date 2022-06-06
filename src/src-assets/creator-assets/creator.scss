@@ -91,6 +91,10 @@ html, body {
 
 /* Component Styling */
 
+button {
+	cursor: pointer;
+}
+
 div.fancy-toggle {
 	position: relative;
 	width:80px;
@@ -1600,9 +1604,17 @@ node-creation-selection-dialog {
 				}
 
 				button.answer-node-select {
+
+					color: $white;
+					background: $color-accent;
+
+					&:hover {
+						background: $color-accent-highlight;
+					}
+
 					&.managed {
 						color: $white;
-						background: $color-accent;
+						background: $color-accent-highlight;
 					}
 				}
 

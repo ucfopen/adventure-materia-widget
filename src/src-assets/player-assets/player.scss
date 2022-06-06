@@ -259,14 +259,21 @@ h1 {
 		.answer {
 			display:block;
 			margin-bottom:10px;
-			font-size: 18px;
+			
 			color:#000000;
+			
+			background: none;
+			border: none;
 			text-decoration:none;
 
+			font-size: 18px;
 			font-weight: normal;
+			font-family: 'Lora';
+
+			text-align: left;
 
 			counter-increment: q;
-			vertical-align: middle;
+			cursor: pointer;
 
 			&:hover, &:focus {
 				color: $blue;

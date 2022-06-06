@@ -62,7 +62,7 @@
 					<div class="asset-container">
 						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-hidden="true" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 			</div>
@@ -129,14 +129,14 @@
 			ng-hide="question.type == OVER">
 			<div class="mc"
 				ng-show="type == MC">
-				<a href="#"
+				<button
 					class="answer"
 					ng-repeat="answer in answers"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
 					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
-					tabindex="0">) {{answer.text}}</a>
+					tabindex="0">) {{answer.text}}</button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"
