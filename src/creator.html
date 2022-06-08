@@ -424,6 +424,7 @@
 					ng-show="mediaReady && displayNodeCreation != HOTSPOT">
 					<img ng-show="showImage" ng-src="{{image.src}}" />
 					<iframe ng-show="!showImage" width="100%" height="100%" ng-src="{{url}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+					<input class="image-alt-text" ng-if="editedNode.media.type == 'image'" ng-model="editedNode.media.alt" placeholder="Image alt text" />
 					<div class="media-toolbar">
 						<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
 						<button type="button" ng-show="displayNodeCreation == NARR || displayNodeCreation == END" ng-click="swapMediaOrientation()">Change Orientation: {{ (editedNode.media.align == 'top' || editedNode.media.align == 'bottom') ? "Horizontal" : "Vertical" }}</button>
@@ -512,6 +513,7 @@
 						ng-show="!mediaReady"
 						ng-click="beginMediaImport()">Upload an Image</button>
 						<!-- bottom toolbar with buttons for adding and managing hotspots -->
+						<input class="hotspot-alt-text" ng-show="mediaReady" ng-model="editedNode.media.alt" placeholder="Enter alt text for the hotspot image" />
 						<hotspot-toolbar ng-show="mediaReady">
 							<ul>
 								<li><button type="button"

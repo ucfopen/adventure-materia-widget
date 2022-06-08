@@ -60,9 +60,9 @@
 			<div ng-switch-when="image-only">
 				<figure class="asset image-only">
 					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-hidden="true" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 			</div>
@@ -75,9 +75,9 @@
 				<h2 class="text left" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 				<figure class="asset right">
 					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-hidden="true" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 			</div>
@@ -85,9 +85,9 @@
 			<div ng-switch-when="left">
 				<figure class="asset left">
 					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-hidden="true" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 				<h2 class="text right" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
@@ -96,9 +96,9 @@
 			<div ng-switch-when="bottom">
 				<figure class="asset center">
 					<div class="asset-container" >
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-hidden="true" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 				<h2 class="text bottom" auto-text-scale ng-bind-html="question.text"></h2>
@@ -108,9 +108,9 @@
 				<h2 class="text top" auto-text-scale ng-bind-html="question.text"></h2>
 				<figure class="asset center">
 					<div class="asset-container" >
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-hidden="true" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 			</div>
@@ -227,7 +227,7 @@
 							aria-label="{{answer.text}}"/>
 					</g>
 				</svg>
-				<img ng-if="question.options.asset.type === 'image'" aria-hidden="true" ng-src="{{question.image}}">
+				<img ng-if="question.options.asset.type === 'image'" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" ng-src="{{question.image}}">
 			</div>
 			<div class="trans"ng-if="type == TRANS">
 				<input type="button"

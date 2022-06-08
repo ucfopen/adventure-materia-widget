@@ -462,6 +462,9 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					url: tree.media.url
 					type: tree.media.type # right now just "image", will be expanded upon in the future
 
+				if tree.media.type is 'image'
+					itemData.options.asset.alt = if tree.media.alt then tree.media.alt else ''
+
 			switch tree.type
 				when "mc"
 					itemData.options.randomize = tree.randomizeAnswers
@@ -534,6 +537,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						url: Materia.CreatorCore.getMediaUrl item.options.asset.id
 						align: item.options.asset.align
 						type: item.options.asset.type
+						alt: if item.options.asset.alt then item.options.asset.alt else ''
 				else
 					node.media =
 						id: item.options.asset.id
