@@ -240,7 +240,7 @@
 		</section>
 		<section class="lightbox" ng-class="{ 'show': lightboxTarget != -1}" ng-hide="lightboxTarget == -1">
 			<div class="lightbox-content">
-				<button class="lightbox-close" ng-click="setLightboxTarget(-1)">X</button>
+				<button class="lightbox-close" ng-click="setLightboxTarget(-1)" ng-attr-tabindex="{{lightboxTarget != -1 ? 0 : -1}}" lightbox-focus-manager aria-label="close lightbox">X</button>
 				<div ng-if="question.options.asset.type == 'image'" class="lightbox-image-container">
 					<img class="lightbox-image" ng-src="{{question.image}}" alt="{{question.text}}" ng-class="{'lightbox-image-zoom': lightboxZoom == 1}" ng-click="setLightboxZoom(!lightboxZoom)">
 				</div>

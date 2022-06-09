@@ -64,11 +64,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.setLightboxZoom = (val) ->
 		$scope.lightboxZoom = val
 
-	$scope.hoveringAsset = 0
-
-	$scope.setHoveringAsset = (val) ->
-		$scope.hoveringAsset = val
-
 	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
 		text: null
@@ -558,5 +553,11 @@ Adventure.directive "feedbackFocusManager", [() ->
 			if newVal and newVal.length > 0 then $element[0].focus()
 ]
 
+Adventure.directive "lightboxFocusManager", ['$timeout', ($timeout) ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
 
-
+		# Auto-focus lightbox close button when visible
+		$scope.$watch "lightboxTarget", (newVal, oldVal) ->
+			$timeout -> $element[0].focus()
+]
