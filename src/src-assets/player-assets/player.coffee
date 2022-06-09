@@ -64,11 +64,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.setLightboxZoom = (val) ->
 		$scope.lightboxZoom = val
 
-	$scope.hoveringAsset = 0
-
-	$scope.setHoveringAsset = (val) ->
-		$scope.hoveringAsset = val
-
 	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
 		text: null
@@ -546,7 +541,8 @@ Adventure.directive "focusManager", [() ->
 
 			# Focuses on the text after each answer has been given so screen reader users
 			# don't have to go back in the order of the widget
-			$element[0].focus()
+			if ($scope.lightboxTarget == -1)
+				$element[0].focus()
 ]
 
 Adventure.directive "feedbackFocusManager", [() ->
@@ -558,5 +554,11 @@ Adventure.directive "feedbackFocusManager", [() ->
 			if newVal and newVal.length > 0 then $element[0].focus()
 ]
 
+Adventure.directive "lightboxFocusManager", ['$timeout', ($timeout) ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
 
-
+		# Auto-focus lightbox close button when visible
+		$scope.$watch "lightboxTarget", (newVal, oldVal) ->
+			$timeout -> $element[0].focus()
+]

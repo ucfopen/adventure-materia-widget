@@ -259,9 +259,9 @@ h1 {
 		.answer {
 			display:block;
 			margin-bottom:10px;
-			
+
 			color:#000000;
-			
+
 			background: none;
 			border: none;
 			text-decoration:none;
@@ -610,6 +610,10 @@ rect, ellipse, polygon {
 			position: relative;
 			display: block;
 			margin: 20px auto 0 auto;
+
+			&:focus {
+				outline: thick solid $blue-focus;
+			}
 		}
 
 		.lightbox-image:hover {
