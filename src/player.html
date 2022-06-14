@@ -12,8 +12,9 @@
 		<script src="materia.enginecore.js"></script>
 
 		<!-- YOUR PREREQUISITES -->
-		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular.min.js"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-sanitize.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.8.2/angular-sanitize.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-aria/1.8.2/angular-aria.min.js"></script>
 		<script src="assets/micromarkdown.min.js"></script>
 
 		<!-- MAIN PLAYER SCRIPT -->
@@ -28,14 +29,20 @@
 		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
 
 		<div class="feedback"
-			ng-class="{ show: feedback }">
-			<div class="feedback-content">
+			ng-class="{ show: feedback }"
+			ng-attr-aria-hidden="{{ !(feedback.length > 0) }}"
+			tabindex="-1">
+			<div class="feedback-content" tabindex="-1">
 				{{feedback}}
 			</div>
 			<input class="feedback-button trans-button"
 				type="button"
 				value="OK"
-				ng-click="closeFeedback()">
+				ng-click="closeFeedback()"
+				ng-attr-tabindex="{{feedback.length > 0 ? 0 : -1}}"
+				aria-label="{{feedback}}. Return to Widget"
+				aria-live="assertive"
+				feedback-focus-manager>
 		</div>
 
 		<section class="question clearfix"
@@ -45,14 +52,17 @@
 				'transitional-mode' : question.type == NARR || question.type == END,
 				'hidden-title' : hideTitle == true,
 				'end-screen-mode' : question.type == OVER}"
-			ng-switch="layout">
+			ng-switch="layout"
+			focus-manager
+			aria-live="assertive"
+			tabindex="0">
 			<!-- just an image -->
 			<div ng-switch-when="image-only">
 				<figure class="asset image-only">
 					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 			</div>
@@ -65,9 +75,9 @@
 				<h2 class="text left" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
 				<figure class="asset right">
 					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 			</div>
@@ -75,9 +85,9 @@
 			<div ng-switch-when="left">
 				<figure class="asset left">
 					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 				<h2 class="text right" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
@@ -86,9 +96,9 @@
 			<div ng-switch-when="bottom">
 				<figure class="asset center">
 					<div class="asset-container" >
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 				<h2 class="text bottom" auto-text-scale ng-bind-html="question.text"></h2>
@@ -98,9 +108,9 @@
 				<h2 class="text top" auto-text-scale ng-bind-html="question.text"></h2>
 				<figure class="asset center">
 					<div class="asset-container" >
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" dynamic-media-scale />
+						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
 						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" ng-click="setLightboxTarget(1)"></button>
+						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
 					</div>
 				</figure>
 			</div>
@@ -119,12 +129,14 @@
 			ng-hide="question.type == OVER">
 			<div class="mc"
 				ng-show="type == MC">
-				<a href="#"
+				<button
 					class="answer"
 					ng-repeat="answer in answers"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
+					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
 					data-index="{{answer.index}}"
-					data-link="{{answer.link}}">) {{answer.text}}</a>
+					data-link="{{answer.link}}"
+					tabindex="0">) {{answer.text}}</button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"
@@ -134,14 +146,17 @@
 				<input type="button"
 					class="trans-button"
 					value="Submit"
-					ng-click="handleShortAnswerInput()"/>
+					ng-click="handleShortAnswerInput()"
+					tabindex="0" />
 			</div>
 			<div class="hotspot" ng-if="type == HOTSPOT">
 				<!-- label element for the hotspot label text, if it exists -->
 				<div class="hotspot-label"
 					id="hotspot-label"
 					ng-click="handleAnswerSelection(answer.link,answer.index)"
-					ng-style="{'top':hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px','opacity':hotspotLabelTarget.show? '1' : '0'}">
+					ng-style="{'top':hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px','opacity':hotspotLabelTarget.show? '1' : '0'}"
+					aria-hidden="true"
+					>
 					{{hotspotLabelTarget.text}}
 				</div>
 
@@ -158,6 +173,7 @@
 						data-label="{{answer.text}}"
 						visibility-manager
 						label-manager
+						ng-click="handleAnswerSelection(answer.options.link,answer.index)"
 						>
 						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
 							ng-attr-cx="0"
@@ -170,7 +186,12 @@
 							fill-opacity="0.5"
 							ng-mouseover='onHotspotHover(answer, $event)'
 							ng-mouseout='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+							ng-focus='onHotspotHover(answer, $event)'
+							ng-blue='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
+							tabindex="0"
+							aria-label="{{answer.text}}"/>
 
 						<rect ng-if="answer.options.svg.type == 'rect'"
 							ng-attr-x="0"
@@ -183,7 +204,12 @@
 							fill-opacity="0.5"
 							ng-mouseover='onHotspotHover(answer, $event)'
 							ng-mouseout='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+							ng-focus='onHotspotHover(answer, $event)'
+							ng-blue='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
+							tabindex="0"
+							aria-label="{{answer.text}}"/>
 
 						<polygon ng-if="answer.options.svg.type == 'polygon'"
 							ng-attr-points="{{answer.options.svg.points}}"
@@ -193,17 +219,23 @@
 							fill-opacity="0.5"
 							ng-mouseover='onHotspotHover(answer, $event)'
 							ng-mouseout='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)" />
+							ng-focus='onHotspotHover(answer, $event)'
+							ng-blue='onHotspotHoverOut($event)'
+							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
+							tabindex="0"
+							aria-label="{{answer.text}}"/>
 					</g>
 				</svg>
-				<img ng-if="question.options.asset.type === 'image'" ng-src="{{question.image}}">
+				<img ng-if="question.options.asset.type === 'image'" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" ng-src="{{question.image}}">
 			</div>
 			<div class="trans"ng-if="type == TRANS">
 				<input type="button"
 					class="trans-button"
 					ng-class='{ left: question.layout == 2, right: question.layout == 3 }'
 					value="Continue"
-					ng-click="handleAnswerSelection(link,0)"/>
+					ng-click="handleAnswerSelection(link,0)"
+					tabindex="0" />
 			</div>
 		</section>
 		<section class="lightbox" ng-class="{ 'show': lightboxTarget != -1}" ng-hide="lightboxTarget == -1">

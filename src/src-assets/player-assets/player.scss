@@ -13,6 +13,7 @@ $red-lightest: #ffd7d7;
 $blue: #3d90b1;
 $blue-lighter: #49afd7;
 $blue-lightest: #bdecff;
+$blue-focus: #66dbff;
 
 $gray-darker: #333333;
 $gray: #888888;
@@ -258,14 +259,21 @@ h1 {
 		.answer {
 			display:block;
 			margin-bottom:10px;
-			font-size: 18px;
+			
 			color:#000000;
+			
+			background: none;
+			border: none;
 			text-decoration:none;
 
+			font-size: 18px;
 			font-weight: normal;
+			font-family: 'Lora';
+
+			text-align: left;
 
 			counter-increment: q;
-			vertical-align: middle;
+			cursor: pointer;
 
 			&:hover, &:focus {
 				color: $blue;
@@ -273,6 +281,14 @@ h1 {
 
 			&:before {
 				content: counter(q, upper-alpha);
+			}
+
+			&:focus {
+				outline: thick solid $blue-focus;
+			}
+
+			&:active {
+				outline: 0;
 			}
 		}
 	}
@@ -298,6 +314,14 @@ h1 {
 		.trans-button {
 			vertical-align: top;
 			width: 100px;
+
+			&:focus {
+				outline: thick solid $blue-focus;
+			}
+
+			&:active {
+				outline: 0;
+			}
 		}
 		.short-answer {
 			width: 400px;
@@ -327,7 +351,15 @@ h1 {
 	color:#ffffff;
 	cursor: pointer;
 
-	&:hover, &:hover {
+	&:focus {
+		outline: thick solid $blue-focus;
+	}
+
+	&:active {
+		outline: 0;
+	}
+
+	&:hover {
 		background: $blue-lighter;
 	}
 	&.left {
@@ -469,9 +501,19 @@ h1 {
 
 rect, ellipse, polygon {
 	cursor: pointer;
+
 	&:hover {
 		opacity: 0.7;
 	}
+
+	&:focus {
+		outline: thick solid $blue-focus;
+	}
+
+	&:active {
+		outline: 0;
+	}
+
 }
 
 .expand-btn {
@@ -480,8 +522,8 @@ rect, ellipse, polygon {
 	font-size:16px;
 	font-weight:bold;
 	background:$blue;
-	border:solid 1px #d3d3d3;
 	border-radius:5px;
+	border: 0px;
 	color:#ffffff;
 
 	cursor: pointer;

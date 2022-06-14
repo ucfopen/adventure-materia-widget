@@ -31,7 +31,8 @@
                 "id": 0,
                 "asset": {
                   "id": "<%MEDIA='assets/1.png'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "Drawing of a nurse pushing a stretcher with patient."
                 }
               }
             },
@@ -120,7 +121,8 @@
                 "id": 2,
                 "asset": {
                   "id": "<%MEDIA='assets/2.png'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "Drawing of a doctor reviewing documents."
                 }
               }
             },
@@ -376,7 +378,9 @@
                 "id": 10,
                 "asset": {
                   "id": "<%MEDIA='assets/3.png'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "Drawing of a maternal figure comforting a sick patient in bed."
+
                 }
               }
             },
@@ -405,7 +409,8 @@
                 "id": 11,
                 "asset": {
                   "id": "<%MEDIA='assets/3.png'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "Drawing of a maternal figure comforting a sick patient in bed."
                 }
               }
             },
@@ -461,7 +466,8 @@
                 "finalScore": 90,
                 "asset": {
                   "id": "<%MEDIA='assets/5.JPG'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "A photograph of congratulatory balloons in a hospital being held by someone just out of frame."
                 }
               }
             },
@@ -483,7 +489,8 @@
                 "finalScore": 100,
                 "asset": {
                   "id": "<%MEDIA='assets/5.JPG'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "A photograph of congratulatory balloons in a hospital being held by someone just out of frame."
                 }
               }
             },
@@ -505,7 +512,8 @@
                 "finalScore": 70,
                 "asset": {
                   "id": "<%MEDIA='assets/5.JPG'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "A photograph of congratulatory balloons in a hospital being held by someone just out of frame."
                 }
               }
             },
@@ -527,7 +535,8 @@
                 "finalScore": 80,
                 "asset": {
                   "id": "<%MEDIA='assets/5.JPG'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "A photograph of congratulatory balloons in a hospital being held by someone just out of frame."
                 }
               }
             },
@@ -599,7 +608,8 @@
                 "id": 19,
                 "asset": {
                   "id": "<%MEDIA='assets/4.png'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "A drawing of a doctor inspecting the tip of a syringe."
                 }
               }
             },
@@ -715,7 +725,8 @@
                 "id": 24,
                 "asset": {
                   "id": "<%MEDIA='assets/4.png'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "A drawing of a doctor inspecting the tip of a syringe."
                 }
               }
             },
@@ -782,7 +793,8 @@
                 "visibility": 0,
                 "asset": {
                   "id": "<%MEDIA='assets/6.png'%>",
-                  "materiaType": "asset"
+                  "materiaType": "asset",
+                  "alt": "An example medical chart with symptoms that include shallow and rapid respiration, lethargy and irritability, dry lips, bowel sounds, and inability to urinate or take fluids."
                 }
               }
             },

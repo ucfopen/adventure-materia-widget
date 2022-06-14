@@ -1,4 +1,4 @@
-Adventure = angular.module "Adventure"
+Adventure = angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 ## CONTROLLER ##
 Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce) ->
@@ -537,3 +537,26 @@ Adventure.directive "labelManager", ['$timeout', ($timeout) ->
 			$scope.hotspotLabelTarget.x = null
 			$scope.hotspotLabelTarget.y = null
 ]
+
+Adventure.directive "focusManager", [() ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "question", (newVal, oldVal) ->
+
+			# Focuses on the text after each answer has been given so screen reader users
+			# don't have to go back in the order of the widget
+			$element[0].focus()
+]
+
+Adventure.directive "feedbackFocusManager", [() ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		# Auto-focus feedback close button when visible
+		$scope.$watch "feedback", (newVal, oldVal) ->
+			if newVal and newVal.length > 0 then $element[0].focus()
+]
+
+
+

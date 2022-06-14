@@ -91,6 +91,10 @@ html, body {
 
 /* Component Styling */
 
+button {
+	cursor: pointer;
+}
+
 div.fancy-toggle {
 	position: relative;
 	width:80px;
@@ -1532,11 +1536,23 @@ node-creation-selection-dialog {
 			max-height: 100%;
 		}
 
-		div.media-toolbar {
-			width: 340px;
-			// height: 30px;
+		input.image-alt-text {
+			position: absolute;
+			bottom: 2px;
+			left: 4%;
+			z-index: $z-index-modal-svg;
 
-			padding-top: 2px;
+			width: 90%;
+			background: rgba(255,255,255,0.9);
+			border: solid 1px $gray;
+			border-radius: 2px;
+		}
+
+		div.media-toolbar {
+			position: absolute;
+			top: 100%;
+			width: 340px;
+			padding-top: 4px;
 
 			text-align: center;
 
@@ -1600,9 +1616,17 @@ node-creation-selection-dialog {
 				}
 
 				button.answer-node-select {
+
+					color: $white;
+					background: $color-accent;
+
+					&:hover {
+						background: $color-accent-highlight;
+					}
+
 					&.managed {
 						color: $white;
-						background: $color-accent;
+						background: $color-accent-highlight;
 					}
 				}
 
@@ -1887,6 +1911,20 @@ node-creation-selection-dialog {
 			}
 		}
 
+		input.hotspot-alt-text {
+			position: absolute;
+			z-index: $z-index-modal-dialog;
+			left: 2px;
+			bottom: 38px;
+
+			width: 40%;
+
+			background: rgba(255,255,255,0.9);
+
+			border: solid 1px $gray;
+			border-radius: 2px;
+		}
+
 		hotspot-toolbar {
 			position: absolute;
 			display: block;
@@ -1896,7 +1934,7 @@ node-creation-selection-dialog {
 			width: $edit-popup-content-width-full;
 			height: 30px;
 
-			padding-top: 10px;
+			padding-top: 6px;
 
 			background-color: rgba(0, 0, 0, 0.6);
 

@@ -1,7 +1,6 @@
 ---
 general:
   name: Adventure
-  group: Materia
   height: 593
   width: 800
   in_catalog: Yes

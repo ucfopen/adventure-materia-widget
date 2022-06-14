@@ -264,6 +264,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			url: Materia.CreatorCore.getMediaUrl media[0].id
 			id: media[0].id
 			align: "right"
+			alt: ""
 
 		$scope.mediaReady = true
 		$scope.showImage = true;
