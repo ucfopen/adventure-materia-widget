@@ -734,6 +734,119 @@ Adventure.directive "titleEditor", [() ->
 				$scope.showBackgroundCover = true
 ]
 
+# Directive for editing items
+Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeHistorySrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "showItemManager", (newVal, oldVal) ->
+			if newVal
+				$scope.showInventoryBackgroundCover = true
+
+				# Collapse any open item editors
+				$scope.editingIndex = -1
+
+		$scope.$watch "inventoryItems", (newVal, oldVal) ->
+			if newVal
+				treeSrv.setInventoryItems(newVal)
+
+		$scope.newItemName = ''
+
+		$scope.icons = [
+			'pencil',
+			'image',
+			'headphones',
+			'folder-open',
+			'map',
+			'wrench',
+			'gift',
+			'aid-kit',
+			'lab',
+			'star-full',
+			'smile2',
+			'sad2',
+			'heart',
+			'flag',
+			'leaf',
+			'trophy',
+			'hammer',
+			'key',
+			'binoculars',
+			'phone',
+			'book',
+			'camera',
+			'eyedropper'
+		]
+
+		$scope.addNewItem = () ->
+			if $scope.newItemName.trim() != ''
+				newItem =
+					name: $scope.newItemName.trim()
+					id: treeSrv.getItemCount()
+					description: ''
+					count: 1
+					# numberOfUsesLeft: -999
+					icon: ''
+				treeSrv.incrementItemCount()
+				$scope.inventoryItems.push(newItem)
+				# inventory = treeSrv.getInventoryItems()
+				# inventory.push(newItem)
+				# treeSrv.setInventoryItems(inventory)
+
+				$scope.newItemName = ''
+				# Collapse any open item editors
+				$scope.editingIndex = -1
+
+		$scope.removeItemFromInventoryItems = (index, item) ->
+			# inventory = treeSrv.getInventoryItems()
+			if item in $scope.inventoryItems
+				$scope.inventoryItems.splice index, 1
+				# inventory.splice index, 1
+				# treeSrv.setInventoryItems(inventory)
+				treeSrv.deleteItemFromAllNodes $scope.treeData, item
+				# Collapse any open item editors
+				$scope.editingIndex = -1
+
+		$scope.handleEditItem = (item, index, event = null) ->
+			if event then event.stopPropagation()
+			if ! ($scope.editingIndex is index)
+				# Open item editor for this item
+				$scope.editingIndex = index
+			else
+				inventory = treeSrv.getInventoryItems()
+				treeSrv.updateAllItems $scope.treeData, inventory[$scope.editingIndex]
+				$scope.toast "Item '#{inventory[$scope.editingIndex].name}' saved!"
+				$scope.editingIndex = -1
+
+		$scope.openItemIconSelector = (item) ->
+			$scope.showItemIconSelector = true
+			$scope.currentItem = item
+
+		$scope.selectIcon = (icon) ->
+			# inventory = treeSrv.getInventoryItems()
+			# inventory[inventory.indexOf($scope.currentItem)].icon = icon
+			# treeSrv.setInventoryItems(inventory)
+			$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = icon
+			$scope.showItemIconSelector = false
+
+		$scope.saveAndCloseInventory = () ->
+			inventory = treeSrv.getInventoryItems()
+			if inventory
+				historyActions = treeHistorySrv.getActions()
+				lastIndex = treeHistorySrv.getHistorySize() - 1
+				# Check if changes were made
+				peek = treeHistorySrv.retrieveSnapshot(lastIndex)
+				unless treeHistorySrv.compareTrees(peek.tree, $scope.treeData)
+					treeHistorySrv.addToHistory $scope.treeData, historyActions.INVENTORY_EDITED, "Inventory Items Edited"
+					# Update item data across all nodes
+					for item in inventory
+						treeSrv.updateAllItems $scope.treeData, item
+					$scope.toast "Items saved!"
+
+			$scope.hideCoverAndModals()
+
+]
+
 # Directive for the small tooltips displaying the answers associated with a given node on mouseover
 Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 	restrict: "E",
@@ -752,7 +865,16 @@ Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 				$scope.hoveredNode.tooltips = []
 
 				angular.forEach node.answerLinks, (answer, index) ->
-					$scope.hoveredNode.tooltips.push answer
+					tooltip = {
+						...answer
+					}
+					$scope.hoveredNode.tooltips.push tooltip
+
+				if node.items
+					tooltip = {
+						givesItems: node.items
+					}
+					$scope.hoveredNode.tooltips.push tooltip
 
 				$scope.hoveredNode.showTooltips = true
 ]
@@ -774,7 +896,6 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 		# if the history "cursor" is not at the top of the stack (they've clicked undo or have selected an earlier action),
 		# and a new action is performed, all actions between the cursor and the top of the stack are discarded
 		$scope.$on "tree.history.added", (evt) ->
-
 			# Have to get initial size of history stack
 			$scope.historySize = treeHistorySrv.getHistorySize()
 
@@ -807,12 +928,14 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 
 		$scope.rollBackToSnapshot = (index) ->
 			if $scope.existingNodeSelectionMode or $scope.copyNodeMode then return false
-
 			snapshot = treeHistorySrv.retrieveSnapshot index
 			tree = treeSrv.createTreeDataFromQset JSON.parse snapshot.tree
 			$scope.treeData = tree
 			treeSrv.set tree
 			treeSrv.setNodeCount snapshot.nodeCount
+			treeSrv.setItemCount snapshot.itemCount
+			treeSrv.setInventoryItems tree.inventoryItems
+			$scope.inventoryItems = tree.inventoryItems || []
 
 			$scope.historyPosition = index
 ]
@@ -1185,6 +1308,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 						feedback: null
 						target: newAnswerTarget
 						linkMode: $scope.NEW
+						requiredItems: []
+						items: []
 
 					node.answers = []
 					node.answers.push newAnswer
@@ -1217,8 +1342,14 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 					feedback: null
 					target: newDefaultId
 					linkMode: $scope.NEW
+					requiredItems: []
+					items: []
 					matches: []
 					isDefault: true
+					options: {
+						caseSensitive: false
+						whitespaceSensitive: false
+					}
 
 				# The new answer has to take the 0 index spot in the answers array
 				node.answers.splice 0, 0, newDefault
@@ -1609,6 +1740,16 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 							$scope.answers = []
 							$scope.newAnswer()
 
+				if $scope.editedNode.items
+					$scope.items = $scope.editedNode.items
+				else
+					$scope.items = []
+
+				if $scope.editedNode.requiredItems
+					$scope.requiredItems = $scope.editedNode.requiredItems
+				else
+					$scope.requiredItems = []
+
 				if $scope.editedNode.media
 					if $scope.editedNode.media.type is "image"
 						$scope.showImage = true
@@ -1667,6 +1808,16 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.editedNode.answers = $scope.answers
 		), true
 
+		$scope.$watch "items", ((newVal, oldVal) ->
+			if newVal isnt null and $scope.editedNode
+				$scope.editedNode.items = $scope.items
+		), true
+
+		$scope.$watch "requiredItems", ((newVal, oldVal) ->
+			if newVal isnt null and $scope.editedNode
+				$scope.editedNode.requiredItems = $scope.requiredItems
+		), true
+
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
 		$scope.$on "editedNode.media.updated", (evt) ->
 			if $scope.editedNode.media.type is 'image'
@@ -1696,6 +1847,117 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.inputUrl = ''
 			$scope.showImportTypeSelection = true
 
+		$scope.toggleItemPopup = () ->
+			$scope.showRequiredItems = false
+			if $scope.showItemSelection is true
+				$scope.showItemSelection = false
+				return
+			$scope.showItemSelection = true
+
+			# Add items not already being used to the items available for selection
+			$scope.availableItems = []
+			for item in $scope.inventoryItems
+				do (item) ->
+					used = false
+					for i in $scope.items
+						if item.id is i.id
+							used = true
+					if ! used
+						$scope.availableItems.push(item)
+
+			$scope.selectedItem = $scope.availableItems[0]
+
+		$scope.toggleRequiredItemPopup = () ->
+			$scope.showItemSelection = false
+			if $scope.showRequiredItems is true
+				$scope.showRequiredItems = false
+				return
+			$scope.showRequiredItems = true
+
+			# Add items not already required to the items available for selection
+			$scope.availableItems = []
+			for item in $scope.inventoryItems
+				do (item) ->
+					required = false
+					for required_item in $scope.requiredItems
+						if item.id is required_item.id
+							required = true
+					if ! required
+						$scope.availableItems.push(item)
+
+			$scope.selectedItem = $scope.availableItems[0]
+
+		$scope.addItemToNode = (item) ->
+			if item
+				# If item already exists in node, increment item count
+				for i in $scope.items
+					if item.id is i.id
+						i.count += 1
+						return
+				# Add item to node
+				newItem = {
+					...item
+					count: 1
+					numberOfUsesLeft: -999
+				}
+				$scope.items.push(newItem)
+				# Remove item from the select dropdown
+				index = $scope.availableItems.indexOf(item)
+				$scope.availableItems.splice index, 1
+				$scope.selectedItem = $scope.availableItems[0]
+
+		$scope.removeItemFromNode = (item, index) ->
+			$scope.items.splice index, 1
+			$scope.availableItems.push(item)
+			$scope.showItemManagerDialog = false
+
+		$scope.addRequiredItemToNode = (item) ->
+			if item
+				if item in $scope.requiredItems
+					item.count += 1
+				else
+					# Add item to node
+					$scope.requiredItems.push(item)
+					# Remove item from the select dropdown
+					index = $scope.availableItems.indexOf(item)
+					$scope.availableItems.splice index, 1
+					$scope.selectedItem = $scope.availableItems[0]
+
+		$scope.removeRequiredItemFromNode = (item, index) ->
+			$scope.requiredItems.splice index, 1
+			$scope.availableItems.push(item)
+			if $scope.requiredItems.length == 0
+				$scope.itemButtonDialog = "Add Items"
+			$scope.showItemManagerDialog = false
+
+		$scope.addRequiredItemToAnswer = (item, answer) ->
+			$scope.currentAnswer = answer
+			if item
+				for i in answer.requiredItems when i.id is item.id
+					i.count += 1
+					$scope.flashItem(answer, item)
+					return
+
+				newItem = {
+					...item
+					count: 1
+				}
+				answer.requiredItems.push(newItem)
+				$scope.flashItem(answer, item)
+
+		$scope.flashItem = (answer, item) ->
+			for i, index in answer.requiredItems when i.id is item.id
+				$scope.itemIndex = index
+			$scope.flashItemBox = true
+			$timeout(() ->
+				$scope.flashItemBox = false
+			, 500)
+
+		$scope.removeRequiredItemFromAnswer = (item, answer) ->
+			item.count -= 1
+			if (item.count <= 0)
+				answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
+
 		$scope.newAnswer = (text = null) ->
 
 			# If the editedNode has a pending target, the new answer's target will be set to it
@@ -1723,10 +1985,14 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				target: targetId
 				linkMode: linkMode
 				id: treeSrv.generateAnswerHash()
+				requiredItems: []
 
 			# Add a matches property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
 				newAnswer.matches = []
+				newAnswer.options =
+					caseSensitive: false
+					whitespaceSensitive: false
 			$scope.answers.push newAnswer
 
 			# Refresh all answerLinks references as some have changed
@@ -1936,6 +2202,20 @@ Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHist
 				align: "right"
 
 			$rootScope.$broadcast "editedNode.media.updated"
+]
+
+# Directive for the item selection modal
+Adventure.directive "itemSelection", [() ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+]
+
+# Directive for the item manager dialog
+Adventure.directive "itemManagerDialog", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', '$sce', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout, $sce) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
 ]
 
 Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (legacyQsetSrv, $timeout, $sce) ->

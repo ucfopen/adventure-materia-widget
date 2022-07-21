@@ -1,13 +1,14 @@
 Adventure = angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 ## CONTROLLER ##
-Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce) ->
+Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce, $timeout) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
 	$scope.SHORTANS = "shortanswer"
 	$scope.HOTSPOT = "hotspot"
 	$scope.TRANS = "transitional"
+	$scope.RESTRICTED = "restricted"
 	$scope.NARR = "narrative" # May not be required
 	$scope.END = "end" # May not be required
 	$scope.OVER = "over" # the imaginary node after end nodes, representing the end of the widget
@@ -26,8 +27,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.title = ""
 	$scope.qset = null
 	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
+	$scope.hideInventoryBtn = false
 	$scope.scoringDisabled = false
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
+	$scope.inventory = []
 
 	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
@@ -42,6 +45,8 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				manageQuestionScreen(qset.items[0].options.id)
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
+
+				if qset.options.hideInventoryBtn then $scope.hideInventoryBtn = qset.options.hideInventoryBtn
 
 				if qset.options.scoreMode and qset.options.scoreMode is "Non-Scoring"
 					$scope.scoringDisabled = true
@@ -93,7 +98,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			$sanitize presanitized
 
 		catch error
-			console.log error
 			q_data.questions[0].text = "*Question text removed due to malformed or dangerous HTML content*"
 
 		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
@@ -109,6 +113,70 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			id : q_data.options.id
 			materiaId: q_data.id
 			options: q_data.options
+			items: q_data.items
+			requiredItems: q_data.requiredItems
+
+		# Check if player's inventory contains the required items to view this question
+		if !! $scope.checkInventory($scope.question)[0]
+			handleRestrictedNode()
+
+		# Remove new item alerts
+		for i in $scope.inventory
+			i.new = false
+
+		# Add items to player's inventory
+		if $scope.question.items
+			action = 'added to'
+
+			for q_i in $scope.question.items
+				do (q_i) ->
+					hasItem = false
+					# Check to see if player already has item
+					# If so, just update item count
+					for p_i in $scope.inventory
+						if q_i.id is p_i.id
+							hasItem = true
+							if q_i.count < 0
+								action = 'removed from'
+							p_i.count += q_i.count
+					if (! hasItem)
+						newItem = {
+							...q_i
+							new: true
+							showDescription: false
+							numberOfUsesLeft: if q_i.numberOfUsesLeft then q_i.numberOfUsesLeft else -999
+							description: if q_i.description then q_i.description else ''
+							name: q_i.name
+							count: if q_i.count then q_i.count else 1
+							id: q_i.id
+							icon: q_i.icon
+						}
+						$scope.inventory.push(newItem)
+
+			$scope.notifMessage = if $scope.question.items.length > 1 then "(#{$scope.question.items.length}) Items updated!" else if $scope.question.items.length > 0 then "#{$scope.question.items[0].name} (#{Math.abs($scope.question.items[0].count)}) has been #{action} your inventory!"
+
+			if $scope.notifRegister isnt null then $timeout.cancel $scope.notifRegister
+
+			if $scope.question.items.length > 0
+				$scope.showNotif = true
+			else
+				# Hide inventory notifications
+				$scope.hideNotif()
+
+			$scope.notifRegister = $timeout (() ->
+				$scope.hideNotif()
+			), 10000
+
+		# Update number of uses for each item
+		for i, index in $scope.inventory
+			# Skip items with unlimited use
+			if (i.numberOfUsesLeft == -999)
+				continue
+			i.numberOfUsesLeft -= 1
+			# Remove item if no uses left
+			if (i.numberOfUsesLeft <= 0)
+				$scope.inventory.splice index, 1
+
 
 		$scope.answers = []
 
@@ -121,6 +189,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					link : q_data.answers[i].options.link
 					index : i
 					options : q_data.answers[i].options
+					requiredItems: q_data.answers[i].options.requiredItems
 				$scope.answers.push answer
 
 		# shuffle answer order if asked to do so
@@ -145,8 +214,33 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			when $scope.MC then handleMultipleChoice q_data
 			when $scope.HOTSPOT then handleHotspot q_data
 			when $scope.SHORTANS then handleShortAnswer q_data
+			when $scope.RESTRICTED then handleRestrictedNode q_data
 			else
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
+
+	$scope.hideNotif = () ->
+		$scope.showNotif = false
+		$scope.notifMessage = ""
+
+	$scope.toggleInventory = () ->
+		$scope.showInventory = ! $scope.showInventory
+		$scope.selectedItem = $scope.inventory[0]
+		$scope.hideNotif()
+
+	$scope.setSelectedItem = (item) ->
+		$scope.selectedItem = item
+
+	# Checks to see if player inventory contains all required items
+	# Returns array of missing items
+	$scope.checkInventory = (answer) ->
+		missingItems = []
+		skip = false
+		angular.forEach answer.requiredItems, (item) ->
+			hasRequiredItem = $scope.inventory.some (playerItem) ->
+				playerItem.id is item.id and playerItem.count >= item.count
+			if ! hasRequiredItem
+				missingItems.push(item)
+		return missingItems
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
 	$scope.handleAnswerSelection = (link, index) ->
@@ -268,6 +362,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		$scope.question.text = "[Blank destination: click Continue to end the widget preview.]"
 		$scope.link = -1
 		Materia.Score.submitFinalScoreFromClient null, "Blank Destination! Be sure to edit or remove this node before publishing.", 100
+
+	handleRestrictedNode = () ->
+		$scope.type = $scope.RESTRICTED
+		$scope.layout = "text-only"
+		itemArray = item.name for item in $scope.question.requiredItems
+		$scope.question.text = "[Destination requires item(s): [#{itemArray.toString(', ')}]]"
+		$scope.link = $scope.question.options.parentId
 
 	# Submit the user's response to the logs
 	_logProgress = ->
@@ -444,6 +545,7 @@ Adventure.directive "dynamicMediaScale", [() ->
 
 			scaledWidth = if ($scope.layout is "image-only") or ((width * ratio) < (containerWidth / 2)) then (width * ratio) else (containerWidth * 2 / 5)
 			scaledHeight = if ($scope.question.options.asset.type is "video") then ((height * ratio) + "px") else "auto"
+			console.log(scaledWidth)
 
 			# Apply scaling
 			$attrs.$set "style", "width:"+scaledWidth+"px;height:"+scaledHeight+";"

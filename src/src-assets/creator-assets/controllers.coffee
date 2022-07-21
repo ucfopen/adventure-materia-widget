@@ -22,8 +22,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	$scope.scoreMode = $scope.NORMAL
 	$scope.internalScoreMessage = ""
 	$scope.showImportTypeSelection = false
-	$scope.showImage = true;
-	$scope.urlError = '　';
+	$scope.showImage = true
+	$scope.urlError = '　'
 
 	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
 	PRESANITIZE_CHARACTERS =
@@ -106,6 +106,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	historyActions = treeHistorySrv.getActions()
 
+	$scope.inventoryItems = []
+
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 
 		# Returning from a suspended node creation screen, don't do anything
@@ -183,6 +185,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	$scope.hideCoverAndModals = ->
 		$scope.showIntroDialog = false
 		$scope.showBackgroundCover = false
+		$scope.showInventoryBackgroundCover = false
 		$scope.nodeTools.show = false
 		$scope.showCreationDialog = false
 		$scope.showDeleteWarning = false
@@ -190,6 +193,10 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		$scope.validation.show = false
 		$scope.showScoreModeDialog = false
 		$scope.showImportTypeSelection = false
+		$scope.showItemSelection = false
+		$scope.showRequiredItems = false
+		$scope.showItemManager = false
+		$scope.showItemIconSelector = false
 
 		$scope.resetNewNodeManager()
 
@@ -201,6 +208,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 			$scope.showIntroDialog = true
 			$scope.showBackgroundCover = true
+
+			$scope.inventoryItems = []
 
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.WIDGET_INIT, "Widget Initialized"
 
@@ -217,6 +226,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
+
+				$scope.inventoryItems = qset.options.inventoryItems || []
 
 				# Optional qset parameters based on score mode
 				if qset.options.scoreMode then $scope.scoreMode = qset.options.scoreMode
@@ -249,6 +260,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			qset.options.hidePlayerTitle = $scope.hidePlayerTitle
 			qset.options.scoreMode = $scope.scoreMode
 			qset.options.internalScoreMessage = $scope.internalScoreMessage
+			qset.options.inventoryItems = treeSrv.getInventoryItems()
 			Materia.CreatorCore.save $scope.title, qset, 2
 
 	materiaCallbacks.onSaveComplete = (title, widget, qset, version) -> true
@@ -359,6 +371,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			parentId: parent
 			type: type
 			contents: []
+			requiredItems: []
+			items: []
 
 		treeSrv.findAndAdd $scope.treeData, parent, newNode
 
@@ -383,6 +397,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			type: $scope.BLANK
 			contents: []
 			pendingTarget: data.target
+			items: []
+			requiredItems: []
 
 		if data.specialCase
 			if data.specialCase is "otherNode"
@@ -407,6 +423,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		qset.options.hidePlayerTitle = $scope.hidePlayerTitle
 		qset.options.scoreMode = $scope.scoreMode
 		qset.options.internalScoreMessage = $scope.internalScoreMessage
+		qset.options.inventoryItems = treeSrv.getInventoryItems()
 
 		$scope.showQsetGenerator = true
 		$scope.generatedQset = JSON.stringify qset, null, 2

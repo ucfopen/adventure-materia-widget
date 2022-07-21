@@ -26,6 +26,36 @@
 			<h1>{{title}}</h1>
 		</header>
 
+		<button ng-class="{'icon-backpack': !showInventory, 'icon-cross': showInventory, 'show-inventory' : !hideInventoryBtn}" ng-click="toggleInventory()"></button>
+		<div class="notif-message" ng-if="showNotif">
+			<p>{{ notifMessage }}</p>
+		</div>
+
+		<div class="inventory" ng-class="{ show: showInventory }">
+			<div class="inventory-container">
+				<h2 class="inventory-header">Inventory Items</h2>
+				<div class="inventory-content">
+					<div class="inventory-items">
+						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)">
+							<span ng-if="item.new" class="new-item">NEW!</span><span ng-if="item.icon" class="icon-{{item.icon}}"></span>
+							{{item.name}}
+						</div>
+					</div>
+					<div class="item-description" ng-show="selectedItem">
+						<div class="item-header">
+							<span ng-if="selectedItem.icon" class="icon-{{selectedItem.icon}}"></span>
+							<h4>
+								{{selectedItem.name}}
+							</h4>
+						</div>
+						<p>{{selectedItem.description}}<p>
+						<p>Count: {{selectedItem.count}}<p>
+						<p ng-show="selectedItem.numberOfUsesLeft != -999">Number of Uses Left: {{selectedItem.numberOfUsesLeft}}<p>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
 
 		<div class="feedback"
@@ -132,11 +162,19 @@
 				<button
 					class="answer"
 					ng-repeat="answer in answers"
+					ng-show="!checkInventory(answer)[0]"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
 					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
 					tabindex="0">) {{answer.text}}</button>
+				<button
+					class="answer nonselectable"
+					ng-repeat="answer in answers"
+					ng-show="checkInventory(answer)[0]"
+					data-index="{{answer.index}}"
+					data-link="{{answer.link}}"
+					tabindex="0">) {{answer.text}}<span> Requires item(s): <span ng-repeat="item in answer.requiredItems">{{item.name}} ({{item.count}})<span ng-show="!$last">, </span></span></button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"
@@ -168,7 +206,9 @@
 					xmlns="http://www.w3.org/2000/svg"
 					xmlns:xlink="http://www.w3.org/1999/xlink"
 					xml:space="preserve">
-					<g ng-repeat="answer in answers"
+					<g
+						ng-if="checkInventory(answer) == true"
+						ng-repeat="answer in answers"
 						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})"
 						data-label="{{answer.text}}"
 						visibility-manager
@@ -229,7 +269,7 @@
 				</svg>
 				<img ng-if="question.options.asset.type === 'image'" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" ng-src="{{question.image}}">
 			</div>
-			<div class="trans"ng-if="type == TRANS">
+			<div class="trans" ng-if="type == TRANS || type == RESTRICTED">
 				<input type="button"
 					class="trans-button"
 					ng-class='{ left: question.layout == 2, right: question.layout == 3 }'
@@ -240,7 +280,7 @@
 		</section>
 		<section class="lightbox" ng-class="{ 'show': lightboxTarget != -1}" ng-hide="lightboxTarget == -1">
 			<div class="lightbox-content">
-				<button class="lightbox-close" ng-click="setLightboxTarget(-1)" ng-attr-tabindex="{{lightboxTarget != -1 ? 0 : -1}}" lightbox-focus-manager aria-label="close lightbox">X</button>
+				<button class="lightbox-close icon-cross" ng-click="setLightboxTarget(-1)" ng-attr-tabindex="{{lightboxTarget != -1 ? 0 : -1}}" lightbox-focus-manager aria-label="close lightbox"></button>
 				<div ng-if="question.options.asset.type == 'image'" class="lightbox-image-container">
 					<img class="lightbox-image" ng-src="{{question.image}}" alt="{{question.text}}" ng-class="{'lightbox-image-zoom': lightboxZoom == 1}" ng-click="setLightboxZoom(!lightboxZoom)">
 				</div>

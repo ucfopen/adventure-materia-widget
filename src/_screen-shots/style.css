@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('font/icomoon.eot?qyoacq');
-  src:  url('font/icomoon.eot?qyoacq#iefix') format('embedded-opentype'),
-    url('font/icomoon.ttf?qyoacq') format('truetype'),
-    url('font/icomoon.woff?qyoacq') format('woff'),
-    url('font/icomoon.svg?qyoacq#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?qyoacq');
+  src:  url('fonts/icomoon.eot?qyoacq#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?qyoacq') format('truetype'),
+    url('fonts/icomoon.woff?qyoacq') format('woff'),
+    url('fonts/icomoon.svg?qyoacq#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -19,7 +19,7 @@
   font-variant: normal;
   text-transform: none;
   line-height: 1;
-
+  
   /* Enable Ligatures ================ */
   letter-spacing: 0;
   -webkit-font-feature-settings: "liga";

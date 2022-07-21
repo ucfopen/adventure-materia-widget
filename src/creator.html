@@ -76,6 +76,79 @@
 					class="important-button"
 					ng-click="hideCoverAndModals()">Done</button>
 			</title-editor>
+			<button class="item-editor-button" ng-click="showItemManager = true">{{inventoryItems.length ? 'Edit Items' : 'Add Items'}}</button>
+			<item-manager ng-show="showItemManager" class="item-modal">
+				<h4>Edit Items</h4>
+				<ul class="list-items">
+					<li
+						ng-repeat="item in inventoryItems"
+						ng-mouseover="hoverItem = true"
+						ng-mouseout="hoverItem = false"
+					>
+						<div class="item-icon">
+							<span ng-show="item.icon" class="icon-{{item.icon}}"></span>
+							<button
+								ng-show="editingIndex == $index"
+								ng-click="openItemIconSelector(item)"
+							>Select Icon</button>
+						</div>
+						<div class="item-content">
+							<div class="item-name">
+								<span ng-show="editingIndex != $index">{{item.name}}</span>
+								<input
+									type="text"
+									ng-model="item.name"
+									ng-show="editingIndex == $index"
+									enter-submit="handleEditItem(item, $index, $event)"
+									auto-select
+								/>
+							</div>
+							<div class="item-description">
+								<span ng-show="editingIndex != $index" class="description">{{item.description}}</span>
+								<textarea
+									ng-model="item.description"
+									ng-show="editingIndex == $index"
+									placeholder="(Optional) Enter Item Description Here"
+									enter-submit="handleEditItem(item, $index, $event)"
+									auto-select></textarea>
+							</div>
+						</div>
+						<div class="item-options">
+							<button type="button"
+							class="important-button"
+							ng-click="handleEditItem(item, $index, $event)">{{editingIndex == $index ? 'Save' : 'Edit'}}</button>
+							<button class="delete-button" type="button" ng-click="removeItemFromInventoryItems($index, item)">Remove</button>
+						</div>
+					</li>
+				</ul>
+				<div class="options-bar new-item-bar">
+					<input type="text"
+						ng-model="newItemName"
+						placeholder="Enter Item Name Here"
+						enter-submit="addNewItem()"
+						auto-select />
+					<button type="button"
+						class="important-button"
+						ng-click="addNewItem()">Add</button>
+					<button type="button"
+						class="important-button save-button"
+						ng-click="saveAndCloseInventory()">Save</button>
+				</div>
+			</item-manager>
+			<div item-icon-selector ng-show="showItemIconSelector" class="item-modal">
+				<h4>Icon Selector</h4>
+				<ul class="icons-list">
+					<li class="icon-{{icon}}" ng-repeat="icon in icons" ng-click="selectIcon(icon)" ng-class="{'selectedIcon' : currentItem.icon == icon}"></li>
+				</ul>
+				<div class="options-bar">
+					<button type="button"
+						class="important-button"
+						ng-click="addNewIcon()">Upload SVG Icon</button>
+					<button type="button"
+						class="important-button save-button"
+						ng-click="showItemIconSelector = false">Done</button>
+				</div>
+			</div>
 			<debug-qset-generator ng-show="showQsetGenerator">
 				<h4>Generated QSet</h4>
 				<textarea ng-model="generatedQset" auto-select></textarea>
@@ -398,47 +471,44 @@
 			</new-node-manager-dialog>
 			<node-creation class="node-creation-screen"
 				ng-click="hidePopup"
-				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT}"
+				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT, 'multi-choice': displayNodeCreation == MC}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
 				<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
 				<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
-				<textarea class="question-box"
-					ng-class="{
-						'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
-						'tiny' : displayNodeCreation == HOTSPOT,
-						'align-top' : editedNode.media.align == 'top',
-						'align-bottom' : editedNode.media.align == 'bottom',
-						'shared' : (mediaReady && displayNodeCreation != HOTSPOT),
-						'align-right' : editedNode.media.align == 'left'}"
-					ng-model="question"
-					placeholder="{{questionPlaceholder}}"></textarea>
-				<div class="media-box"
-					ng-class="{
-						'align-left' : editedNode.media.align == 'left',
-						'align-right' : editedNode.media.align == 'right',
-						'align-top' : editedNode.media.align == 'top',
-						'align-bottom' : editedNode.media.align == 'bottom'}"
-					ng-show="mediaReady && displayNodeCreation != HOTSPOT">
-					<img ng-show="showImage" ng-src="{{image.src}}" />
-					<iframe ng-show="!showImage" width="100%" height="100%" ng-src="{{url}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-					<input class="image-alt-text" ng-if="editedNode.media.type == 'image'" ng-model="editedNode.media.alt" placeholder="Image alt text" />
-					<div class="media-toolbar">
-						<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
-						<button type="button" ng-show="displayNodeCreation == NARR || displayNodeCreation == END" ng-click="swapMediaOrientation()">Change Orientation: {{ (editedNode.media.align == 'top' || editedNode.media.align == 'bottom') ? "Horizontal" : "Vertical" }}</button>
-						<button type="button" ng-click="changeMedia()">Change Media</button>
-						<button type="button" class="delete-button" ng-click="removeMedia()">Remove</button>
+				<div class="question-media-box" ng-class="{
+					'align-left' : editedNode.media.align == 'left',
+					'align-right' : editedNode.media.align == 'right',
+					'align-top' : editedNode.media.align == 'top',
+					'align-bottom' : editedNode.media.align == 'bottom'}">
+					<textarea class="question-box"
+						ng-class="{
+							'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
+							'tiny' : displayNodeCreation == HOTSPOT}"
+						ng-model="question"
+						placeholder="{{questionPlaceholder}}"></textarea>
+					<div class="media-box"
+						ng-show="mediaReady && displayNodeCreation != HOTSPOT">
+						<img ng-show="showImage" ng-src="{{image.src}}" />
+						<iframe ng-show="!showImage" width="100%" height="100%" ng-src="{{url}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<input class="image-alt-text" ng-if="editedNode.media.type == 'image'" ng-model="editedNode.media.alt" placeholder="Image alt text" />
+						<div class="media-toolbar">
+							<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
+							<button type="button" ng-show="displayNodeCreation == NARR || displayNodeCreation == END" ng-click="swapMediaOrientation()">Change Orientation: {{ (editedNode.media.align == 'top' || editedNode.media.align == 'bottom') ? "Horizontal" : "Vertical" }}</button>
+							<button type="button" ng-click="changeMedia()">Change Media</button>
+							<button type="button" class="delete-button" ng-click="removeMedia()">Remove</button>
+						</div>
 					</div>
+					<button type="button"
+						id="big-upload-button"
+						ng-if="displayNodeCreation != HOTSPOT"
+						ng-hide="mediaReady"
+						ng-click="showPopup()">
+							<span>+</span>Add Media
+					</button>
 				</div>
-				<button type="button"
-					id="big-upload-button"
-					ng-if="displayNodeCreation != HOTSPOT"
-					ng-hide="mediaReady"
-					ng-click="showPopup()">
-						<span>+</span>Add Media
-				</button>
 				<div class="answers-container"
 					ng-class="{'long' : displayNodeCreation == SHORTANS}"
 					ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS"
@@ -465,7 +535,20 @@
 							<button type="button"
 								class="answer-node-select"
 								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
-								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}
+							</button>
+							<div class="add-answer-items">
+								<span>(Optional) Required Items: </span>
+								<select ng-options="item.name for item in inventoryItems" ng-model="answerSelectedItem">
+								</select>
+								<button class="add-item" ng-click="addRequiredItemToAnswer(answerSelectedItem, answer)">Add</button>
+							</div>
+							<div class="answer-items">
+								<p ng-hide="answer.requiredItems.length">Items required for this answer to appear in the player will be shown here. Click an item to decrease its count.</p>
+								<button type="button" ng-class="{'flashItemBox' : flashItemBox == true && $index == itemIndex && currentAnswer == answer}"
+									ng-repeat="item in answer.requiredItems"
+									ng-click="removeRequiredItemFromAnswer(item, answer)">{{item.name}} ({{item.count}})</button>
+							</div>
 						</li>
 
 						<li ng-if="displayNodeCreation == 	SHORTANS"
@@ -550,6 +633,17 @@
 							<textarea class="feedback-box"
 								placeholder="Enter optional feedback here."
 								ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
+							<div class="hotspot-required-items">
+								<p ng-hide="answers[hotspotAnswerManager.answerIndex].requiredItems.length">Required items will be shown here. Click an item to remove it.</p>
+								<button type="button" ng-class="{'flashItemBox' : flashItemBox == true && $index == itemIndex}"
+									ng-repeat="item in answers[hotspotAnswerManager.answerIndex].requiredItems"
+									ng-click="removeRequiredItemFromAnswer(item, answers[hotspotAnswerManager.answerIndex])">{{item.name}} ({{item.count}})</button>
+							</div>
+							<div>
+								<select ng-options="item.name for item in inventoryItems" ng-model="answerSelectedItem">
+								</select>
+								<button ng-click="addRequiredItemToAnswer(answerSelectedItem, answers[hotspotAnswerManager.answerIndex])">Add</button>
+							</div>
 							<div class="button-options">
 								<button type="button"
 									ng-class="{'important-button' : colorDrawerOpen}"
@@ -683,52 +777,141 @@
 							ng-show="mediaReady" />
 					</div>
 				</hotspot-manager>
-				<!-- container for selecting the destination for narrative nodes -->
-				<div class="continuity-container" ng-if="displayNodeCreation == NARR">
-					<span>Select the destination to continue on:</span>
-					<button type="button"
-						class="answer-node-select"
-						ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
-						ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+
+				<div class="bottom-bar">
+					<!-- container for selecting the destination for narrative nodes -->
+					<div class="continuity-container" ng-if="displayNodeCreation == NARR">
+						<span>Select the destination to continue on:</span>
+						<button type="button"
+							class="answer-node-select"
+							ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
+							ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+					</div>
+					<!-- container for selecting the destination for end nodes -->
+					<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NORMAL">
+						<span>The user's path will conclude with this destination. Set the final score:</span>
+						<final-score-box
+							ng-form="finalScoreForm"
+							name="finalScoreForm">
+							<input type="number"
+								name="finalScoreInput"
+								class="final-score"
+								ng-class="{'invalid' : !finalScoreForm.$valid}"
+								ng-model="finalScore"
+								placeholder="100"
+								min="0"
+								max="100" />
+						</final-score-box>
+						<span>%</span>
+					</div>
+					<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NONSCORING">
+						<span>End Points do not provide scores when the widget is in Non-Scoring mode.</span>
+					</div>
+					<div class="answer-options">
+						<button class="add-answer important-button"
+							type="button"
+							ng-click="newAnswer()"
+							ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
+						<div class="random-select-container" ng-if="displayNodeCreation == MC">
+							<input type="checkbox"
+							ng-model="editedNode.randomizeAnswers"
+							value="true" /> Randomize Answers
+						</div>
+					</div>
+					<div class="items-container">
+						<button type="button"
+							class="item-button"
+							ng-click="toggleItemPopup()" ng-show="displayNodeCreation != END"><span>Give Player Items</span>
+						</button>
+						<button class="save-button important-button"
+							ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+							type="button"
+							ng-click="saveAndClose()">Done
+						</button>
+					</div>
 				</div>
-				<!-- container for selecting the destination for end nodes -->
-				<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NORMAL">
-					<span>The user's path will conclude with this destination. Set the final score:</span>
-					<final-score-box
-						ng-form="finalScoreForm"
-						name="finalScoreForm">
-						<input type="number"
-							name="finalScoreInput"
-							class="final-score"
-							ng-class="{'invalid' : !finalScoreForm.$valid}"
-							ng-model="finalScore"
-							placeholder="100"
-							min="0"
-							max="100" />
-					</final-score-box>
-					<span>%</span>
+				<div item-selection ng-show="showItemSelection" class="item-selection item-modal">
+					<h4>
+						<span>What Items Should This Visiting This Node Give The Player?</span>
+						<span class="hide-popup icon-cross"
+						ng-click="showItemSelection = false"
+						ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
+						tabindex="0"></span>
+					</h4>
+					<ul class="list-items">
+						<li
+							ng-repeat="item in items"
+							ng-click="manageItem(item)"
+							ng-mouseover="hoverItem = true"
+							ng-mouseout="hoverItem = false"
+						>
+							<div class="item-icon" ng-show="item.icon">
+								<span class="icon-{{item.icon}}"></span>
+							</div>
+							{{item.name}} ({{item.count ? item.count : 1}})
+							<div class="item-options">
+								<div class="item-quantity">
+									<div>
+										<span>Quantity:</span>
+										<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
+									</div>
+									<span>(A negative number indicates item loss)</span>
+								</div>
+								<button class="delete-button" type="button" ng-click="removeItemFromNode(item, $index)">Remove</button>
+							</div>
+						</li>
+						<li class="options-bar add-item">
+							<div>
+								<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+								</select>
+								<button ng-click="addItemToNode(selectedItem)">Add Item</button>
+							</div>
+							<button ng-click="toggleItemPopup()">Done</button>
+						</li>
+					</ul>
 				</div>
-				<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NONSCORING">
-					<span>End Points do not provide scores when the widget is in Non-Scoring mode.</span>
+				<div ng-show="showRequiredItems" class="required-items item-modal">
+					<h4>
+						<span>Required Items</span>
+						<span class="hide-popup icon-cross"
+						ng-click="showRequiredItems = false"
+						ng-keypress="$event.keyCode === 13 ? showRequiredItems = false : ''"
+						tabindex="0"></span>
+					</h4>
+					<ul class="list-items">
+						<li
+							ng-repeat="item in requiredItems"
+							ng-click="manageItem(item)"
+							ng-mouseover="hoverItem = true"
+							ng-mouseout="hoverItem = false"
+						>
+							{{item.name}} ({{item.count ? item.count : 1}})
+							<div class="item-options">
+								<div class="item-quantity">
+									<span>Quantity:</span>
+									<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
+									<span>(A negative number indicates item loss)</span>
+								</div>
+								<button class="delete-button" type="button" ng-click="removeRequiredItemFromNode(item, $index)">Remove</button>
+							</div>
+						</li>
+					</ul>
+					<div class="add-item options-bar">
+						<div>
+							<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+							</select>
+							<button ng-click="addRequiredItemToNode(selectedItem)">Add Item</button>
+						</div>
+						<button ng-click="toggleRequiredItemPopup()">Done</button>
+					</div>
 				</div>
-				<button class="add-answer important-button"
-					type="button"
-					ng-click="newAnswer()"
-					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
-				<div class="random-select-container" ng-if="displayNodeCreation == MC">
-				<input type="checkbox"
-					ng-model="editedNode.randomizeAnswers"
-					value="true" /> Randomize Answers
-				</div>
-				<button class="save-button important-button"
-					ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
-					type="button"
-					ng-click="saveAndClose()">Done</button>
 			</node-creation>
 			<node-tooltips ng-show="hoveredNode.showTooltips">
 				<div class="tooltip"
 					ng-repeat="tooltip in hoveredNode.tooltips">
-					<span class="tooltip-title">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
+					<span class="tooltip-title"
+					ng-if="!tooltip.givesItems">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
+					<span class="tooltip-title" ng-if="tooltip.givesItems">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems">{{item.name}} ({{item.count ? item.count : 1}})</p>
 				</div>
 			</node-tooltips>
 			<import-type-selection ng-show="showImportTypeSelection">
@@ -802,11 +985,12 @@
 					<img src="assets/creator-assets/drawer-arrow.svg" />
 					Action History
 				</header>
-				<div class="action-history" ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)">
+				<div class="action-history" ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)" ng-class="{'selectedAction': historyPosition == item.index}">
 					{{item.context}}
 				</div>
 			</tree-history>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
+			<div id="backgroundcover" ng-click="saveAndCloseInventory()" ng-class="{ show: showInventoryBackgroundCover }"></div>
 			<tree-visualization data="treeData"
 				offset="treeOffset"
 				on-hover="onNodeHover(data)"

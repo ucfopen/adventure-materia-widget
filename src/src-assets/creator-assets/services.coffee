@@ -18,6 +18,11 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	# Iterator that generates node IDs
 	count = 1
 
+	# Iterator that generates item IDs
+	itemCount = 2
+
+	inventoryItems = []
+
 	# Self explanatory getter function
 	get = ->
 		treeData
@@ -35,6 +40,24 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 	incrementNodeCount = ->
 		count++
+
+	getItemCount = ->
+		itemCount
+
+	setItemCount = (val) ->
+		itemCount = val
+
+	incrementItemCount = ->
+		itemCount++
+
+	decrementItemCount = ->
+		itemCount--
+
+	getInventoryItems = ->
+		inventoryItems
+
+	setInventoryItems = (val) ->
+		inventoryItems = val
 
 	# Max depth is the maximum tree depth, used for determining height of the D3 canvas
 	getMaxDepth = ->
@@ -404,6 +427,91 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 		return
 
+	updateAllItems = (tree, updatedItem) ->
+		if tree.items
+			for item, index in tree.items
+				do (item, index) ->
+					if item.id is updatedItem.id
+						tree.items[index] = {
+							...item
+							name: updatedItem.name
+							description: updatedItem.description
+							icon: updatedItem.icon
+						}
+
+		if tree.requiredItems
+			for item in tree.requiredItems
+				do (item, index) ->
+					if item.id is updatedItem.id
+						tree.items[index] = {
+							...item
+							name: updatedItem.name
+							description: updatedItem.description
+							icon: updatedItem.icon
+						}
+
+		if tree.answers
+			for answer in tree.answers
+				if answer.requiredItems
+					for item, index in answer.requiredItems
+						do (item) ->
+							if item.id is updatedItem.id
+								answer.requiredItems[index] = {
+									...item
+									name: updatedItem.name
+									description: updatedItem.description
+									icon: updatedItem.icon
+								}
+
+		if !tree.contents then return
+
+		i = 0
+
+		while i < tree.contents.length
+
+			child = tree.contents[i]
+
+			updateAllItems child, updatedItem
+
+			i++
+
+		return
+
+	deleteItemFromAllNodes = (tree, deletedItem) ->
+		if tree.items
+			for item, index in tree.items
+				do (item) ->
+					if item.id is deletedItem.id
+						tree.items.splice index, 1
+
+		if tree.requiredItems
+			for item, index in tree.requiredItems
+				do (item) ->
+					if item.id is deletedItem.id
+						tree.requiredItems.splice index, 1
+
+		if tree.answers
+			for answer in tree.answers
+				if answer.requiredItems
+					for item, index in answer.requiredItems
+						do (item) ->
+							if item.id is deletedItem.id
+								answer.requiredItems.splice index, 1
+
+		if !tree.contents then return
+
+		i = 0
+
+		while i < tree.contents.length
+
+			child = tree.contents[i]
+
+			deleteItemFromAllNodes child, deletedItem
+
+			i++
+
+		return
+
 	# Probably deprecated??
 	findMaxDepth = (tree, depth=0) ->
 
@@ -431,12 +539,13 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			items: formatTreeDataForQset tree, []
 			options:
 				nodeCount: count
+				inventoryItems: inventoryItems
+				itemCount: itemCount
 
 
 	formatTreeDataForQset = (tree, items) ->
 
 		if !tree.children or (($filter('filter')(items, {nodeId : tree.id}, true)).length is 0)
-
 			itemData =
 				materiaType: "question"
 				id: null
@@ -447,7 +556,10 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					id: tree.id
 					parentId: tree.parentId
 					type: tree.type
+					redirectId: tree.redirectId
 				answers: []
+				items: if tree.items then tree.items else []
+				requiredItems: if tree.requiredItems then tree.requiredItems else []
 
 			question =
 				text: if tree.question then tree.question else ""
@@ -487,6 +599,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						link: answer.target
 						linkMode: answer.linkMode
 						feedback: answer.feedback
+						requiredItems: answer.requiredItems
+						hidden: answer.hidden
 
 				switch tree.type
 					when "shortanswer"
@@ -519,8 +633,11 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 		if qset.options.nodeCount then setNodeCount qset.options.nodeCount
 
-		angular.forEach qset.items, (item, index) ->
+		if qset.options.itemCount then setItemCount qset.options.itemCount
 
+		if qset.options.inventoryItems then setInventoryItems qset.options.inventoryItems
+
+		angular.forEach qset.items, (item, index) ->
 			node =
 				id: item.options.id
 				name: integerToLetters item.options.id
@@ -569,6 +686,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					linkMode: answer.options.linkMode
 					feedback: answer.options.feedback
 					id: generateAnswerHash()
+					requiredItems: answer.options.requiredItems
 
 				switch item.options.type
 					when "shortanswer"
@@ -579,6 +697,23 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						nodeAnswer.svg = answer.options.svg
 
 				node.answers.push nodeAnswer
+
+			angular.forEach item.items, (inventoryItem, index) ->
+				unless node.items then node.items = []
+				nodeItem =
+					name: inventoryItem.name
+					id: inventoryItem.id
+
+				node.items.push nodeItem
+
+			angular.forEach item.requiredItems, (requiredItem, index) ->
+				unless node.requiredItems then node.requiredItems = []
+
+				nodeItem =
+					name: requiredItem.name
+					id: requiredItem.id
+
+				node.requiredItems.push nodeItem
 
 			# Logic to append node to its intended position on the tree
 			if node.parentId is -1 then tree = node
@@ -601,6 +736,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				i = 0
 				previousCount = orphans.length
 
+		tree.inventoryItems = qset.options.inventoryItems || []
+
 		tree
 
 	validateTreeOnStart = (tree) ->
@@ -608,7 +745,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		nodes = queueNodesForValidation tree
 		ids = []
 		errors = []
-
 		ids = createIdArray nodes
 
 		angular.forEach nodes, (node, index) ->
@@ -622,6 +758,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						type: "missing_answer_node"
 
 					errors.push error
+				#
 
 			if node.hasLinkToOther or node.hasLinkToSelf
 
@@ -694,6 +831,9 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 						errors.push error
 
+			#f node.answers and
+
+
 		return errors
 
 
@@ -759,9 +899,16 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	getNodeCount : getNodeCount
 	setNodeCount : setNodeCount
 	incrementNodeCount : incrementNodeCount
+	getItemCount : getItemCount
+	setItemCount : setItemCount
+	incrementItemCount : incrementItemCount
+	getInventoryItems: getInventoryItems
+	setInventoryItems: setInventoryItems
 	getMaxDepth : getMaxDepth
 	findAnswersWithTarget : findAnswersWithTarget
 	updateAllAnswerLinks : updateAllAnswerLinks
+	updateAllItems: updateAllItems
+	deleteItemFromAllNodes: deleteItemFromAllNodes
 	findNode : findNode
 	findAndAdd : findAndAdd
 	findAndReplace : findAndReplace
@@ -799,6 +946,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		NODE_EDITED: "NODE_EDITED"
 		NODE_COPIED: "NODE_COPIED"
 		NODE_CONVERTED : "NODE_CONVERTED"
+		INVENTORY_EDITED: "INVENTORY_EDITED"
 
 	getActions = () ->
 		return actions
@@ -816,12 +964,16 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 			timestamp : Date.now()
 			tree: JSON.stringify treeSrv.createQSetFromTree tree # snapshots are converted into the equivalent Qset structure to remove unnecessary D3 info. Also reduces complexity for compareTrees below
 			nodeCount : treeSrv.getNodeCount()
+			itemCount : treeSrv.getItemCount()
 
 	addToHistory = (tree, action, context) ->
 		snapshot = createSnapshot tree, action, context
+		console.log("snapshot created: ")
+		console.log(snapshot)
 		history.push snapshot
 
-		if history.length > HISTORY_LIMIT then history.splice 0, 1 # not using spliceHistory here to avoid broadcasting tree.history.removed
+		if history.length > HISTORY_LIMIT
+			history.splice 0, 1 # not using spliceHistory here to avoid broadcasting tree.history.removed
 		$rootScope.$broadcast "tree.history.added"
 
 	spliceHistory = (index, distance = 1) ->
@@ -835,7 +987,8 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		# SOURCE is a tree from a snapshot (string)
 		# DIFF is the raw tree to be compared (must be converted to a Qset object and stringified before comparison)
 		diff = JSON.stringify treeSrv.createQSetFromTree diff
-
+		console.log(source)
+		console.log(diff)
 		return source == diff
 
 	getActions : getActions

@@ -14,6 +14,8 @@ Adventure.service "legacyQsetSrv", [() ->
 
 		parentNodeRefs = []
 		nodeCount = 0
+		itemCount = 0
+		inventoryItems = []
 
 		angular.forEach items, (item, index) ->
 
@@ -162,10 +164,18 @@ Adventure.service "legacyQsetSrv", [() ->
 			else if item.options.id is 0
 				item.options.parentId = -1
 
+
+		if qset.options.inventoryItems
+			inventoryItems = qset.options.inventoryItems
+		else
+			inventoryItems = []
+
 		newQset =
 			items: items
 			options:
 				nodeCount: nodeCount
+				itemCount: inventoryItems.length
+				inventoryItems: inventoryItems
 
 		return JSON.stringify newQset
 

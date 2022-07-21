@@ -1,12 +1,14 @@
 /* Adventure 2.0 Player Styles */
 
 @import '../../assets/icomoon.css';
+@import '../../assets/item-assets/style.css';
 
 /* Variable definitions */
 
 $black: #000000;
 $white: #ffffff;
 $red: #b90000;
+$red-darker: #950d05;
 $red-lighter: #de0000;
 $red-lightest: #ffd7d7;
 
@@ -63,6 +65,83 @@ body {
 
 	&.show-title {
 		display: block;
+	}
+
+	h1 {
+		display: inline-block;
+	}
+
+}
+
+button.show-inventory {
+	width:40px;
+	height:40px;
+	background:$white;
+	border: none;
+	border-radius:5px;
+	cursor: pointer;
+	z-index: 1001;
+	// Inventory z-index is 1000
+
+	display: inline-block;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+
+	font-size: 24px;
+	color: $blue;
+
+	&:focus {
+		outline: thick solid $blue-focus;
+	}
+
+	&:hover {
+		background: $gray-lightest;
+	}
+}
+
+.notif-message {
+	animation: 'notif-bounce' 0.6s infinite;
+	animation-direction: alternate;
+	animation-timing-function: ease-in-out;
+
+	z-index: 1;
+	position: absolute;
+	right: 10px;
+	top: 60px;
+
+	background: $blue-lighter;
+	color: $white;
+	box-shadow: $shadow-dialog;
+	opacity: 80%;
+
+	border-radius: 5px;
+	padding: 5px 10px;
+
+	font-size: 14px;
+	max-width: 100px;
+	text-align: center;
+
+	&::before {
+		position: absolute;
+	  content: "";
+	  width: 0px;
+	  height: 0px;
+	  border-bottom: 15px solid $blue-lighter;
+	  border-right: 15px solid transparent;
+	  border-top: 15px solid transparent;
+	  border-left: 15px solid transparent;
+	  top: -25px;
+	  right: 5px;
+	}
+}
+
+@keyframes notif-bounce {
+	0% {
+		top: 60px;
+	}
+	100% {
+		top: 65px;
 	}
 }
 
@@ -275,6 +354,16 @@ h1 {
 			counter-increment: q;
 			cursor: pointer;
 
+			&.nonselectable {
+				color: $gray-darker;
+				cursor: default;
+			}
+
+			&.nonselectable span {
+				font-style: italic;
+				font-size: 16px;
+			}
+
 			&:hover, &:focus {
 				color: $blue;
 			}
@@ -385,6 +474,122 @@ h1 {
 	&.show {
 		z-index: 12;
 		opacity: 0.5;
+	}
+}
+
+.inventory {
+	position: absolute;
+	z-index: -500;
+	width: 100%;
+	height: 100%;
+	top: 0%;
+	left: 0%;
+	opacity: 0;
+
+	background: rgba(55,55,55,0.75);
+
+	&.show {
+		z-index: 1000;
+		opacity: 1;
+	}
+
+	.inventory-container {
+		position: relative;
+		top: 50%;
+		left: 50%;
+		width: 540px;
+		height: 300px;
+
+		display: flex;
+		flex-direction: column;
+
+		margin-left: -270px;
+		margin-top: -170px;
+
+		border-radius: 5px;
+		background: #fff;
+
+		.inventory-header {
+			text-align:center;
+			background:$blue;
+			padding:10px 0px;
+			margin: 0;
+			color: $white;
+		}
+
+		.inventory-content {
+			display: flex;
+			flex-direction: row;
+			align-items: stretch;
+			height: 100%;
+
+			.inventory-items {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-content: flex-start;
+				overflow: auto;
+				flex-grow:2;
+
+				div.item {
+					padding: 10px;
+					margin: 5px;
+					border-radius: 20px;
+					max-height: 25px;
+
+					position: relative;
+				}
+
+				div.item:hover {
+					background: $blue-lightest;
+					cursor: pointer;
+				}
+
+				.new-item {
+					border-radius: 10px;
+					display: inline-block;
+					background-color: $red-lighter;
+					color: white;
+					font-size: 10px;
+					font-style: italic;
+					padding: 2px 5px;
+					margin: 0px 5px;
+					box-sizing:border-box;
+				}
+			}
+
+			.item-description {
+				flex-grow: 1;
+				background-color: $blue-lightest;
+				min-width: 200px;
+
+				.item-header {
+					display: flex;
+					flex-direction: row;
+					grid-gap: 20px;
+					align-items: center;
+
+
+					background: $blue-lighter;
+					height: 20px;
+					margin: 0;
+					padding: 10px;
+					color: $white;
+
+					h4 {
+						background: $blue-lighter;
+						height: 20px;
+						margin: 0;
+						padding: 10px;
+						color: $white;
+					}
+				}
+
+				p {
+					padding: 0 10px;
+				}
+			}
+		}
 	}
 }
 
@@ -576,8 +781,8 @@ rect, ellipse, polygon {
 			border: none;
 			border-radius: 5px;
 
-			color: #fff;
-			background: #e42b20;
+			color: $white;
+			background: $red;
 			box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 
 			font-size: 18px;
@@ -586,9 +791,13 @@ rect, ellipse, polygon {
 
 			cursor: pointer;
 
-			&:hover, &:focus {
-				background: #6c6c6c;
+			&:hover {
+				background: $red-darker;
 			}
+
+			 &:focus {
+				 outline: thick solid $blue-focus;
+			 }
 		}
 
 		.lightbox-video {
