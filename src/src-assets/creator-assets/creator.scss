@@ -64,6 +64,7 @@ $z-index-hidden: -1;
 $z-index-default: 0;
 $z-index-behind-cover: 5;
 $z-index-background-cover: 10;
+$z-index-dialog-background-cover: 75;
 $z-index-modal-low-priority: 25;
 $z-index-modal: 50;
 $z-index-modal-svg: 75;
@@ -186,7 +187,7 @@ div.fancy-toggle {
 
 /* Container formatting */
 
-#backgroundcover {
+#backgroundcover, #infobackgroundcover {
 	position: fixed;
 	top: 0px;
 	right: 0px;
@@ -198,6 +199,14 @@ div.fancy-toggle {
 	transition: all 0.5s ease;
 	&.show {
 		z-index: $z-index-background-cover;
+		opacity: 0.3;
+		transition: opacity 0.5s ease;
+	}
+}
+
+#infobackgroundcover {
+	&.show {
+		z-index: $z-index-dialog-background-cover;
 		opacity: 0.3;
 		transition: opacity 0.5s ease;
 	}
@@ -1557,6 +1566,7 @@ node-creation-selection-dialog {
 	.question-box {
 		width: $edit-popup-standard-question-width; // 80%
 		flex-grow: 2;
+		max-height: 300px;
 
 		border: solid 1px #cccccc;
 		border-radius: 3px;
@@ -1768,9 +1778,6 @@ node-creation-selection-dialog {
 
 		overflow-y: auto;
 
-		display: flex;
-		flex-direction: column;
-
 		&.long {
 			max-height: 242px;
 
@@ -1788,22 +1795,100 @@ node-creation-selection-dialog {
 			margin: 0px;
 			padding: 0px;
 
+			display: flex;
+			flex-direction: column;
+			grid-gap: 10px;
+
 			li {
 				width: 99%;
-				padding-left: 1%;
+				padding: 5px;
+				box-sizing: border-box;
 
 				background: $color-primary;
 
 				-webkit-transition: background 0.5s;
 				transition: background 0.5s;
 
-				input {
-					position: relative;
-					width: 40%;
-					height: 2em;
+				display: flex;
+				flex-direction: row;
+				grid-gap: 10px;
 
-					margin: 10px 0 10px 5px;
-					padding-left: 15px;
+				border-radius: 5px;
+
+				.answer-textareas {
+					flex-grow: 1;
+
+					display: flex;
+					flex-direction: column;
+					grid-gap: 10px;
+
+					.match-options {
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						font-size: 0.8em;
+						color: $gray-darker;
+
+						#characterSensitive {
+							margin-left: 20px;
+						}
+					}
+				}
+
+				.add-match-box {
+					display: flex;
+					flex-direction: row;
+					grid-gap: 10px;
+
+					input {
+						width: 100%;
+					}
+
+					button.add-match {
+						width: 110px;
+					}
+				}
+
+				.add-answer-items {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					grid-gap: 15px;
+
+					> * {
+						font-size: 10pt;
+					}
+
+					span {
+						color: $gray;
+					}
+
+					select {
+						min-width: 200px;
+						height: 2em;
+					}
+				}
+
+				.answer-options {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					text-align: center;
+					grid-gap: 20px;
+
+					color: $gray-darker;
+
+					div {
+						flex-grow: 2;
+						display: flex;
+						flex-direction: column;
+						justify-content: start;
+					}
+				}
+
+				input {
+					height: 2em;
+					padding: 5px 10px;
 
 					border: solid 1px #cccccc;
 					border-radius: 3px;
@@ -1813,10 +1898,16 @@ node-creation-selection-dialog {
 					background: $color-selection-hover;
 				}
 
+				button.delete-button {
+					width: 30px;
+					height: 30px;
+				}
+
 				button.answer-node-select, button.add-item {
 
 					color: $white;
 					background: $color-accent;
+					height: fit-content;
 
 					&:hover {
 						background: $color-accent-highlight;
@@ -1828,12 +1919,31 @@ node-creation-selection-dialog {
 					}
 				}
 
+				button.answer-node-select {
+					height: 50px;
+					width: 50px;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					border-radius: 50%;
+				}
 
 				.answer-items {
 					width: 100%;
-					padding: 10px 0;
 					display: flex;
+					flex-direction: column;
 					gap: 10px;
+					box-sizing: border-box;
+
+					background: $gray-lighter;
+					border: solid 1px #cccccc;
+					border-radius: 5px;
+					padding: 10px;
+
+					p {
+						color: $gray;
+						font-size: 0.8em;
+					}
 
 					button:hover {
 						background: $red;
@@ -1843,46 +1953,11 @@ node-creation-selection-dialog {
 
 				&.short-answer-mode {
 
-					position: relative;
-					padding: 5px 0px;
-
-					button.delete-button {
-						position: absolute;
-						top: 10px;
-						left: 10px;
-					}
-
-					button.answer-node-select {
-						position: relative;
-						top: -73px;
-						left: 5px;
-						// position: absolute;
-						// right: 30px;
-						// top: 10px;
-					}
-
-					input {
-						width: 582px; // 80%
-						margin: 2px 0px 2px 47px;
-
-						&.shared-row {
-							width: 490px;
-						}
-					}
-
 					.possible-answers-box {
-						position: relative;
-						display: inline-block;
-						width: 587px; // 80%
-
-						left: 42px;
-
-						margin: 5px 0 5px 5px;
-						padding: 5px;
-
 						background: $gray-lighter;
 						border: solid 1px #cccccc;
 						border-radius: 5px;
+						padding: 10px;
 
 						button {
 							margin: 0px 2px 2px 0px;
@@ -1902,21 +1977,17 @@ node-creation-selection-dialog {
 
 				&.unmatched-answers-row {
 
-					padding: 10px 0px 10px 1%;
-					margin-bottom: 10px;
-
 					background: $gray-lightest;
 					border-radius: 5px;
 
+					.unmatched-left-padding {
+						width: 30px;
+						height: 30px;
+					}
+
 					.unmatched-answers-box {
-						position: relative;
-						display: inline-block;
-						width: 587px; // 80%
-
-						left: 35px;
-
-						margin: 5px 0 0 5px;
 						padding: 5px;
+						margin: 5px 0;
 
 						background: $gray-lighter;
 						border: solid 1px #cccccc;
@@ -1931,26 +2002,13 @@ node-creation-selection-dialog {
 							}
 						}
 					}
-
-					input {
-						width: 582px; // 80%
-						margin: 5px 0px 5px 40px;
-					}
-
-					button.answer-node-select {
-						position: relative;
-						top: -33px;
-						// position: absolute;
-						// right: 35px;
-						// top: 20px;
-					}
 				}
 
 			}
 		}
 	}
 
-	div.answer-options {
+	div.add-answer-options {
 		margin: 0px 0px 0px 20px;
 		// position: absolute;
 		// bottom: 20px;
@@ -2756,4 +2814,51 @@ import-type-selection {
 
 .hidden {
 	z-index: $z-index-hidden;
+}
+
+
+.info-icon {
+	border-radius: 50%;
+	border: 2px solid $blue-focus;
+	color: $blue-lighter;
+	font-style: italic;
+	height: 30px;
+	width: 30px;
+	padding: 0;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.info-dialog {
+	z-index: $z-index-modal-dialog;
+	position: absolute;
+	top: 200px;
+	left: 20%;
+	width: $misc-popup-width;
+
+	background: $white;
+	border: 3px solid $blue-focus;
+	border-radius: 10px;
+	padding: 10px;
+
+	div {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 10px;
+		grid-gap: 10px;
+	}
+
+	button {
+		position: absolute;
+		border-radius: 50%;
+		border: 1px solid $blue-focus;
+		right: -10px;
+		top: -10px;
+		height: 35px;
+		width: 35px;
+	}
 }

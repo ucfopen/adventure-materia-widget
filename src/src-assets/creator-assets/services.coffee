@@ -605,6 +605,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				switch tree.type
 					when "shortanswer"
 						itemAnswerData.options.matches = answer.matches
+						itemAnswerData.options.caseSensitive = answer.caseSensitive
+						itemAnswerData.options.characterSensitive = answer.characterSensitive
 						if answer.isDefault then itemAnswerData.options.isDefault = true
 
 					when "hotspot"
@@ -691,6 +693,9 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				switch item.options.type
 					when "shortanswer"
 						nodeAnswer.matches = answer.options.matches
+						nodeAnswer.caseSensitive = answer.options.caseSensitive
+						nodeAnswer.characterSensitive = answer.options.characterSensitive
+
 						if answer.options.isDefault then nodeAnswer.isDefault = true
 
 					when "hotspot"

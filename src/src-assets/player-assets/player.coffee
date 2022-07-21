@@ -267,7 +267,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	# Do stuff when the user submits something in the SA answer box
 	$scope.handleShortAnswerInput = ->
 
-		response = $scope.response.toLowerCase()
+		response = $scope.response
 		$scope.response = ""
 
 		# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
@@ -279,8 +279,30 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			# Loop through each match to see if it matches the recorded response
 			for j in [0...$scope.q_data.answers[i].options.matches.length]
 
+
 				# TODO make matching algo more robust
-				if $scope.q_data.answers[i].options.matches[j].toLowerCase().trim() is response
+				match = $scope.q_data.answers[i].options.matches[j]
+
+				# Remove whitespace
+				match = match.trim().split('').filter((letter) -> letter.match(/\W/)).join()
+				response = response.trim().split('').filter((letter) -> letter.match(/\W/)).join()
+
+				# If matches are not whitespace or character sensitive
+				if (! $scope.q_data.answers[i].options.characterSensitive)
+					# Remove any special characters
+					# Look at alphanumeric characters only
+					match = match.split('').filter((letter) -> letter.match(/\w/)).join()
+					response = response.split('').filter((letter) -> letter.match(/\w/)).join()
+
+				# If matches are not case sensitive
+				if (! $scope.q_data.answers[i].options.caseSensitive)
+					match = match.toLowerCase()
+					response = response.toLowerCase()
+
+				console.log(match)
+				console.log(response)
+
+				if match is response
 
 					link = ~~$scope.q_data.answers[i].options.link # is parsing required?
 

@@ -516,38 +516,55 @@
 					<ul>
 						<li class="unmatched-answers-row"
 							ng-if="displayNodeCreation == SHORTANS">
-							<div class="unmatched-answers-box">
-								<p><span>Unmatched Answers:</span> Used if the response doesn't match any possible answers you provided.</p>
+							<div class="unmatched-left-padding"></div>
+							<div class="answer-textareas">
+								<div class="unmatched-answers-box">
+									<p><span>Unmatched Answers:</span> Used if the response doesn't match any possible answers you provided.</p>
+								</div>
+								<input type="text" ng-model="answers[0].feedback" placeholder="Enter Optional Feedback" />
 							</div>
-							<input type="text" ng-model="answers[0].feedback" placeholder="Enter Optional Feedback" />
-							<button type="button"
-								class="answer-node-select"
-								ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
-								ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+							<div class="answer-options">
+								<p>Choose Destination</p>
+								<div>
+									<button type="button"
+										class="answer-node-select"
+										ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
+										ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target)}}
+									</button>
+								</div>
+							</div>
 
 						</li>
 						<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
 							<button type="button"
 								class="delete-button"
 								ng-click="removeAnswerPreCheck($index, $event)">X</button>
-							<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
-							<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
-							<button type="button"
-								class="answer-node-select"
-								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
-								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}
-							</button>
-							<div class="add-answer-items">
-								<span>(Optional) Required Items: </span>
-								<select ng-options="item.name for item in inventoryItems" ng-model="answerSelectedItem">
-								</select>
-								<button class="add-item" ng-click="addRequiredItemToAnswer(answerSelectedItem, answer)">Add</button>
+							<div class="answer-textareas">
+								<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
+								<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
+								<div class="add-answer-items">
+									<span>(Optional) Required Items: </span>
+									<select ng-options="item.name for item in inventoryItems" ng-model="answerSelectedItem">
+									</select>
+									<button class="add-item" ng-click="addRequiredItemToAnswer(answerSelectedItem, answer)">Add</button>
+									<button class="info-icon" ng-click="displayInfoDialog('Require the player to have certain items in their inventory to select this answer and move to the next destination. Create items on the widget home screen.')">i</button>
+								</div>
+								<div class="answer-items">
+									<p ng-hide="answer.requiredItems.length">Items required for this answer to appear in the player will be shown here. Click an item to decrease its count.</p>
+									<button type="button" ng-class="{'flashItemBox' : flashItemBox == true && $index == itemIndex && currentAnswer == answer}"
+										ng-repeat="item in answer.requiredItems"
+										ng-click="removeRequiredItemFromAnswer(item, answer)">{{item.name}} ({{item.count}})</button>
+								</div>
 							</div>
-							<div class="answer-items">
-								<p ng-hide="answer.requiredItems.length">Items required for this answer to appear in the player will be shown here. Click an item to decrease its count.</p>
-								<button type="button" ng-class="{'flashItemBox' : flashItemBox == true && $index == itemIndex && currentAnswer == answer}"
-									ng-repeat="item in answer.requiredItems"
-									ng-click="removeRequiredItemFromAnswer(item, answer)">{{item.name}} ({{item.count}})</button>
+							<div class="answer-options">
+								<p>Choose Destination</p>
+								<div>
+									<button type="button"
+										class="answer-node-select"
+										ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+										ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}
+									</button>
+								</div>
 							</div>
 						</li>
 
@@ -560,27 +577,43 @@
 								class="delete-button"
 								ng-click="removeAnswerPreCheck($index, $event)"
 								ng-disabled="$index == 0">X</button>
-							<input type="text"
-								class="shared-row"
-								ng-model="newMatch"
-								placeholder="Add a possible answer. Matches are not case sensitive."
-								enter-submit="addAnswerMatch($index)"></input>
-							<button type="button"
-								class="important-button"
-								ng-click="addAnswerMatch($index)">Add Match</button>
-							<div class="possible-answers-box">
-								<p ng-hide="answer.matches.length">Possible answers will be shown here. Click an answer to remove it.</p>
-								<button type="button"
-									ng-repeat="match in answer.matches"
-									ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
+							<div class="answer-textareas">
+								<div class="add-match-box">
+									<input type="text"
+										class="shared-row"
+										ng-model="newMatch"
+										placeholder="Add a possible answer. Matches are case insensitive by default."
+										enter-submit="addAnswerMatch($index)"></input>
+									<button type="button"
+										class="important-button add-match"
+										ng-click="addAnswerMatch($index)">Add Match</button>
+								</div>
+								<div class="possible-answers-box">
+									<p ng-hide="answer.matches.length">Possible answers will be shown here. Click an answer to remove it.</p>
+									<button type="button"
+										ng-repeat="match in answer.matches"
+										ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
+								</div>
+								<input type="text"
+									ng-model="answer.feedback"
+									placeholder="Enter Optional Feedback" />
+								<div class="match-options">
+									<input type="checkbox"
+										ng-model="answer.caseSensitive" id="caseSensitive"/>
+									<label for="caseSensitive">Make Case Sensitive</label>
+									<input type="checkbox"
+										ng-model="answer.characterSensitive" id="characterSensitive"/>
+									<label for="characterSensitive">Make Special Character Sensitive</label>
+								</div>
 							</div>
-							<input type="text"
-								ng-model="answer.feedback"
-								placeholder="Enter Optional Feedback" />
-							<button type="button"
-								class="answer-node-select"
-								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
-								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
+							<div class="answer-options">
+								<p>Choose Destination</p>
+								<button type="button"
+									class="answer-node-select"
+									ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+									ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}
+								</button>
+							</div>
 						</li>
 					</ul>
 				</div>
@@ -807,7 +840,7 @@
 					<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NONSCORING">
 						<span>End Points do not provide scores when the widget is in Non-Scoring mode.</span>
 					</div>
-					<div class="answer-options">
+					<div class="add-answer-options">
 						<button class="add-answer important-button"
 							type="button"
 							ng-click="newAnswer()"
@@ -989,8 +1022,16 @@
 					{{item.context}}
 				</div>
 			</tree-history>
+			<div info-dialog class="info-dialog" ng-show="showInfoDialog">
+				<div>
+					<p class="info-icon">i</p>
+					<p>{{infoMessage}}</p>
+				</div>
+				<button class="icon-cross" ng-click="showInfoDialog = false"></button>
+			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
 			<div id="backgroundcover" ng-click="saveAndCloseInventory()" ng-class="{ show: showInventoryBackgroundCover }"></div>
+			<div id="infobackgroundcover" ng-click="showInfoDialog = false" ng-class="{ show: showInfoDialog }"></div>
 			<tree-visualization data="treeData"
 				offset="treeOffset"
 				on-hover="onNodeHover(data)"

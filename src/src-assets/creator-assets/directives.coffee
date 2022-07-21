@@ -1332,6 +1332,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 				angular.forEach node.answers, (answer, index) ->
 					answer.text = null
 					answer.matches = []
+					answer.caseSensitive = false
+					answer.characterSensitive = false
 
 				# Create the new node associated with the [Unmatched Response] answer
 				newDefaultId = $scope.addNode $scope.nodeTools.target, $scope.BLANK
@@ -1346,10 +1348,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 					items: []
 					matches: []
 					isDefault: true
-					options: {
-						caseSensitive: false
-						whitespaceSensitive: false
-					}
+					caseSensitive: false
+					characterSensitive: false
 
 				# The new answer has to take the 0 index spot in the answers array
 				node.answers.splice 0, 0, newDefault
@@ -1987,12 +1987,11 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				id: treeSrv.generateAnswerHash()
 				requiredItems: []
 
-			# Add a matches property to the answer object if it's a short answer question.
+			# Add a matches and case sensitivity property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
 				newAnswer.matches = []
-				newAnswer.options =
-					caseSensitive: false
-					whitespaceSensitive: false
+				newAnswer.caseSensitive = false
+				newAnswer.characterSensitive = false
 			$scope.answers.push newAnswer
 
 			# Refresh all answerLinks references as some have changed
@@ -2106,6 +2105,11 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			if $scope.editedNode.media.align is "left" or $scope.editedNode.media.align is "right" then $scope.editedNode.media.align = "top"
 			else $scope.editedNode.media.align = "right"
 
+
+		$scope.displayInfoDialog = (message) ->
+			$scope.infoMessage = message
+			$scope.showInfoDialog = true
+
 		$scope.saveAndClose = ->
 			$scope.hideCoverAndModals()
 			# auto-hide set to false here because the timer in the displayNodeCreation $watch will handle it
@@ -2131,10 +2135,37 @@ Adventure.directive "shortAnswerSet", ['treeSrv', (treeSrv) ->
 
 				while j < $scope.answers[i].matches.length
 
-					matchTo = $scope.answers[i].matches[j].toLowerCase()
+					# Remove whitespace
+					matchTo = $scope.answers[i].matches[j].trim()
+					matchTo = matchTo.split('').filter((letter) -> letter.match(/\W/)).join()
 
-					if matchTo.localeCompare($scope.newMatch.toLowerCase()) is 0
-						$scope.toast "This match already exists!"
+					matchFrom = $scope.newMatch.trim()
+					matchFrom = matchFrom.split('').filter((letter) -> letter.match(/\W/)).join()
+
+					console.log(matchTo)
+					console.log(matchFrom)
+
+					matchErrorMessage = "This match already exists!"
+
+					if (! $scope.answers[i].characterSensitive)
+						# If matches DO NOT have same special characters, customize toast message
+						if ! (matchTo.toLowerCase().localeCompare(matchFrom.toLowerCase()) is 0)
+							matchErrorMessage += " Make whitespace and character sensitive to add match."
+
+						matchTo = matchTo.split('').filter((letter) -> letter.match(/\w/)).join()
+
+						matchFrom = matchFrom.split('').filter((letter) -> letter.match(/\w/)).join()
+
+					if (! $scope.answers[i].caseSensitive)
+						# If matches DIFFER in case, customize toast message
+						if ! (matchTo.localeCompare(matchFrom) is 0)
+							matchErrorMessage += " Make case sensitive to add match."
+
+						matchTo = matchTo.toLowerCase()
+						matchFrom = matchFrom.toLowerCase()
+
+					if matchTo.localeCompare(matchFrom) is 0
+						$scope.toast matchErrorMessage
 						return
 
 					j++
@@ -2204,18 +2235,18 @@ Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHist
 			$rootScope.$broadcast "editedNode.media.updated"
 ]
 
-# Directive for the item selection modal
-Adventure.directive "itemSelection", [() ->
+# Directive for the info dialog
+Adventure.directive "infoDialog", [ '$rootScope','$timeout', '$sce', ($rootScope, $timeout, $sce) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
-]
+		$scope.$watch "showInfoDialog", (newVal, oldVal) ->
+			if newVal
+				$scope.showBackgroundCover = true
 
-# Directive for the item manager dialog
-Adventure.directive "itemManagerDialog", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', '$sce', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout, $sce) ->
-	restrict: "E",
-	link: ($scope, $element, $attrs) ->
-
+		$scope.hideInfoDialog = () ->
+			$scope.showInfo = false
+			$scope.hideCoverAndModals()
 ]
 
 Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (legacyQsetSrv, $timeout, $sce) ->
