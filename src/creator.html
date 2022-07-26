@@ -113,7 +113,7 @@
 									auto-select></textarea>
 							</div>
 						</div>
-						<div class="item-options">
+						<div class="item-options" ng-class="{'show': editingIndex == $index}">
 							<button type="button"
 							class="important-button"
 							ng-click="handleEditItem(item, $index, $event)">{{editingIndex == $index ? 'Save' : 'Edit'}}</button>
@@ -547,10 +547,10 @@
 									<select ng-options="item.name for item in inventoryItems" ng-model="answerSelectedItem">
 									</select>
 									<button class="add-item" ng-click="addRequiredItemToAnswer(answerSelectedItem, answer)">Add</button>
-									<button class="info-icon" ng-click="displayInfoDialog('Require the player to have certain items in their inventory to select this answer and move to the next destination. Create items on the widget home screen.')">i</button>
+									<button class="info-icon" ng-click="displayInfoDialog('Require the player to have certain items in their inventory to be able to select this answer. You can create items on the widget home screen.')">i</button>
 								</div>
 								<div class="answer-items">
-									<p ng-hide="answer.requiredItems.length">Items required for this answer to appear in the player will be shown here. Click an item to decrease its count.</p>
+									<p ng-hide="answer.requiredItems.length">Items required for this answer to be selectable will appear here. Click an item to decrease its count or remove it.</p>
 									<button type="button" ng-class="{'flashItemBox' : flashItemBox == true && $index == itemIndex && currentAnswer == answer}"
 										ng-repeat="item in answer.requiredItems"
 										ng-click="removeRequiredItemFromAnswer(item, answer)">{{item.name}} ({{item.count}})</button>
@@ -600,10 +600,10 @@
 								<div class="match-options">
 									<input type="checkbox"
 										ng-model="answer.caseSensitive" id="caseSensitive"/>
-									<label for="caseSensitive">Make Case Sensitive</label>
+									<label for="caseSensitive">Make Matches Case Sensitive</label>
 									<input type="checkbox"
 										ng-model="answer.characterSensitive" id="characterSensitive"/>
-									<label for="characterSensitive">Make Special Character Sensitive</label>
+									<label for="characterSensitive">Make Matches Special Character Sensitive ('$', '#', '%', etc.)</label>
 								</div>
 							</div>
 							<div class="answer-options">
@@ -667,12 +667,12 @@
 								placeholder="Enter optional feedback here."
 								ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
 							<div class="hotspot-required-items">
-								<p ng-hide="answers[hotspotAnswerManager.answerIndex].requiredItems.length">Required items will be shown here. Click an item to remove it.</p>
+								<p ng-hide="answers[hotspotAnswerManager.answerIndex].requiredItems.length">Required items will be shown here. Click an item to decrease its count or remove it.</p>
 								<button type="button" ng-class="{'flashItemBox' : flashItemBox == true && $index == itemIndex}"
 									ng-repeat="item in answers[hotspotAnswerManager.answerIndex].requiredItems"
 									ng-click="removeRequiredItemFromAnswer(item, answers[hotspotAnswerManager.answerIndex])">{{item.name}} ({{item.count}})</button>
 							</div>
-							<div>
+							<div class="select-required-items">
 								<select ng-options="item.name for item in inventoryItems" ng-model="answerSelectedItem">
 								</select>
 								<button ng-click="addRequiredItemToAnswer(answerSelectedItem, answers[hotspotAnswerManager.answerIndex])">Add</button>
@@ -871,7 +871,7 @@
 						ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
 						tabindex="0"></span>
 					</h4>
-					<ul class="list-items">
+					<ul class="list-items give-items">
 						<li
 							ng-repeat="item in items"
 							ng-click="manageItem(item)"
@@ -882,7 +882,7 @@
 								<span class="icon-{{item.icon}}"></span>
 							</div>
 							{{item.name}} ({{item.count ? item.count : 1}})
-							<div class="item-options">
+							<div class="item-options" ng-show="hoverItem">
 								<div class="item-quantity">
 									<div>
 										<span>Quantity:</span>
@@ -893,15 +893,15 @@
 								<button class="delete-button" type="button" ng-click="removeItemFromNode(item, $index)">Remove</button>
 							</div>
 						</li>
-						<li class="options-bar add-item">
-							<div>
-								<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
-								</select>
-								<button ng-click="addItemToNode(selectedItem)">Add Item</button>
-							</div>
-							<button ng-click="toggleItemPopup()">Done</button>
-						</li>
 					</ul>
+					<div class="options-bar add-item">
+						<div>
+							<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+							</select>
+							<button ng-click="addItemToNode(selectedItem)">Add Item</button>
+						</div>
+						<button ng-click="toggleItemPopup()">Done</button>
+					</div>
 				</div>
 				<div ng-show="showRequiredItems" class="required-items item-modal">
 					<h4>

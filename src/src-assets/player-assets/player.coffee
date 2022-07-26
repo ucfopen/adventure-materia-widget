@@ -284,10 +284,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				match = $scope.q_data.answers[i].options.matches[j]
 
 				# Remove whitespace
-				match = match.trim().split('').filter((letter) -> letter.match(/\W/)).join()
-				response = response.trim().split('').filter((letter) -> letter.match(/\W/)).join()
+				match = match.trim().split('').filter((letter) -> letter.match(/\w/)).join()
+				response = response.trim().split('').filter((letter) -> letter.match(/\w/)).join()
 
-				# If matches are not whitespace or character sensitive
+				# If matches are not character sensitive
 				if (! $scope.q_data.answers[i].options.characterSensitive)
 					# Remove any special characters
 					# Look at alphanumeric characters only

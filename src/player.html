@@ -26,7 +26,7 @@
 			<h1>{{title}}</h1>
 		</header>
 
-		<button ng-class="{'icon-backpack': !showInventory, 'icon-cross': showInventory, 'show-inventory' : !hideInventoryBtn}" ng-click="toggleInventory()"></button>
+		<button ng-class="{'icon-backpack': !showInventory, 'icon-cross': showInventory, 'show-inventory' : !hideInventoryBtn}" ng-click="toggleInventory()" ng-show="inventory[0]"></button>
 		<div class="notif-message" ng-if="showNotif">
 			<p>{{ notifMessage }}</p>
 		</div>
@@ -207,7 +207,7 @@
 					xmlns:xlink="http://www.w3.org/1999/xlink"
 					xml:space="preserve">
 					<g
-						ng-if="checkInventory(answer) == true"
+						ng-if="!checkInventory(answer)[0]"
 						ng-repeat="answer in answers"
 						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})"
 						data-label="{{answer.text}}"

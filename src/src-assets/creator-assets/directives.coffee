@@ -2137,13 +2137,10 @@ Adventure.directive "shortAnswerSet", ['treeSrv', (treeSrv) ->
 
 					# Remove whitespace
 					matchTo = $scope.answers[i].matches[j].trim()
-					matchTo = matchTo.split('').filter((letter) -> letter.match(/\W/)).join()
+					matchTo = matchTo.split('').filter((letter) -> ! letter.match(/\W/g)).join()
 
 					matchFrom = $scope.newMatch.trim()
-					matchFrom = matchFrom.split('').filter((letter) -> letter.match(/\W/)).join()
-
-					console.log(matchTo)
-					console.log(matchFrom)
+					matchFrom = matchFrom.split('').filter((letter) -> ! letter.match(/\W/)).join()
 
 					matchErrorMessage = "This match already exists!"
 
@@ -2532,15 +2529,18 @@ Adventure.directive "hotspotAnswerManager", [() ->
 
 				# Get bounds of the answerManager and the entire tree container to check if the manager is off-screen
 				bounds = angular.element($element)[0].getBoundingClientRect()
-				container = document.getElementById("tree-svg").getBoundingClientRect()
+				# Bounds
+				managerMaxHeight = 400
+				managerMaxWidth = 400
+				container = document.getElementById("adventure-container").getBoundingClientRect()
 
 				# Move the manager so its back into frame if it's out of bounds
-				if (yOffset + bounds.height) > container.height
-					diffY = (yOffset + bounds.height) - container.height - 5
+				if (yOffset + managerMaxHeight) > container.height
+					diffY = (yOffset + managerMaxHeight) - container.height - 5
 					yOffset -= diffY
 
-				if (xOffset + bounds.width) > container.width
-					diffX = (xOffset + bounds.width) - container.width - 5
+				if (xOffset + managerMaxWidth) > container.width
+					diffX = (xOffset + managerMaxWidth) - container.width - 5
 					xOffset -= diffX
 
 				# Finally, update the position of the manager so the X/Y coords properly align with the hotspot canvas
