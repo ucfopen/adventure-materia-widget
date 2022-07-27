@@ -1720,21 +1720,35 @@ node-creation-selection-dialog {
 			flex-direction: row;
 		}
 
+		&.align-bottom, &.align-top {
+			align-items: center;
+
+			.media-box {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+
+				.image-box {
+					display: flex;
+					flex-direction: column;
+				}
+			}
+		}
+
 		&.align-bottom {
 			flex-direction: column-reverse;
-			align-items: center;
 		}
 
 		&.align-top {
 			flex-direction: column;
-			align-items: center;
 		}
 	}
 
 	.media-box {
 		// position: absolute;
 		// top: 69px;
-		width: 340px;
+		// width: 340px;
+		max-height: 300px;
 
 		border: solid 1px $gray-lighter;
 
@@ -1783,7 +1797,8 @@ node-creation-selection-dialog {
 			// left: 4%;
 			z-index: $z-index-modal-svg;
 
-			width: 90%;
+			width: 100%;
+			box-sizing: border-box;
 			background: rgba(255,255,255,0.9);
 			border: solid 1px $gray;
 			border-radius: 2px;
