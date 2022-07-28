@@ -80,16 +80,24 @@
 			<item-manager ng-show="showItemManager" class="item-modal">
 				<h4>Edit Items</h4>
 				<ul class="list-items">
+					<!-- <li class="list-header">
+						<div>Icon</div>
+						<div class="item-content">
+							<div class="item-name">Name</div>
+							<div class="item-description">Description</div>
+						</div>
+					</li> -->
 					<li
-						ng-repeat="item in inventoryItems"
+						ng-repeat="item in inventoryItems track by item.id"
 						ng-mouseover="hoverItem = true"
 						ng-mouseout="hoverItem = false"
 					>
 						<div class="item-icon">
-							<span ng-show="item.icon" class="icon-{{item.icon}}"></span>
+							<span class="icon-{{item.icon.icomoon_name}}" ng-class="{'show': item.icon.icomoon}" ng-if="!item.icon.url"></span>
+							<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
 							<button
 								ng-show="editingIndex == $index"
-								ng-click="openItemIconSelector(item)"
+								ng-click="toggleItemIconSelector(item)"
 							>Select Icon</button>
 						</div>
 						<div class="item-content">
@@ -138,15 +146,20 @@
 			<div item-icon-selector ng-show="showItemIconSelector" class="item-modal">
 				<h4>Icon Selector</h4>
 				<ul class="icons-list">
-					<li class="icon-{{icon}}" ng-repeat="icon in icons" ng-click="selectIcon(icon)" ng-class="{'selectedIcon' : currentItem.icon == icon}"></li>
+					<li class="icon-{{icon.icomoon_name}}" ng-repeat="icon in icons" ng-click="handleIconClick(icon)" ng-class="{'selectedIcon' : currentItem.icon == icon}">
+						<img ng-if="icon.url" ng-src="{{icon.url}}" ng-alt="{{icon.alt}}"/>
+					</li>
 				</ul>
 				<div class="options-bar">
-					<button type="button"
-						class="important-button"
-						ng-click="addNewIcon()">Upload SVG Icon</button>
+					<div>
+						<button type="button"
+							class="important-button"
+							ng-click="manageNewIcon()">Upload Icon</button>
+						<button type="button" class="important-button delete-button" ng-click="removeSelectedIcon()" ng-if="currentItem.icon.url">Remove Selected Icon</button>
+					</div>
 					<button type="button"
 						class="important-button save-button"
-						ng-click="showItemIconSelector = false">Done</button>
+						ng-click="toggleItemIconSelector()">Done</button>
 				</div>
 			</div>
 			<debug-qset-generator ng-show="showQsetGenerator">
@@ -874,23 +887,40 @@
 						tabindex="0"></span>
 					</h4>
 					<ul class="list-items give-items">
+						<!-- <li class="list-header">
+							<div>Icon</div>
+							<div class="item-content">
+								<div class="item-name">Name</div>
+								<div class="item-description">Description</div>
+							</div>
+							<div class="item-options">
+							</div>
+						</li> -->
 						<li
 							ng-repeat="item in items"
 							ng-click="manageItem(item)"
 							ng-mouseover="hoverItem = true"
 							ng-mouseout="hoverItem = false"
 						>
-							<div class="item-icon" ng-show="item.icon">
-								<span class="icon-{{item.icon}}"></span>
+							<div class="item-icon">
+								<span class="icon-{{item.icon.icomoon_name}}" ng-class="{'show': item.icon.icomoon}" ng-if="!item.icon.url"></span>
+								<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
 							</div>
-							{{item.name}} ({{item.count ? item.count : 1}})
-							<div class="item-options" ng-show="hoverItem">
+							<div class="item-content">
+								<div class="item-name">
+									<span>{{item.name}}</span>
+								</div>
+								<div class="item-description">
+									<span class="description">{{item.description}}</span>
+								</div>
+							</div>
+							<div class="item-options" ng-class="{'show': hoverItem}">
 								<div class="item-quantity">
 									<div>
 										<span>Quantity:</span>
 										<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
 									</div>
-									<span>(A negative number indicates item loss)</span>
+									<span>(A negative number will subtract that amount from the player's inventory)</span>
 								</div>
 								<button class="delete-button" type="button" ng-click="removeItemFromNode(item, $index)">Remove</button>
 							</div>
@@ -921,7 +951,7 @@
 							ng-mouseout="hoverItem = false"
 						>
 							{{item.name}} ({{item.count ? item.count : 1}})
-							<div class="item-options">
+							<div class="item-options" ng-class="{'show': hoverItem}">
 								<div class="item-quantity">
 									<span>Quantity:</span>
 									<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
@@ -946,7 +976,7 @@
 					ng-repeat="tooltip in hoveredNode.tooltips">
 					<span class="tooltip-title"
 					ng-if="!tooltip.givesItems">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
-					<span class="tooltip-title" ng-if="tooltip.givesItems">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems">{{item.name}} ({{item.count ? item.count : 1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.givesItems">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems">{{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
 				</div>
 			</node-tooltips>
 			<import-type-selection ng-show="showImportTypeSelection">

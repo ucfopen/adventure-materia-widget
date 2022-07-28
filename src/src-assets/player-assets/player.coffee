@@ -34,7 +34,8 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
-
+			console.log('qset')
+			console.log(qset)
 			#Convert an old qset prior to running the widget
 			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
@@ -88,6 +89,8 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		else if q_data.questions[0].text != "" then $scope.layout = q_data.options.asset.align
 		else $scope.layout = "image-only"
 
+		console.log(q_data)
+
 		# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 		# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 		try
@@ -113,22 +116,20 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			id : q_data.options.id
 			materiaId: q_data.id
 			options: q_data.options
-			items: q_data.items
-			requiredItems: q_data.requiredItems
 
 		# Check if player's inventory contains the required items to view this question
-		if !! $scope.checkInventory($scope.question)[0]
-			handleRestrictedNode()
+		# if !! $scope.checkInventory($scope.question)[0]
+		# 	handleRestrictedNode()
 
 		# Remove new item alerts
 		for i in $scope.inventory
 			i.new = false
 
 		# Add items to player's inventory
-		if $scope.question.items
+		if $scope.question.options.items
 			action = 'added to'
 
-			for q_i in $scope.question.items
+			for q_i in $scope.question.options.items
 				do (q_i) ->
 					hasItem = false
 					# Check to see if player already has item
@@ -149,15 +150,19 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							name: q_i.name
 							count: if q_i.count then q_i.count else 1
 							id: q_i.id
-							icon: q_i.icon
+							icon: {
+								...q_i.icon
+								url: if q_i.icon.url then Materia.Engine.getMediaUrl q_i.icon.id else ''
+							}
 						}
+
 						$scope.inventory.push(newItem)
 
-			$scope.notifMessage = if $scope.question.items.length > 1 then "(#{$scope.question.items.length}) Items updated!" else if $scope.question.items.length > 0 then "#{$scope.question.items[0].name} (#{Math.abs($scope.question.items[0].count)}) has been #{action} your inventory!"
+			$scope.notifMessage = if $scope.question.options.items.length > 1 then "(#{$scope.question.options.items.length}) Items updated!" else if $scope.question.options.items.length > 0 then "#{$scope.question.options.items[0].name} (#{Math.abs($scope.question.options.items[0].count)}) has been #{action} your inventory!"
 
 			if $scope.notifRegister isnt null then $timeout.cancel $scope.notifRegister
 
-			if $scope.question.items.length > 0
+			if $scope.question.options.items.length > 0
 				$scope.showNotif = true
 			else
 				# Hide inventory notifications
@@ -203,7 +208,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if $scope.question.type is $scope.HOTSPOT then $scope.layout = "hotspot"
 		if $scope.question.layout isnt "text-only"
 			if $scope.question.options.asset.type is "image"
-				image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
+				image_url = Materia.Engine.getMediaUrl q_data.options.asset.id
 				$scope.question.image = image_url
 			else
 				$scope.question.video = $sce.trustAsResourceUrl($scope.question.options.asset.url)
@@ -233,6 +238,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	# Checks to see if player inventory contains all required items
 	# Returns array of missing items
 	$scope.checkInventory = (answer) ->
+		console.log('hi')
 		missingItems = []
 		skip = false
 		angular.forEach answer.requiredItems, (item) ->
@@ -240,6 +246,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				playerItem.id is item.id and playerItem.count >= item.count
 			if ! hasRequiredItem
 				missingItems.push(item)
+
+		console.log(missingItems)
+		console.log(answer.requiredItems)
+		console.log($scope.inventory)
 		return missingItems
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)

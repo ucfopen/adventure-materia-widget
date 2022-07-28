@@ -35,19 +35,23 @@
 				<div class="inventory-content">
 					<div class="inventory-items">
 						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)">
-							<span ng-if="item.new" class="new-item">NEW!</span><span ng-if="item.icon" class="icon-{{item.icon}}"></span>
+							<span ng-if="item.new" class="new-item">NEW!</span><span ng-if="item.icon.icomoon" class="icon-{{item.icon.icomoon_name}}"></span>
+							<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
 							{{item.name}}
 						</div>
 					</div>
 					<div class="item-description" ng-show="selectedItem">
 						<div class="item-header">
-							<span ng-if="selectedItem.icon" class="icon-{{selectedItem.icon}}"></span>
+							<span ng-if="selectedItem.icon.icomoon" class="icon-{{selectedItem.icon.icomoon_name}}"></span>
+							<img ng-if="selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" ng-alt="{{selectedItem.icon.alt}}"/>
 							<h4>
 								{{selectedItem.name}}
 							</h4>
 						</div>
-						<p>{{selectedItem.description}}<p>
-						<p>Count: {{selectedItem.count}}<p>
+						<p class="small">{{selectedItem.description ? 'Description' : 'No description'}}</p>
+						<p>{{selectedItem.description}}</p>
+						<p class="small">Count</p>
+						<p>{{selectedItem.count}}</p>
 						<p ng-show="selectedItem.numberOfUsesLeft != -999">Number of Uses Left: {{selectedItem.numberOfUsesLeft}}<p>
 					</div>
 				</div>
@@ -114,7 +118,7 @@
 				<button
 					class="answer"
 					ng-repeat="answer in answers"
-					ng-show="!checkInventory(answer)[0]"
+					ng-if="!checkInventory(answer)[0]"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
 					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
 					data-index="{{answer.index}}"
@@ -123,7 +127,7 @@
 				<button
 					class="answer nonselectable"
 					ng-repeat="answer in answers"
-					ng-show="checkInventory(answer)[0]"
+					ng-if="checkInventory(answer)[0]"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
 					tabindex="0">) {{answer.text}}<span> Requires item(s): <span ng-repeat="item in answer.requiredItems">{{item.name}} ({{item.count}})<span ng-show="!$last">, </span></span></button>

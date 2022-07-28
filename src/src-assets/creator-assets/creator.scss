@@ -548,6 +548,17 @@ button {
 		}
 	}
 
+	&.important-button {
+		background: $color-accent;
+		color: $white;
+
+		font-weight: 900;
+
+		&:hover {
+			background: $color-accent-highlight;
+		}
+	}
+
 	&.delete-button {
 		background: $red;
 		color: $white;
@@ -558,17 +569,6 @@ button {
 
 		&:disabled {
 			background: $gray;
-		}
-	}
-
-	&.important-button {
-		background: $color-accent;
-		color: $white;
-
-		font-weight: 900;
-
-		&:hover {
-			background: $color-accent-highlight;
 		}
 	}
 }
@@ -932,6 +932,12 @@ node-tooltips {
 			flex-grow: 2;
 		}
 
+		// &.list-header {
+		// 	color: $gray-darker;
+		// 	border-bottom: 1px solid $blue-lightest;
+		// 	font-weight: bold;
+		// }
+
 		.item-icon {
 			display: flex;
 			flex-direction: column;
@@ -944,6 +950,17 @@ node-tooltips {
 				display: flex;
 				align-items: center;
 				justify-content: center;
+				visibility: hidden;
+
+				&.show {
+					visibility: visible;
+				}
+			}
+
+			img {
+				width: 35px;
+				height: 35px;
+				object-fit: cover;
 			}
 		}
 
@@ -952,6 +969,11 @@ node-tooltips {
 			flex-direction: column;
 			flex-grow: 2;
 
+			.item-description {
+				color: $gray-darker;
+				font-style: italic;
+			}
+
 			textarea, input {
 				width: 100%;
 				box-sizing: border-box;
@@ -959,7 +981,6 @@ node-tooltips {
 		}
 
 		.item-options {
-			font-style: italic;
 			visibility: hidden;
 			display: flex;
 			justify-content: space-around;
@@ -972,6 +993,12 @@ node-tooltips {
 			.item-quantity {
 				display: flex;
 				flex-direction: column;
+				max-width: 250px;
+				margin-right: 30px;
+
+				> span {
+					font-style: italic;
+				}
 
 				div {
 					display: flex;
@@ -1035,6 +1062,13 @@ node-tooltips {
 			justify-content: center;
 			padding: 0;
 			margin: 0;
+			border: 2px solid transparent;
+
+			img {
+				width: 35px;
+				height: 35px;
+				object-fit: cover;
+			}
 
 			&:hover {
 				cursor: pointer;
@@ -1521,15 +1555,12 @@ node-creation-selection-dialog {
 
 .node-creation-screen {
 	position: relative;
-	// position: fixed;
-	// left: 50%;
 	z-index: $z-index-modal;
 
 	width: 80%;
 	max-width: 1000px;
 	height: 90%;
 	margin: auto;
-	// margin: 5px 0px 0px -400px;
 
 	border-radius: 10px;
 	background: $color-primary;
@@ -1540,43 +1571,14 @@ node-creation-selection-dialog {
 	flex-direction: column;
 	justify-content: space-between;
 
-	// &.short {
-	// 	max-height: 520px;
-	//
-	// 	@media screen and (max-height: $edit-popup-standard-height + 69) {
-	// 		top: 10px;
-	// 		max-height: 550px;
-	// 	}
-	// }
-	//
-	// &.long {
-	// 	max-height: 620px;
-	//
-	// 	@media screen and (max-height: $edit-popup-standard-height + 69) {
-	// 		top: 10px;
-	// 		max-height: 450px;
-	// 	}
-	// }
-
 	&.hotspot {
 		max-height: 650px;
 		height: 100%;
-		//
-		// @media screen and (max-height: $edit-popup-standard-height + 69) {
-		// 	top: 10px;
-		// 	width: $edit-popup-width + 15;
-		// 	max-height: 535px;
-		// }
 
 		textarea {
 			resize: none;
 		}
 	}
-
-	// @media screen and (max-height: $edit-popup-standard-height + 69) {
-	// 	top: 10px;
-	// 	max-height: 450px;
-	// }
 
 	h2 {
 		width: 100%;
@@ -1602,59 +1604,11 @@ node-creation-selection-dialog {
 
 		font-size: 2em;
 
-		// resize: none;
-
-		// @media screen and (max-height: $edit-popup-standard-height + 69) {
-		// 	min-height: 100%;
-		// }
-		//
-		// &.expanded {
-		// 	max-height: 325px;
-		//
-		// 	@media screen and (max-height: $edit-popup-standard-height + 69) {
-		// 		max-height: 250px;
-		// 	}
-		// }
-		//
-		// &.tiny {
-		// 	width: $edit-popup-content-width-full - 4;
-		// 	height: 50px;
-		//
-		// 	margin-bottom: 5px;
-		//
-		// 	font-size: 1.8em;
-		// }
-		//
-		// &.shared {
-		// 	width: $edit-popup-content-width-half;
-		// }
-		//
-		// &.align-top {
-		// 	width: $edit-popup-content-width-full;
-		// 	height: 95px;
-		// }
-		//
-		// &.align-bottom {
-		// 	position: absolute;
-		// 	top: 306px;
-		// 	width: $edit-popup-content-width-full;
-		// 	height: 95px;
-		//
-		// 	@media screen and (max-height: $edit-popup-standard-height + 69) {
-		// 		top: 206px;
-		// 	}
-		// }
-		//
-		// &.align-right {
-		// 	margin: 20px 20px 30px 380px;
-		// }
-
 		&.tiny {
 			max-height: 2em;
 		}
 
 		@media screen and (max-height: $edit-popup-standard-height + 69) {
-			// max-height: 100px;
 			font-size: 1em;
 
 			transition: all 0.1s ease;
@@ -1678,10 +1632,6 @@ node-creation-selection-dialog {
 	}
 
 	#big-upload-button {
-
-		// position: absolute;
-		// top: 69px;
-
 		text-align: center;
 		max-height: 100px;
 		display: flex;
@@ -1694,10 +1644,6 @@ node-creation-selection-dialog {
 			width: 100%;
 			font-size:48px;
 		}
-
-		// @media screen and (max-height: $edit-popup-standard-height + 69) {
-		// 	top: 85px;
-		// }
 	}
 
 	.question-media-box {
@@ -1708,9 +1654,7 @@ node-creation-selection-dialog {
 
 		margin: $edit-popup-padding;
 		grid-gap: $edit-popup-padding;
-		//overflow-y: auto;
 		padding: 2px;
-		//min-height: 75px;
 
 		&.align-left {
 			flex-direction: row-reverse;
@@ -1745,56 +1689,19 @@ node-creation-selection-dialog {
 	}
 
 	.media-box {
-		// position: absolute;
-		// top: 69px;
-		// width: 340px;
 		max-height: 300px;
 
 		border: solid 1px $gray-lighter;
 
 		text-align: center;
 
-		// &.align-right {
-		// 	right: 20px;
-		// }
-		//
-		// &.align-left {
-		// 	left: 20px;
-		// }
-		//
-		// &.align-top {
-		// 	position: relative;
-		// 	top: 0px;
-		// 	width: 80%;
-		// 	margin-left: auto;
-		// 	margin-right: auto;
-		//
-		// 	div.media-toolbar {
-		// 		width: 100%;
-		// 	}
-		// }
-		//
-		// &.align-bottom {
-		// 	position: absolute;
-		// 	top: 69px;
-		// 	left: 50%;
-		// 	width: 602px; // alternative to 80% width
-		// 	margin-left: -301px;
-		//
-		// 	div.media-toolbar {
-		// 		width: 100%;
-		// 	}
-		// }
-
 		img {
 			max-width: 100%;
 			max-height: 104px;
+			object-fit: cover;
 		}
 
 		input.image-alt-text {
-			// position: absolute;
-			// bottom: 2px;
-			// left: 4%;
 			z-index: $z-index-modal-svg;
 
 			width: 100%;
@@ -2585,9 +2492,6 @@ node-creation-selection-dialog {
 				align-items: center;
 
 				button {
-					// position: absolute;
-					// top: 15px;
-					// right: 20px;
 
 					&.managed {
 						color: $white;

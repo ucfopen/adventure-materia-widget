@@ -750,33 +750,11 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			if newVal
 				treeSrv.setInventoryItems(newVal)
 
-		$scope.newItemName = ''
+		$scope.$watch "icons", (newVal, oldVal) ->
+			if newVal
+				console.log(newVal)
 
-		$scope.icons = [
-			'pencil',
-			'image',
-			'headphones',
-			'folder-open',
-			'map',
-			'wrench',
-			'gift',
-			'aid-kit',
-			'lab',
-			'star-full',
-			'smile2',
-			'sad2',
-			'heart',
-			'flag',
-			'leaf',
-			'trophy',
-			'hammer',
-			'key',
-			'binoculars',
-			'phone',
-			'book',
-			'camera',
-			'eyedropper'
-		]
+		$scope.newItemName = ''
 
 		$scope.addNewItem = () ->
 			if $scope.newItemName.trim() != ''
@@ -786,24 +764,19 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					description: ''
 					count: 1
 					# numberOfUsesLeft: -999
-					icon: ''
+					icon: null
 				treeSrv.incrementItemCount()
 				$scope.inventoryItems.push(newItem)
-				# inventory = treeSrv.getInventoryItems()
-				# inventory.push(newItem)
-				# treeSrv.setInventoryItems(inventory)
 
 				$scope.newItemName = ''
 				# Collapse any open item editors
 				$scope.editingIndex = -1
 
 		$scope.removeItemFromInventoryItems = (index, item) ->
-			# inventory = treeSrv.getInventoryItems()
 			if item in $scope.inventoryItems
 				$scope.inventoryItems.splice index, 1
-				# inventory.splice index, 1
-				# treeSrv.setInventoryItems(inventory)
 				treeSrv.deleteItemFromAllNodes $scope.treeData, item
+				treeSrv.decrementItemCount()
 				# Collapse any open item editors
 				$scope.editingIndex = -1
 
@@ -814,20 +787,40 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				$scope.editingIndex = index
 			else
 				inventory = treeSrv.getInventoryItems()
+				# Reflect changes in tree
 				treeSrv.updateAllItems $scope.treeData, inventory[$scope.editingIndex]
 				$scope.toast "Item '#{inventory[$scope.editingIndex].name}' saved!"
 				$scope.editingIndex = -1
 
-		$scope.openItemIconSelector = (item) ->
-			$scope.showItemIconSelector = true
-			$scope.currentItem = item
+		$scope.toggleItemIconSelector = (item = null) ->
+			if $scope.showItemIconSelector
+				$scope.showItemIconSelector = false
+				$scope.editingIcons = false
+			else
+				$scope.showItemIconSelector = true
+				$scope.editingIcons = true
+				$scope.currentItem = item
 
-		$scope.selectIcon = (icon) ->
-			# inventory = treeSrv.getInventoryItems()
-			# inventory[inventory.indexOf($scope.currentItem)].icon = icon
-			# treeSrv.setInventoryItems(inventory)
-			$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = icon
-			$scope.showItemIconSelector = false
+		$scope.handleIconClick = (icon) ->
+			if $scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon is icon
+				# Deselect icon
+				$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = null
+			else
+				# Select icon
+				$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = icon
+			treeSrv.updateAllItems $scope.treeData, $scope.currentItem
+
+		$scope.manageNewIcon = () ->
+			Materia.CreatorCore.showMediaImporter()
+
+		$scope.removeSelectedIcon = () ->
+			# Remove icon from icon list
+			$scope.icons.splice $scope.icons.map((i) -> i.id).indexOf($scope.currentItem.icon.id), 1
+
+			# Remove icon from current item
+			$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = null
+
+			treeSrv.updateAllItems $scope.treeData, $scope.currentItem
 
 		$scope.saveAndCloseInventory = () ->
 			inventory = treeSrv.getInventoryItems()
@@ -836,7 +829,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				lastIndex = treeHistorySrv.getHistorySize() - 1
 				# Check if changes were made
 				peek = treeHistorySrv.retrieveSnapshot(lastIndex)
-				unless treeHistorySrv.compareTrees(peek.tree, $scope.treeData)
+				if treeHistorySrv.compareTrees(peek.tree, $scope.treeData)
 					treeHistorySrv.addToHistory $scope.treeData, historyActions.INVENTORY_EDITED, "Inventory Items Edited"
 					# Update item data across all nodes
 					for item in inventory
@@ -935,7 +928,7 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 			treeSrv.setNodeCount snapshot.nodeCount
 			treeSrv.setItemCount snapshot.itemCount
 			treeSrv.setInventoryItems tree.inventoryItems
-			$scope.inventoryItems = tree.inventoryItems || []
+			$scope.inventoryItems = tree.inventoryItems
 
 			$scope.historyPosition = index
 ]
@@ -1945,6 +1938,8 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				answer.requiredItems.push(newItem)
 				$scope.flashItem(answer, item)
 
+				$scope.checkIfUnreachable(item, answer)
+
 		$scope.flashItem = (answer, item) ->
 			for i, index in answer.requiredItems when i.id is item.id
 				$scope.itemIndex = index
@@ -1952,6 +1947,13 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$timeout(() ->
 				$scope.flashItemBox = false
 			, 500)
+
+		$scope.checkIfUnreachable = (item, answer) ->
+			# TO DO
+			# Check for whether the player can get the
+			# required items needed to select this answer
+			# Display a warning in creator if not
+			return
 
 		$scope.removeRequiredItemFromAnswer = (item, answer) ->
 			item.count -= 1

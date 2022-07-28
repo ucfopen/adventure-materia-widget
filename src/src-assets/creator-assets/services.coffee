@@ -23,6 +23,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 	inventoryItems = []
 
+	customIcons = []
+
 	# Self explanatory getter function
 	get = ->
 		treeData
@@ -58,6 +60,12 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 	setInventoryItems = (val) ->
 		inventoryItems = val
+
+	getCustomIcons = ->
+		customIcons
+
+	setCustomIcons = (val) ->
+		customIcons = val
 
 	# Max depth is the maximum tree depth, used for determining height of the D3 canvas
 	getMaxDepth = ->
@@ -540,6 +548,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			options:
 				nodeCount: count
 				inventoryItems: inventoryItems
+				customIcons: customIcons
 				itemCount: itemCount
 
 
@@ -557,9 +566,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					parentId: tree.parentId
 					type: tree.type
 					redirectId: tree.redirectId
+					items: if tree.items then tree.items else []
 				answers: []
-				items: if tree.items then tree.items else []
-				requiredItems: if tree.requiredItems then tree.requiredItems else []
 
 			question =
 				text: if tree.question then tree.question else ""
@@ -576,6 +584,14 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 				if tree.media.type is 'image'
 					itemData.options.asset.alt = if tree.media.alt then tree.media.alt else ''
+
+			if itemData.options.items
+				for item in itemData.options.items
+					if item.icon and ! item.icon.icomoon
+						item = {
+							...item.icon
+							materiaType: "asset"
+						}
 
 			switch tree.type
 				when "mc"
@@ -638,6 +654,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		if qset.options.itemCount then setItemCount qset.options.itemCount
 
 		if qset.options.inventoryItems then setInventoryItems qset.options.inventoryItems
+
+		if qset.options.icons then setIcons qset.options.icons
 
 		angular.forEach qset.items, (item, index) ->
 			node =
@@ -703,22 +721,27 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 				node.answers.push nodeAnswer
 
-			angular.forEach item.items, (inventoryItem, index) ->
-				unless node.items then node.items = []
-				nodeItem =
-					name: inventoryItem.name
-					id: inventoryItem.id
+			if item.options.items
+				angular.forEach item.options.items, (inventoryItem, index) ->
+					unless node.items then node.items = []
+					console.log('item')
+					console.log(inventoryItem)
+					nodeItem =
+						name: inventoryItem.name
+						id: inventoryItem.id
+						count: inventoryItem.count || 1
+						icon: inventoryItem.icon || null
 
-				node.items.push nodeItem
+					node.items.push nodeItem
 
-			angular.forEach item.requiredItems, (requiredItem, index) ->
-				unless node.requiredItems then node.requiredItems = []
-
-				nodeItem =
-					name: requiredItem.name
-					id: requiredItem.id
-
-				node.requiredItems.push nodeItem
+			# angular.forEach item.requiredItems, (requiredItem, index) ->
+			# 	unless node.requiredItems then node.requiredItems = []
+			#
+			# 	nodeItem =
+			# 		name: requiredItem.name
+			# 		id: requiredItem.id
+			#
+			# 	node.requiredItems.push nodeItem
 
 			# Logic to append node to its intended position on the tree
 			if node.parentId is -1 then tree = node
@@ -741,7 +764,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				i = 0
 				previousCount = orphans.length
 
-		tree.inventoryItems = qset.options.inventoryItems || []
+		# tree.inventoryItems = qset.options.inventoryItems || []
 
 		tree
 
@@ -907,8 +930,11 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	getItemCount : getItemCount
 	setItemCount : setItemCount
 	incrementItemCount : incrementItemCount
+	decrementItemCount : decrementItemCount
 	getInventoryItems: getInventoryItems
 	setInventoryItems: setInventoryItems
+	getCustomIcons: getCustomIcons
+	setCustomIcons: setCustomIcons
 	getMaxDepth : getMaxDepth
 	findAnswersWithTarget : findAnswersWithTarget
 	updateAllAnswerLinks : updateAllAnswerLinks
@@ -973,8 +999,6 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 
 	addToHistory = (tree, action, context) ->
 		snapshot = createSnapshot tree, action, context
-		console.log("snapshot created: ")
-		console.log(snapshot)
 		history.push snapshot
 
 		if history.length > HISTORY_LIMIT
@@ -992,8 +1016,6 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		# SOURCE is a tree from a snapshot (string)
 		# DIFF is the raw tree to be compared (must be converted to a Qset object and stringified before comparison)
 		diff = JSON.stringify treeSrv.createQSetFromTree diff
-		console.log(source)
-		console.log(diff)
 		return source == diff
 
 	getActions : getActions

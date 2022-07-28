@@ -108,6 +108,34 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	$scope.inventoryItems = []
 
+	$scope.icons = []
+
+	$scope.icomoon_icons = [
+		'pencil',
+		'image',
+		'headphones',
+		'folder-open',
+		'map',
+		'wrench',
+		'gift',
+		'aid-kit',
+		'lab',
+		'star-full',
+		'smile2',
+		'sad2',
+		'heart',
+		'flag',
+		'leaf',
+		'trophy',
+		'hammer',
+		'key',
+		'binoculars',
+		'phone',
+		'book',
+		'camera',
+		'eyedropper'
+	]
+
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 
 		# Returning from a suspended node creation screen, don't do anything
@@ -197,6 +225,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		$scope.showRequiredItems = false
 		$scope.showItemManager = false
 		$scope.showItemIconSelector = false
+		$scope.editingIcons = false
 
 		$scope.resetNewNodeManager()
 
@@ -211,10 +240,17 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 			$scope.inventoryItems = []
 
+			for icomoon_icon in $scope.icomoon_icons
+				formattedIcon =
+					icomoon_name: icomoon_icon
+					icomoon: true
+				$scope.icons.push(formattedIcon)
+
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.WIDGET_INIT, "Widget Initialized"
 
 	materiaCallbacks.initExistingWidget = (title,widget,qset,version,baseUrl) ->
-
+		console.log('initializing widget')
+		console.log(qset)
 		showIntroDialog = false
 
 		if qset
@@ -222,12 +258,27 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
 			$scope.$apply () ->
+				console.log('qset')
+				console.log(qset)
 				$scope.title = title
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
 
 				$scope.inventoryItems = qset.options.inventoryItems || []
+
+				treeSrv.setCustomIcons qset.options.customIcons
+
+				$scope.icons = []
+
+				for icomoon_icon in $scope.icomoon_icons
+					formattedIcon =
+						icomoon_name: icomoon_icon
+						icomoon: true
+					$scope.icons.push(formattedIcon)
+
+				for custom_icon in qset.options.customIcons
+					$scope.icons.push(custom_icon)
 
 				# Optional qset parameters based on score mode
 				if qset.options.scoreMode then $scope.scoreMode = qset.options.scoreMode
@@ -241,6 +292,9 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 				treeSrv.set $scope.treeData
 				treeSrv.updateAllAnswerLinks $scope.treeData
+
+				console.log('tree data')
+				console.log($scope.treeData)
 
 				treeHistorySrv.addToHistory $scope.treeData, historyActions.EXISTING_WIDGET_INIT, "Existing Widget Initialized"
 
@@ -261,27 +315,46 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			qset.options.scoreMode = $scope.scoreMode
 			qset.options.internalScoreMessage = $scope.internalScoreMessage
 			qset.options.inventoryItems = treeSrv.getInventoryItems()
+			qset.options.customIcons = treeSrv.getCustomIcons()
+			console.log('saving widget')
+			console.log(qset)
 			Materia.CreatorCore.save $scope.title, qset, 2
 
 	materiaCallbacks.onSaveComplete = (title, widget, qset, version) -> true
 
 	# onMediaImportComplete is required by the creator core
-	# Since it's not intrinsically tied to any one dom element, and does no dom manipulation,
-	# we just update the editedNode object and kick off a broadcast that directives will listen for
+	# if editing a node, tie the media to that node
+	# if editing icons, add the media to icons
 	materiaCallbacks.onMediaImportComplete = (media) ->
-		unless $scope.editedNode then return
+		if $scope.editingIcons and $scope.currentItem
+			newIcon =
+				icomoon_name: ""
+				icomoon: false
+				type: "image"
+				url: Materia.CreatorCore.getMediaUrl media[0].id
+				id: media[0].id
+				alt: ""
+			$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = newIcon
+			$scope.icons.push(newIcon)
+			treeSrv.setCustomIcons [
+				...treeSrv.getCustomIcons(),
+				newIcon
+			]
+			$scope.$apply()
 
-		$scope.editedNode.media =
-			type: "image"
-			url: Materia.CreatorCore.getMediaUrl media[0].id
-			id: media[0].id
-			align: "right"
-			alt: ""
+		else if $scope.editedNode
+			$scope.editedNode.media =
+				type: "image"
+				url: Materia.CreatorCore.getMediaUrl media[0].id
+				id: media[0].id
+				align: "right"
+				alt: ""
 
-		$scope.mediaReady = true
-		$scope.showImage = true;
+			$scope.mediaReady = true
+			$scope.showImage = true;
 
-		$rootScope.$broadcast "editedNode.media.updated"
+			$rootScope.$broadcast "editedNode.media.updated"
+
 
 	# handles hover behavior of associated tooltips
 	# (associated answer & validation warnings)
@@ -371,7 +444,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			parentId: parent
 			type: type
 			contents: []
-			requiredItems: []
+			# requiredItems: []
 			items: []
 
 		treeSrv.findAndAdd $scope.treeData, parent, newNode
@@ -398,7 +471,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			contents: []
 			pendingTarget: data.target
 			items: []
-			requiredItems: []
+			# requiredItems: []
 
 		if data.specialCase
 			if data.specialCase is "otherNode"
@@ -424,6 +497,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		qset.options.scoreMode = $scope.scoreMode
 		qset.options.internalScoreMessage = $scope.internalScoreMessage
 		qset.options.inventoryItems = treeSrv.getInventoryItems()
+		qset.options.customIcons = treeSrv.getCustomIcons()
 
 		$scope.showQsetGenerator = true
 		$scope.generatedQset = JSON.stringify qset, null, 2

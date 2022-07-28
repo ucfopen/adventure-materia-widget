@@ -189,7 +189,7 @@ h1 {
 
 		img {
 			max-width: 100%;
-			height: fit-content;
+			height: 100%;
 		}
 	}
 
@@ -268,6 +268,15 @@ h1 {
 		grid-gap: 10px;
 	}
 
+	&.right, &.left {
+		img {
+			height: fit-content;
+		}
+		h2 {
+			width: 100%;
+		}
+	}
+
 	&.right {
 		flex-direction: row;
 	}
@@ -278,10 +287,6 @@ h1 {
 
 	&.top, &.bottom {
 		align-items: center;
-
-		img {
-			height: 100%;
-		}
 	}
 
 	&.top {
@@ -594,20 +599,34 @@ h1 {
 				flex-direction: row;
 				flex-wrap: wrap;
 				align-content: flex-start;
-				overflow: auto;
 				flex-grow:2;
+				height: 247px;
+				overflow: auto;
 
 				div.item {
-					padding: 10px;
-					margin: 5px;
+					padding: 15px;
+					margin: 15px;
 					border-radius: 20px;
 					max-height: 25px;
 
 					position: relative;
+
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					grid-gap: 10px;
+
+					border: 2px solid $blue-lightest;
+
+					img {
+						width: 35px;
+						height: 35px;
+						object-fit: cover;
+					}
 				}
 
 				div.item:hover {
-					background: $blue-lightest;
+					box-shadow: $shadow-dialog;
 					cursor: pointer;
 				}
 
@@ -621,6 +640,10 @@ h1 {
 					padding: 2px 5px;
 					margin: 0px 5px;
 					box-sizing:border-box;
+
+					position: absolute;
+					left: 0;
+					top: 0;
 				}
 			}
 
@@ -629,18 +652,34 @@ h1 {
 				background-color: $blue-lightest;
 				min-width: 200px;
 
+				.small {
+					font-style: italic;
+					font-size: 0.75em;
+					margin-bottom: 0;
+					border-bottom: 1px solid $blue-lighter;
+				}
+
+				p {
+					margin-top: 0;
+				}
+
 				.item-header {
 					display: flex;
 					flex-direction: row;
 					grid-gap: 20px;
 					align-items: center;
 
-
 					background: $blue-lighter;
 					height: 20px;
 					margin: 0;
 					padding: 10px;
 					color: $white;
+
+					img {
+						width: 35px;
+						height: 35px;
+						object-fit: cover;
+					}
 
 					h4 {
 						background: $blue-lighter;
