@@ -34,8 +34,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
-			console.log('qset')
-			console.log(qset)
 			#Convert an old qset prior to running the widget
 			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
@@ -84,12 +82,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		for n in [0...$scope.qset.items.length]
 			if $scope.qset.items[n].options.id is questionId
 				q_data = $scope.qset.items[n]
+		# MWDK changes id of first item
+		if questionId is 0
+			q_data = $scope.qset.items[0]
 
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else if q_data.questions[0].text != "" then $scope.layout = q_data.options.asset.align
 		else $scope.layout = "image-only"
-
-		console.log(q_data)
 
 		# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 		# Instead, parse in advance, catch the error, and warn the user that the text was nasty
@@ -152,7 +151,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							id: q_i.id
 							icon: {
 								...q_i.icon
-								url: if q_i.icon.url then Materia.Engine.getMediaUrl q_i.icon.id else ''
+								url: if q_i.icon and q_i.icon.url then Materia.Engine.getMediaUrl q_i.icon.id else ''
 							}
 						}
 
@@ -238,7 +237,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	# Checks to see if player inventory contains all required items
 	# Returns array of missing items
 	$scope.checkInventory = (answer) ->
-		console.log('hi')
 		missingItems = []
 		skip = false
 		angular.forEach answer.requiredItems, (item) ->
@@ -246,10 +244,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				playerItem.id is item.id and playerItem.count >= item.count
 			if ! hasRequiredItem
 				missingItems.push(item)
-
-		console.log(missingItems)
-		console.log(answer.requiredItems)
-		console.log($scope.inventory)
 		return missingItems
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
@@ -258,6 +252,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if link is -1 then return _end()
 
 		$scope.selectedAnswer = $scope.q_data.answers[index].text
+
+		missingItems = $scope.checkInventory($scope.q_data.answers[index].options)
+
+		if missingItems[0]
+			string = missingItems.map((item) -> "#{item.name} (amount: #{item.count});")
+			$scope.feedback = "Requires the items: #{string}"
+			return
 
 		# Disable the hotspot label before moving on, if it's a hotspot
 		if $scope.type is $scope.HOTSPOT
@@ -308,9 +309,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				if (! $scope.q_data.answers[i].options.caseSensitive)
 					match = match.toLowerCase()
 					response = response.toLowerCase()
-
-				console.log(match)
-				console.log(response)
 
 				if match is response
 
@@ -577,7 +575,6 @@ Adventure.directive "dynamicMediaScale", [() ->
 
 			scaledWidth = if ($scope.layout is "image-only") or ((width * ratio) < (containerWidth / 2)) then (width * ratio) else (containerWidth * 2 / 5)
 			scaledHeight = if ($scope.question.options.asset.type is "video") then ((height * ratio) + "px") else "auto"
-			console.log(scaledWidth)
 
 			# Apply scaling
 			$attrs.$set "style", "width:"+scaledWidth+"px;height:"+scaledHeight+";"

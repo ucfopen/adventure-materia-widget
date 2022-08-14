@@ -1988,6 +1988,8 @@ node-creation-selection-dialog {
 		justify-content: space-between;
 		padding: 10px;
 
+		z-index: $z-index-modal-svg;
+
 		background: $gray-lightest;
 		border-bottom-left-radius: 10px;
 		border-bottom-right-radius: 10px;
@@ -2110,35 +2112,41 @@ node-creation-selection-dialog {
 
 	hotspot-manager {
 		position: relative;
-		display: block;
+		// display: block;
 		width: 100%;
-		height: 400px;
 		flex-grow: 2;
+
+		display: flex;
+		flex-direction: column;
+		
+		border: solid 1px $gray-lighter;
+
+		@media screen and (max-height: 1000px) {
+			& {
+				height: 300px;
+			}
+		}
 
 		.image-container {
 			position: relative;
 			display: block;
 			width: $edit-popup-content-width-full;
 			height: 400px;
+			overflow: auto;
+			overflow-x: hidden;
 
 			margin: auto;
 
-			border: solid 1px $gray-lighter;
-
 			text-align: center;
+
+			@media screen and (max-height: 1000px) {
+				& {
+					height: 300px;
+				}
+			}
 
 			@media screen and (max-height: $edit-popup-standard-height + 69) {
 				margin-top: 0px;
-			}
-
-			#uploadButton {
-				display: block;
-				margin-top: 100px;
-				margin-left: auto;
-				margin-right: auto;
-
-				padding: 10px 15px;
-				font-size: 15px;
 			}
 
 			svg#hotspot-canvas {
@@ -2188,37 +2196,89 @@ node-creation-selection-dialog {
 
 				z-index: $z-index-modal + 1;
 				max-width: 100%;
-				max-height: 90%;
+				//max-height: 90%;
+				height: 400px;
 			}
 		}
 
-		input.hotspot-alt-text {
+		#hotspot-label {
+			position:absolute;
+			z-index: $z-index-modal-dialog - 1;
+
+			max-width: 180px;
+
+			padding: 8px;
+
+			border-radius: 5px;
+			color: #fff;
+			background: rgba(0,0,0,0.8);
+			font-weight: normal;
+			font-size:0.8em;
+
+			cursor: pointer;
+
+			&.hidden {
+				z-index: $z-index-hidden;
+			}
+		}
+
+		svg#polygon-svg-artboard {
+			display: block;
 			position: absolute;
-			z-index: $z-index-modal-dialog;
-			left: 2px;
-			bottom: 38px;
+			width: 698px;
+			height: 400px;
+			z-index: $z-index-modal-svg + 1;
 
-			width: 40%;
+			background: $white;
+			opacity: 0.7;
+		}
+	}
 
-			background: rgba(255,255,255,0.9);
+	
 
-			border: solid 1px $gray;
-			border-radius: 2px;
+	.image-options-container {
+		width: 100%;
+
+		#uploadButton {
+			display: block;
+			margin-top: 100px;
+			margin-left: auto;
+			margin-right: auto;
+
+			padding: 10px 15px;
+			font-size: 15px;
 		}
 
 		hotspot-toolbar {
-			position: absolute;
+			position: fixed;
 			display: block;
 			z-index: $z-index-modal-dialog;
 
-			bottom: 0px;
+			bottom: 65px;
 
-			width: $edit-popup-content-width-full;
+			display: flex;
+			flex-direction: column;
+
+			//width: $edit-popup-content-width-full;
 			height: 30px;
 
 			padding-top: 6px;
 
 			background-color: rgba(0, 0, 0, 0.6);
+			
+			input.hotspot-alt-text {
+				position: absolute;
+				z-index: $z-index-modal-dialog;
+				left: 2px;
+				bottom: 38px;
+
+				width: 40%;
+
+				background: rgba(255,255,255,0.9);
+
+				border: solid 1px $gray;
+				border-radius: 2px;
+			}
 
 			ul {
 				list-style-type: none;
@@ -2236,12 +2296,12 @@ node-creation-selection-dialog {
 		}
 
 		div.visibility-manager {
-			position: absolute;
+			position: fixed;
 			width: 300px;
 
-			left: 50%;
+			left: 63%;
 			margin-left: -150px;
-			bottom: 40px;
+			bottom: 110px;
 
 			z-index: $z-index-modal-dialog;
 
@@ -2290,247 +2350,215 @@ node-creation-selection-dialog {
 				}
 			}
 		}
+	}
 
-		hotspot-answer-manager {
-			position: absolute;
-			display: none;
-			width: 0px;
+	hotspot-answer-manager {
+		position: absolute;
+		display: none;
+		width: 0px;
 
-			z-index: $z-index-modal-dialog;
+		z-index: $z-index-modal-dialog;
 
-			background: $color-primary;
+		background: $color-primary;
 
-			border-radius: 5px;
-			box-shadow: $shadow-small;
+		border-radius: 5px;
+		box-shadow: $shadow-small;
 
-			transition: width 0.5s ease;
-			transition: height 0.5s ease;
+		transition: width 0.5s ease;
+		transition: height 0.5s ease;
 
-			font-size:13px;
+		font-size:13px;
 
-			&.visible {
-				display: flex;
-				width: 400px;
-				flex-direction: column;
-				justify-content: space-between;
-				align-items: center;
+		&.visible {
+			display: flex;
+			width: 400px;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		h4 {
+			border-top-left-radius: 5px;
+			border-top-right-radius: 5px;
+
+			width: 100%;
+			box-sizing: border-box;
+
+			margin: 0px;
+			padding: 10px 25px;
+
+			color: $color-primary;
+			background: $color-accent;
+		}
+
+		input {
+			width: 90%;
+			height: 2em;
+
+			margin: 10px 2px;
+			padding-left: 15px;
+			box-sizing: border-box;
+
+			border: solid 1px #cccccc;
+			border-radius: 3px;
+		}
+
+		textarea {
+			width: 90%;
+			height: 5em;
+
+			padding-left: 15px;
+			box-sizing: border-box;
+
+			border: solid 1px #cccccc;
+			border-radius: 3px;
+		}
+
+		.add-item {
+			height: 100px;
+			width: 100%;
+		}
+
+		.hotspot-required-items {
+			max-height: 60px;
+			overflow: auto;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin: 10px 0px 10px 15px;
+
+			button:hover {
+				background: $red;
+				color: $white;
 			}
 
-			h4 {
-				border-top-left-radius: 5px;
-				border-top-right-radius: 5px;
-
-				width: 100%;
-				box-sizing: border-box;
-
-				margin: 0px;
-				padding: 10px 25px;
-
-				color: $color-primary;
-				background: $color-accent;
+			button {
+				margin: 1px;
 			}
 
-			input {
-				width: 90%;
+		}
+
+		div.select-required-items {
+			margin-bottom: 10px;
+
+			select {
+				margin-right: 10px;
+				border: 1px solid $color-accent;
+				border-radius: 5px;
+				min-width: 100px;
 				height: 2em;
-
-				margin: 10px 2px;
-				padding-left: 15px;
-				box-sizing: border-box;
-
-				border: solid 1px #cccccc;
-				border-radius: 3px;
 			}
+		}
 
-			textarea {
-				width: 90%;
-				height: 5em;
+		div.button-options {
+			margin: 5px 5px 10px 15px;
+			text-align: center;
 
-				padding-left: 15px;
-				box-sizing: border-box;
-
-				border: solid 1px #cccccc;
-				border-radius: 3px;
+			button {
+				margin-right: 4px;
 			}
+		}
 
-			.add-item {
-				height: 100px;
-				width: 100%;
+		div.colors-container {
+			width: 270px;
+			margin-top: 5px;
+			padding: 10px 15px;
+
+			background: $gray-lightest;
+
+			button {
+				display: inline-block;
+				width: 20px;
+				height: 18px;
+
+				padding: 0px;
+
+				margin: 0px 5px 5px 0px;
+
+				border: solid 1px $gray;
+
+				&.blue {
+					background: #0000FF;
+				}
+
+				&.red {
+					background: #FF0000;
+				}
+
+				&.green {
+					background: #008000;
+				}
+
+				&.aliceblue {
+					background: #F0F8FF;
+				}
+
+				&.coral {
+					background: #FF7F50;
+				}
+
+				&.indigo {
+					background: #4B0082;
+				}
+
+				&.lightgreen {
+					background: #90EE90;
+				}
+
+				&.slategrey {
+					background: #708090;
+				}
+
+				&.yellow {
+					background: #FFFF00;
+				}
+
+				&.teal {
+					background: #008080;
+				}
+
+				&.blueviolet {
+					background: #8A2BE2;
+				}
+
+				&.darkred {
+					background: #8B0000;
+				}
+
+				&.cyan {
+					background: #00FFFF;
+				}
+
+				&.goldenrod {
+					background: #DAA520;
+				}
 			}
+		}
 
-			.hotspot-required-items {
-				max-height: 60px;
-				overflow: auto;
-				display: flex;
-				flex-wrap: wrap;
-				gap: 10px;
-				margin: 10px 0px 10px 15px;
+		div.continuity-container {
+			width: 100%;
+			padding: 10px 20px;
+			box-sizing: border-box;
 
-				button:hover {
-					background: $red;
+			background: $gray-lighter;
+
+			text-align: left;
+
+			border-bottom-left-radius: 5px;
+			border-bottom-right-radius: 5px;
+
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+
+			button {
+
+				&.managed {
 					color: $white;
-				}
-
-				button {
-					margin: 1px;
-				}
-
-			}
-
-			div.select-required-items {
-				margin-bottom: 10px;
-
-				select {
-					margin-right: 10px;
-					border: 1px solid $color-accent;
-					border-radius: 5px;
-					min-width: 100px;
-					height: 2em;
+					background: $color-accent;
 				}
 			}
-
-			div.button-options {
-				margin: 5px 5px 10px 15px;
-				text-align: center;
-
-				button {
-					margin-right: 4px;
-				}
-			}
-
-			div.colors-container {
-				width: 270px;
-				margin-top: 5px;
-				padding: 10px 15px;
-
-				background: $gray-lightest;
-
-				button {
-					display: inline-block;
-					width: 20px;
-					height: 18px;
-
-					padding: 0px;
-
-					margin: 0px 5px 5px 0px;
-
-					border: solid 1px $gray;
-
-					&.blue {
-						background: #0000FF;
-					}
-
-					&.red {
-						background: #FF0000;
-					}
-
-					&.green {
-						background: #008000;
-					}
-
-					&.aliceblue {
-						background: #F0F8FF;
-					}
-
-					&.coral {
-						background: #FF7F50;
-					}
-
-					&.indigo {
-						background: #4B0082;
-					}
-
-					&.lightgreen {
-						background: #90EE90;
-					}
-
-					&.slategrey {
-						background: #708090;
-					}
-
-					&.yellow {
-						background: #FFFF00;
-					}
-
-					&.teal {
-						background: #008080;
-					}
-
-					&.blueviolet {
-						background: #8A2BE2;
-					}
-
-					&.darkred {
-						background: #8B0000;
-					}
-
-					&.cyan {
-						background: #00FFFF;
-					}
-
-					&.goldenrod {
-						background: #DAA520;
-					}
-				}
-			}
-
-			div.continuity-container {
-				width: 100%;
-				padding: 10px 20px;
-				box-sizing: border-box;
-
-				background: $gray-lighter;
-
-				text-align: left;
-
-				border-bottom-left-radius: 5px;
-				border-bottom-right-radius: 5px;
-
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
-
-				button {
-
-					&.managed {
-						color: $white;
-						background: $color-accent;
-					}
-				}
-			}
-		}
-
-		#hotspot-label {
-			position:absolute;
-			z-index: $z-index-modal-dialog - 1;
-
-			max-width: 180px;
-
-			padding: 8px;
-
-			border-radius: 5px;
-			color: #fff;
-			background: rgba(0,0,0,0.8);
-			font-weight: normal;
-			font-size:0.8em;
-
-			cursor: pointer;
-
-			&.hidden {
-				z-index: $z-index-hidden;
-			}
-		}
-
-		svg#polygon-svg-artboard {
-			display: block;
-			position: absolute;
-			width: 698px;
-			height: 400px;
-			z-index: $z-index-modal-svg + 1;
-
-			background: $white;
-			opacity: 0.7;
 		}
 	}
 }

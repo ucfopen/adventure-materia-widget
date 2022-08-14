@@ -750,10 +750,6 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			if newVal
 				treeSrv.setInventoryItems(newVal)
 
-		$scope.$watch "icons", (newVal, oldVal) ->
-			if newVal
-				console.log(newVal)
-
 		$scope.newItemName = ''
 
 		$scope.addNewItem = () ->
@@ -776,7 +772,8 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			if item in $scope.inventoryItems
 				$scope.inventoryItems.splice index, 1
 				treeSrv.deleteItemFromAllNodes $scope.treeData, item
-				treeSrv.decrementItemCount()
+				# treeSrv.decrementItemCount()
+
 				# Collapse any open item editors
 				$scope.editingIndex = -1
 
@@ -829,6 +826,8 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				lastIndex = treeHistorySrv.getHistorySize() - 1
 				# Check if changes were made
 				peek = treeHistorySrv.retrieveSnapshot(lastIndex)
+				console.log(peek.tree)
+				console.log($scope.treeData)
 				if treeHistorySrv.compareTrees(peek.tree, $scope.treeData)
 					treeHistorySrv.addToHistory $scope.treeData, historyActions.INVENTORY_EDITED, "Inventory Items Edited"
 					# Update item data across all nodes
@@ -1768,8 +1767,8 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				if $scope.editedNode.type is $scope.MC
 					unless $scope.editedNode.randomizeAnswers then $scope.editedNode.randomizeAnswers = false
 
-				if $scope.editedNode.type is $scope.HOTSPOT
-					unless $scope.editedNode.hotspotVisibility then $scope.editedNode.hotspotVisibility = "always"
+				# if $scope.editedNode.type is $scope.HOTSPOT
+				# 	unless $scope.editedNode.hotspotVisibility then $scope.editedNode.hotspotVisibility = $scope.ALWAYS
 
 
 				if $scope.editedNode.type is $scope.END
@@ -1804,11 +1803,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 		$scope.$watch "items", ((newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
 				$scope.editedNode.items = $scope.items
-		), true
-
-		$scope.$watch "requiredItems", ((newVal, oldVal) ->
-			if newVal isnt null and $scope.editedNode
-				$scope.editedNode.requiredItems = $scope.requiredItems
 		), true
 
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
@@ -1860,26 +1854,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 			$scope.selectedItem = $scope.availableItems[0]
 
-		$scope.toggleRequiredItemPopup = () ->
-			$scope.showItemSelection = false
-			if $scope.showRequiredItems is true
-				$scope.showRequiredItems = false
-				return
-			$scope.showRequiredItems = true
-
-			# Add items not already required to the items available for selection
-			$scope.availableItems = []
-			for item in $scope.inventoryItems
-				do (item) ->
-					required = false
-					for required_item in $scope.requiredItems
-						if item.id is required_item.id
-							required = true
-					if ! required
-						$scope.availableItems.push(item)
-
-			$scope.selectedItem = $scope.availableItems[0]
-
 		$scope.addItemToNode = (item) ->
 			if item
 				# If item already exists in node, increment item count
@@ -1902,25 +1876,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 		$scope.removeItemFromNode = (item, index) ->
 			$scope.items.splice index, 1
 			$scope.availableItems.push(item)
-			$scope.showItemManagerDialog = false
-
-		$scope.addRequiredItemToNode = (item) ->
-			if item
-				if item in $scope.requiredItems
-					item.count += 1
-				else
-					# Add item to node
-					$scope.requiredItems.push(item)
-					# Remove item from the select dropdown
-					index = $scope.availableItems.indexOf(item)
-					$scope.availableItems.splice index, 1
-					$scope.selectedItem = $scope.availableItems[0]
-
-		$scope.removeRequiredItemFromNode = (item, index) ->
-			$scope.requiredItems.splice index, 1
-			$scope.availableItems.push(item)
-			if $scope.requiredItems.length == 0
-				$scope.itemButtonDialog = "Add Items"
 			$scope.showItemManagerDialog = false
 
 		$scope.addRequiredItemToAnswer = (item, answer) ->

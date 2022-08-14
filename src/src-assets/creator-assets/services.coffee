@@ -43,6 +43,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	incrementNodeCount = ->
 		count++
 
+	# Methods for inventory item count
 	getItemCount = ->
 		itemCount
 
@@ -724,8 +725,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if item.options.items
 				angular.forEach item.options.items, (inventoryItem, index) ->
 					unless node.items then node.items = []
-					console.log('item')
-					console.log(inventoryItem)
 					nodeItem =
 						name: inventoryItem.name
 						id: inventoryItem.id

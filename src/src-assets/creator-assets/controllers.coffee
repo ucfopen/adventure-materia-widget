@@ -249,8 +249,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.WIDGET_INIT, "Widget Initialized"
 
 	materiaCallbacks.initExistingWidget = (title,widget,qset,version,baseUrl) ->
-		console.log('initializing widget')
-		console.log(qset)
 		showIntroDialog = false
 
 		if qset
@@ -258,8 +256,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
 			$scope.$apply () ->
-				console.log('qset')
-				console.log(qset)
 				$scope.title = title
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 
@@ -293,9 +289,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				treeSrv.set $scope.treeData
 				treeSrv.updateAllAnswerLinks $scope.treeData
 
-				console.log('tree data')
-				console.log($scope.treeData)
-
 				treeHistorySrv.addToHistory $scope.treeData, historyActions.EXISTING_WIDGET_INIT, "Existing Widget Initialized"
 
 	materiaCallbacks.onSaveClicked = (mode = 'save') ->
@@ -316,8 +309,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			qset.options.internalScoreMessage = $scope.internalScoreMessage
 			qset.options.inventoryItems = treeSrv.getInventoryItems()
 			qset.options.customIcons = treeSrv.getCustomIcons()
-			console.log('saving widget')
-			console.log(qset)
 			Materia.CreatorCore.save $scope.title, qset, 2
 
 	materiaCallbacks.onSaveComplete = (title, widget, qset, version) -> true
