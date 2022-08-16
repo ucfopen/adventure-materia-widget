@@ -108,7 +108,20 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	$scope.inventoryItems = []
 
-	$scope.icons = []
+	$scope.icons = [
+		{
+			id: "assets/item-assets/icons/aid-kit.svg",
+			type: "image",
+			alt: "First aid kit.",
+			icomoon: false
+		},
+		{
+			id: "assets/item-assets/icons/angry2.svg",
+			type: "image",
+			alt: "Angry face.",
+			icomoon: false
+		}
+	]
 
 	$scope.icomoon_icons = [
 		'pencil',
@@ -231,6 +244,24 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 		$scope.displayNodeCreation = "none"
 
+	$scope.initIcons = (customIcons = null) ->
+		for icomoon_icon in $scope.icomoon_icons
+			formattedIcon =
+				icomoon_name: icomoon_icon
+				icomoon: true
+			$scope.icons.push(formattedIcon)
+
+		angular.forEach $scope.icons, (icon, index) ->
+			if icon.id
+				$scope.icons[index] = {
+					...icon,
+					url: icon.id
+				}
+
+		if customIcons
+			for custom_icon in customIcons
+				$scope.icons.push(custom_icon)
+
 	materiaCallbacks.initNewWidget = (widget, baseUrl) ->
 		$scope.$apply ->
 			$scope.title = "My Adventure Widget"
@@ -240,11 +271,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 			$scope.inventoryItems = []
 
-			for icomoon_icon in $scope.icomoon_icons
-				formattedIcon =
-					icomoon_name: icomoon_icon
-					icomoon: true
-				$scope.icons.push(formattedIcon)
+			$scope.initIcons()
 
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.WIDGET_INIT, "Widget Initialized"
 
@@ -265,16 +292,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 				treeSrv.setCustomIcons qset.options.customIcons
 
-				$scope.icons = []
-
-				for icomoon_icon in $scope.icomoon_icons
-					formattedIcon =
-						icomoon_name: icomoon_icon
-						icomoon: true
-					$scope.icons.push(formattedIcon)
-
-				for custom_icon in qset.options.customIcons
-					$scope.icons.push(custom_icon)
+				$scope.initIcons(qset.options.customIcons)
 
 				# Optional qset parameters based on score mode
 				if qset.options.scoreMode then $scope.scoreMode = qset.options.scoreMode
@@ -319,8 +337,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	materiaCallbacks.onMediaImportComplete = (media) ->
 		if $scope.editingIcons and $scope.currentItem
 			newIcon =
-				icomoon_name: ""
-				icomoon: false
+				is_custom: true
 				type: "image"
 				url: Materia.CreatorCore.getMediaUrl media[0].id
 				id: media[0].id

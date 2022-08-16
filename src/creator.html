@@ -146,7 +146,12 @@
 			<div item-icon-selector ng-show="showItemIconSelector" class="item-modal">
 				<h4>Icon Selector</h4>
 				<ul class="icons-list">
-					<li class="icon-{{icon.icomoon_name}}" ng-repeat="icon in icons" ng-click="handleIconClick(icon)" ng-class="{'selectedIcon' : currentItem.icon == icon}">
+					<li ng-class="{
+						'icon-{{icon.icomoon_name}}': icon.icomoon_name, 
+						'selectedIcon' : currentItem.icon == icon
+					}" 
+					ng-repeat="icon in icons" 
+					ng-click="handleIconClick(icon)">
 						<img ng-if="icon.url" ng-src="{{icon.url}}" ng-alt="{{icon.alt}}"/>
 					</li>
 				</ul>
@@ -155,7 +160,10 @@
 						<button type="button"
 							class="important-button"
 							ng-click="manageNewIcon()">Upload Icon</button>
-						<button type="button" class="important-button delete-button" ng-click="removeSelectedIcon()" ng-if="currentItem.icon.url">Remove Selected Icon</button>
+						<button type="button" 
+						class="important-button delete-button" 
+						ng-click="removeSelectedIcon()" 
+						ng-if="currentItem.icon.is_custom">Remove Selected Icon</button>
 					</div>
 					<button type="button"
 						class="important-button save-button"

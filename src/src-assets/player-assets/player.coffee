@@ -151,7 +151,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							id: q_i.id
 							icon: {
 								...q_i.icon
-								url: if q_i.icon and q_i.icon.url then Materia.Engine.getMediaUrl q_i.icon.id else ''
+								url: if q_i.icon and q_i.icon.id then Materia.Engine.getMediaUrl q_i.icon.id else ''
 							}
 						}
 

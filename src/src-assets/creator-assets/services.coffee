@@ -19,7 +19,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	count = 1
 
 	# Iterator that generates item IDs
-	itemCount = 2
+	itemCount = 0
 
 	inventoryItems = []
 

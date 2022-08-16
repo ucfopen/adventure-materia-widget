@@ -799,6 +799,8 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				$scope.currentItem = item
 
 		$scope.handleIconClick = (icon) ->
+			console.log(icon)
+			console.log($scope.currentItem)
 			if $scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon is icon
 				# Deselect icon
 				$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = null
