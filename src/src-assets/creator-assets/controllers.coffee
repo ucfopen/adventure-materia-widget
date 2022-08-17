@@ -114,12 +114,183 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			alt: "First aid kit."
 		},
 		{
+			id: "assets/item-assets/icons/barcode.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/binoculars.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/book.svg",
+			type: "image",
+			alt: "Book."
+		},
+		{
+			id: "assets/item-assets/icons/briefcase.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/camera.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/coin-dollar.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/compass2.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/credit-card.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/eyedropper.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/folder-open.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/gift.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/hammer.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/headphones.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/heart.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/image.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/key.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/lab.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/leaf.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/magic-wand.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/map.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/mobile2.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/mug.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/pencil.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/phone.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
 			id: "assets/item-assets/icons/angry2.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/sad2.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/smile2.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/happy2.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/spoon-knife.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/star-full.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/stopwatch.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/trophy.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/truck.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/user.svg",
+			type: "image",
+			alt: "Angry face."
+		},
+		{
+			id: "assets/item-assets/icons/wrench.svg",
 			type: "image",
 			alt: "Angry face."
 		}
 	]
 
+	# Replaced with SVG icons above
 	$scope.icomoon_icons = [
 		'pencil',
 		'image',
@@ -248,11 +419,12 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				url: icon.id
 			}
 
-		for icomoon_icon in $scope.icomoon_icons
-			formattedIcon =
-				icomoon_name: icomoon_icon
-				icomoon: true
-			$scope.icons.push(formattedIcon)
+		# Replaced with SVG icons
+		# for icomoon_icon in $scope.icomoon_icons
+		# 	formattedIcon =
+		# 		icomoon_name: icomoon_icon
+		# 		icomoon: true
+		# 	$scope.icons.push(formattedIcon)
 
 		# Initialize the user's uploaded icons
 		if customIcons
