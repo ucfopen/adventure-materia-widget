@@ -916,7 +916,7 @@ node-tooltips {
 		margin-bottom: 5px;
 		font-size: 11pt;
 
-		padding: 5px 10px 5px 25px;
+		padding: 5px 10px;
 
 		background: $white;
 
@@ -941,6 +941,7 @@ node-tooltips {
 		.item-icon {
 			display: flex;
 			flex-direction: column;
+			grid-gap: 20px;
 			align-items: center;
 
 			span {
@@ -958,9 +959,13 @@ node-tooltips {
 			}
 
 			img {
-				width: 35px;
-				height: 35px;
+				width: 15px;
+				height: 15px;
 				object-fit: cover;
+			}
+
+			button {
+				min-width: 85px;
 			}
 		}
 
@@ -976,6 +981,7 @@ node-tooltips {
 
 			textarea, input {
 				width: 100%;
+				max-width: 350px;
 				box-sizing: border-box;
 			}
 		}
@@ -1065,8 +1071,8 @@ node-tooltips {
 			border: 2px solid transparent;
 
 			img {
-				width: 35px;
-				height: 35px;
+				width: 15px;
+				height: 15px;
 				object-fit: cover;
 			}
 
@@ -1075,11 +1081,7 @@ node-tooltips {
 			}
 
 			&.selectedIcon {
-				border: 2px solid $blue-focus;
-			}
-
-			&:active{
-				border: 2px solid $blue-focus;
+				background-color: $blue-focus;
 			}
 		}
 	}

@@ -62,6 +62,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	setInventoryItems = (val) ->
 		inventoryItems = val
 
+	# Methods for custom icons
 	getCustomIcons = ->
 		customIcons
 
@@ -448,16 +449,16 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 							icon: updatedItem.icon
 						}
 
-		if tree.requiredItems
-			for item in tree.requiredItems
-				do (item, index) ->
-					if item.id is updatedItem.id
-						tree.items[index] = {
-							...item
-							name: updatedItem.name
-							description: updatedItem.description
-							icon: updatedItem.icon
-						}
+		# if tree.requiredItems
+		# 	for item in tree.requiredItems
+		# 		do (item, index) ->
+		# 			if item.id is updatedItem.id
+		# 				tree.items[index] = {
+		# 					...item
+		# 					name: updatedItem.name
+		# 					description: updatedItem.description
+		# 					icon: updatedItem.icon
+		# 				}
 
 		if tree.answers
 			for answer in tree.answers
@@ -994,7 +995,6 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 			timestamp : Date.now()
 			tree: JSON.stringify treeSrv.createQSetFromTree tree # snapshots are converted into the equivalent Qset structure to remove unnecessary D3 info. Also reduces complexity for compareTrees below
 			nodeCount : treeSrv.getNodeCount()
-			itemCount : treeSrv.getItemCount()
 
 	addToHistory = (tree, action, context) ->
 		snapshot = createSnapshot tree, action, context
@@ -1016,6 +1016,8 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		# DIFF is the raw tree to be compared (must be converted to a Qset object and stringified before comparison)
 		diff = JSON.stringify treeSrv.createQSetFromTree diff
 		return source == diff
+
+	
 
 	getActions : getActions
 	getHistory : getHistory

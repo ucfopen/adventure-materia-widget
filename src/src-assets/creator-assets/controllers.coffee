@@ -106,20 +106,17 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	historyActions = treeHistorySrv.getActions()
 
-	$scope.inventoryItems = []
-
+	# Add SVG icons here
 	$scope.icons = [
 		{
 			id: "assets/item-assets/icons/aid-kit.svg",
 			type: "image",
-			alt: "First aid kit.",
-			icomoon: false
+			alt: "First aid kit."
 		},
 		{
 			id: "assets/item-assets/icons/angry2.svg",
 			type: "image",
-			alt: "Angry face.",
-			icomoon: false
+			alt: "Angry face."
 		}
 	]
 
@@ -245,19 +242,19 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		$scope.displayNodeCreation = "none"
 
 	$scope.initIcons = (customIcons = null) ->
+		angular.forEach $scope.icons, (icon, index) ->
+			$scope.icons[index] = {
+				...icon,
+				url: icon.id
+			}
+
 		for icomoon_icon in $scope.icomoon_icons
 			formattedIcon =
 				icomoon_name: icomoon_icon
 				icomoon: true
 			$scope.icons.push(formattedIcon)
 
-		angular.forEach $scope.icons, (icon, index) ->
-			if icon.id
-				$scope.icons[index] = {
-					...icon,
-					url: icon.id
-				}
-
+		# Initialize the user's uploaded icons
 		if customIcons
 			for custom_icon in customIcons
 				$scope.icons.push(custom_icon)
@@ -269,9 +266,10 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			$scope.showIntroDialog = true
 			$scope.showBackgroundCover = true
 
-			$scope.inventoryItems = []
-
 			$scope.initIcons()
+
+			# Add default items?
+			$scope.inventoryItems = []
 
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.WIDGET_INIT, "Widget Initialized"
 
@@ -288,9 +286,11 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
 
+				treeSrv.setInventoryItems qset.options.inventoryItems || []
+
 				$scope.inventoryItems = qset.options.inventoryItems || []
 
-				treeSrv.setCustomIcons qset.options.customIcons
+				treeSrv.setCustomIcons qset.options.customIcons || []
 
 				$scope.initIcons(qset.options.customIcons)
 

@@ -785,7 +785,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			else
 				inventory = treeSrv.getInventoryItems()
 				# Reflect changes in tree
-				treeSrv.updateAllItems $scope.treeData, inventory[$scope.editingIndex]
+				treeSrv.updateAllItems $scope.treeData, $scope.currentItem
 				$scope.toast "Item '#{inventory[$scope.editingIndex].name}' saved!"
 				$scope.editingIndex = -1
 
@@ -799,14 +799,12 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				$scope.currentItem = item
 
 		$scope.handleIconClick = (icon) ->
-			console.log(icon)
-			console.log($scope.currentItem)
-			if $scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon is icon
+			if $scope.inventoryItems[$scope.editingIndex].icon is icon
 				# Deselect icon
-				$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = null
+				$scope.inventoryItems[$scope.editingIndex].icon = null
 			else
 				# Select icon
-				$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = icon
+				$scope.inventoryItems[$scope.editingIndex].icon = icon
 			treeSrv.updateAllItems $scope.treeData, $scope.currentItem
 
 		$scope.manageNewIcon = () ->
@@ -828,9 +826,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				lastIndex = treeHistorySrv.getHistorySize() - 1
 				# Check if changes were made
 				peek = treeHistorySrv.retrieveSnapshot(lastIndex)
-				console.log(peek.tree)
-				console.log($scope.treeData)
-				if treeHistorySrv.compareTrees(peek.tree, $scope.treeData)
+				if !treeHistorySrv.compareTrees(peek.tree, $scope.treeData)
 					treeHistorySrv.addToHistory $scope.treeData, historyActions.INVENTORY_EDITED, "Inventory Items Edited"
 					# Update item data across all nodes
 					for item in inventory
@@ -924,12 +920,11 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 			if $scope.existingNodeSelectionMode or $scope.copyNodeMode then return false
 			snapshot = treeHistorySrv.retrieveSnapshot index
 			tree = treeSrv.createTreeDataFromQset JSON.parse snapshot.tree
+			inventoryItems = (JSON.parse snapshot.tree).options.inventoryItems
 			$scope.treeData = tree
+			$scope.inventoryItems = inventoryItems
 			treeSrv.set tree
-			treeSrv.setNodeCount snapshot.nodeCount
-			treeSrv.setItemCount snapshot.itemCount
-			treeSrv.setInventoryItems tree.inventoryItems
-			$scope.inventoryItems = tree.inventoryItems
+			treeSrv.setInventoryItems inventoryItems
 
 			$scope.historyPosition = index
 ]
