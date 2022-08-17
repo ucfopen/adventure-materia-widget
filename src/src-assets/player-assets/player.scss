@@ -290,11 +290,11 @@ h1 {
 	}
 
 	&.top {
-		flex-direction: column-reverse;
+		flex-direction: column;
 	}
 
 	&.bottom {
-		flex-direction: column;
+		flex-direction: column-reverse;
 	}
 
 	h2 {

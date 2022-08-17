@@ -1571,7 +1571,7 @@ node-creation-selection-dialog {
 
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
+	// justify-content: space-between;
 
 	&.hotspot {
 		max-height: 650px;
@@ -1652,7 +1652,6 @@ node-creation-selection-dialog {
 		display: flex;
 		flex-direction: row;
 		align-items: stretch;
-		flex-grow: 1;
 
 		margin: $edit-popup-padding;
 		grid-gap: $edit-popup-padding;
@@ -1988,7 +1987,12 @@ node-creation-selection-dialog {
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
+
+		position: absolute;
+		bottom: 0;
+		width: 100%;
 		padding: 10px;
+		box-sizing: border-box;
 
 		z-index: $z-index-modal-svg;
 
@@ -2123,7 +2127,7 @@ node-creation-selection-dialog {
 		
 		border: solid 1px $gray-lighter;
 
-		@media screen and (max-height: 1000px) {
+		@media screen and (max-height: 650px) {
 			& {
 				height: 300px;
 			}
@@ -2133,17 +2137,17 @@ node-creation-selection-dialog {
 			position: relative;
 			display: block;
 			width: $edit-popup-content-width-full;
-			height: 400px;
+			height: 410px;
 			overflow: auto;
 			overflow-x: hidden;
 
-			margin: auto;
+			margin: 0 auto;
 
 			text-align: center;
 
-			@media screen and (max-height: 1000px) {
+			@media screen and (max-height: 650px) {
 				& {
-					height: 300px;
+					height: 310px;
 				}
 			}
 
@@ -2240,23 +2244,35 @@ node-creation-selection-dialog {
 
 	.image-options-container {
 		width: 100%;
+		position: absolute;
+		bottom: 54px;
+		z-index: $z-index-modal-dialog;
+
+		@media screen and (max-height: 650px) {
+			& {
+				bottom: 90px;
+			}
+		}
+
+		@media screen and (max-height: 500px) {
+			position: fixed;
+			bottom: 100px;
+		}
 
 		#uploadButton {
 			display: block;
-			margin-top: 100px;
+			//margin-top: 100px;
 			margin-left: auto;
 			margin-right: auto;
+			margin-bottom: 10px;
 
 			padding: 10px 15px;
 			font-size: 15px;
 		}
 
 		hotspot-toolbar {
-			position: fixed;
-			display: block;
-			z-index: $z-index-modal-dialog;
-
-			bottom: 65px;
+			//position: absolute;
+			//display: block;
 
 			display: flex;
 			flex-direction: column;
@@ -2267,6 +2283,12 @@ node-creation-selection-dialog {
 			padding-top: 6px;
 
 			background-color: rgba(0, 0, 0, 0.6);
+
+			@media screen and (max-height: 650px) {
+				& {
+					position: fixed;
+				}
+			}
 			
 			input.hotspot-alt-text {
 				position: absolute;
@@ -2379,18 +2401,32 @@ node-creation-selection-dialog {
 			align-items: center;
 		}
 
-		h4 {
+		.hotspot-answer-header {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			width: 100%;
+			box-sizing: border-box;
+			margin: 0px;
+			padding: 10px 10px 10px 25px;
+	
+			color: $color-primary;
+			background: $color-accent;
+
 			border-top-left-radius: 5px;
 			border-top-right-radius: 5px;
 
-			width: 100%;
-			box-sizing: border-box;
+			h4 {
+				margin: 0;
+			}
 
-			margin: 0px;
-			padding: 10px 25px;
-
-			color: $color-primary;
-			background: $color-accent;
+			.hide-popup {
+				cursor: pointer;
+	
+				&:hover {
+					color: $red;
+				}
+			}
 		}
 
 		input {

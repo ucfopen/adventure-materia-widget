@@ -570,7 +570,7 @@
 									<select ng-options="item.name for item in inventoryItems" ng-model="answerSelectedItem">
 									</select>
 									<button class="add-item" ng-click="addRequiredItemToAnswer(answerSelectedItem, answer)">Add</button>
-									<button class="info-icon" ng-click="displayInfoDialog('Require the player to have certain items in their inventory to be able to select this answer. You can create items on the widget home screen.')">i</button>
+									<button class="info-icon" ng-click="displayInfoDialog('Require the player to have certain items in their inventory to be able to select this answer. You can create items on the widget home screen. Click Add to add a new item or increase its count.')">i</button>
 								</div>
 								<div class="answer-items">
 									<p ng-hide="answer.requiredItems.length">Items required for this answer to be selectable will appear here. Click an item to decrease its count or remove it.</p>
@@ -650,7 +650,13 @@
 					ng-class="{'visible' : hotspotAnswerManager.show}"
 					data-pos-x="{{hotspotAnswerManager.x}}"
 					data-pos-y="{{hotspotAnswerManager.y}}">
-					<h4>Manage This Hotspot</h4>
+					<div class="hotspot-answer-header">
+						<h4>Manage This Hotspot</h4>
+						<span class="hide-popup icon-cross"
+						ng-click="hotspotAnswerManager.show = false"
+						ng-keypress="$event.keyCode === 13 ? hotspotAnswerManager.show = false : ''"
+						tabindex="0"></span>
+					</div>
 					<input type="text" placeholder="Enter hotspot label here."
 						ng-model="answers[hotspotAnswerManager.answerIndex].text"/>
 					<textarea class="feedback-box"
