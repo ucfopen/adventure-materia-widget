@@ -1745,9 +1745,9 @@ node-creation-selection-dialog {
 			}
 		}
 
-		@media screen and (max-height: $edit-popup-standard-height + 69) {
-			max-height: 170px;
-		}
+		// @media screen and (max-height: $edit-popup-standard-height + 69) {
+		// 	max-height: 170px;
+		// }
 
 		ul {
 			list-style-type: none;
