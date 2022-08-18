@@ -649,15 +649,16 @@ h1 {
 				background-color: $blue-lightest;
 				min-width: 200px;
 
-				.small {
-					font-style: italic;
-					font-size: 0.75em;
-					margin-bottom: 0;
+				h4 {
+					margin: 0 0 10px 0;
+					padding-left: 10px;
 					border-bottom: 1px solid $blue-lighter;
+					font-size: 14px;
 				}
 
 				p {
 					margin-top: 0;
+					font-size: 12px;
 				}
 
 				.item-header {
@@ -677,11 +678,11 @@ h1 {
 						object-fit: cover;
 					}
 
-					h4 {
+					h3 {
 						background: $blue-lighter;
 						margin: 0;
 						color: $white;
-						font-size: 12px;
+						font-size: 16px;
 					}
 				}
 

@@ -901,6 +901,7 @@ node-tooltips {
 		display: flex;
 		justify-content: space-between;
 		box-sizing: border-box;
+		align-items: center;
 
 		margin: 0px;
 		padding: 10px 25px;
@@ -910,6 +911,18 @@ node-tooltips {
 
 		color: $color-primary;
 		background: $color-accent;
+
+		> div {
+			display: flex;
+			flex-direction: row;
+			grid-gap: 20px;
+			align-items: center;
+		}
+
+		.hide-popup:hover {
+			cursor: pointer;
+			color: $red;
+		}
 	}
 
 	ul li, .options-bar {
@@ -932,6 +945,11 @@ node-tooltips {
 			flex-grow: 2;
 		}
 
+		&.answer-required-item > * {
+			align-content: center;
+			justify-content: center;
+		}
+
 		// &.list-header {
 		// 	color: $gray-darker;
 		// 	border-bottom: 1px solid $blue-lightest;
@@ -943,10 +961,10 @@ node-tooltips {
 			flex-direction: column;
 			grid-gap: 20px;
 			align-items: center;
+			min-width: 35px;
+			min-height: 35px;
 
 			span {
-				width: 35px;
-				height: 35px;
 				text-align: center;
 				display: flex;
 				align-items: center;
@@ -987,14 +1005,9 @@ node-tooltips {
 		}
 
 		.item-options {
-			visibility: hidden;
 			display: flex;
 			justify-content: space-around;
 			gap: 10px;
-
-			&.show {
-				visibility: visible;
-			}
 
 			.item-quantity {
 				display: flex;
@@ -1011,6 +1024,24 @@ node-tooltips {
 					flex-direction: row;
 					align-items: center;
 					gap: 10px;
+				}
+			}
+
+			button {
+				background: $color-primary;
+				color: $gray-darker;
+		
+				&:hover {
+					color: $color-accent-highlight;
+				}
+
+				&.save {
+					background: $color-accent;
+					color: $color-primary;
+
+					&:hover {
+						background: $color-accent-highlight;
+					}
 				}
 			}
 		}
@@ -1034,12 +1065,6 @@ node-tooltips {
 		&.selected {
 			color: $color-primary;
 			background: $color-accent;
-		}
-	}
-
-	ul.give-items {
-		li {
-			min-height: 67px;
 		}
 	}
 
@@ -1099,12 +1124,19 @@ node-tooltips {
 		height: 30px;
 	}
 
-	button:not(.delete-button) {
+	button {
 		background: $color-accent;
 		color: $color-primary;
 
 		&:hover {
 			background: $color-accent-highlight;
+		}
+	}
+
+	.delete-button {
+		&:hover {
+			background: $red-lighter;
+			color: $color-primary !important;
 		}
 	}
 }
@@ -1571,7 +1603,7 @@ node-creation-selection-dialog {
 
 	display: flex;
 	flex-direction: column;
-	// justify-content: space-between;
+	justify-content: space-between;
 
 	&.hotspot {
 		max-height: 650px;
@@ -1652,6 +1684,7 @@ node-creation-selection-dialog {
 		display: flex;
 		flex-direction: row;
 		align-items: stretch;
+		flex-grow: 1;
 
 		margin: $edit-popup-padding;
 		grid-gap: $edit-popup-padding;
@@ -1780,6 +1813,7 @@ node-creation-selection-dialog {
 					display: flex;
 					flex-direction: column;
 					grid-gap: 10px;
+					justify-content: space-between;
 
 					.match-options {
 						display: flex;
@@ -1833,15 +1867,21 @@ node-creation-selection-dialog {
 					flex-direction: column;
 					align-items: center;
 					text-align: center;
-					grid-gap: 20px;
+					grid-gap: 10px;
 
 					color: $gray-darker;
 
-					div {
-						flex-grow: 2;
+					div, div.answer-destination * {
 						display: flex;
-						flex-direction: column;
-						justify-content: start;
+						flex-direction: row;
+						justify-content: center;
+						align-items: center;
+						grid-gap: 10px;
+					}
+
+					.require-item-btn {
+						width: 100%;
+						height: 35px;
 					}
 				}
 
@@ -1879,8 +1919,8 @@ node-creation-selection-dialog {
 				}
 
 				button.answer-node-select {
-					height: 50px;
-					width: 50px;
+					height: 45px;
+					width: 45px;
 					display: flex;
 					flex-direction: column;
 					justify-content: center;
@@ -1988,8 +2028,6 @@ node-creation-selection-dialog {
 		align-items: center;
 		justify-content: space-between;
 
-		position: absolute;
-		bottom: 0;
 		width: 100%;
 		padding: 10px;
 		box-sizing: border-box;
@@ -2001,30 +2039,27 @@ node-creation-selection-dialog {
 		border-bottom-right-radius: 10px;
 
 		box-shadow: inset 0 2px 2px $gray-lighter;
-	}
 
-	&.short {
-		.items-container {
-			// position: absolute;
-			// bottom: 15px;
-			// right: 15px;
+		&.hotspot {
+			position: absolute;
+			bottom: 0;
 		}
-	}
 
-	&.hotspot {
-		.items-container {
-			// bottom: 5px;
+		button {
+			height: 100%;
+			padding: 5px 15px 5px 15px;
+		}
+
+		> div {
+			height: 35px;
 		}
 	}
 
 	.items-container {
 		display: flex;
 		flex-direction: row;
+		justify-content: space-between;
 		height: 35px;
-
-		// position: absolute;
-		// bottom: 20px;
-		// right: 20px;
 
 		button.save-button {
 
@@ -2124,8 +2159,6 @@ node-creation-selection-dialog {
 
 		display: flex;
 		flex-direction: column;
-		
-		border: solid 1px $gray-lighter;
 
 		@media screen and (max-height: 650px) {
 			& {
@@ -2145,11 +2178,11 @@ node-creation-selection-dialog {
 
 			text-align: center;
 
-			@media screen and (max-height: 650px) {
-				& {
-					height: 310px;
-				}
-			}
+			// @media screen and (max-height: 650px) {
+			// 	& {
+			// 		height: 310px;
+			// 	}
+			// }
 
 			@media screen and (max-height: $edit-popup-standard-height + 69) {
 				margin-top: 0px;
@@ -2240,10 +2273,7 @@ node-creation-selection-dialog {
 		}
 	}
 
-	
-
 	.image-options-container {
-		width: 100%;
 		position: absolute;
 		bottom: 54px;
 		z-index: $z-index-modal-dialog;
@@ -2257,17 +2287,6 @@ node-creation-selection-dialog {
 		@media screen and (max-height: 500px) {
 			position: fixed;
 			bottom: 100px;
-		}
-
-		#uploadButton {
-			display: block;
-			//margin-top: 100px;
-			margin-left: auto;
-			margin-right: auto;
-			margin-bottom: 10px;
-
-			padding: 10px 15px;
-			font-size: 15px;
 		}
 
 		hotspot-toolbar {

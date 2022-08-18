@@ -312,6 +312,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 				if match is response
 
+					missingItems = $scope.checkInventory($scope.q_data.answers[i].options)
+
+					if missingItems[0]
+						string = missingItems.map((item) -> "#{item.name} (amount: #{item.count});")
+						$scope.feedback = "Requires the items: #{string}"
+						return
+
 					link = ~~$scope.q_data.answers[i].options.link # is parsing required?
 
 					$scope.selectedAnswer = $scope.q_data.answers[i].options.matches[j]

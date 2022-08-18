@@ -760,7 +760,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					description: ''
 					count: 1
 					# numberOfUsesLeft: -999
-					icon: null
+					icon: {}
 				treeSrv.incrementItemCount()
 				$scope.inventoryItems.push(newItem)
 
@@ -782,6 +782,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			if ! ($scope.editingIndex is index)
 				# Open item editor for this item
 				$scope.editingIndex = index
+				$scope.currentItem = item
 			else
 				inventory = treeSrv.getInventoryItems()
 				# Reflect changes in tree
@@ -862,7 +863,7 @@ Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 
 				if node.items
 					tooltip = {
-						givesItems: node.items
+						items: node.items
 					}
 					$scope.hoveredNode.tooltips.push tooltip
 
@@ -1876,11 +1877,10 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.showItemManagerDialog = false
 
 		$scope.addRequiredItemToAnswer = (item, answer) ->
-			$scope.currentAnswer = answer
 			if item
 				for i in answer.requiredItems when i.id is item.id
 					i.count += 1
-					$scope.flashItem(answer, item)
+					# $scope.flashItem(answer, item)
 					return
 
 				newItem = {
@@ -1888,9 +1888,15 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					count: 1
 				}
 				answer.requiredItems.push(newItem)
-				$scope.flashItem(answer, item)
 
-				$scope.checkIfUnreachable(item, answer)
+				# Remove item from the select dropdown
+				index = $scope.availableItems.indexOf(item)
+				$scope.availableItems.splice index, 1
+				$scope.selectedItem = $scope.availableItems[0]
+
+				# $scope.flashItem(answer, item)
+
+				# $scope.checkIfUnreachable(item, answer)
 
 		$scope.flashItem = (answer, item) ->
 			for i, index in answer.requiredItems when i.id is item.id
@@ -1907,10 +1913,34 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			# Display a warning in creator if not
 			return
 
+		$scope.toggleRequiredItemsModal = (answer) ->
+			$scope.showRequiredItems = !$scope.showRequiredItems
+
+			# Add items not already being used to the items available for selection
+			$scope.availableItems = []
+			for item in $scope.inventoryItems
+				do (item) ->
+					used = false
+					for i in answer.requiredItems
+						if item.id is i.id
+							used = true
+					if ! used
+						$scope.availableItems.push(item)
+
+			$scope.currentAnswer = answer
+			$scope.selectedItem = $scope.availableItems[0]
+
 		$scope.removeRequiredItemFromAnswer = (item, answer) ->
-			item.count -= 1
-			if (item.count <= 0)
-				answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
+			# item.count -= 1
+			# if (item.count <= 0)
+			# 	answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
+			answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
+
+			# Add item to the select dropdown
+			item.count = 1
+			$scope.availableItems.push(item)
+			$scope.selectedItem = $scope.availableItems[0]
+
 
 		$scope.newAnswer = (text = null) ->
 
@@ -2060,8 +2090,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			else $scope.editedNode.media.align = "right"
 
 
-		$scope.displayInfoDialog = (message) ->
-			$scope.infoMessage = message
+		$scope.displayInfoDialog = (type) ->
+			switch type
+				when 'required-items' then $scope.infoMessage = "Required items for this answer to be chosen. You can create items on the widget home screen."
 			$scope.showInfoDialog = true
 
 		$scope.saveAndClose = ->
