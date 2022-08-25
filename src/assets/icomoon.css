@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('font/icomoon.eot?qyoacq');
-  src:  url('font/icomoon.eot?qyoacq#iefix') format('embedded-opentype'),
-    url('font/icomoon.ttf?qyoacq') format('truetype'),
-    url('font/icomoon.woff?qyoacq') format('woff'),
-    url('font/icomoon.svg?qyoacq#icomoon') format('svg');
+  src:  url('font/icomoon.eot?ox5mwk');
+  src:  url('font/icomoon.eot?ox5mwk#iefix') format('embedded-opentype'),
+    url('font/icomoon.ttf?ox5mwk') format('truetype'),
+    url('font/icomoon.woff?ox5mwk') format('woff'),
+    url('font/icomoon.svg?ox5mwk#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -20,16 +20,6 @@
   text-transform: none;
   line-height: 1;
 
-  /* Enable Ligatures ================ */
-  letter-spacing: 0;
-  -webkit-font-feature-settings: "liga";
-  -moz-font-feature-settings: "liga=1";
-  -moz-font-feature-settings: "liga";
-  -ms-font-feature-settings: "liga" 1;
-  font-feature-settings: "liga";
-  -webkit-font-variant-ligatures: discretionary-ligatures;
-  font-variant-ligatures: discretionary-ligatures;
-
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -40,6 +30,15 @@
 }
 .icon-enlarge:before {
   content: "\e989";
+}
+.icon-lock:before {
+  content: "\e98f";
+}
+.icon-eye-blocked:before {
+  content: "\e9d1";
+}
+.icon-cancel-circle:before {
+  content: "\ea0d";
 }
 .icon-cross:before {
   content: "\ea0f";

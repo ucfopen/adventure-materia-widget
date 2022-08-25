@@ -581,15 +581,20 @@
 								</div> -->
 							</div>
 							<div class="answer-options">
-								<div class="answer-destination">
+								<div class="answer-destination" ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">
 									<p>Destination</p>
 									<button type="button"
 										class="answer-node-select"
 										ng-class="{'managed' : answer.id == newNodeManager.answerId}"
-										ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}
+										>{{ integerToLetters(answer.target) }}
 									</button>
 								</div>
-								<button ng-show="inventoryItems[0]" class="important-button require-item-btn" ng-click="toggleRequiredItemsModal(answer)">Require Items</button>
+								<button ng-show="inventoryItems[0]" class="important-button require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
+									<div class="required-item-tooltip" ng-show="answer.showTooltip">
+										Add a required item
+									</div>
+									<i class="arrow-top" ng-show="answer.showTooltip"></i>
+								</button>
 							</div>
 						</li>
 
@@ -632,15 +637,20 @@
 									placeholder="Enter Optional Feedback" />
 							</div>
 							<div class="answer-options">
-								<div class="answer-destination">
+								<div class="answer-destination" ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">
 									<p>Destination</p>
 									<button type="button"
 										class="answer-node-select"
 										ng-class="{'managed' : answer.id == newNodeManager.answerId}"
-										ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}
+										>{{ integerToLetters(answer.target) }}
 									</button>
 								</div>
-								<button ng-show="inventoryItems[0]" class="important-button require-item-btn" ng-click="toggleRequiredItemsModal(answer)">Require Items</button>
+								<button ng-show="inventoryItems[0]" class="important-button require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
+									<div class="required-item-tooltip" ng-show="answer.showTooltip">
+										Add a required item
+									</div>
+									<i class="arrow-top" ng-show="answer.showTooltip"></i>
+								</button>
 							</div>
 						</li>
 					</ul>

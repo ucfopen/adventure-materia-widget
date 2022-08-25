@@ -1,6 +1,7 @@
 /* Adventure 2.0 Creator Styles */
 
 @import '../../assets/item-assets/style.css';
+@import '../../assets/icomoon.css';
 
 /* Variable definitions */
 
@@ -1864,24 +1865,82 @@ node-creation-selection-dialog {
 
 				.answer-options {
 					display: flex;
-					flex-direction: column;
+					flex-direction: row-reverse;
 					align-items: center;
 					text-align: center;
 					grid-gap: 10px;
 
 					color: $gray-darker;
 
-					div, div.answer-destination * {
+					> div, div.answer-destination {
 						display: flex;
-						flex-direction: row;
+						flex-direction: column;
 						justify-content: center;
 						align-items: center;
 						grid-gap: 10px;
+						height: 100%;
+						padding: 10px;
+
+						border: 1px solid $color-accent;
+						border-radius: 10px;
+						box-sizing: border-box;
+
+						background-color: $color-accent;
+						color: $white;
+
+						&:hover {
+							background: $color-accent-highlight;
+							cursor: pointer;
+						}
 					}
 
 					.require-item-btn {
 						width: 100%;
-						height: 35px;
+						height: 100%;
+						position: relative;
+						display: flex;
+						flex-direction: row;
+						align-items: center;
+						grid-gap: 2px;
+						background-color: $gray-lightest;
+						border-color: $gray-lighter;
+						color: $color-accent;
+					}
+
+					.icon-lock {
+						font-size: 35px;
+						width: 25px;
+					}
+
+					.arrow-right {
+						border-top: 13px solid transparent;
+						border-left: 8px solid $color-accent;
+						border-bottom: 13px solid transparent;
+					}
+
+					.required-item-tooltip {
+						position: absolute;
+						left: -80%;
+						bottom: -50px;
+						width: 125px;
+						z-index: $z-index-modal;
+
+						background: $gray-darker;
+						color: $white;
+
+						padding: 10px;
+						border-radius: 5px;
+						font-weight: normal;
+					}
+
+					.arrow-top {
+						position: absolute;
+						bottom: -15px;
+						left: 30%;
+						border-left: 10px solid transparent;
+						border-right: 10px solid transparent;
+						
+						border-bottom: 10px solid $gray-darker;
 					}
 				}
 
@@ -1903,19 +1962,8 @@ node-creation-selection-dialog {
 				}
 
 				button.answer-node-select, button.add-item {
-
 					color: $white;
-					background: $color-accent;
 					height: fit-content;
-
-					&:hover {
-						background: $color-accent-highlight;
-					}
-
-					&.managed {
-						color: $white;
-						background: $color-accent-highlight;
-					}
 				}
 
 				button.answer-node-select {
@@ -1925,6 +1973,9 @@ node-creation-selection-dialog {
 					flex-direction: column;
 					justify-content: center;
 					border-radius: 50%;
+					border: 1px solid $white;
+					background-color: transparent;
+					font-size: 24px;
 				}
 
 				.answer-items {
