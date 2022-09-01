@@ -1915,6 +1915,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 		$scope.toggleRequiredItemsModal = (answer) ->
 			$scope.showRequiredItems = !$scope.showRequiredItems
+			$scope.showItemSelection = false
 
 			# Add items not already being used to the items available for selection
 			$scope.availableItems = []
@@ -1928,6 +1929,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						$scope.availableItems.push(item)
 
 			$scope.currentAnswer = answer
+			console.log(answer)
 			$scope.selectedItem = $scope.availableItems[0]
 
 		$scope.removeRequiredItemFromAnswer = (item, answer) ->
@@ -2390,8 +2392,8 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (lega
 
 					# The hotspot answer manager will appear adjacent to the cursor
 					# Pass it the cursor location, which is tweaked in the answer manager's directive before being applied
-					$scope.hotspotAnswerManager.x = evt.clientX
-					$scope.hotspotAnswerManager.y = evt.clientY
+					# $scope.hotspotAnswerManager.x = evt.clientX
+					# $scope.hotspotAnswerManager.y = evt.clientY
 
 					$scope.hotspotAnswerManager.answerIndex = index
 					$scope.hotspotAnswerManager.target = $scope.answers[index].target
@@ -2536,7 +2538,7 @@ Adventure.directive "hotspotAnswerManager", [() ->
 
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 
-				$attrs.$set "style", styles
+				# $attrs.$set "style", styles
 
 		$scope.closeManager = (evt) ->
 

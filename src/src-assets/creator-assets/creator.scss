@@ -60,6 +60,7 @@ $edit-popup-standard-height: 620px;
 // $edit-popup-extra-height: 620px;
 // $edit-popup-less-height: 570px;
 
+$node-creation-panels-width: 1100px;
 
 $z-index-hidden: -1;
 $z-index-default: 0;
@@ -97,6 +98,18 @@ html, body {
 }
 
 /* Component Styling */
+
+.arrow-right {
+	border-top: 13px solid transparent;
+	border-left: 8px solid $color-accent;
+	border-bottom: 13px solid transparent;
+}
+
+.arrow-left {
+	border-top: 13px solid transparent;
+	border-right: 8px solid $color-accent;
+	border-bottom: 13px solid transparent;
+}
 
 button {
 	cursor: pointer;
@@ -878,46 +891,57 @@ node-tooltips {
 	}
 }
 
-.item-modal, title-editor {
-	position: absolute;
-	left: 50%;
-	top: 10%;
-	z-index: $z-index-modal-dialog;
-
-	width: $misc-popup-width;
-	margin: 5px 0px 0px -300px;
+.item-selection {
 	border-radius: 10px;
-	background: $color-primary;
+	background: $gray-lightest;
 
 	box-shadow: $shadow-dialog;
 
-	&.item-modal {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		max-height: 80%;
+	display: flex;
+	flex-direction: column;
+	// justify-content: space-between;
+	max-height: 80%;
+	padding: 0 25px;
+	box-sizing: border-box;
+
+	z-index: $z-index-modal-dialog;
+
+	/** Show modal on screen widths < 1000px **/
+	@media screen and (max-width: $node-creation-panels-width) {
+		&.item-panel {
+			display: none;
+		}
+	}
+	/** Show two panels on screen widths >= 1000px **/
+	@media screen and (min-width: $node-creation-panels-width) {
+		&.item-modal {
+			display: none;
+		}
 	}
 
-	h4 {
+	&.item-panel {
+		position: relative;
+	}
+
+	h4, .item-header {
 		display: flex;
 		justify-content: space-between;
 		box-sizing: border-box;
-		align-items: center;
 
-		margin: 0px;
-		padding: 10px 25px;
+		padding: 10px 0;
 
 		border-top-left-radius: 5px;
 		border-top-right-radius: 5px;
 
-		color: $color-primary;
-		background: $color-accent;
+		border-bottom: 1px solid $gray-darker;
 
 		> div {
 			display: flex;
-			flex-direction: row;
-			grid-gap: 20px;
-			align-items: center;
+			flex-direction: column;
+
+			h3 {
+				
+			}
 		}
 
 		.hide-popup:hover {
@@ -930,9 +954,8 @@ node-tooltips {
 		margin-bottom: 5px;
 		font-size: 11pt;
 
-		padding: 5px 10px;
-
-		background: $white;
+		padding: 10px 0;
+		margin-right: 2px;
 
 		-webkit-transition: background 0.5s;
 		transition: background 0.5s;
@@ -941,6 +964,20 @@ node-tooltips {
 		flex-direction: row;
 		justify-content: space-between;
 		gap: 10px;
+
+		.selector {
+			display: flex;
+			flex-direction: row;
+			grid-gap: 20px;
+
+			select {
+				width: 200px;
+			}
+
+			button {
+				min-width: 75px;
+			}
+		}
 
 		> input {
 			flex-grow: 2;
@@ -962,8 +999,11 @@ node-tooltips {
 			flex-direction: column;
 			grid-gap: 20px;
 			align-items: center;
+			justify-content: center;
 			min-width: 35px;
 			min-height: 35px;
+			//background-color:$gray-lighter;
+			border-radius: 2px;
 
 			span {
 				text-align: center;
@@ -992,6 +1032,7 @@ node-tooltips {
 			display: flex;
 			flex-direction: column;
 			flex-grow: 2;
+			justify-content: center;
 
 			.item-description {
 				color: $gray-darker;
@@ -1008,23 +1049,18 @@ node-tooltips {
 		.item-options {
 			display: flex;
 			justify-content: space-around;
+			align-items: center;
 			gap: 10px;
 
 			.item-quantity {
 				display: flex;
-				flex-direction: column;
+				flex-direction: row;
+				grid-gap: 10px;
 				max-width: 250px;
-				margin-right: 30px;
+				align-items: center;
 
-				> span {
-					font-style: italic;
-				}
-
-				div {
-					display: flex;
-					flex-direction: row;
-					align-items: center;
-					gap: 10px;
+				input {
+					width: 70px;
 				}
 			}
 
@@ -1051,8 +1087,8 @@ node-tooltips {
 			align-items: center;
 		}
 
-		&:hover {
-			background: $color-selection-hover;
+		&:hover:not(.options-bar) {
+			// background: $color-selection-hover;
 
 			&.pointer {
 				cursor: pointer;
@@ -1076,40 +1112,6 @@ node-tooltips {
 
 		overflow: auto;
 		overflow-x: hidden;
-	}
-
-	ul.icons-list {
-		max-height: 300px;
-		overflow: auto;
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		grid-gap: 10px;
-
-		li {
-			width: 35px;
-			height: 35px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0;
-			margin: 0;
-			border: 2px solid transparent;
-
-			img {
-				width: 15px;
-				height: 15px;
-				object-fit: cover;
-			}
-
-			&:hover {
-				cursor: pointer;
-			}
-
-			&.selectedIcon {
-				background-color: $blue-focus;
-			}
-		}
 	}
 
 	input {
@@ -1142,10 +1144,154 @@ node-tooltips {
 	}
 }
 
+.item-manager {
+	position: relative;
+	width: 80%;
+	height: 80%;
+	max-width: 700px;
+	margin: auto;
+	z-index: $z-index-modal;
+	margin-top: 20px;
+
+	padding: 0 !important;
+
+	background-color: $white;
+
+	> h4 {
+		background-color: $color-accent;
+		color: $white;
+		padding: 10px 25px !important;
+		border: none !important;
+		margin: 0;
+	}
+
+	ul, .options-bar {
+		padding: 10px 25px !important;
+	}
+
+
+
+	.arrow-left {
+		position: absolute;
+		left: 112px;
+		border-right-color: $gray-lightest;
+		z-index: $z-index-modal-dialog;
+	}
+}
+
+item-icon-selector {
+	position: absolute;
+	padding: 0 !important;
+	bottom: 0;
+	top: 0;
+	left: 120px;
+	z-index: $z-index-modal;
+	width: 75%;
+	max-height: 500px !important;
+	padding: 0px;
+
+	> h4 {
+		padding: 10px 25px !important;
+	}
+
+	ul.icons-list {
+		max-height: 300px;
+		overflow: auto;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		grid-gap: 10px;
+
+		li {
+			width: 35px;
+			height: 35px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0;
+			border: 2px solid transparent;
+			padding: 0;
+
+			img {
+				width: 15px;
+				height: 15px;
+				object-fit: cover;
+			}
+
+			&:hover {
+				cursor: pointer;
+				background-color: $gray-lighter;
+			}
+
+			&.selectedIcon {
+				background-color: $blue-focus;
+			}
+		}
+	}
+}
+
+.item-modal {
+	position: fixed;
+	height: 60%;
+	width: 55%;
+	top: 100px;
+	left: 11%;
+	margin: auto;
+	z-index: $z-index-modal;
+	margin-top: 20px;
+
+	.arrow-right {
+		position: absolute;
+		right: -8px;
+		bottom: 120px;
+		border-left-color: $gray-lightest;
+	}
+}
+
+.item-panel {
+	height: 100%;
+	max-height: 100%;
+	min-width: 350px;
+}
+
 title-editor {
+	position: absolute;
+	width: 500px;
+
+	top: 150px;
+	left: 50%;
+	margin-left: -200px;
+	padding-bottom: 25px;
+
+	z-index: $z-index-modal;
+
+	background: $color-primary;
+	border-radius: 5px;
+
+	h4 {
+		width: 100%;
+		box-sizing: border-box;
+
+		margin: 0px;
+		padding: 10px 25px;
+
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+
+		color: $color-primary;
+		background: $color-accent;
+	}
+
 	input {
 		width: 385px;
+		height: 2em;
+		font-weight: 1.2em;
+		padding: 5px 10px 5px 10px;
 		margin: 25px 5px 10px 20px;
+
+		border: solid 1px $gray-lighter;
+		border-radius: 3px;
 	}
 }
 
@@ -1607,6 +1753,100 @@ node-creation-selection-dialog {
 	justify-content: space-between;
 
 	&.hotspot {
+		justify-content: start;
+	}
+
+	.node-creation-panels {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		max-height: 80%;
+
+		.panel-left {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
+			width: 100%;
+			max-width: 1000px;
+			overflow: hidden;
+		}
+
+		.panel-right {
+			padding: 10px;
+		}
+	}
+
+	@media screen and (max-width: $node-creation-panels-width) {
+		.panel-right {
+			display: none;
+		}
+	}
+
+	@media screen and (min-width: $node-creation-panels-width) {
+		.node-creation-panels {
+			flex-direction: row;
+		}
+	}
+
+	.require-item-btn {
+		// width: 100%;
+		height: 100%;
+		position: relative;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		grid-gap: 2px;
+		background-color: $gray-lightest;
+		border-color: $gray-lighter;
+		color: $color-accent;
+	}
+
+	.icon-lock {
+		font-size: 35px;
+		width: 25px;
+	}
+
+	.required-item-tooltip {
+		position: absolute;
+		left: -80%;
+		top: -50px;
+		width: 125px;
+		z-index: $z-index-modal;
+
+		background: $gray-darker;
+		color: $white;
+
+		padding: 10px;
+		border-radius: 5px;
+		font-weight: normal;
+
+		&.tooltip-bottom {
+			bottom: -50px;
+			top: auto;
+		}
+	}
+
+	.arrow-top {
+		position: absolute;
+		bottom: -15px;
+		left: 30%;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		
+		border-bottom: 10px solid $gray-darker;
+	}
+
+	.arrow-bottom {
+		position: absolute;
+		top: -15px;
+		left: 30%;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		
+		border-top: 10px solid $gray-darker;
+	}
+
+	&.hotspot {
 		max-height: 650px;
 		height: 100%;
 
@@ -1685,7 +1925,7 @@ node-creation-selection-dialog {
 		display: flex;
 		flex-direction: row;
 		align-items: stretch;
-		flex-grow: 1;
+		// flex-grow: 1;
 
 		margin: $edit-popup-padding;
 		grid-gap: $edit-popup-padding;
@@ -1768,20 +2008,9 @@ node-creation-selection-dialog {
 		margin: 10px 10px 0px 10px;
 		padding: 5px;
 
-		overflow-y: auto;
+		max-height: 500px; 
+		overflow-y: scroll;
 		flex-grow: 2;
-
-		&.long {
-			// max-height: 242px;
-
-			@media screen and (max-height: $edit-popup-standard-height + 69) {
-				max-height: 270px;
-			}
-		}
-
-		// @media screen and (max-height: $edit-popup-standard-height + 69) {
-		// 	max-height: 170px;
-		// }
 
 		ul {
 			list-style-type: none;
@@ -1797,14 +2026,15 @@ node-creation-selection-dialog {
 				padding: 5px;
 				box-sizing: border-box;
 
-				background: $color-primary;
-
 				-webkit-transition: background 0.5s;
 				transition: background 0.5s;
+				position: relative;
 
-				display: flex;
-				flex-direction: row;
-				grid-gap: 10px;
+				&.unmatched-answers-row, div.answer {
+					display: flex;
+					flex-direction: row;
+					grid-gap: 10px;
+				}
 
 				border-radius: 5px;
 
@@ -1893,55 +2123,6 @@ node-creation-selection-dialog {
 							cursor: pointer;
 						}
 					}
-
-					.require-item-btn {
-						width: 100%;
-						height: 100%;
-						position: relative;
-						display: flex;
-						flex-direction: row;
-						align-items: center;
-						grid-gap: 2px;
-						background-color: $gray-lightest;
-						border-color: $gray-lighter;
-						color: $color-accent;
-					}
-
-					.icon-lock {
-						font-size: 35px;
-						width: 25px;
-					}
-
-					.arrow-right {
-						border-top: 13px solid transparent;
-						border-left: 8px solid $color-accent;
-						border-bottom: 13px solid transparent;
-					}
-
-					.required-item-tooltip {
-						position: absolute;
-						left: -80%;
-						bottom: -50px;
-						width: 125px;
-						z-index: $z-index-modal;
-
-						background: $gray-darker;
-						color: $white;
-
-						padding: 10px;
-						border-radius: 5px;
-						font-weight: normal;
-					}
-
-					.arrow-top {
-						position: absolute;
-						bottom: -15px;
-						left: 30%;
-						border-left: 10px solid transparent;
-						border-right: 10px solid transparent;
-						
-						border-bottom: 10px solid $gray-darker;
-					}
 				}
 
 				input {
@@ -1957,7 +2138,6 @@ node-creation-selection-dialog {
 				}
 
 				button.delete-button {
-					width: 30px;
 					height: 30px;
 				}
 
@@ -2204,23 +2384,27 @@ node-creation-selection-dialog {
 
 	hotspot-manager {
 		position: relative;
-		// display: block;
 		width: 100%;
+		display: flex;
+		flex-direction: row;
 		flex-grow: 2;
 
-		display: flex;
-		flex-direction: column;
+		.image-manager {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
 
-		@media screen and (max-height: 650px) {
-			& {
-				height: 300px;
+			@media screen and (max-height: 650px) {
+				& {
+					height: 300px;
+				}
 			}
 		}
 
 		.image-container {
 			position: relative;
 			display: block;
-			width: $edit-popup-content-width-full;
+			width: 600px;
 			height: 410px;
 			overflow: auto;
 			overflow-x: hidden;
@@ -2228,12 +2412,6 @@ node-creation-selection-dialog {
 			margin: 0 auto;
 
 			text-align: center;
-
-			// @media screen and (max-height: 650px) {
-			// 	& {
-			// 		height: 310px;
-			// 	}
-			// }
 
 			@media screen and (max-height: $edit-popup-standard-height + 69) {
 				margin-top: 0px;
@@ -2466,9 +2644,23 @@ node-creation-selection-dialog {
 		&.visible {
 			display: flex;
 			width: 400px;
+			height: 100%;
 			flex-direction: column;
 			justify-content: space-between;
 			align-items: center;
+
+			left: 0;
+			right: 0;
+			margin: auto;
+
+			@media screen and (min-width: $node-creation-panels-width) {
+				position: relative;
+				left: auto;
+			}
+
+			@media screen and (max-width: $node-creation-panels-width) {
+				
+			}
 		}
 
 		.hotspot-answer-header {
@@ -2560,10 +2752,14 @@ node-creation-selection-dialog {
 
 		div.button-options {
 			margin: 5px 5px 10px 15px;
-			text-align: center;
+			display: flex;
 
 			button {
 				margin-right: 4px;
+			}
+
+			.item-modal {
+				left: 12%;
 			}
 		}
 
@@ -2882,19 +3078,6 @@ import-type-selection {
 		margin-top: 10px;
 		color: $red;
 		font-weight: 700;
-	}
-}
-
-.item-selection, .required-items {
-	.add-item {
-		cursor: default;
-
-		select {
-			margin-right: 10px;
-			padding: 10px 25px;
-			border: 1px solid $color-accent;
-			border-radius: 5px;
-		}
 	}
 }
 
