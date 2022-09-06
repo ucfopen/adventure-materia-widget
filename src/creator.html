@@ -586,7 +586,7 @@
 													>{{ integerToLetters(answer.target) }}
 												</button>
 											</div>
-											<button ng-show="inventoryItems[0]" class="important-button require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
+											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
 												<div class="required-item-tooltip tooltip-bottom" ng-show="answer.showTooltip">
 													Add a required item
 												</div>
@@ -639,7 +639,7 @@
 													>{{ integerToLetters(answer.target) }}
 												</button>
 											</div>
-											<button ng-show="inventoryItems[0]" class="important-button require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
+											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
 												<div class="required-item-tooltip" ng-show="answer.showTooltip">
 													Add a required item
 												</div>
@@ -845,8 +845,13 @@
 							</div>
 							<!-- management popup when an individual hotspot is selected -->
 							<hotspot-answer-manager
-							ng-class="{'visible' : hotspotAnswerManager.show}" class="hotspot-answer-manager-modal">
-								<div class="hotspot-answer-header">
+							ng-class="{'visible' : hotspotAnswerManager.show}"
+							data-pos-x="{{hotspotAnswerManager.x}}"
+							data-pos-y="{{hotspotAnswerManager.y}}"
+							ng-click="bringToFront($event)"
+							>
+								<div class="hotspot-answer-header" 
+								ng-mousedown="dragStart($event)">
 									<h4>Manage This Hotspot</h4>
 									<span class="hide-popup icon-cross"
 									ng-click="hotspotAnswerManager.show = false"
@@ -871,7 +876,8 @@
 								</div> -->
 								<div class="button-options">
 									<!-- required items modal for hotspot -->
-									<div ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]" class="item-selection item-modal">
+									<div ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]" class="item-selection item-modal"
+									ng-click="bringToFront($event)">
 										<div class="item-header">
 											<div>
 												<h3>Required Items</h3>
@@ -922,7 +928,7 @@
 										</div>
 										<!-- <i class="arrow-right"></i> -->
 									</div>
-									<button ng-show="inventoryItems[0]" class="important-button require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = true" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
+									<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = true" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
 										<div class="required-item-tooltip tooltip-bottom" ng-show="answers[hotspotAnswerManager.answerIndex].showTooltip">
 											Add a required item
 										</div>
@@ -956,7 +962,8 @@
 							</hotspot-answer-manager>
 						</hotspot-manager>
 						<!-- item selection for individual nodes -->
-						<div item-selection ng-show="showItemSelection" class="item-selection item-modal">
+						<div item-selection ng-show="showItemSelection" class="item-selection item-modal"
+						ng-click="bringToFront($event)">
 							<h4>
 								<span>What Items Should This Visiting This Node Give The Player?</span>
 								<span class="hide-popup icon-cross"
@@ -1007,7 +1014,8 @@
 					</div>
 					<div class="panel-right">
 						<!-- item selection for individual nodes -->
-						<div item-selection ng-show="showItemSelection" class="item-selection item-panel">
+						<div item-selection ng-show="showItemSelection" class="item-selection item-panel"
+						ng-click="bringToFront($event)">
 							<h4>
 								<span>What Items Should This Visiting This Node Give The Player?</span>
 								<span class="hide-popup icon-cross"
@@ -1056,7 +1064,8 @@
 							</div>
 						</div>
 						<!-- required items panel for answer choices -->
-						<div ng-show="showRequiredItems" class="item-selection item-panel">
+						<div ng-show="showRequiredItems" class="item-selection item-panel" 
+						ng-click="bringToFront($event)">
 							<div class="item-header">
 								<div>
 									<h3>Required Items</h3>

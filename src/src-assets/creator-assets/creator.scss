@@ -1236,9 +1236,11 @@ item-icon-selector {
 	height: 60%;
 	width: 55%;
 	top: 100px;
-	left: 11%;
+	// left: 11%;
+	left: 0;
+	right: 0;
 	margin: auto;
-	z-index: $z-index-modal;
+	z-index: $z-index-modal-dialog;
 	margin-top: 20px;
 
 	.arrow-right {
@@ -1252,7 +1254,8 @@ item-icon-selector {
 .item-panel {
 	height: 100%;
 	max-height: 100%;
-	min-width: 350px;
+	min-width: 300px;
+	z-index: 200;
 }
 
 title-editor {
@@ -1799,6 +1802,10 @@ node-creation-selection-dialog {
 		background-color: $gray-lightest;
 		border-color: $gray-lighter;
 		color: $color-accent;
+
+		&:hover {
+			background-color: $gray-lighter;
+		}
 	}
 
 	.icon-lock {
@@ -2504,7 +2511,7 @@ node-creation-selection-dialog {
 
 	.image-options-container {
 		position: absolute;
-		bottom: 54px;
+		bottom: 0;
 		z-index: $z-index-modal-dialog;
 
 		@media screen and (max-height: 650px) {
@@ -2625,7 +2632,7 @@ node-creation-selection-dialog {
 	}
 
 	hotspot-answer-manager {
-		position: absolute;
+		position: fixed;
 		display: none;
 		width: 0px;
 
@@ -2644,23 +2651,10 @@ node-creation-selection-dialog {
 		&.visible {
 			display: flex;
 			width: 400px;
-			height: 100%;
+			// height: 100%;
 			flex-direction: column;
 			justify-content: space-between;
 			align-items: center;
-
-			left: 0;
-			right: 0;
-			margin: auto;
-
-			@media screen and (min-width: $node-creation-panels-width) {
-				position: relative;
-				left: auto;
-			}
-
-			@media screen and (max-width: $node-creation-panels-width) {
-				
-			}
 		}
 
 		.hotspot-answer-header {

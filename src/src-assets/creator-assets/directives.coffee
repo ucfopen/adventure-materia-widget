@@ -1913,9 +1913,37 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			# Display a warning in creator if not
 			return
 
+		# Changing z-indexes of windows inside hotspot manager on click
+		$scope.bringToFront = (event) ->
+			vis = document.querySelector('visibility-manager')
+			hotspot = document.querySelector('hotspot-answer-manager')
+			item = document.querySelector('.item-panel')
+
+			if event.target.closest('.item-panel')
+				item.style.zIndex = 200;
+				if(vis)
+					vis.style.zIndex = 100;
+				if(hotspot)
+					hotspot.style.zIndex = 100;
+			else if event.target.closest('hotspot-answer-manager')
+				hotspot.style.zIndex = 200;
+				if(vis)
+					vis.style.zIndex = 100;
+				if(item)
+					item.style.zIndex = 100;
+			else if event.target.closest('visibility-manager')
+				vis.style.zIndex = 200;
+				if(item)
+					item.style.zIndex = 100;
+				if(hotspot)
+					hotspot.style.zIndex = 100;
+
 		$scope.toggleRequiredItemsModal = (answer) ->
 			$scope.showRequiredItems = !$scope.showRequiredItems
 			$scope.showItemSelection = false
+			if document.querySelector('hotspot-answer-manager')
+				document.querySelector('hotspot-answer-manager').style.zIndex = 100;
+
 
 			# Add items not already being used to the items available for selection
 			$scope.availableItems = []
@@ -2389,14 +2417,19 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (lega
 					$scope.hotspotAnswerManager.answerIndex = null
 				else
 					$scope.hotspotAnswerManager.show = true
+					# $scope.showRequiredItems = false
+					# $scope.showItemSelection = false
 
 					# The hotspot answer manager will appear adjacent to the cursor
 					# Pass it the cursor location, which is tweaked in the answer manager's directive before being applied
-					# $scope.hotspotAnswerManager.x = evt.clientX
-					# $scope.hotspotAnswerManager.y = evt.clientY
+					$scope.hotspotAnswerManager.x = evt.clientX
+					$scope.hotspotAnswerManager.y = evt.clientY
 
 					$scope.hotspotAnswerManager.answerIndex = index
 					$scope.hotspotAnswerManager.target = $scope.answers[index].target
+
+					$scope.hotspotAnswerManager.svgWidth = evt.currentTarget.offsetWidth
+					$scope.hotspotAnswerManager.svgHeight = evt.currentTarget.offsetHeight
 
 			$scope.selectedSVG.hasMoved = false # once the click event has checked on hasMoved, we can reset it
 
@@ -2523,22 +2556,54 @@ Adventure.directive "hotspotAnswerManager", [() ->
 
 				# Move the manager so its back into frame if it's out of bounds
 				if (yOffset + managerMaxHeight) > container.height
-					diffY = (yOffset + managerMaxHeight) - container.height - 5
+					diffY = (yOffset + managerMaxHeight) - container.height - $scope.hotspotAnswerManager.svgWidth
 					yOffset -= diffY
 
 				if (xOffset + managerMaxWidth) > container.width
-					diffX = (xOffset + managerMaxWidth) - container.width - 5
+					diffX = (xOffset + managerMaxWidth) - container.width - $scope.hotspotAnswerManager.svgHeight
 					xOffset -= diffX
 
 				# Finally, update the position of the manager so the X/Y coords properly align with the hotspot canvas
-				managerBounds = document.getElementById("hotspot-manager").getBoundingClientRect()
+				#managerBounds = document.getElementById("hotspot-manager").getBoundingClientRect()
 
-				xOffset -= managerBounds.left
-				yOffset -= managerBounds.top
+				#xOffset -= managerBounds.left
+				#yOffset -= managerBounds.top
 
-				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
 
-				# $attrs.$set "style", styles
+				styles = "left: " + xOffset + "px; top: " + yOffset + "px;" + "z-index: 200;"
+
+				$attrs.$set "style", styles
+
+		$scope.dragStart = (e) ->
+			e.preventDefault()
+
+			$scope.mousePos =
+				x: e.clientX
+				y: e.clientY
+
+			document.onmouseup = $scope.closeDragListeners
+			document.onmousemove = $scope.elementDrag
+
+
+		$scope.elementDrag = (e) ->
+			e.preventDefault();
+			
+			xOffset = $scope.hotspotAnswerManager.x - ($scope.mousePos.x - e.clientX)
+			yOffset = $scope.hotspotAnswerManager.y - ($scope.mousePos.y - e.clientY)
+
+			styles = "left: " + xOffset + "px; top: " + yOffset + "px;" + "z-index: 200;"
+			
+			$attrs.$set "style", styles
+			
+
+		$scope.closeDragListeners = (e) ->
+			e.preventDefault();
+
+			$scope.hotspotAnswerManager.x = $scope.hotspotAnswerManager.x - ($scope.mousePos.x - e.clientX)
+			$scope.hotspotAnswerManager.y = $scope.hotspotAnswerManager.y - ($scope.mousePos.y - e.clientY)
+
+			document.onmouseup = null;
+			document.onmousemove= null;
 
 		$scope.closeManager = (evt) ->
 
