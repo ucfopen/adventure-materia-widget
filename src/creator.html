@@ -78,7 +78,15 @@
 			</title-editor>
 			<button class="item-editor-button" ng-click="showItemManager = true">{{inventoryItems.length ? 'Edit Items' : 'Add Items'}}</button>
 			<item-manager ng-show="showItemManager" class="item-selection item-manager">
-				<h4>Edit Items</h4>
+				<div class="item-header">
+					<div class="item-heading">
+						<h4>Edit Items</h4>
+						<span class="hide-popup icon-cross"
+						ng-click="saveAndCloseInventory()"
+						ng-keypress="$event.keyCode === 13 ? saveAndCloseInventory() : ''"
+						tabindex="0"></span>
+					</div>
+				</div>
 				<ul class="list-items">
 					<li
 						ng-repeat="item in inventoryItems track by item.id"
@@ -122,7 +130,11 @@
 							<button class="delete-button" type="button" ng-click="removeItemFromInventoryItems($index, item)">Remove</button>
 						</div>
 						<item-icon-selector ng-show="showItemIconSelector && currentItem == item" class="item-selection">
-							<h4>Icon Selector</h4>
+							<div class="item-header">
+								<div class="item-heading">
+									<h4>Icon Selector</h4>
+								</div>
+							</div>
 							<ul class="icons-list">
 								<li ng-class="{
 									'icon-{{icon.icomoon_name}}': icon.icomoon_name, 
@@ -489,11 +501,11 @@
 				ng-click="hidePopup"
 				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT, 'multi-choice': displayNodeCreation == MC}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
-				<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
-				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
-				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
-				<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
-				<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
+				<h2 ng-if="displayNodeCreation == MC">Multiple Choice</h2>
+				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer</h2>
+				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot</h2>
+				<h2 ng-if="displayNodeCreation == NARR">Narrative</h2>
+				<h2 ng-if="displayNodeCreation == END">End Point</h2>
 				<div class="node-creation-panels">
 					<div class="panel-left">
 						<div class="question-media-box" ng-class="{
@@ -648,17 +660,17 @@
 										</div>
 									</div>
 									<!-- required items modal for answer choices -->
-									<div ng-show="showRequiredItems && currentAnswer == answer" class="item-selection item-modal">
+									<div ng-show="showRequiredItems && currentAnswer == answer" class="item-selection item-modal"  
+									ng-mousedown="modalDragStart($event)">
 										<div class="item-header">
-											<div>
+											<div class="item-heading">
 												<h3>Required Items</h3>
-												<p>The player must have the items in their inventory to select this answer.</p>
-												<!-- <button class="info-icon" ng-click="displayInfoDialog('required-items')">i</button> -->
+												<span class="hide-popup icon-cross"
+												ng-click="toggleRequiredItemsModal(answer)"
+												ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answer) : ''"
+												tabindex="0"></span>
 											</div>
-											<span class="hide-popup icon-cross"
-											ng-click="toggleRequiredItemsModal(answer)"
-											ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answer) : ''"
-											tabindex="0"></span>
+											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
 										</div>
 										<ul class="list-items give-items">
 											<li
@@ -830,7 +842,7 @@
 												ng-click="beginMediaImport()">Change Media</button></li>
 										</ul>
 									</hotspot-toolbar>
-									<div class="visibility-manager" ng-show="visibilityManagerOpen">
+									<div class="visibility-manager" ng-show="visibilityManagerOpen" ng-click="bringToFront($event)">
 										<h4>For this image,</h4>
 										<ul>
 											<li ng-class="{'selected':editedNode.hotspotVisibility == ALWAYS}"
@@ -878,16 +890,16 @@
 									<!-- required items modal for hotspot -->
 									<div ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]" class="item-selection item-modal"
 									ng-click="bringToFront($event)">
-										<div class="item-header">
-											<div>
+										<div class="item-header"  
+										ng-mousedown="modalDragStart($event)">
+											<div class="item-heading">
 												<h3>Required Items</h3>
-												<p>The player must have the items in their inventory to select this answer.</p>
-												<!-- <button class="info-icon" ng-click="displayInfoDialog('required-items')">i</button> -->
+												<span class="hide-popup icon-cross"
+												ng-click="toggleRequiredItemsModal(answer)"
+												ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answer) : ''"
+												tabindex="0"></span>
 											</div>
-											<span class="hide-popup icon-cross"
-											ng-click="toggleRequiredItemsModal(answer)"
-											ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answer) : ''"
-											tabindex="0"></span>
+											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
 										</div>
 										<ul class="list-items give-items">
 											<li
@@ -963,14 +975,18 @@
 						</hotspot-manager>
 						<!-- item selection for individual nodes -->
 						<div item-selection ng-show="showItemSelection" class="item-selection item-modal"
-						ng-click="bringToFront($event)">
-							<h4>
-								<span>What Items Should This Visiting This Node Give The Player?</span>
-								<span class="hide-popup icon-cross"
-								ng-click="showItemSelection = false"
-								ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
-								tabindex="0"></span>
-							</h4>
+						ng-click="bringToFront($event)"  
+						ng-mousedown="modalDragStart($event)">
+							<div class="item-header">
+								<div class="item-heading">
+									<h3>Give Player Items</h3>
+									<span class="hide-popup icon-cross"
+									ng-click="showItemSelection = false"
+									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
+									tabindex="0"></span>
+								</div>
+								<p class="item-instructions">Visiting this node will give the player these items.</p>
+							</div>
 							<ul class="list-items give-items">
 								<li
 									ng-repeat="item in items"
@@ -992,11 +1008,8 @@
 									</div>
 									<div class="item-options" ng-class="{'show': hoverItem}">
 										<div class="item-quantity">
-											<div>
-												<span>Quantity</span>
-												<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
-											</div>
-											<!-- <span>(A negative number will subtract that amount from the player's inventory)</span> -->
+											<span>Quantity</span>
+											<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
 										</div>
 										<button class="delete-button" type="button" ng-click="removeItemFromNode(item, $index)">Remove</button>
 									</div>
@@ -1016,13 +1029,16 @@
 						<!-- item selection for individual nodes -->
 						<div item-selection ng-show="showItemSelection" class="item-selection item-panel"
 						ng-click="bringToFront($event)">
-							<h4>
-								<span>What Items Should This Visiting This Node Give The Player?</span>
-								<span class="hide-popup icon-cross"
-								ng-click="showItemSelection = false"
-								ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
-								tabindex="0"></span>
-							</h4>
+							<div class="item-header">
+								<div class="item-heading">
+									<h3>Give Player Items</h3>
+									<span class="hide-popup icon-cross"
+									ng-click="showItemSelection = false"
+									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
+									tabindex="0"></span>
+								</div>
+								<p class="item-instructions">Visiting this node will give the player these items.</p>
+							</div>
 							<ul class="list-items give-items">
 								<li
 									ng-repeat="item in items"
@@ -1067,15 +1083,14 @@
 						<div ng-show="showRequiredItems" class="item-selection item-panel" 
 						ng-click="bringToFront($event)">
 							<div class="item-header">
-								<div>
+								<div class="item-heading">
 									<h3>Required Items</h3>
-									<p>The player must have the items in their inventory to select this answer.</p>
-									<!-- <button class="info-icon" ng-click="displayInfoDialog('required-items')">i</button> -->
+									<span class="hide-popup icon-cross"
+									ng-click="showRequiredItems = false"
+									ng-keypress="$event.keyCode === 13 ? showRequiredItems = false : ''"
+									tabindex="0"></span>
 								</div>
-								<span class="hide-popup icon-cross"
-								ng-click="showRequiredItems = false"
-								ng-keypress="$event.keyCode === 13 ? showRequiredItems = false : ''"
-								tabindex="0"></span>
+								<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
 							</div>
 							<ul class="list-items give-items">
 								<li

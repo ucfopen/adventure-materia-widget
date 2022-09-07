@@ -899,7 +899,6 @@ node-tooltips {
 
 	display: flex;
 	flex-direction: column;
-	// justify-content: space-between;
 	max-height: 80%;
 	padding: 0 25px;
 	box-sizing: border-box;
@@ -919,34 +918,30 @@ node-tooltips {
 		}
 	}
 
-	&.item-panel {
-		position: relative;
-	}
-
-	h4, .item-header {
-		display: flex;
-		justify-content: space-between;
-		box-sizing: border-box;
-
-		padding: 10px 0;
+	.item-header {
 
 		border-top-left-radius: 5px;
 		border-top-right-radius: 5px;
-
 		border-bottom: 1px solid $gray-darker;
 
-		> div {
+		.item-heading {
 			display: flex;
-			flex-direction: column;
+			flex-direction: row;
+			justify-content: space-between;
+			box-sizing: border-box;
+			align-items: center;
+		}
 
-			h3 {
-				
+		.hide-popup {
+
+			&:hover {
+				cursor: pointer;
+				color: $red;
 			}
 		}
 
-		.hide-popup:hover {
-			cursor: pointer;
-			color: $red;
+		.item-instructions {
+			padding-bottom: 10px;
 		}
 	}
 
@@ -1061,6 +1056,7 @@ node-tooltips {
 
 				input {
 					width: 70px;
+					box-sizing: border-box;
 				}
 			}
 
@@ -1153,46 +1149,25 @@ node-tooltips {
 	z-index: $z-index-modal;
 	margin-top: 20px;
 
-	padding: 0 !important;
-
-	background-color: $white;
-
-	> h4 {
-		background-color: $color-accent;
-		color: $white;
-		padding: 10px 25px !important;
-		border: none !important;
-		margin: 0;
-	}
-
-	ul, .options-bar {
-		padding: 10px 25px !important;
-	}
-
-
+	background-color: $gray-lightest;
 
 	.arrow-left {
 		position: absolute;
 		left: 112px;
-		border-right-color: $gray-lightest;
+		border-right-color: $white;
 		z-index: $z-index-modal-dialog;
 	}
 }
 
 item-icon-selector {
 	position: absolute;
-	padding: 0 !important;
 	bottom: 0;
 	top: 0;
 	left: 120px;
 	z-index: $z-index-modal;
 	width: 75%;
 	max-height: 500px !important;
-	padding: 0px;
-
-	> h4 {
-		padding: 10px 25px !important;
-	}
+	background: $white !important;
 
 	ul.icons-list {
 		max-height: 300px;
@@ -1200,8 +1175,8 @@ item-icon-selector {
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
-		justify-content: space-between;
 		grid-gap: 10px;
+		padding-left: 25px;
 
 		li {
 			width: 35px;
@@ -1232,11 +1207,10 @@ item-icon-selector {
 }
 
 .item-modal {
-	position: fixed;
+	position: absolute;
 	height: 60%;
 	width: 55%;
 	top: 100px;
-	// left: 11%;
 	left: 0;
 	right: 0;
 	margin: auto;
@@ -1252,6 +1226,7 @@ item-icon-selector {
 }
 
 .item-panel {
+	position: relative;
 	height: 100%;
 	max-height: 100%;
 	min-width: 300px;
@@ -1996,7 +1971,7 @@ node-creation-selection-dialog {
 		div.media-toolbar {
 			// position: absolute;
 			// top: 100%;
-			width: 340px;
+			// width: 340px;
 			padding-top: 4px;
 
 			text-align: center;
@@ -2646,8 +2621,6 @@ node-creation-selection-dialog {
 		transition: width 0.5s ease;
 		transition: height 0.5s ease;
 
-		font-size:13px;
-
 		&.visible {
 			display: flex;
 			width: 400px;
@@ -2672,17 +2645,23 @@ node-creation-selection-dialog {
 			border-top-left-radius: 5px;
 			border-top-right-radius: 5px;
 
+			cursor: move;
+			&:active {
+				cursor: grabbing;
+			}
+
 			h4 {
 				margin: 0;
 			}
 
 			.hide-popup {
-				cursor: pointer;
-	
 				&:hover {
 					color: $red;
+					cursor: pointer;
 				}
 			}
+
+			
 		}
 
 		input {

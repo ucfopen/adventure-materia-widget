@@ -1915,12 +1915,12 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 		# Changing z-indexes of windows inside hotspot manager on click
 		$scope.bringToFront = (event) ->
-			vis = document.querySelector('visibility-manager')
+			vis = document.querySelector('.visibility-manager')
 			hotspot = document.querySelector('hotspot-answer-manager')
-			item = document.querySelector('.item-panel')
+			items = document.querySelectorAll('.item-selection')
 
-			if event.target.closest('.item-panel')
-				item.style.zIndex = 200;
+			if event.target.closest('.item-selection')
+				items.forEach((item) -> item.style.zIndex = 200)
 				if(vis)
 					vis.style.zIndex = 100;
 				if(hotspot)
@@ -1929,12 +1929,12 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				hotspot.style.zIndex = 200;
 				if(vis)
 					vis.style.zIndex = 100;
-				if(item)
-					item.style.zIndex = 100;
-			else if event.target.closest('visibility-manager')
+				if(items)
+					items.forEach((item) -> item.style.zIndex = 100)
+			else if event.target.closest('.visibility-manager')
 				vis.style.zIndex = 200;
-				if(item)
-					item.style.zIndex = 100;
+				if(items)
+					items.forEach((item) -> item.style.zIndex = 100)
 				if(hotspot)
 					hotspot.style.zIndex = 100;
 
@@ -1960,6 +1960,39 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			console.log(answer)
 			$scope.selectedItem = $scope.availableItems[0]
 
+		# drag doesn't work when item modals have position: fixed, instead of position: absolute
+
+		# $scope.modalDragStart = (e) ->
+		# 	$scope.modal = document.querySelector('.item-modal')
+		# 	e.preventDefault()
+
+		# 	$scope.mousePos =
+		# 		x: e.clientX
+		# 		y: e.clientY
+
+		# 	document.onmouseup = $scope.closeModalDragListeners
+		# 	document.onmousemove = $scope.modalDrag
+
+
+		# $scope.modalDrag = (e) ->
+		# 	e.preventDefault();
+			
+		# 	xOffset = $scope.modal.offsetLeft - ($scope.mousePos.x - e.clientX)
+		# 	yOffset = $scope.modal.offsetTop - ($scope.mousePos.y - e.clientY)
+
+		# 	console.log(xOffset)
+		# 	console.log(yOffset)
+			
+		# 	$scope.modal.style.top = xOffset + "px"
+		# 	$scope.modal.style.left = yOffset + "px"
+			
+
+		# $scope.closeModalDragListeners = (e) ->
+		# 	e.preventDefault();
+
+		# 	document.onmouseup = null;
+		# 	document.onmousemove= null;
+
 		$scope.removeRequiredItemFromAnswer = (item, answer) ->
 			# item.count -= 1
 			# if (item.count <= 0)
@@ -1970,7 +2003,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			item.count = 1
 			$scope.availableItems.push(item)
 			$scope.selectedItem = $scope.availableItems[0]
-
 
 		$scope.newAnswer = (text = null) ->
 
@@ -2014,7 +2046,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			# Inform the answers-container auto-scroll-and-focus directive that a new answer is added
 			$rootScope.$broadcast "editedNode.answers.added"
 
-
 		# Check to see if removing this answer will delete any child nodes of the selected answer's node
 		# If there are child nodes present, bring up the warning dialog
 		# Otherwise, go ahead and remove the answer (and associated node, if applicable)
@@ -2033,7 +2064,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.deleteDialog.show = true
 			else
 				$scope.removeAnswer index, targetId
-
 
 		$scope.removeAnswer = (index, targetId) ->
 
@@ -2074,7 +2104,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
-
 
 		$scope.manageNewNode = ($event, target, id, mode) ->
 
@@ -2428,8 +2457,8 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (lega
 					$scope.hotspotAnswerManager.answerIndex = index
 					$scope.hotspotAnswerManager.target = $scope.answers[index].target
 
-					$scope.hotspotAnswerManager.svgWidth = evt.currentTarget.offsetWidth
-					$scope.hotspotAnswerManager.svgHeight = evt.currentTarget.offsetHeight
+					$scope.hotspotAnswerManager.svgWidth = evt.currentTarget.getBoundingClientRect().width
+					$scope.hotspotAnswerManager.svgHeight = evt.currentTarget.getBoundingClientRect().height
 
 			$scope.selectedSVG.hasMoved = false # once the click event has checked on hasMoved, we can reset it
 
@@ -2556,21 +2585,25 @@ Adventure.directive "hotspotAnswerManager", [() ->
 
 				# Move the manager so its back into frame if it's out of bounds
 				if (yOffset + managerMaxHeight) > container.height
-					diffY = (yOffset + managerMaxHeight) - container.height - $scope.hotspotAnswerManager.svgWidth
+					diffY = (yOffset + managerMaxHeight) - container.height
 					yOffset -= diffY
 
 				if (xOffset + managerMaxWidth) > container.width
-					diffX = (xOffset + managerMaxWidth) - container.width - $scope.hotspotAnswerManager.svgHeight
+					diffX = (xOffset + managerMaxWidth) - container.width
 					xOffset -= diffX
 
-				# Finally, update the position of the manager so the X/Y coords properly align with the hotspot canvas
+				# Finally, update the positio n of the manager so the X/Y coords properly align with the hotspot canvas
 				#managerBounds = document.getElementById("hotspot-manager").getBoundingClientRect()
 
 				#xOffset -= managerBounds.left
 				#yOffset -= managerBounds.top
 
-
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px;" + "z-index: 200;"
+
+				$scope.hotspotAnswerManager.x = xOffset
+				$scope.hotspotAnswerManager.y = yOffset
+
+				document.querySelectorAll('.item-selection').forEach((modal) -> modal.style.zIndex = 100)
 
 				$attrs.$set "style", styles
 
