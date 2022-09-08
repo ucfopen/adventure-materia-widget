@@ -807,6 +807,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				# Select icon
 				$scope.inventoryItems[$scope.editingIndex].icon = icon
 			treeSrv.updateAllItems $scope.treeData, $scope.currentItem
+			console.log($scope.currentItem)
 
 		$scope.manageNewIcon = () ->
 			Materia.CreatorCore.showMediaImporter()

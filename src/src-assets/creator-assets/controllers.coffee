@@ -318,7 +318,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	]
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
-
+		
 		# Returning from a suspended node creation screen, don't do anything
 		if oldVal is "suspended" then return
 
@@ -412,13 +412,46 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 		$scope.displayNodeCreation = "none"
 
+	$scope.loadIcons = () ->
+		return new Promise((resolve, reject) -> 
+			xhr = new XMLHttpRequest()
+			xhr.open("GET", "/assets/icons.json", true)
+			xhr.responseType = 'json'
+			xhr.onload = () ->
+				if xhr.status >= 200 && xhr.status < 300
+					resolve(xhr.response)
+				else
+					reject({
+						status: xhr.status,
+						statusText: xhr.statusText
+					})
+			xhr.onerror = () ->
+				reject({
+					status: xhr.status,
+					statusText: xhr.statusText
+				})
+			xhr.send()
+		)
+
 	$scope.initIcons = (customIcons = null) ->
 		angular.forEach $scope.icons, (icon, index) ->
 			$scope.icons[index] = {
 				...icon,
 				url: icon.id
 			}
+		
+		$scope.loadIcons().then((result) ->
+			angular.forEach result.icons, (icon, index) ->
+				$scope.icons[index] = {
+					name: icon.name,
+					url: "assets/icons/#{icon.name}"
+				}
+			console.log($scope.icons)
 
+		).catch((err) ->
+			console.log(err)
+		)
+		
 		# Replaced with SVG icons
 		# for icomoon_icon in $scope.icomoon_icons
 		# 	formattedIcon =

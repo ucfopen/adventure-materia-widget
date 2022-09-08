@@ -660,7 +660,7 @@
 										</div>
 									</div>
 									<!-- required items modal for answer choices -->
-									<div ng-show="showRequiredItems && currentAnswer == answer" class="item-selection item-modal"  
+									<div ng-show="showRequiredItems && currentAnswer == answer" class="item-selection item-modal required-item-modal"  
 									ng-mousedown="modalDragStart($event)">
 										<div class="item-header">
 											<div class="item-heading">
@@ -888,7 +888,7 @@
 								</div> -->
 								<div class="button-options">
 									<!-- required items modal for hotspot -->
-									<div ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]" class="item-selection item-modal"
+									<div ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]" class="item-selection item-modal required-item-modal"
 									ng-click="bringToFront($event)">
 										<div class="item-header"  
 										ng-mousedown="modalDragStart($event)">
@@ -973,7 +973,7 @@
 								</div>
 							</hotspot-answer-manager>
 						</hotspot-manager>
-						<!-- item selection for individual nodes -->
+						<!-- item selection for individual nodes
 						<div item-selection ng-show="showItemSelection" class="item-selection item-modal"
 						ng-click="bringToFront($event)"  
 						ng-mousedown="modalDragStart($event)">
@@ -1021,9 +1021,9 @@
 									</select>
 									<button ng-click="addItemToNode(selectedItem)">Add Item</button>
 								</div>
-								<!-- <button ng-click="toggleItemPopup()">Done</button> -->
+								<button ng-click="toggleItemPopup()">Done</button>
 							</div>
-						</div>
+						</div> -->
 					</div>
 					<div class="panel-right">
 						<!-- item selection for individual nodes -->
@@ -1180,6 +1180,58 @@
 						</div>
 					</div>
 					<div class="items-container">
+						<!-- item selection for individual nodes -->
+						<div item-selection ng-show="showItemSelection" class="item-selection item-modal give-item-modal"
+						ng-click="bringToFront($event)"  
+						ng-mousedown="modalDragStart($event)">
+							<div class="item-header">
+								<div class="item-heading">
+									<h3>Give Player Items</h3>
+									<span class="hide-popup icon-cross"
+									ng-click="showItemSelection = false"
+									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
+									tabindex="0"></span>
+								</div>
+								<p class="item-instructions">Visiting this node will give the player these items.</p>
+							</div>
+							<ul class="list-items give-items">
+								<li
+									ng-repeat="item in items"
+									ng-click="manageItem(item)"
+									ng-mouseover="hoverItem = true"
+									ng-mouseout="hoverItem = false"
+								>
+									<div class="item-icon">
+										<span class="icon-{{item.icon.icomoon_name}}" ng-class="{'show': item.icon.icomoon}" ng-if="!item.icon.url"></span>
+										<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+									</div>
+									<div class="item-content">
+										<div class="item-name">
+											<span>{{item.name}}</span>
+										</div>
+										<div class="item-description" ng-if="item.description">
+											<span class="description">{{item.description}}</span>
+										</div>
+									</div>
+									<div class="item-options" ng-class="{'show': hoverItem}">
+										<div class="item-quantity">
+											<span>Quantity</span>
+											<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
+										</div>
+										<button class="delete-button" type="button" ng-click="removeItemFromNode(item, $index)">Remove</button>
+									</div>
+								</li>
+							</ul>
+							<div class="options-bar add-item">
+								<div class="selector">
+									<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+									</select>
+									<button ng-click="addItemToNode(selectedItem)">Add Item</button>
+								</div>
+								<!-- <button ng-click="toggleItemPopup()">Done</button> -->
+							</div>
+							<i class="arrow-bottom"></i>
+						</div>
 						<button type="button"
 							class="item-button"
 							ng-click="toggleItemPopup()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>Give Player Items</span>

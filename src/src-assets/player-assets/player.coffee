@@ -151,7 +151,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							id: q_i.id
 							icon: {
 								...q_i.icon
-								url: if q_i.icon.id then q_i.icon.id else ''
+								url: if q_i.icon.name then "assets/icons/#{q_i.icon.name}" else ''
 							}
 						}
 
@@ -228,6 +228,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	$scope.toggleInventory = () ->
 		$scope.showInventory = ! $scope.showInventory
+		console.log($scope.inventory)
 		$scope.selectedItem = $scope.inventory[0]
 		$scope.hideNotif()
 
