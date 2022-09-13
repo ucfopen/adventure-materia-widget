@@ -949,7 +949,8 @@
 										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
 									</div>
 									<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = true" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false">
-										<span class="icon-backpack"></span>
+										<span class="icon-unlocked" ng-if="!answers[hotspotAnswerManager.answerIndex].requiredItems[0]"></span>
+										<span class="icon-lock" ng-if="answers[hotspotAnswerManager.answerIndex].requiredItems[0]"></span>
 										<div class="required-item-tooltip tooltip-bottom" ng-show="answers[hotspotAnswerManager.answerIndex].showTooltip">
 											{{answers[hotspotAnswerManager.answerIndex].requiredItems[0] ? 'Edit Required Items' : 'Add Required Items'}}
 										</div>
