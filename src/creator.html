@@ -711,6 +711,7 @@
 										</div>
 										<!-- <i class="arrow-right"></i> -->
 									</div>
+
 								</li>
 							</ul>
 						</div>
@@ -828,7 +829,6 @@
 								<div class="image-options-container">
 									<!-- bottom toolbar with buttons for adding and managing hotspots -->
 									<hotspot-toolbar ng-show="mediaReady">
-										<input class="hotspot-alt-text" ng-show="mediaReady" ng-model="editedNode.media.alt" placeholder="Enter alt text for the hotspot image" />	
 										<ul>
 											<li><button type="button"
 												ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
@@ -836,23 +836,27 @@
 												ng-click="startSquareHotspot()">+ Square Hotspot</button></li>
 											<li><button type="button"
 												ng-click="startPolygonHotspot()">+ Polygon Hotspot</button></li>
-											<li><button type="button"
-												ng-click="visibilityManagerOpen = !visibilityManagerOpen">Edit Visibility</button></li>
+											<li>
+												<button type="button"
+												ng-click="visibilityManagerOpen = !visibilityManagerOpen">Edit Visibility</button>
+												<div class="visibility-manager" ng-show="visibilityManagerOpen" ng-click="bringToFront($event)">
+													<h4>For this image,</h4>
+													<ul>
+														<li ng-class="{'selected':editedNode.hotspotVisibility == ALWAYS}"
+															ng-click="editedNode.hotspotVisibility = ALWAYS; visibilityManagerOpen = false">Always show hotspots</li>
+														<li ng-class="{'selected':editedNode.hotspotVisibility == MOUSEOVER}"
+															ng-click="editedNode.hotspotVisibility = MOUSEOVER; visibilityManagerOpen = false">Reveal hotspots on mouseover</li>
+														<li ng-class="{'selected':editedNode.hotspotVisibility == NEVER}"
+															ng-click="editedNode.hotspotVisibility= NEVER; visibilityManagerOpen = false">Don't show hotspots</li>
+													</ul>
+												</div>
+												<i class="arrow-left" ng-show="visibilityManagerOpen"></i>
+											</li>
 											<li><button type="button"
 												ng-click="beginMediaImport()">Change Media</button></li>
 										</ul>
+										<textarea class="hotspot-alt-text" ng-show="mediaReady" ng-model="editedNode.media.alt" placeholder="Enter alt text for the hotspot image"></textarea>
 									</hotspot-toolbar>
-									<div class="visibility-manager" ng-show="visibilityManagerOpen" ng-click="bringToFront($event)">
-										<h4>For this image,</h4>
-										<ul>
-											<li ng-class="{'selected':editedNode.hotspotVisibility == ALWAYS}"
-												ng-click="editedNode.hotspotVisibility = ALWAYS; visibilityManagerOpen = false">Always show hotspots</li>
-											<li ng-class="{'selected':editedNode.hotspotVisibility == MOUSEOVER}"
-												ng-click="editedNode.hotspotVisibility = MOUSEOVER; visibilityManagerOpen = false">Reveal hotspots on mouseover</li>
-											<li ng-class="{'selected':editedNode.hotspotVisibility == NEVER}"
-												ng-click="editedNode.hotspotVisibility= NEVER; visibilityManagerOpen = false">Don't show hotspots</li>
-										</ul>
-									</div>
 								</div>
 							</div>
 							<!-- management popup when an individual hotspot is selected -->
@@ -888,7 +892,7 @@
 								</div> -->
 								<div class="button-options">
 									<!-- required items modal for hotspot -->
-									<div ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]" class="item-selection item-modal required-item-modal"
+									<div ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]" class="item-selection item-modal required-item-modal-hotspot"
 									ng-click="bringToFront($event)">
 										<div class="item-header"  
 										ng-mousedown="modalDragStart($event)">
@@ -938,7 +942,7 @@
 											</div>
 											<!-- <button ng-click="showRequiredItems = false">Done</button> -->
 										</div>
-										<!-- <i class="arrow-right"></i> -->
+										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
 									</div>
 									<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = true" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
 										<div class="required-item-tooltip tooltip-bottom" ng-show="answers[hotspotAnswerManager.answerIndex].showTooltip">
