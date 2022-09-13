@@ -1242,13 +1242,13 @@ item-icon-selector {
 
 	&.required-item-modal-hotspot {
 		position: absolute;
-		top: 10px;
-		left: 115px;
+		top: 40px;
+		left: 120px;
 
 		.arrow-left {
 			position: absolute;
 			left: -8px;
-			top: 155px;
+			top: 135px;
 			border-right-color: $gray-lightest;
 		}
 	}

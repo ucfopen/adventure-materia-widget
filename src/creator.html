@@ -903,8 +903,8 @@
 											<div class="item-heading">
 												<h3>Required Items</h3>
 												<span class="hide-popup icon-cross"
-												ng-click="toggleRequiredItemsModal(answer)"
-												ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answer) : ''"
+												ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])"
+												ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex]) : ''"
 												tabindex="0"></span>
 											</div>
 											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
