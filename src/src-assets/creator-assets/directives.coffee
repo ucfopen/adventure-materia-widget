@@ -1940,26 +1940,29 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					hotspot.style.zIndex = 100;
 
 		$scope.toggleRequiredItemsModal = (answer) ->
-			$scope.showRequiredItems = !$scope.showRequiredItems
-			$scope.showItemSelection = false
-			if document.querySelector('hotspot-answer-manager')
-				document.querySelector('hotspot-answer-manager').style.zIndex = 100;
+			if (answer is $scope.currentAnswer)
+				$scope.showRequiredItems = false
+				$scope.currentAnswer = null
+			else
+				$scope.showRequiredItems = true
+				$scope.showItemSelection = false
+				if document.querySelector('hotspot-answer-manager')
+					document.querySelector('hotspot-answer-manager').style.zIndex = 100;
 
 
-			# Add items not already being used to the items available for selection
-			$scope.availableItems = []
-			for item in $scope.inventoryItems
-				do (item) ->
-					used = false
-					for i in answer.requiredItems
-						if item.id is i.id
-							used = true
-					if ! used
-						$scope.availableItems.push(item)
+				# Add items not already being used to the items available for selection
+				$scope.availableItems = []
+				for item in $scope.inventoryItems
+					do (item) ->
+						used = false
+						for i in answer.requiredItems
+							if item.id is i.id
+								used = true
+						if ! used
+							$scope.availableItems.push(item)
 
-			$scope.currentAnswer = answer
-			console.log(answer)
-			$scope.selectedItem = $scope.availableItems[0]
+				$scope.currentAnswer = answer
+				$scope.selectedItem = $scope.availableItems[0]
 
 		# drag doesn't work when item modals have position: fixed, instead of position: absolute
 

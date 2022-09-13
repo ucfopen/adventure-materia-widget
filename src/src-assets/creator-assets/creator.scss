@@ -22,6 +22,8 @@ $tealish: #61a47f;
 
 $orange: #ff8f11;
 
+$green: #d5f7b3;
+
 $gray-darker: #333333;
 $gray: #888888;
 $gray-lighter: #cccccc;
@@ -1262,7 +1264,7 @@ item-icon-selector {
 	.arrow-bottom {
 		position: absolute;
 		bottom: -10px;
-		right: 140px;
+		right: 105px;
 		border-top-color: $gray-lightest;
 	}
 }
@@ -1784,7 +1786,6 @@ node-creation-selection-dialog {
 			flex-direction: column;
 			flex-grow: 1;
 			width: 100%;
-			max-width: 1000px;
 			overflow: hidden;
 		}
 
@@ -1810,15 +1811,19 @@ node-creation-selection-dialog {
 		height: 100%;
 		position: relative;
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
+		justify-content: center;
 		align-items: center;
 		grid-gap: 2px;
 		background-color: $gray-lightest;
-		border-color: $gray-lighter;
-		color: $color-accent;
+		border-color: $white;
+		color: $gray-darker;
+		font-size: 14px;
+		max-width: 105px;
+		padding-left: 20px;
 
 		&:hover {
-			background-color: $gray-lighter;
+			background-color: $gray-lightest;
 		}
 
 		.arrow-bottom {
@@ -1826,16 +1831,24 @@ node-creation-selection-dialog {
 			top: -15px;
 			left: 30%;
 		}
-	}
 
-	.icon-lock {
-		font-size: 35px;
-		width: 25px;
+
+		span {
+			font-size: 3em;
+		}
+
+		&.requires-items {
+			background-color: $gray-lightest;
+
+			&:hover {
+				background-color: $gray-lighter;
+			}
+		}
 	}
 
 	.required-item-tooltip {
 		position: absolute;
-		left: -80%;
+		left: -60%;
 		top: -50px;
 		width: 125px;
 		z-index: $z-index-modal;
@@ -1856,7 +1869,7 @@ node-creation-selection-dialog {
 	.arrow-top {
 		position: absolute;
 		bottom: -15px;
-		left: 30%;
+		left: 40%;
 		border-left: 10px solid transparent;
 		border-right: 10px solid transparent;
 		
@@ -2321,9 +2334,10 @@ node-creation-selection-dialog {
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
+			grid-gap: 10px;
 
-			span {
-				padding: 0 10px;
+			.icon-backpack {
+				font-size: 2em;
 			}
 		}
 

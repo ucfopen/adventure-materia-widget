@@ -598,9 +598,11 @@
 													>{{ integerToLetters(answer.target) }}
 												</button>
 											</div>
-											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
+											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-class="{'requires-items': answer.requiredItems[0]}" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
+												<span class="icon-unlocked" ng-if="!answer.requiredItems[0]"></span>
+												<span class="icon-lock" ng-if="answer.requiredItems[0]"></span>
 												<div class="required-item-tooltip tooltip-bottom" ng-show="answer.showTooltip">
-													Add a required item
+													{{answer.requiredItems[0] ? 'Edit Required Items' : 'Add Required Items'}}
 												</div>
 												<i class="arrow-top" ng-show="answer.showTooltip"></i>
 											</button>
@@ -651,9 +653,11 @@
 													>{{ integerToLetters(answer.target) }}
 												</button>
 											</div>
-											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
+											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
+												<span class="icon-unlocked" ng-if="!answer.requiredItems[0]"></span>
+												<span class="icon-lock" ng-if="answer.requiredItems[0]"></span>
 												<div class="required-item-tooltip" ng-show="answer.showTooltip">
-													Add a required item
+													{{answer.requiredItems[0] ? 'Edit Required Items' : 'Add Required Items'}}
 												</div>
 												<i class="arrow-bottom" ng-show="answer.showTooltip"></i>
 											</button>
@@ -944,9 +948,10 @@
 										</div>
 										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
 									</div>
-									<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = true" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false"><span class="icon-lock"></span><i class="arrow-right"></i>
+									<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = true" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false">
+										<span class="icon-backpack"></span>
 										<div class="required-item-tooltip tooltip-bottom" ng-show="answers[hotspotAnswerManager.answerIndex].showTooltip">
-											Add a required item
+											{{answers[hotspotAnswerManager.answerIndex].requiredItems[0] ? 'Edit Required Items' : 'Add Required Items'}}
 										</div>
 										<i class="arrow-top" ng-show="answers[hotspotAnswerManager.answerIndex].showTooltip"></i>
 									</button>
@@ -1238,7 +1243,7 @@
 						</div>
 						<button type="button"
 							class="item-button"
-							ng-click="toggleItemPopup()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>Give Player Items</span>
+							ng-click="toggleItemPopup()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>{{items[0] ? 'Edit Items' : 'Add Items'}}</span><span class="icon-backpack"></span>
 						</button>
 						<button class="save-button important-button"
 							ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
