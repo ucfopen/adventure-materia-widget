@@ -24,7 +24,11 @@ copyList.push(
 		to: `${outputPath}/guides/assets`,
 		toType: 'dir'
 	},
-	)
+	{
+		from: `${srcPath}/assets/icons.json`,
+		to: `${outputPath}/assets/icons.json`,
+	}
+)
 
 // completely replace the default entries with ours
 const entries = {
@@ -42,6 +46,10 @@ const entries = {
 		srcPath+"src-assets/creator-assets/directives.coffee",
 		srcPath+"src-assets/creator-assets/controllers.coffee",
 	],
+	"assets/score-assets/scoreScreen.js": [
+		srcPath+"src-assets/score-assets/app.coffee",
+		srcPath+"src-assets/score-assets/score.coffee"
+	],
 	"assets/creator-assets/creator.css": [
 		srcPath+"creator.html",
 		srcPath+"src-assets/creator-assets/creator.scss"
@@ -49,6 +57,10 @@ const entries = {
 	"assets/player-assets/player.css": [
 		srcPath+"player.html",
 		srcPath+"src-assets/player-assets/player.scss"
+	],
+	"assets/score-assets/score.css": [
+		srcPath+"scoreScreen.html",
+		srcPath+"src-assets/score-assets/score.scss"
 	],
 	"guides/player.temp.html": [
 		srcPath+"_guides/player.md"
