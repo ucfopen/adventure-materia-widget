@@ -100,6 +100,14 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		y: 0
 		pendingHide: false
 
+	$scope.hoveredLock =
+		showItems: false
+		target: null
+		requiredItems: [] # initially an empty array that's populated on-hover with the answer's required items array
+		x: 0
+		y: 0
+		pendingHide: false
+
 	$scope.validation =
 		show: false
 		errors: []
@@ -348,11 +356,24 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	# handles hover behavior of associated tooltips
 	# (associated answer & validation warnings)
 	$scope.onNodeHover = (data) ->
+		# Required item tooltip
+		if data.type is "lock"
+			$scope.hoveredLock.pendingHide = false
+			if $scope.hoveredLock.target isnt data.id
+
+				$scope.$apply () ->
+					$scope.hoveredLock.x = data.x
+					$scope.hoveredLock.y = data.y
+					$scope.hoveredLock.target = data.id
+					$scope.hoveredLock.requiredItems = data.requiredItems
+					$scope.hoveredLock.answer = data.answer
+			return
 		if data.type is "bridge" then return
 		if $scope.existingNodeSelectionMode is true then return
 		$scope.hoveredNode.pendingHide = false
-		if $scope.hoveredNode.target isnt data.id
 
+		# Node tooltip
+		if $scope.hoveredNode.target isnt data.id
 			$scope.$apply () ->
 				$scope.hoveredNode.x = data.x
 				$scope.hoveredNode.y = data.y
@@ -363,8 +384,25 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	# if the flag is reset by another hover event happening, don't hide the tooltip (cursor is still traveling over the node)
 	# If it's not reset, go ahead and hide the tooltip
 	$scope.onNodeHoverOut = (data) ->
+		# Required item tooltip
+		if data.type is "lock"
+			if $scope.hoveredLock.target is data.id
+				if $scope.hoveredLock.showItems is true
+					$scope.hoveredLock.pendingHide = true
+					$timeout (() ->
+						if $scope.hoveredLock.pendingHide is true
+							$scope.$apply () ->
+								$scope.hoveredLock.showItems = false
+								$scope.hoveredLock.target = null
+					), 500
+			else if $scope.hoveredLock.target isnt data.id
+				$scope.hoveredLock.showItems = false
+			return
+		
 		if data.type is "bridge" then return
 		if $scope.existingNodeSelectionMode is true then return
+
+		# Node tooltip
 		if $scope.hoveredNode.target is data.id
 			if $scope.hoveredNode.showTooltips is true
 				$scope.hoveredNode.pendingHide = true
@@ -433,7 +471,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			parentId: parent
 			type: type
 			contents: []
-			# requiredItems: []
 			items: []
 
 		treeSrv.findAndAdd $scope.treeData, parent, newNode
@@ -460,7 +497,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			contents: []
 			pendingTarget: data.target
 			items: []
-			# requiredItems: []
 
 		if data.specialCase
 			if data.specialCase is "otherNode"

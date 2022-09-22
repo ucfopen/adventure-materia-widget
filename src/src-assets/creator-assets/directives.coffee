@@ -68,7 +68,7 @@ Adventure.directive "autoSelect", [() ->
 # The true monster directive; handles the actual tree display for the widget
 # Give up all hope, ye who enter here
 # (Seriously, sorry in advance, D3 is a clusterf*ck)
-Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$rootScope', (treeSrv, $window, $compile, $rootScope) ->
+Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$rootScope', '$timeout', (treeSrv, $window, $compile, $rootScope, $timeout) ->
 	restrict: "E",
 	scope: {
 		data: "=", # binds treeData in a way that's accessible to the directive
@@ -211,6 +211,18 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 							links.push newLink
 
+				# Adding required items to links
+				angular.forEach links, (link, index) ->
+					angular.forEach node.answers, (answer, index) ->
+						if answer.target is link.target.id
+							link.lock =
+								requiredItems: answer.requiredItems
+								answer: answer.text
+								x: link.source.x
+								y: link.source.y + (link.target.y - link.source.y)/2
+								id: link.target.id
+								type: "lock"
+								sourceType: link.source.type
 
 			# We need to effectively "filter" each link and create the intermediate nodes
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
@@ -330,14 +342,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				.data(links)
 				.enter()
 				.append("g")
-
+			
 			paths = linkGroup.append("svg:path")
 				.attr("class", (d) ->
 					if d.specialCase then return "special link"
 					else return "link"
 				)
 				.attr("marker-end", "url(#arrowhead)")
-
+			
 			# Paths come in three flavors:
 			# Standard, hierarchical links are straight, end-to-end paths from a parent node to a child
 			# Special, non-hierarchical links are curves, so the math for the curve must be computed for each link
@@ -385,10 +397,8 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						return "M" + offsetX + "," + offsetY + "L" + d.target.x + "," + d.target.y
 					)
 
-
 				# If it's just a standard link, this part is easy
 				else path.attr("d", lineData)
-
 
 			linkGroup.append("svg:circle")
 				.attr("class","loopback")
@@ -414,6 +424,106 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					else return "none"
 				)
 
+			# Node circle that displays the number of required items to select associated answer
+			# Positioned 1/4 of the way down the arrow
+			requiredItemsCircles = linkGroup.append("svg:circle")
+				.attr("class", (d) -> 
+					if (d.lock)
+						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and d.lock.requiredItems[0])
+							return "link-req-items show"
+						else
+							return "link-req-items hide"
+				)
+				.attr("r", "10")
+				.attr("cx", (d) ->
+					return (d.source.x + (d.source.x + d.target.x) / 2) / 2
+				)
+				.attr("cy", (d) ->
+					return (d.source.y + (d.source.y + d.target.y) / 2) / 2
+				)
+				.on("mouseover", (d, i) ->
+					$scope.onHover {data: d.lock}
+
+					d3.select(this)
+					.transition()
+					.attr("r", 20)
+				)
+				.on("mouseout", (d, i) ->
+					$scope.onHoverOut {data: d.lock}
+
+					d3.select(this)
+					.transition()
+					.attr("r", 10)
+				)
+			
+			# Text inside required items circles
+			requiredItemsText = linkGroup.append("text")
+				.attr("class", (d) ->
+					if (d.lock)
+						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and d.lock.requiredItems[0])
+							return "link-req-items show"
+						else
+							return "link-req-items hide"
+				)
+				.attr("dx", (d) ->
+					return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 5
+				)
+				.attr("dy", (d) ->
+					return (d.source.y + (d.source.y + d.target.y) / 2) / 2 + 5
+				)
+				.text((d) -> (if d.lock and d.lock.requiredItems then d.lock.requiredItems.length))
+				.on("mouseover", (d, i) ->
+					$scope.onHover {data: d.lock}
+
+					d3.select(this.parentNode).select(".link-req-items")
+					.transition()
+					.attr("r", 20)
+				)
+				.on("mouseout", (d, i) ->
+					$scope.onHoverOut {data: d.lock}
+
+					d3.select(this.parentNode).select(".link-req-items")
+					.transition()
+					.attr("r", 10)
+				)
+
+			
+			# Displaying the required items was too cluttered
+
+			# requiredItemsImages = linkGroup.each((e) ->
+			# 	parent = d3.select(this)
+			# 	if e.lock
+			# 		for item, index in e.lock.requiredItems
+			# 			if index < 6
+			# 				parent.append("svg:image")
+			# 				.attr("class", (d) ->
+			# 					if ((e.lock.sourceType is "mc" or e.lock.sourceType is "shortanswer" or e.lock.sourceType is "hotspot") and e.lock.requiredItems[0])
+			# 						return "link-req-items show"
+			# 					else
+			# 						return "link-req-items hide"
+			# 				)
+			# 				.attr("xlink:href", e.lock.requiredItems[index].icon.url
+			# 				)
+			# 				.attr("x", ((e.source.x + (e.source.x + e.target.x) / 2) / 2 - 10))
+			# 				.attr("y", ((e.source.y + (e.source.y + e.target.y) / 2) / 2 + 10) + 20 * index)
+			# 				.attr("width", "20px")
+			# 				.attr("height", "20px")
+			# 				.on("mouseover", (d) ->
+			# 					$scope.onHover {data: e.lock}
+
+			# 					d3.select(this.parentNode).select(".link-req-items")
+			# 					.transition()
+			# 					.attr("r", 20)
+			# 				)
+			# 				.on("mouseout", (d) ->
+			# 					$scope.onHoverOut {data: e.lock}
+
+			# 					d3.select(this.parentNode).select(".link-req-items")
+			# 					.transition()
+			# 					.attr("r", 10)
+			# 				) 
+			# )
+
 			nodeGroup = $scope.svg.selectAll("g.node")
 				.data(nodes)
 				.enter()
@@ -425,6 +535,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						return "node focused #{d.type}"
 					else if $scope.copyMode and d.type is "blank" then return "node copyMode #{d.type}"
 					else if $scope.existingLinkMode and d.ineligibleTarget then return "node ineligible #{d.type}"
+					else if d.type is "lock" then return "lock"
 					else return "node #{d.type}"
 				)
 				.on("mouseover", (d, i) ->
@@ -450,6 +561,34 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				.on("click", (d, i) ->
 					$scope.nodeClick {data: d} # when clicked, we return all of the node's data
 					d3.event.stopPropagation()
+				)
+				.on("dragover", (d, i) ->
+
+					#  Animation effects on node mouseover
+					d3.select(this).select("circle")
+					.transition()
+					.attr("r", 30)
+
+					$rootScope.nodeDrop =
+						data: d
+						screenX: d3.event.screenX
+						screenY: d3.event.screenY
+
+				)
+				.on("dragleave", (d, i) ->
+					#d3.event.preventDefault()
+					# Animation effects on node mouseout
+					d3.select(this).select("circle")
+					.transition()
+					.attr("r", 20)
+
+					# Absolutely horrendous but since
+					# dragleave triggers immediately after mouseup
+					# we must wait for ondragend to trigger on the item
+					# before we set drop target to null
+					$timeout(() ->
+						$rootScope.nodeDrop = null
+					, 2000)
 				)
 				.attr("transform", (d) ->
 					"translate(#{d.x},#{d.y})"
@@ -520,7 +659,43 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				.attr("font-size", 14)
 				.text (d) ->
 					d.name
+			
+			# Positions for item icons around each node
+			dataPos = [[34, -20], [20, -34], [0, -40], [-20, -34], [-34, -20], [-40, 0], [-34, 20]]
 
+			# Removed the last item pos [-20, 34]: too cramped
+			
+			# Display icons for each item that a node gives around each node
+			# Points were calculated using a circle of radius 30
+			nodeGroup.each((e) -> 
+				g = d3.select(this)
+				numLeftoverItems = 0
+				numUsedItems = 0
+				if e.items
+					index = 0
+					for item in e.items
+						if index < dataPos.length - 1
+							if e.items[index].icon.url
+								g.append("svg:image")
+									.attr("xlink:href", e.items[index].icon.url
+									)
+									.attr("x", -10 + dataPos[index][0])
+									.attr("y", -10 + dataPos[index][1])
+									.attr("width", "20px")
+									.attr("height", "20px")
+								numUsedItems++
+							else 
+								numLeftoverItems++
+							index++
+					numLeftoverItems += e.items.length - index
+					if numLeftoverItems > 0
+						g.append("text")
+							.attr("class", "leftover-items")
+							.text("+#{numLeftoverItems}")
+							.attr("x", -5 + dataPos[numUsedItems][0])
+							.attr("y", dataPos[numUsedItems][1])
+			)
+			
 			# The small warning graphic applied to nodes with validation problems
 			warningSymbol = nodeGroup.append("svg:g")
 				.attr("class", "warning-symbol")
@@ -734,6 +909,23 @@ Adventure.directive "titleEditor", [() ->
 				$scope.showBackgroundCover = true
 ]
 
+# Directive for dragging items
+Adventure.directive "draggableItemsBox", ['treeSrv', 'treeHistorySrv', '$rootScope', (treeSrv, treeHistorySrv, $rootScope) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.dragItemEnd = (event) ->
+			# event.clientX and clientY are 0 in firefox
+			# so we will use the $rootScope.nodeDrop set from dragover event
+			if ($rootScope.nodeDrop)
+				item = treeSrv.getInventoryItem(event.target.dataset.id)
+
+				tree = treeSrv.get()
+				treeSrv.findNodeAndAddItem(tree, $rootScope.nodeDrop.data.id, item)
+				treeSrv.set tree
+
+]
+
 # Directive for editing items
 Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeHistorySrv) ->
 	restrict: "E",
@@ -749,6 +941,12 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 		$scope.$watch "inventoryItems", (newVal, oldVal) ->
 			if newVal
 				treeSrv.setInventoryItems(newVal)
+
+		$scope.$watch "inventoryItems.length", (newVal, oldVal) ->
+			if newVal
+				treeSrv.setInventoryItems($scope.inventoryItems)
+				$scope.editItemButtonDialog = 
+					"Edit items (#{$scope.inventoryItems.length})"
 
 		$scope.newItemName = ''
 
@@ -772,6 +970,9 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			if item in $scope.inventoryItems
 				$scope.inventoryItems.splice index, 1
 				treeSrv.deleteItemFromAllNodes $scope.treeData, item
+
+				treeSrv.set $scope.treeData
+				# Since we're using itemCount for IDs, don't decrement
 				# treeSrv.decrementItemCount()
 
 				# Collapse any open item editors
@@ -787,6 +988,9 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				inventory = treeSrv.getInventoryItems()
 				# Reflect changes in tree
 				treeSrv.updateAllItems $scope.treeData, $scope.currentItem
+
+				treeSrv.set $scope.treeData
+
 				$scope.toast "Item '#{inventory[$scope.editingIndex].name}' saved!"
 				$scope.editingIndex = -1
 
@@ -807,7 +1011,8 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				# Select icon
 				$scope.inventoryItems[$scope.editingIndex].icon = icon
 			treeSrv.updateAllItems $scope.treeData, $scope.currentItem
-			console.log($scope.currentItem)
+
+			treeSrv.set $scope.treeData
 
 		$scope.manageNewIcon = () ->
 			Materia.CreatorCore.showMediaImporter()
@@ -821,6 +1026,8 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 
 			treeSrv.updateAllItems $scope.treeData, $scope.currentItem
 
+			treeSrv.set $scope.treeData
+
 		$scope.saveAndCloseInventory = () ->
 			inventory = treeSrv.getInventoryItems()
 			if inventory
@@ -833,6 +1040,9 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					# Update item data across all nodes
 					for item in inventory
 						treeSrv.updateAllItems $scope.treeData, item
+
+					treeSrv.set $scope.treeData
+					
 					$scope.toast "Items saved!"
 
 			$scope.hideCoverAndModals()
@@ -862,13 +1072,46 @@ Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 					}
 					$scope.hoveredNode.tooltips.push tooltip
 
+				removedItems = []
+				givesItems = []
+
 				if node.items
+					for item in node.items
+						console.log(item)
+						if item.count > 0
+							givesItems.push item
+						else if item.count < 0
+							itemNegated = {
+								...item
+								count: Math.abs(item.count)
+							}
+							removedItems.push itemNegated
+
 					tooltip = {
-						items: node.items
+						...tooltip
+						givesItems: givesItems,
+						removedItems: removedItems
 					}
 					$scope.hoveredNode.tooltips.push tooltip
 
 				$scope.hoveredNode.showTooltips = true
+]
+
+# Directive for the small tooltips displaying the answers associated with a given node on mouseover
+Adventure.directive "requiredItemsTooltip", ['treeSrv', (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+		$scope.$watch "hoveredLock.target", (newVal, oldVal) ->
+			if newVal isnt null
+
+				# Update the position of the tooltip container
+				# Crazy math is due to ensuring the dialog continues to position properly after panning and/or zooming the tree
+				xOffset = ($scope.hoveredLock.x * $scope.treeOffset.scale) + $scope.treeOffset.x + $scope.treeOffset.scaleXOffset + (35 * $scope.treeOffset.scale)
+				yOffset = ($scope.hoveredLock.y * $scope.treeOffset.scale) + ($scope.treeOffset.y - 5) + $scope.treeOffset.scaleYOffset
+				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
+				$attrs.$set "style", styles
+
+				$scope.hoveredLock.showItems = true
 ]
 
 # Directive in charge of managing the Action History, in conjunction with the treeHistorySrv service
@@ -1707,6 +1950,10 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
 				else $scope.question = null
 
+				# Reset size of question box
+				document.querySelector(".question-box").style.width = null; 
+				document.querySelector(".question-box").style.height = null; 
+
 				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
 				else
 					switch $scope.editedNode.type
@@ -1787,7 +2034,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.questionPlaceholder = "Enter some narrative text here."
 			else if $scope.editedNode.type is $scope.END
 				$scope.questionPlaceholder = "Enter a conclusion here for this decision tree or path."
-
 
 		# Update the node's properties when the associated input models change
 		$scope.$watch "question", (newVal, oldVal) ->
@@ -1879,6 +2125,8 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 		$scope.addRequiredItemToAnswer = (item, answer) ->
 			if item
+				answer.requiredItems = answer.requiredItems || []
+
 				for i in answer.requiredItems when i.id is item.id
 					i.count += 1
 					# $scope.flashItem(answer, item)
@@ -1940,7 +2188,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					hotspot.style.zIndex = 100;
 
 		$scope.toggleRequiredItemsModal = (answer) ->
-			if (answer is $scope.currentAnswer)
+			if ($scope.currentAnswer and $scope.currentAnswer is answer)
 				$scope.showRequiredItems = false
 				$scope.currentAnswer = null
 			else
@@ -1955,9 +2203,10 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				for item in $scope.inventoryItems
 					do (item) ->
 						used = false
-						for i in answer.requiredItems
-							if item.id is i.id
-								used = true
+						if answer.requiredItems
+							for i in answer.requiredItems
+								if item.id is i.id
+									used = true
 						if ! used
 							$scope.availableItems.push(item)
 
@@ -2036,6 +2285,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				linkMode: linkMode
 				id: treeSrv.generateAnswerHash()
 				requiredItems: []
+				hideAnswer: false
 
 			# Add a matches and case sensitivity property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
@@ -2165,7 +2415,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 ]
 
 # Directive for each short answer set. Contains logic for adding and removing individual answer matches.
-Adventure.directive "shortAnswerSet", ['treeSrv', (treeSrv) ->
+Adventure.directive "shortAnswerSet", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -2225,6 +2475,8 @@ Adventure.directive "shortAnswerSet", ['treeSrv', (treeSrv) ->
 		$scope.removeAnswerMatch = (matchIndex, answerIndex) ->
 
 			$scope.answers[answerIndex].matches.splice matchIndex, 1
+
+			$scope.answers[answerIndex].text = $scope.answers[answerIndex].matches.join ", "
 ]
 
 Adventure.directive "finalScoreBox", [() ->

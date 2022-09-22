@@ -18,6 +18,7 @@
 		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-animate.min.js'></script>
 		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-sanitize.min.js'></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+		<script src="//cdn.skypack.dev/d3-drag@3" charset="utf-8"></script>
 
 		<!-- MAIN CREATOR SCRIPT -->
 		<script src="assets/creator-assets/creator.js"></script>
@@ -76,7 +77,22 @@
 					class="important-button"
 					ng-click="hideCoverAndModals()">Done</button>
 			</title-editor>
-			<button class="item-editor-button" ng-click="showItemManager = true">{{inventoryItems.length ? 'Edit Items' : 'Add Items'}}</button>
+			<draggable-items-box class="inventory-items-preview">
+				<button class="item-editor-button" ng-click="showItemManager = true">
+					<span class="plus-sign" ng-show="!inventoryItems.length">+</span>
+					{{inventoryItems.length ? 'Edit Inventory Items' : 'Add Inventory Items'}}
+				</button>
+				<div class="items-drag-box">
+					<!-- <div ng-repeat="item in inventoryItems" draggable="true" ng-mousedown="dragItemStart($event)"
+					ondragend="angular.element(this).scope().dragItemEnd(event)"
+					data-id="{{item.id}}"> -->
+					<div ng-repeat="item in inventoryItems">
+						<img class="item-icon-small" ng-if="item.icon.url" ng-src="{{item.icon.url}}"/>
+						<span>{{item.name}}</span>
+					</div>
+				</div>
+			</draggable-items-box>
+			
 			<item-manager ng-show="showItemManager" class="item-selection item-manager">
 				<div class="item-header">
 					<div class="item-heading">
@@ -507,12 +523,14 @@
 				<h2 ng-if="displayNodeCreation == NARR">Narrative</h2>
 				<h2 ng-if="displayNodeCreation == END">End Point</h2>
 				<div class="node-creation-panels">
-					<div class="panel-left">
+					<div class="panel-left" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
+					'tiny' : displayNodeCreation == HOTSPOT, 'column': showRequiredItems || showItemSelection}">
 						<div class="question-media-box" ng-class="{
 							'align-left' : editedNode.media.align == 'left',
 							'align-right' : editedNode.media.align == 'right',
 							'align-top' : editedNode.media.align == 'top',
-							'align-bottom' : editedNode.media.align == 'bottom'}">
+							'align-bottom' : editedNode.media.align == 'bottom','expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
+							'tiny' : displayNodeCreation == HOTSPOT}" >
 							<textarea class="question-box"
 								ng-class="{
 									'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
@@ -567,7 +585,8 @@
 
 								</li>
 								<li ng-repeat="answer in answers" 
-								ng-show="displayNodeCreation == MC || displayNodeCreation == SHORTANS && $index > 0">
+								ng-show="displayNodeCreation == MC || displayNodeCreation == SHORTANS && $index > 0" 
+								ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}">
 									<div ng-if="displayNodeCreation == MC" class="answer">
 										<button type="button"
 											class="delete-button"
@@ -609,7 +628,6 @@
 										</div>
 									</div>
 									<div ng-if="displayNodeCreation == SHORTANS" class="answer"
-										ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}"
 										short-answer-set>
 										<button type="button"
 											class="delete-button"
@@ -668,7 +686,7 @@
 									ng-mousedown="modalDragStart($event)">
 										<div class="item-header">
 											<div class="item-heading">
-												<h3>Required Items</h3>
+												<h3>Required Items for ' {{currentAnswer.text}} '</h3>
 												<span class="hide-popup icon-cross"
 												ng-click="toggleRequiredItemsModal(answer)"
 												ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answer) : ''"
@@ -711,6 +729,9 @@
 												</select>
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
+											<input type="checkbox"
+											ng-model="currentAnswer.hideAnswer"
+											value="false" /> Hide Answer if Player Does Have Items
 											<!-- <button ng-click="showRequiredItems = false">Done</button> -->
 										</div>
 										<!-- <i class="arrow-right"></i> -->
@@ -830,7 +851,7 @@
 										ng-src="{{image.src}}"
 										ng-show="mediaReady" />
 								</div>
-								<div class="image-options-container">
+								<div class="image-options-container" ng-show="mediaReady" >
 									<!-- bottom toolbar with buttons for adding and managing hotspots -->
 									<hotspot-toolbar ng-show="mediaReady">
 										<ul>
@@ -901,7 +922,7 @@
 										<div class="item-header"  
 										ng-mousedown="modalDragStart($event)">
 											<div class="item-heading">
-												<h3>Required Items</h3>
+												<h3>Required Items for ' {{answers[hotspotAnswerManager.answerIndex].text}} '</h3>
 												<span class="hide-popup icon-cross"
 												ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])"
 												ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex]) : ''"
@@ -1094,7 +1115,7 @@
 						ng-click="bringToFront($event)">
 							<div class="item-header">
 								<div class="item-heading">
-									<h3>Required Items</h3>
+									<h3>Required Items for ' {{currentAnswer.text}} '</h3>
 									<span class="hide-popup icon-cross"
 									ng-click="showRequiredItems = false"
 									ng-keypress="$event.keyCode === 13 ? showRequiredItems = false : ''"
@@ -1234,7 +1255,7 @@
 							</ul>
 							<div class="options-bar add-item">
 								<div class="selector">
-									<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+									<select ng-options="item.name for item in availableItems" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>
 									</select>
 									<button ng-click="addItemToNode(selectedItem)">Add Item</button>
 								</div>
@@ -1257,12 +1278,17 @@
 			<node-tooltips ng-show="hoveredNode.showTooltips">
 				<div class="tooltip"
 					ng-repeat="tooltip in hoveredNode.tooltips"
-					ng-show="tooltip.text || tooltip.items[0]">
+					ng-show="tooltip.text || tooltip.givesItems[0] || tooltip.removedItems[0]">
 					<span class="tooltip-title"
-					ng-if="!tooltip.items[0] && tooltip.text">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
-					<span class="tooltip-title" ng-if="tooltip.items[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.items" ng-if="tooltip.items[0]">{{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
+					ng-if="tooltip.text">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
+					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="item.icon.url" src="{{item.icon.url}}"/> {{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="item.icon.url" src="{{item.icon.url}}"/> {{item.name}} (Quantity: {{item.count ? item.count : -1}})</p>
 				</div>
 			</node-tooltips>
+			<required-items-tooltip ng-show="hoveredLock.showItems">
+				<span>The answer "{{hoveredLock.answer}}" requires item(s):</span>
+				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="item.icon && item.icon.url" src="{{item.icon.url}}"/> {{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
+			</required-items-tooltip>
 			<import-type-selection ng-show="showImportTypeSelection">
 				<h2>
 					<span>Choose Type of Media</span>

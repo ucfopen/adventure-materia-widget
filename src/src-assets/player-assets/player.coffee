@@ -124,21 +124,31 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		for i in $scope.inventory
 			i.new = false
 
+		$scope.addedItems = []
+		$scope.removedItems = []
+		$scope.inventoryUpdate = false
+
 		# Add items to player's inventory
-		if $scope.question.options.items
-			action = 'added to'
+		if $scope.question.options.items[0]
+			$scope.inventoryUpdate = true
 
 			for q_i in $scope.question.options.items
 				do (q_i) ->
 					hasItem = false
+					# Inventory update
+					if q_i.count < 0
+						$scope.removedItems.push(q_i)
+					else
+						$scope.addedItems.push(q_i)
 					# Check to see if player already has item
 					# If so, just update item count
-					for p_i in $scope.inventory
+					for p_i, i in $scope.inventory
 						if q_i.id is p_i.id
 							hasItem = true
-							if q_i.count < 0
-								action = 'removed from'
 							p_i.count += q_i.count
+							# Remove item from inventory
+							if (p_i.count <= 0)
+								$scope.inventory.splice i, 0
 					if (! hasItem)
 						newItem = {
 							...q_i
@@ -151,13 +161,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							id: q_i.id
 							icon: {
 								...q_i.icon
-								url: if q_i.icon.name then "assets/icons/#{q_i.icon.name}" else ''
+								url: if q_i.icon and q_i.icon.name then "assets/icons/#{q_i.icon.name}" else ''
 							}
 						}
-
 						$scope.inventory.push(newItem)
-
-			$scope.notifMessage = if $scope.question.options.items.length > 1 then "(#{$scope.question.options.items.length}) Items updated!" else if $scope.question.options.items.length > 0 then "#{$scope.question.options.items[0].name} (#{Math.abs($scope.question.options.items[0].count)}) has been #{action} your inventory!"
 
 			if $scope.notifRegister isnt null then $timeout.cancel $scope.notifRegister
 
@@ -188,12 +195,16 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			for i in [0..q_data.answers.length-1]
 				continue if not q_data.answers[i]
 
+				continue if q_data.answers[i].options.hideAnswer
+
 				answer =
 					text : q_data.answers[i].text
 					link : q_data.answers[i].options.link
 					index : i
 					options : q_data.answers[i].options
 					requiredItems: q_data.answers[i].options.requiredItems
+					hideAnswer: q_data.answers[i].options.hideAnswer
+
 				$scope.answers.push answer
 
 		# shuffle answer order if asked to do so
@@ -228,7 +239,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	$scope.toggleInventory = () ->
 		$scope.showInventory = ! $scope.showInventory
-		console.log($scope.inventory)
+		$scope.inventoryUpdate = false
 		$scope.selectedItem = $scope.inventory[0]
 		$scope.hideNotif()
 

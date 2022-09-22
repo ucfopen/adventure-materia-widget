@@ -106,7 +106,7 @@ button.show-inventory {
 	animation-direction: alternate;
 	animation-timing-function: ease-in-out;
 
-	z-index: 1;
+	z-index: 100;
 	position: absolute;
 	right: 10px;
 	top: 60px;
@@ -125,16 +125,22 @@ button.show-inventory {
 
 	&::before {
 		position: absolute;
-	  content: "";
-	  width: 0px;
-	  height: 0px;
-	  border-bottom: 15px solid $blue-lighter;
-	  border-right: 15px solid transparent;
-	  border-top: 15px solid transparent;
-	  border-left: 15px solid transparent;
-	  top: -25px;
-	  right: 5px;
+		content: "";
+		width: 0px;
+		height: 0px;
+		border-bottom: 15px solid $blue-lighter;
+		border-right: 15px solid transparent;
+		border-top: 15px solid transparent;
+		border-left: 15px solid transparent;
+		top: -25px;
+		right: 5px;
 	}
+}
+
+.arrow-right {
+	border-top: 13px solid transparent;
+	border-left: 8px solid $color-accent;
+	border-bottom: 13px solid transparent;
 }
 
 @keyframes notif-bounce {
@@ -563,16 +569,11 @@ h1 {
 
 	.inventory-container {
 		position: relative;
-		top: 50%;
-		left: 50%;
-		width: 540px;
-		height: 300px;
+		margin: 20px;
+		height: 90%;
 
 		display: flex;
 		flex-direction: column;
-
-		margin-left: -270px;
-		margin-top: -170px;
 
 		border-radius: 5px;
 		background: #fff;
@@ -613,7 +614,8 @@ h1 {
 					align-items: center;
 					grid-gap: 10px;
 
-					border: 2px solid $blue-lightest;
+					border: 2px solid $white;
+					background-color: $blue-lightest;
 
 					img {
 						width: 35px;
@@ -641,6 +643,22 @@ h1 {
 					position: absolute;
 					left: 0;
 					top: 0;
+				}
+
+				.item-count {
+					position: absolute;
+					right: -5px;
+					bottom: -5px;
+					width: 15px;
+					height: 15px;
+					border-radius: 50%;
+					border: 2px $blue-lighter solid;
+					text-align: center;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					background-color: $white;
+					font-size: 10px;
 				}
 			}
 
@@ -694,7 +712,26 @@ h1 {
 	}
 }
 
-.feedback {
+.inventory-tooltip {
+	position: absolute;
+	right: 60px;
+	top: 10px;
+	z-index: 50;
+	background: white;
+	color: $blue;
+	border-radius: 10px;
+	padding: 0 5px;
+	font-size: 12px;
+
+	.arrow-right {
+		position: absolute;
+		right: -5px;
+		top: 10px;
+		border-left-color:white;
+	}
+}
+
+.feedback, .inventory-update {
 	position: absolute;
 	z-index: -1;
 	top: 50%;
@@ -720,8 +757,15 @@ h1 {
 		position: absolute;
 		left: -5px;
 		top: -25px;
-		content: 'FEEDBACK';
 		padding: 0px 5px;
+	}
+
+	&.feedback:before {
+		content: 'FEEDBACK';
+	}
+
+	&.inventory-update:before {
+		content: 'INVENTORY UPDATED';
 	}
 
 	&.show {
@@ -729,11 +773,10 @@ h1 {
 		opacity: 1;
 	}
 
-	.feedback-content {
+	.feedback-content, .update-content {
 		width: 500px;
 		height: 190px;
 
-		margin-top: 6px;
 		padding: 20px;
 
 		font-size: 24px;
@@ -741,6 +784,16 @@ h1 {
 
 		overflow-x: hidden;
 		overflow-y: scroll;
+	}
+
+	.update-content {
+		font-size: 14px;
+
+		.item {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+		}
 	}
 
 	input {

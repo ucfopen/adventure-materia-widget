@@ -23,10 +23,6 @@ copyList.push(
 		from: `${srcPath}/_guides/assets`,
 		to: `${outputPath}/guides/assets`,
 		toType: 'dir'
-	},
-	{
-		from: `${srcPath}/assets/icons.json`,
-		to: `${outputPath}/assets/icons.json`,
 	}
 )
 

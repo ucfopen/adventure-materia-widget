@@ -24,9 +24,19 @@
 	<body id="body" ng-app="Adventure" ng-controller="AdventureController">
 
 
-		<button ng-class="{'icon-backpack': !showInventory, 'icon-cross': showInventory, 'show-inventory' : !hideInventoryBtn}" ng-click="toggleInventory()" ng-show="inventory[0]"></button>
+		<button ng-class="{'icon-backpack': !showInventory, 'icon-cross': showInventory, 'show-inventory' : !hideInventoryBtn}" ng-click="toggleInventory()" ng-show="inventory[0]"  ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false"></button>
 		<div class="notif-message" ng-if="showNotif">
-			<p>{{ notifMessage }}</p>
+			<p ng-if="question.options.items.length > 1">
+				Items updated!
+			</p>
+			<p ng-if="question.options.items.length == 1">
+				<img ng-if="uestion.options.items[0].icon.url" ng-src="{{uestion.options.items[0].icon.url}}"/>
+				{{question.options.items[0].name}} has been added to your inventory!
+			</p>
+		</div>
+		<div class="inventory-tooltip" ng-show="showInventoryTooltip">
+			<p>Inventory</p>
+			<i class="arrow-right"></i>
 		</div>
 
 		<div class="inventory" ng-class="{ show: showInventory }">
@@ -35,14 +45,14 @@
 				<div class="inventory-content">
 					<div class="inventory-items">
 						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)">
-							<span ng-if="item.new" class="new-item">NEW!</span><span ng-if="item.icon.icomoon" class="icon-{{item.icon.icomoon_name}}"></span>
+							<span ng-if="item.new" class="new-item">NEW!</span>
 							<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
 							{{item.name}}
+							<span class="item-count">{{item.count}}</span>
 						</div>
 					</div>
 					<div class="item-description" ng-show="selectedItem">
 						<div class="item-header">
-							<span ng-if="selectedItem.icon.icomoon" class="icon-{{selectedItem.icon.icomoon_name}}"></span>
 							<img ng-if="selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" ng-alt="{{selectedItem.icon.alt}}"/>
 							<h3>
 								{{selectedItem.name}}
@@ -59,6 +69,30 @@
 		</div>
 
 		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
+
+		<div class="inventory-update"
+			ng-show="inventoryUpdate"
+			ng-class="{'show': inventoryUpdate}"
+			>
+			<div class="update-content" tabindex="-1">
+				<p>Item(s) Added: </p>
+				<div class="item" ng-repeat="item in addedItems track by $index" ng>
+					<span class="item-count">+ {{item.count}}</span>
+					<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+					{{item.name}}
+				</div>
+				<p>Item(s) Removed: </p>
+				<div class="item" ng-repeat="item in removedItems track by $index" ng>
+					<span class="item-count">- {{item.count}}</span>
+					<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+					{{item.name}}
+				</div>
+			</div>
+			<input class="trans-button"
+				type="button"
+				value="OK"
+				ng-click="inventoryUpdate = false">
+		</div>
 
 		<div class="feedback"
 			ng-class="{ show: feedback }"

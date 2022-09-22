@@ -1,4 +1,8 @@
 #! /bin/bash
+# Creates JSON file with the files in the icons folder
+# ------------------------------------------------
+
+# Outputs list of file names into lsoutput.log
 ls -a ./src/assets/icons > lsoutput.log
 
 last_line=$(wc -l < lsoutput.log)
@@ -10,6 +14,7 @@ JSON_FMT_LAST_LINE='\t\t{"name":"%s"}\n'
 
 printf '{\n\t"icons": [\n' > $json_output
 
+# Reads lsoutput.log and inserts each filename into JSON file
 while read -r CURRENT_LINE
     current_line_number=$(($current_line_number + 1))
     do

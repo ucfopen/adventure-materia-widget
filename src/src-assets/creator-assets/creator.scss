@@ -485,6 +485,10 @@ g.node {
 	text {
 		fill: $black;
 	}
+
+	.leftover-items {
+		font-size: 10px;
+	}
 }
 
 g.bridge {
@@ -524,6 +528,20 @@ path.link {
 		stroke: $gray-darker;
 		opacity: 0.7;
 		stroke-dasharray: 5,3;
+	}
+}
+
+circle.link-req-items {
+	fill: white;
+	stroke:  $blue;
+}
+
+.link-req-items {
+	display: none;
+	color: $blue;
+
+	&.show {
+		display: block;
 	}
 }
 
@@ -662,11 +680,75 @@ button {
 	}
 }
 
-.item-editor-button {
+.inventory-items-preview {
 	position: absolute;
 	top: 15px;
 	right: 15px;
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
+	width: 165px;
+
+	background-color: $white;
+	border: 1px solid $blue;
+	box-shadow: $shadow-dialog;
+	border-radius: 5px;
+
+	.item-editor-button {
+		background-color: $blue;
+		color: $white;
+		border-radius: 5px;
+		display: flex;
+		flex-direction: column;
+	
+		&:hover {
+			background-color: $blue-lighter;
+			color: $white;
+		}
+	
+		.plus-sign {
+			font-size: 3em;
+		}
+	}
+
+	.items-drag-box {
+		display: flex;
+		flex-direction: column;
+		grid-gap: 2px;
+		padding-top: 5px;
+		max-height: 210px;
+		overflow-y: auto;
+
+		div {
+			padding: 5px;
+			border-radius: 20px;
+
+			position: relative;
+
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			grid-gap: 10px;
+
+			border: 2px solid $blue-lightest;
+
+			.item-icon-small {
+				width: 35px;
+				height: 35px;
+				object-fit: cover;
+			}
+
+			// &:hover {
+			// 	cursor: grab;
+			// }
+
+			// &:active {
+			// 	cursor: grabbing;
+			// }
+		}
+	}
 }
+
 
 /* #### DEBUG #### */
 button.temp-qset-gen-button {
@@ -895,6 +977,50 @@ node-tooltips {
 			font-size: 0.6em;
 
 			margin-bottom: 3px;
+		}
+	}
+
+	p {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		grid-gap: 10px;
+		
+		img {
+			width: 20px;
+			height: 20px;
+		}
+	}
+}
+
+required-items-tooltip {
+	position: absolute;
+	max-width: 250px;
+	margin: 0px 0px 5px 0px;
+	padding: 5px 10px;
+
+	border-radius: 5px;
+	background: $gray-darker;
+
+	color: $color-primary;
+	font-size: 0.7em;
+
+	.tooltip-title {
+		display: block;
+		font-size: 0.6em;
+
+		margin-bottom: 3px;
+	}
+
+	p {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		grid-gap: 10px;
+		
+		img {
+			width: 20px;
+			height: 20px;
 		}
 	}
 }
@@ -1787,6 +1913,18 @@ node-creation-selection-dialog {
 			flex-grow: 1;
 			width: 100%;
 			overflow: hidden;
+
+			@media screen and (min-width: 1000px) {
+				
+				&.tiny {
+					flex-direction: row;
+				}
+
+				&.column {
+					flex-direction: column;
+				}
+				
+			}
 		}
 
 		.panel-right {
@@ -1878,7 +2016,6 @@ node-creation-selection-dialog {
 
 	&.hotspot {
 		max-height: 650px;
-		height: 100%;
 
 		textarea {
 			resize: none;
@@ -1903,14 +2040,29 @@ node-creation-selection-dialog {
 		width: $edit-popup-standard-question-width; // 80%
 		flex-grow: 2;
 		max-height: 300px;
+		box-sizing: border-box;
+		height: 100%;
 
 		border: solid 1px #cccccc;
 		border-radius: 3px;
 
 		font-size: 2em;
 
+		&.expanded {
+			max-height: 100%;
+		}
+
 		&.tiny {
 			max-height: 2em;
+		}
+
+		@media screen and (min-width: 1000px) {
+			&.tiny {
+				resize: both !important;
+				height: 90%;
+				max-height: 100% !important;
+				width: 200px;
+			}
 		}
 
 		@media screen and (max-height: $edit-popup-standard-height + 69) {
@@ -1918,21 +2070,21 @@ node-creation-selection-dialog {
 
 			transition: all 0.1s ease;
 
-			&.tiny {
-				position: relative;
-				height: 22px;
-				font-size: 1em;
+			// &.tiny {
+			// 	position: relative;
+			// 	height: 22px;
+			// 	font-size: 1em;
 
-				resize: none;
+			// 	resize: none;
 
-				margin: 5px 20px 0px 20px;
+			// 	margin: 5px 20px 0px 20px;
 
-				&:focus {
-					position: absolute;
-					z-index: $z-index-modal;
-					height: 50px;
-				}
-			}
+			// 	&:focus {
+			// 		position: absolute;
+			// 		z-index: $z-index-modal;
+			// 		height: 50px;
+			// 	}
+			// }
 		}
 	}
 
@@ -1990,6 +2142,10 @@ node-creation-selection-dialog {
 
 		&.align-top {
 			flex-direction: column;
+		}
+
+		&.expanded {
+			height: 100%;
 		}
 	}
 
@@ -2409,12 +2565,7 @@ node-creation-selection-dialog {
 			display: flex;
 			flex-direction: row-reverse;
 			flex-grow: 1;
-
-			@media screen and (max-height: 650px) {
-				& {
-					height: 300px;
-				}
-			}
+			height: 350px;
 		}
 
 		.image-container {
@@ -2625,12 +2776,13 @@ node-creation-selection-dialog {
 		}
 
 
-		@media screen and (max-width: 1000px) {
+		//@media screen and (max-width: 1000px) {
 			& {
 				position: absolute;
 				z-index: 100;
 				bottom: 0;
 				left: 0;
+				right: 0;
 			}	
 
 			hotspot-toolbar {
@@ -2649,7 +2801,7 @@ node-creation-selection-dialog {
 				left: 0;
 				top: auto;
 			}
-		}
+		//}
 	}
 
 	hotspot-answer-manager {

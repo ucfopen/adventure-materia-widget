@@ -56,6 +56,11 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	decrementItemCount = ->
 		itemCount--
 
+	getInventoryItem = (id) ->
+		for item in inventoryItems
+			if item.id is id
+				return item
+
 	getInventoryItems = ->
 		inventoryItems
 
@@ -99,6 +104,26 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				node =  findNode tree.contents[i], id
 				if node isnt null then return node
 				i++
+		null
+
+	# Finds node and adds item or increments count if already in node
+	findNodeAndAddItem = (tree, id, item) ->
+		node = findNode tree, id
+
+		if node
+			node.items = node.items || []
+			# If item already exists in node, increment item count
+			for i in node.items
+				if item.id is i.id
+					i.count += 1
+					return
+			# Add item to node
+			newItem = {
+				...item
+				count: 1
+			}
+			node.items.push(newItem)
+			return
 		null
 
 	# Recursive function for adding a node to a specified parent node
@@ -449,17 +474,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 							icon: updatedItem.icon
 						}
 
-		# if tree.requiredItems
-		# 	for item in tree.requiredItems
-		# 		do (item, index) ->
-		# 			if item.id is updatedItem.id
-		# 				tree.items[index] = {
-		# 					...item
-		# 					name: updatedItem.name
-		# 					description: updatedItem.description
-		# 					icon: updatedItem.icon
-		# 				}
-
 		if tree.answers
 			for answer in tree.answers
 				if answer.requiredItems
@@ -490,23 +504,17 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	deleteItemFromAllNodes = (tree, deletedItem) ->
 		if tree.items
 			for item, index in tree.items
-				do (item) ->
-					if item.id is deletedItem.id
-						tree.items.splice index, 1
-
-		if tree.requiredItems
-			for item, index in tree.requiredItems
-				do (item) ->
-					if item.id is deletedItem.id
-						tree.requiredItems.splice index, 1
+				if item.id is deletedItem.id
+					tree.items.splice index, 1
+					break
 
 		if tree.answers
 			for answer in tree.answers
 				if answer.requiredItems
 					for item, index in answer.requiredItems
-						do (item) ->
-							if item.id is deletedItem.id
-								answer.requiredItems.splice index, 1
+						if item.id is deletedItem.id
+							answer.requiredItems.splice index, 1
+							break
 
 		if !tree.contents then return
 
@@ -520,6 +528,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 			i++
 
+		
 		return
 
 	# Probably deprecated??
@@ -618,7 +627,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						linkMode: answer.linkMode
 						feedback: answer.feedback
 						requiredItems: answer.requiredItems
-						hidden: answer.hidden
+						hideAnswer: answer.hideAnswer
 
 				switch tree.type
 					when "shortanswer"
@@ -709,6 +718,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					feedback: answer.options.feedback
 					id: generateAnswerHash()
 					requiredItems: answer.options.requiredItems
+					hideAnswer: answer.options.hideAnswer
 
 				switch item.options.type
 					when "shortanswer"
@@ -733,15 +743,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						icon: inventoryItem.icon || null
 
 					node.items.push nodeItem
-
-			# angular.forEach item.requiredItems, (requiredItem, index) ->
-			# 	unless node.requiredItems then node.requiredItems = []
-			#
-			# 	nodeItem =
-			# 		name: requiredItem.name
-			# 		id: requiredItem.id
-			#
-			# 	node.requiredItems.push nodeItem
 
 			# Logic to append node to its intended position on the tree
 			if node.parentId is -1 then tree = node
@@ -931,6 +932,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	setItemCount : setItemCount
 	incrementItemCount : incrementItemCount
 	decrementItemCount : decrementItemCount
+	getInventoryItem: getInventoryItem
 	getInventoryItems: getInventoryItems
 	setInventoryItems: setInventoryItems
 	getCustomIcons: getCustomIcons
@@ -941,6 +943,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	updateAllItems: updateAllItems
 	deleteItemFromAllNodes: deleteItemFromAllNodes
 	findNode : findNode
+	findNodeAndAddItem : findNodeAndAddItem
 	findAndAdd : findAndAdd
 	findAndReplace : findAndReplace
 	findAndAddInBetween : findAndAddInBetween
