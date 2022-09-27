@@ -700,6 +700,7 @@ button {
 		border-radius: 5px;
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 	
 		&:hover {
 			background-color: $blue-lighter;
@@ -708,6 +709,16 @@ button {
 	
 		.plus-sign {
 			font-size: 3em;
+		}
+
+		> div {
+			display: flex;
+			flex-direction: row;
+		}
+
+		img {
+			width: 35px;
+			height: 35px;
 		}
 	}
 
@@ -1114,6 +1125,7 @@ required-items-tooltip {
 			.row {
 				display: flex;
 				flex-direction: row;
+				justify-content: end;
 			}
 
 			img {
@@ -1130,7 +1142,8 @@ required-items-tooltip {
 				flex-direction: row;
 				align-items: center;
 				grid-gap: 10px;
-				padding-right: 10px;
+				padding: 0 10px;
+				min-height: 35px;
 			}
 
 			.selected-item {
@@ -1145,7 +1158,6 @@ required-items-tooltip {
 			}
 
 			dt:hover {
-				background-color: $gray-lighter;
 				cursor: pointer;
 			}
 
@@ -1155,6 +1167,7 @@ required-items-tooltip {
 				margin: 0;
 				position: absolute;
 				width: 200px;
+				border-radius: 5px;
 			}
 
 			button {
@@ -1174,6 +1187,11 @@ required-items-tooltip {
 				overflow: auto;
 				scrollbar-color: $gray;
 				background-color: $gray;
+
+				>:hover {
+
+					background-color: $gray-lighter;
+				}
 			}
 		}
 

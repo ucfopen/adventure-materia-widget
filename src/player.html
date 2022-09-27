@@ -23,14 +23,15 @@
 	</head>
 	<body id="body" ng-app="Adventure" ng-controller="AdventureController">
 
-
-		<button ng-class="{'icon-backpack': !showInventory, 'icon-cross': showInventory, 'show-inventory' : !hideInventoryBtn}" ng-click="toggleInventory()" ng-show="inventory[0]"  ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false"></button>
+		<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn"  ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" class="inventory-button">
+			<img src="assets/icons/BackPack64.png" ng-show="!showInventory"/>
+		</button>
 		<div class="notif-message" ng-if="showNotif">
 			<p ng-if="question.options.items.length > 1">
 				Items updated!
 			</p>
 			<p ng-if="question.options.items.length == 1">
-				<img ng-if="uestion.options.items[0].icon.url" ng-src="{{uestion.options.items[0].icon.url}}"/>
+				<img ng-if="question.options.items[0].icon.url" ng-src="{{question.options.items[0].icon.url}}"/>
 				{{question.options.items[0].name}} has been added to your inventory!
 			</p>
 		</div>

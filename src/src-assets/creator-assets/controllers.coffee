@@ -311,11 +311,15 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			return Materia.CreatorCore.cancelSave ''
 		else
 			qset = treeSrv.createQSetFromTree $scope.treeData
+
+			console.log(qset)
+
 			qset.options.hidePlayerTitle = $scope.hidePlayerTitle
 			qset.options.scoreMode = $scope.scoreMode
 			qset.options.internalScoreMessage = $scope.internalScoreMessage
 			qset.options.inventoryItems = treeSrv.getInventoryItems()
 			qset.options.customIcons = treeSrv.getCustomIcons()
+			console.log(qset)
 			Materia.CreatorCore.save $scope.title, qset, 2
 
 	materiaCallbacks.onSaveComplete = (title, widget, qset, version) -> true

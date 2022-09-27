@@ -74,10 +74,10 @@ body {
 
 }
 
-button.show-inventory {
-	width:40px;
-	height:40px;
-	background:$white;
+.inventory-button {
+	width:64px;
+	height:64px;
+	background: transparent;
 	border: none;
 	border-radius:5px;
 	cursor: pointer;
@@ -87,17 +87,31 @@ button.show-inventory {
 	display: inline-block;
 	position: absolute;
 	right: 10px;
-	top: 10px;
+	top: 2px;
 
 	font-size: 24px;
 	color: $blue;
 
+
 	&:focus {
-		outline: thick solid $blue-focus;
+		background: rgba(0,0,0,0.1);
 	}
 
-	&:hover {
-		background: $gray-lightest;
+	img {
+		width: 64px;
+		height: 64px;
+	}
+}
+
+button.show-inventory {
+	width:40px;
+	height:40px;
+	top: 10px;
+	background: $white;
+
+	&:focus {
+		outline: thick solid $blue-focus;
+		background: $white;
 	}
 }
 
@@ -134,6 +148,11 @@ button.show-inventory {
 		border-left: 15px solid transparent;
 		top: -25px;
 		right: 5px;
+	}
+
+	img {
+		width: 35px;
+		height: 35px;
 	}
 }
 
@@ -714,7 +733,7 @@ h1 {
 
 .inventory-tooltip {
 	position: absolute;
-	right: 60px;
+	right: 80px;
 	top: 10px;
 	z-index: 50;
 	background: white;

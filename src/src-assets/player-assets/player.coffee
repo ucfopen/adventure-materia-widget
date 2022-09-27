@@ -27,7 +27,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.title = ""
 	$scope.qset = null
 	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
-	$scope.hideInventoryBtn = false
+	$scope.showInventoryBtn = false
 	$scope.scoringDisabled = false
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 	$scope.inventory = []
@@ -44,8 +44,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				manageQuestionScreen(qset.items[0].options.id)
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
-
-				if qset.options.hideInventoryBtn then $scope.hideInventoryBtn = qset.options.hideInventoryBtn
 
 				if qset.options.scoreMode and qset.options.scoreMode is "Non-Scoring"
 					$scope.scoringDisabled = true
@@ -116,10 +114,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			materiaId: q_data.id
 			options: q_data.options
 
-		# Check if player's inventory contains the required items to view this question
-		# if !! $scope.checkInventory($scope.question)[0]
-		# 	handleRestrictedNode()
-
 		# Remove new item alerts
 		for i in $scope.inventory
 			i.new = false
@@ -131,6 +125,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		# Add items to player's inventory
 		if $scope.question.options.items[0]
 			$scope.inventoryUpdate = true
+			$scope.showInventoryBtn = true
 
 			for q_i in $scope.question.options.items
 				do (q_i) ->
@@ -179,14 +174,14 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			), 10000
 
 		# Update number of uses for each item
-		for i, index in $scope.inventory
-			# Skip items with unlimited use
-			if (i.numberOfUsesLeft == -999)
-				continue
-			i.numberOfUsesLeft -= 1
-			# Remove item if no uses left
-			if (i.numberOfUsesLeft <= 0)
-				$scope.inventory.splice index, 1
+		# for i, index in $scope.inventory
+		# 	# Skip items with unlimited use
+		# 	if (i.numberOfUsesLeft == -999)
+		# 		continue
+		# 	i.numberOfUsesLeft -= 1
+		# 	# Remove item if no uses left
+		# 	if (i.numberOfUsesLeft <= 0)
+		# 		$scope.inventory.splice index, 1
 
 
 		$scope.answers = []
@@ -204,6 +199,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					options : q_data.answers[i].options
 					requiredItems: q_data.answers[i].options.requiredItems
 					hideAnswer: q_data.answers[i].options.hideAnswer
+
+				if answer.requiredItems[0]
+					$scope.showInventoryBtn = true
 
 				$scope.answers.push answer
 

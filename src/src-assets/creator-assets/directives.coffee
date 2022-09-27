@@ -429,7 +429,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 			requiredItemsCircles = linkGroup.append("svg:circle")
 				.attr("class", (d) -> 
 					if (d.lock)
-						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and d.lock.requiredItems[0])
+						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and (d.lock.requiredItems and d.lock.requiredItems[0]))
 							return "link-req-items show"
 						else
 							return "link-req-items hide"
@@ -460,7 +460,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 			requiredItemsText = linkGroup.append("text")
 				.attr("class", (d) ->
 					if (d.lock)
-						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and d.lock.requiredItems[0])
+						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and d.lock.requiredItems and d.lock.requiredItems[0])
 							return "link-req-items show"
 						else
 							return "link-req-items hide"
@@ -2084,8 +2084,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.invalidQuantity = false
 
 			# Save the original item count for validation
-			for item in $scope.items
-				item.tempCount = item.count
+			if $scope.items
+				for item in $scope.items
+					item.tempCount = item.count
 
 			# Add items not already being used to the items available for selection
 			$scope.availableItems = []
@@ -2125,6 +2126,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				newItem = {
 					...item
 					count: 1
+					tempCount: 1
 					numberOfUsesLeft: -999
 				}
 				$scope.items.push(newItem)
@@ -2151,6 +2153,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				newItem = {
 					...item
 					count: 1
+					tempCount: 1
 				}
 				answer.requiredItems.push(newItem)
 
@@ -2213,8 +2216,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.invalidQuantity = false
 
 				# Save the original item count in case of invalid input
-				for item in answer.requiredItems
-					item.tempCount = item.count
+				if answer.requiredItems
+					for item in answer.requiredItems
+						item.tempCount = item.count
 
 				# Add items not already being used to the items available for selection
 				$scope.availableItems = []

@@ -80,7 +80,9 @@
 			<draggable-items-box class="inventory-items-preview">
 				<button class="item-editor-button" ng-click="showItemManager = true">
 					<span class="plus-sign" ng-show="!inventoryItems.length">+</span>
-					{{inventoryItems.length ? 'Edit Inventory Items' : 'Add Inventory Items'}}
+					<div>
+						<p>{{inventoryItems.length ? 'Edit Inventory Items' : 'Add Inventory Items'}}</p>
+					</div>
 				</button>
 				<div class="items-drag-box">
 					<!-- <div ng-repeat="item in inventoryItems" draggable="true" ng-mousedown="dragItemStart($event)"
@@ -680,7 +682,7 @@
 												tabindex="0"></span>
 											</div>
 											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
-											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
+											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Invalid quantity.</p>
 										</div>
 										<ul class="list-items give-items">
 											<li
@@ -919,7 +921,7 @@
 												tabindex="0"></span>
 											</div>
 											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
-											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
+											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Invalid quantity.</p>
 										</div>
 										<ul class="list-items give-items">
 											<li
@@ -1003,15 +1005,15 @@
 						ng-click="bringToFront($event)">
 							<div class="item-header">
 								<div class="item-heading">
-									<h3>Give Player Items</h3>
+									<h3>Give or Remove Items</h3>
 									<span class="hide-popup icon-cross"
 									ng-click="showItemSelection = false"
 									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
 									tabindex="0"></span>
 								</div>
 								<p class="item-instructions">Visiting this node will give the player these items.</p>
-								<p class="item-instructions">A negative quantity will subtract from the player's current inventory.</p>
-								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
+								<p class="item-instructions">A negative quantity will subtract from the player's current inventory that amount.</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Invalid quantity.</p>
 							</div>
 							<ul class="list-items give-items">
 								<li
@@ -1063,7 +1065,7 @@
 									tabindex="0"></span>
 								</div>
 								<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
-								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Invalid quantity.</p>
 							</div>
 							<ul class="list-items give-items">
 								<li
@@ -1161,7 +1163,7 @@
 						ng-mousedown="modalDragStart($event)">
 							<div class="item-header">
 								<div class="item-heading">
-									<h3>Give Player Items</h3>
+									<h3>Give or Remove Items</h3>
 									<span class="hide-popup icon-cross"
 									ng-click="showItemSelection = false"
 									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
@@ -1169,8 +1171,8 @@
 								</div>
 								
 								<p class="item-instructions">Visiting this node will give the player these items.</p>
-								<p class="item-instructions">A negative quantity will subtract from the player's current inventory.</p>
-								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
+								<p class="item-instructions">A negative quantity will subtract from the player's current inventory that amount.</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Invalid quantity.</p>
 							</div>
 							<ul class="list-items give-items">
 								<li
@@ -1227,7 +1229,7 @@
 						</div>
 						<button type="button"
 							class="item-button"
-							ng-click="toggleItemPopup()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>{{items[0] ? 'Edit Items' : 'Add Items'}}</span><span class="icon-backpack"></span>
+							ng-click="toggleItemPopup()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>{{items[0] ? 'Edit Items' : 'Add Items'}}</span><img src="assets/icons/BackPack64.png"/>
 						</button>
 						<button class="save-button important-button"
 							ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
