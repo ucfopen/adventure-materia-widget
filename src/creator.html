@@ -594,19 +594,6 @@
 										<div class="answer-textareas">
 											<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
 											<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
-											<!-- <div class="add-answer-items" ng-show="inventoryItems[0]">
-												<span>(Optional) Required Items: </span>
-												<select ng-options="item.name for item in inventoryItems" ng-model="answerSelectedItem">
-												</select>
-												<button class="add-item" ng-click="addRequiredItemToAnswer(answerSelectedItem, answer)">Add</button>
-												<button class="info-icon" ng-click="displayInfoDialog('Require the player to have certain items in their inventory to be able to select this answer. You can create items on the widget home screen. Click Add to add a new item or increase its count.')">i</button>
-											</div>
-											<div class="answer-items" ng-show="inventoryItems[0]">
-												<p ng-hide="answer.requiredItems.length">Items required for this answer to be selectable will appear here. Click an item to decrease its count or remove it.</p>
-												<button type="button" ng-class="{'flashItemBox' : flashItemBox == true && $index == itemIndex && currentAnswer == answer}"
-													ng-repeat="item in answer.requiredItems"
-													ng-click="removeRequiredItemFromAnswer(item, answer)">{{item.name}} ({{item.count}})</button>
-											</div> -->
 										</div>
 										<div class="answer-options">
 											<div class="answer-destination" ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">
@@ -693,6 +680,7 @@
 												tabindex="0"></span>
 											</div>
 											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
+											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
 										</div>
 										<ul class="list-items give-items">
 											<li
@@ -715,9 +703,10 @@
 													</div>
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
+													
 													<div class="item-quantity">
 														<span>Quantity</span>
-														<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="1" max="999" ng-model="item.count"/>
+														<input ng-focus = "event = $event" class="increase-count" type="text" ng-model="item.tempCount" ng-pattern="/^-?[1-9]+[0-9]*$/" ng-change="updateCount(event, item, '{{item.count}}', '{{item.count}}')"/>
 													</div>
 													<button class="delete-button" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)">Remove</button>
 												</div>
@@ -725,7 +714,8 @@
 										</ul>
 										<div class="options-bar add-item">
 											<div class="selector">
-												<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+												<select>
+													<option ng-repeat="item in availableItems" value="item.name" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>{{item.name}}</option>
 												</select>
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
@@ -929,6 +919,7 @@
 												tabindex="0"></span>
 											</div>
 											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
+											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
 										</div>
 										<ul class="list-items give-items">
 											<li
@@ -953,7 +944,7 @@
 												<div class="item-options" ng-class="{'show': hoverItem}">
 													<div class="item-quantity">
 														<span>Quantity</span>
-														<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="1" max="999" ng-model="item.count"/>
+														<input ng-focus = "event = $event" class="increase-count" type="text" ng-model="item.tempCount" ng-pattern="/^-?[1-9]+[0-9]*$/" ng-change="updateCount(event, item)"/>
 													</div>
 													<button class="delete-button" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)">Remove</button>
 												</div>
@@ -961,7 +952,8 @@
 										</ul>
 										<div class="options-bar add-item">
 											<div class="selector">
-												<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+												<select>
+													<option ng-repeat="item in availableItems" value="item.name" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>{{item.name}}</option>
 												</select>
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
@@ -1004,57 +996,6 @@
 								</div>
 							</hotspot-answer-manager>
 						</hotspot-manager>
-						<!-- item selection for individual nodes
-						<div item-selection ng-show="showItemSelection" class="item-selection item-modal"
-						ng-click="bringToFront($event)"  
-						ng-mousedown="modalDragStart($event)">
-							<div class="item-header">
-								<div class="item-heading">
-									<h3>Give Player Items</h3>
-									<span class="hide-popup icon-cross"
-									ng-click="showItemSelection = false"
-									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
-									tabindex="0"></span>
-								</div>
-								<p class="item-instructions">Visiting this node will give the player these items.</p>
-							</div>
-							<ul class="list-items give-items">
-								<li
-									ng-repeat="item in items"
-									ng-click="manageItem(item)"
-									ng-mouseover="hoverItem = true"
-									ng-mouseout="hoverItem = false"
-								>
-									<div class="item-icon">
-										<span class="icon-{{item.icon.icomoon_name}}" ng-class="{'show': item.icon.icomoon}" ng-if="!item.icon.url"></span>
-										<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
-									</div>
-									<div class="item-content">
-										<div class="item-name">
-											<span>{{item.name}}</span>
-										</div>
-										<div class="item-description" ng-if="item.description">
-											<span class="description">{{item.description}}</span>
-										</div>
-									</div>
-									<div class="item-options" ng-class="{'show': hoverItem}">
-										<div class="item-quantity">
-											<span>Quantity</span>
-											<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
-										</div>
-										<button class="delete-button" type="button" ng-click="removeItemFromNode(item, $index)">Remove</button>
-									</div>
-								</li>
-							</ul>
-							<div class="options-bar add-item">
-								<div class="selector">
-									<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
-									</select>
-									<button ng-click="addItemToNode(selectedItem)">Add Item</button>
-								</div>
-								<button ng-click="toggleItemPopup()">Done</button>
-							</div>
-						</div> -->
 					</div>
 					<div class="panel-right">
 						<!-- item selection for individual nodes -->
@@ -1069,6 +1010,8 @@
 									tabindex="0"></span>
 								</div>
 								<p class="item-instructions">Visiting this node will give the player these items.</p>
+								<p class="item-instructions">A negative quantity will subtract from the player's current inventory.</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
 							</div>
 							<ul class="list-items give-items">
 								<li
@@ -1090,12 +1033,10 @@
 										</div>
 									</div>
 									<div class="item-options" ng-class="{'show': hoverItem}">
+										
 										<div class="item-quantity">
-											<div>
-												<span>Quantity</span>
-												<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
-											</div>
-											<!-- <span>(A negative number will subtract that amount from the player's inventory)</span> -->
+											<span>Quantity</span>
+											<input ng-focus = "event = $event" class="increase-count" type="text" ng-model="item.tempCount" ng-pattern="/^-?[1-9]+[0-9]*$/" ng-change="updateCount(event, item)"/>
 										</div>
 										<button class="delete-button" type="button" ng-click="removeItemFromNode(item, $index)">Remove</button>
 									</div>
@@ -1103,11 +1044,11 @@
 							</ul>
 							<div class="options-bar add-item">
 								<div class="selector">
-									<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+									<select >
+										<option ng-repeat="item in availableItems" value="item.name" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>{{item.name}}</option>
 									</select>
 									<button ng-click="addItemToNode(selectedItem)">Add Item</button>
 								</div>
-								<!-- <button ng-click="toggleItemPopup()">Done</button> -->
 							</div>
 						</div>
 						<!-- required items panel for answer choices -->
@@ -1122,6 +1063,7 @@
 									tabindex="0"></span>
 								</div>
 								<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
 							</div>
 							<ul class="list-items give-items">
 								<li
@@ -1144,9 +1086,10 @@
 										</div>
 									</div>
 									<div class="item-options" ng-class="{'show': hoverItem}">
+										
 										<div class="item-quantity">
 											<span>Quantity</span>
-											<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="1" max="999" ng-model="item.count"/>
+											<input ng-focus = "event = $event" class="increase-count" type="text" ng-model="item.tempCount" ng-pattern="/^-?[1-9]+[0-9]*$/" ng-change="updateCount(event, item)"/>
 										</div>
 										<button class="delete-button" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)">Remove</button>
 									</div>
@@ -1154,7 +1097,8 @@
 							</ul>
 							<div class="options-bar add-item">
 								<div class="selector">
-									<select ng-options="item.name for item in availableItems" ng-model="selectedItem">
+									<select>
+										<option ng-repeat="item in availableItems" value="item.name" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>{{item.name}}</option>
 									</select>
 									<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 								</div>
@@ -1223,7 +1167,10 @@
 									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
 									tabindex="0"></span>
 								</div>
+								
 								<p class="item-instructions">Visiting this node will give the player these items.</p>
+								<p class="item-instructions">A negative quantity will subtract from the player's current inventory.</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">Quantity must not be 0.</p>
 							</div>
 							<ul class="list-items give-items">
 								<li
@@ -1245,9 +1192,10 @@
 										</div>
 									</div>
 									<div class="item-options" ng-class="{'show': hoverItem}">
+										
 										<div class="item-quantity">
 											<span>Quantity</span>
-											<input class="increase-count" type="number" ng-pattern="/^-?[0-9]+$/" min="-999" max="999" ng-model="item.count"/>
+											<input ng-focus = "event = $event" class="increase-count" type="text" ng-model="item.tempCount" ng-pattern="/^-?[1-9]+[0-9]*$/" ng-change="updateCount(event, item)"/>
 										</div>
 										<button class="delete-button" type="button" ng-click="removeItemFromNode(item, $index)">Remove</button>
 									</div>
@@ -1255,13 +1203,27 @@
 							</ul>
 							<div class="options-bar add-item">
 								<div class="selector">
-									<select ng-options="item.name for item in availableItems" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>
-									</select>
+									<dl ng-class="{'row': !availableItems[0] }">
+										<dt ng-if="!availableItems[0]" class="blank-selection">
+											<i class="arrow-bottom"></i>
+										</dt>
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+											<div class="option-contents">
+												<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+												{{selectedItem.name}}
+											</div>
+											<i class="arrow-bottom"></i>
+										</dt>
+										<div class="options">
+											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+												<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+												{{item.name}}
+												</dt>
+										</div>
+									</dl>
 									<button ng-click="addItemToNode(selectedItem)">Add Item</button>
 								</div>
-								<!-- <button ng-click="toggleItemPopup()">Done</button> -->
 							</div>
-							<i class="arrow-bottom"></i>
 						</div>
 						<button type="button"
 							class="item-button"

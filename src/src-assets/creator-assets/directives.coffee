@@ -1983,11 +1983,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				else
 					$scope.items = []
 
-				if $scope.editedNode.requiredItems
-					$scope.requiredItems = $scope.editedNode.requiredItems
-				else
-					$scope.requiredItems = []
-
 				if $scope.editedNode.media
 					if $scope.editedNode.media.type is "image"
 						$scope.showImage = true
@@ -2085,6 +2080,12 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.showItemSelection = false
 				return
 			$scope.showItemSelection = true
+			# Remove error message
+			$scope.invalidQuantity = false
+
+			# Save the original item count for validation
+			for item in $scope.items
+				item.tempCount = item.count
 
 			# Add items not already being used to the items available for selection
 			$scope.availableItems = []
@@ -2098,6 +2099,20 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						$scope.availableItems.push(item)
 
 			$scope.selectedItem = $scope.availableItems[0]
+
+
+		$scope.selectItem = (item) ->
+			$scope.selectedItem = item
+			$scope.showDropdown = false
+
+		$scope.updateCount = (event, item) ->
+			console.log(item.tempCount)
+			console.log(item.count)
+			if item.tempCount
+				$scope.invalidQuantity = false
+				item.count = item.tempCount
+			else
+				$scope.invalidQuantity = true
 
 		$scope.addItemToNode = (item) ->
 			if item
@@ -2121,6 +2136,8 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 		$scope.removeItemFromNode = (item, index) ->
 			$scope.items.splice index, 1
 			$scope.availableItems.push(item)
+			if (!$scope.availableItems[1]) 
+				$scope.selectedItem = item
 			$scope.showItemManagerDialog = false
 
 		$scope.addRequiredItemToAnswer = (item, answer) ->
@@ -2129,7 +2146,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 				for i in answer.requiredItems when i.id is item.id
 					i.count += 1
-					# $scope.flashItem(answer, item)
 					return
 
 				newItem = {
@@ -2142,10 +2158,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				index = $scope.availableItems.indexOf(item)
 				$scope.availableItems.splice index, 1
 				$scope.selectedItem = $scope.availableItems[0]
-
-				# $scope.flashItem(answer, item)
-
-				# $scope.checkIfUnreachable(item, answer)
 
 		$scope.flashItem = (answer, item) ->
 			for i, index in answer.requiredItems when i.id is item.id
@@ -2197,6 +2209,12 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				if document.querySelector('hotspot-answer-manager')
 					document.querySelector('hotspot-answer-manager').style.zIndex = 100;
 
+				# Remove error message
+				$scope.invalidQuantity = false
+
+				# Save the original item count in case of invalid input
+				for item in answer.requiredItems
+					item.tempCount = item.count
 
 				# Add items not already being used to the items available for selection
 				$scope.availableItems = []

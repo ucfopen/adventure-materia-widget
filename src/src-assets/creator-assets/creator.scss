@@ -720,7 +720,7 @@ button {
 		overflow-y: auto;
 
 		div {
-			padding: 5px;
+			padding: 5px 10px;
 			border-radius: 20px;
 
 			position: relative;
@@ -731,6 +731,10 @@ button {
 			grid-gap: 10px;
 
 			border: 2px solid $blue-lightest;
+
+			span {
+				overflow: hidden;
+			}
 
 			.item-icon-small {
 				width: 35px;
@@ -1077,6 +1081,10 @@ required-items-tooltip {
 		.item-instructions {
 			padding-bottom: 10px;
 		}
+
+		.invalid-quantity-message {
+			color: $red;
+		}
 	}
 
 	ul li, .options-bar {
@@ -1099,12 +1107,73 @@ required-items-tooltip {
 			flex-direction: row;
 			grid-gap: 20px;
 
-			select {
+			::-webkit-scrollbar {
+				background-color: $gray;
+			}
+
+			.row {
+				display: flex;
+				flex-direction: row;
+			}
+
+			img {
+				height: 35px;
+				width: 35px;
+			}
+
+			.arrow-bottom {
+				position: static;
+			}
+
+			dt {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				grid-gap: 10px;
+				padding-right: 10px;
+			}
+
+			.selected-item {
+				justify-content: space-between;
+			}
+
+			.option-contents {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				grid-gap: 10px;
+			}
+
+			dt:hover {
+				background-color: $gray-lighter;
+				cursor: pointer;
+			}
+
+			dl {
+				background-color: $gray-lighter;
+				border: 1px solid $gray-darker;
+				margin: 0;
+				position: absolute;
 				width: 200px;
 			}
 
 			button {
 				min-width: 75px;
+				margin-top: 5px;
+				margin-left: 210px;
+			}
+
+			.blank-selection {
+				width: 100px;
+				height: 2em;
+				justify-content: end;
+			}
+
+			.options {
+				max-height: 150px;
+				overflow: auto;
+				scrollbar-color: $gray;
+				background-color: $gray;
 			}
 		}
 
@@ -1192,6 +1261,10 @@ required-items-tooltip {
 				input {
 					width: 70px;
 					box-sizing: border-box;
+				}
+
+				.ng-invalid-pattern {
+					border: $red solid 1px;
 				}
 			}
 
