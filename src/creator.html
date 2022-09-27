@@ -716,14 +716,30 @@
 										</ul>
 										<div class="options-bar add-item">
 											<div class="selector">
-												<select>
-													<option ng-repeat="item in availableItems" value="item.name" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>{{item.name}}</option>
-												</select>
+												<dl ng-class="{'row': !availableItems[0] }">
+													<dt ng-if="!availableItems[0]" class="blank-selection">
+														<i class="arrow-bottom"></i>
+													</dt>
+													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+														<div class="option-contents">
+															<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+															{{selectedItem.name}}
+														</div>
+														<i class="arrow-bottom"></i>
+													</dt>
+													<div class="options">
+														<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+															<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+															{{item.name}}
+															</dt>
+													</div>
+												</dl>
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
 											<input type="checkbox"
 											ng-model="currentAnswer.hideAnswer"
-											value="false" /> Hide Answer if Player Does Have Items
+											value="false" /> 
+											<p class="hide-answer-option">Hide Answer if Player Does Have Items</p>
 											<!-- <button ng-click="showRequiredItems = false">Done</button> -->
 										</div>
 										<!-- <i class="arrow-right"></i> -->
@@ -954,12 +970,26 @@
 										</ul>
 										<div class="options-bar add-item">
 											<div class="selector">
-												<select>
-													<option ng-repeat="item in availableItems" value="item.name" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>{{item.name}}</option>
-												</select>
+												<dl ng-class="{'row': !availableItems[0] }">
+													<dt ng-if="!availableItems[0]" class="blank-selection">
+														<i class="arrow-bottom"></i>
+													</dt>
+													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+														<div class="option-contents">
+															<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+															{{selectedItem.name}}
+														</div>
+														<i class="arrow-bottom"></i>
+													</dt>
+													<div class="options">
+														<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+															<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+															{{item.name}}
+															</dt>
+													</div>
+												</dl>
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
-											<!-- <button ng-click="showRequiredItems = false">Done</button> -->
 										</div>
 										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
 									</div>
@@ -1046,9 +1076,24 @@
 							</ul>
 							<div class="options-bar add-item">
 								<div class="selector">
-									<select >
-										<option ng-repeat="item in availableItems" value="item.name" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>{{item.name}}</option>
-									</select>
+									<dl ng-class="{'row': !availableItems[0] }">
+										<dt ng-if="!availableItems[0]" class="blank-selection">
+											<i class="arrow-bottom"></i>
+										</dt>
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+											<div class="option-contents">
+												<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+												{{selectedItem.name}}
+											</div>
+											<i class="arrow-bottom"></i>
+										</dt>
+										<div class="options">
+											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+												<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+												{{item.name}}
+												</dt>
+										</div>
+									</dl>
 									<button ng-click="addItemToNode(selectedItem)">Add Item</button>
 								</div>
 							</div>
@@ -1099,12 +1144,26 @@
 							</ul>
 							<div class="options-bar add-item">
 								<div class="selector">
-									<select>
-										<option ng-repeat="item in availableItems" value="item.name" ng-model="selectedItem"><img ng-if="item.icon.url" src="{{item.icon.url}}"/>{{item.name}}</option>
-									</select>
+									<dl ng-class="{'row': !availableItems[0] }">
+										<dt ng-if="!availableItems[0]" class="blank-selection">
+											<i class="arrow-bottom"></i>
+										</dt>
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+											<div class="option-contents">
+												<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+												{{selectedItem.name}}
+											</div>
+											<i class="arrow-bottom"></i>
+										</dt>
+										<div class="options">
+											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+												<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+												{{item.name}}
+												</dt>
+										</div>
+									</dl>
 									<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 								</div>
-								<!-- <button ng-click="showRequiredItems = false">Done</button> -->
 							</div>
 						</div>
 					</div>

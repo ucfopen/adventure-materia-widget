@@ -1199,6 +1199,10 @@ required-items-tooltip {
 			flex-grow: 2;
 		}
 
+		.hide-answer-option {
+			min-width: 200px;
+		}
+
 		&.answer-required-item > * {
 			align-content: center;
 			justify-content: center;
