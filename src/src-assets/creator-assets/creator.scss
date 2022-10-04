@@ -121,6 +121,7 @@ html, body {
 
 button {
 	cursor: pointer;
+	height: 30px;
 }
 
 div.fancy-toggle {
@@ -701,6 +702,7 @@ button {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		height: fit-content;
 	
 		&:hover {
 			background-color: $blue-lighter;
@@ -732,6 +734,7 @@ button {
 
 		div {
 			padding: 5px 10px;
+			margin-right: 5px;
 			border-radius: 20px;
 
 			position: relative;
@@ -867,6 +870,7 @@ debug-qset-loader, debug-qset-generator {
 		padding: 10px 20px;
 		font-weight: 400;
 		font-size: 18px;
+		height: 50px;
 	}
 }
 
@@ -1071,7 +1075,7 @@ required-items-tooltip {
 
 		border-top-left-radius: 5px;
 		border-top-right-radius: 5px;
-		border-bottom: 1px solid $gray-darker;
+		border-bottom: 1px solid $gray-lighter;
 
 		.item-heading {
 			display: flex;
@@ -1079,6 +1083,12 @@ required-items-tooltip {
 			justify-content: space-between;
 			box-sizing: border-box;
 			align-items: center;
+			grid-gap: 10px;
+
+			h3 {
+				max-height: 2.5em;
+				overflow: hidden;
+			}
 		}
 
 		.hide-popup {
@@ -1091,6 +1101,7 @@ required-items-tooltip {
 
 		.item-instructions {
 			padding-bottom: 10px;
+			font-size: 14px;
 		}
 
 		.invalid-quantity-message {
@@ -1102,7 +1113,7 @@ required-items-tooltip {
 		margin-bottom: 5px;
 		font-size: 11pt;
 
-		padding: 10px 0;
+		padding: 10px 10px 10px 0;
 		margin-right: 2px;
 
 		-webkit-transition: background 0.5s;
@@ -1117,6 +1128,7 @@ required-items-tooltip {
 			display: flex;
 			flex-direction: row;
 			grid-gap: 20px;
+			height: 35px;
 
 			::-webkit-scrollbar {
 				background-color: $gray;
@@ -1171,9 +1183,12 @@ required-items-tooltip {
 			}
 
 			button {
-				min-width: 75px;
+				min-width: 80px;
 				margin-top: 5px;
-				margin-left: 210px;
+			}
+
+			button:first-of-type {
+				margin-left: 220px;
 			}
 
 			.blank-selection {
@@ -1186,11 +1201,11 @@ required-items-tooltip {
 				max-height: 150px;
 				overflow: auto;
 				scrollbar-color: $gray;
-				background-color: $gray;
+				background-color: $gray-lighter;
 
 				>:hover {
 
-					background-color: $gray-lighter;
+					background-color: $gray;
 				}
 			}
 		}
@@ -1291,17 +1306,13 @@ required-items-tooltip {
 			}
 
 			button {
-				background: $color-primary;
-				color: $gray-darker;
+				// background: $color-primary;
+				// color: $gray-darker;
+				// height: 35px;
 		
-				&:hover {
-					color: $color-accent-highlight;
-				}
-
-				&.delete-button:hover {
-					background-color: $red;
-					color: $white;
-				}
+				// &:hover {
+				// 	color: $color-accent-highlight;
+				// }
 
 				&.save {
 					background: $color-accent;
@@ -1340,9 +1351,9 @@ required-items-tooltip {
 		list-style-type: none;
 		margin: 0px;
 		padding: 10px 0px 0px 0px;
-
 		overflow: auto;
-		overflow-x: hidden;
+		overflow-x: hidden;	
+		max-height: 300px;
 	}
 
 	input {
@@ -1354,23 +1365,13 @@ required-items-tooltip {
 		border-radius: 3px;
 	}
 
-	button {
-		height: 30px;
-	}
-
-	button {
+	button:not(.delete-button) {
 		background: $color-accent;
 		color: $color-primary;
+		height: 30px;
 
 		&:hover {
 			background: $color-accent-highlight;
-		}
-	}
-
-	.delete-button {
-		&:hover {
-			background: $red-lighter;
-			color: $color-primary !important;
 		}
 	}
 }
@@ -1476,10 +1477,29 @@ item-icon-selector {
 
 	&.give-item-modal {
 		position: absolute;
-		height: 65%;
-		width: 65%;
+		height: 75%;
+		width: 85%;
 		bottom: 70px;
 		right: 40px;
+
+
+		.item-container {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			grid-gap: 10px;
+			overflow: auto;
+			overflow-x: hidden;
+
+			> div {
+				min-width: 50%;
+			}
+
+			.list-items {
+				max-height: 100%;
+				overflow:hidden;
+			}
+		}
 	}
 
 	.arrow-bottom {
@@ -1496,6 +1516,15 @@ item-icon-selector {
 	max-height: 100%;
 	min-width: 300px;
 	z-index: 200;
+
+
+	.item-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		grid-gap: 10px;
+		overflow: auto;
+	}
 }
 
 title-editor {
@@ -2001,6 +2030,7 @@ node-creation-selection-dialog {
 		flex-grow: 1;
 		max-height: 80%;
 		padding: 10px;
+		overflow: auto;
 
 		.panel-left {
 			display: flex;
@@ -2009,7 +2039,7 @@ node-creation-selection-dialog {
 			width: 100%;
 			overflow: hidden;
 
-			@media screen and (min-width: 1000px) {
+			@media screen and (min-width: $node-creation-panels-width) {
 				
 				&.tiny {
 					flex-direction: row;
@@ -2024,6 +2054,7 @@ node-creation-selection-dialog {
 
 		.panel-right {
 			padding: 10px 20px;
+			max-width: 450px;
 		}
 	}
 
@@ -2039,49 +2070,36 @@ node-creation-selection-dialog {
 		}
 	}
 
+	.answer-required-items {
+		display: flex;
+		flex-direction: column;
+		grid-gap: 10px;
+		height: 100%;
+	}
+
 	.require-item-btn {
 		// width: 100%;
-		height: 100%;
+		// height: 100%;
 		position: relative;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		grid-gap: 2px;
-		background-color: $gray-lightest;
 		border-color: $white;
-		color: $gray-darker;
 		font-size: 14px;
 		max-width: 105px;
-		padding-left: 20px;
-
-		&:hover {
-			background-color: $gray-lightest;
-		}
 
 		.arrow-bottom {
 			position: absolute;
 			top: -15px;
 			left: 30%;
 		}
-
-
-		span {
-			font-size: 3em;
-		}
-
-		&.requires-items {
-			background-color: $gray-lightest;
-
-			&:hover {
-				background-color: $gray-lighter;
-			}
-		}
 	}
 
 	.required-item-tooltip {
 		position: absolute;
-		left: -60%;
+		left: -20%;
 		top: -50px;
 		width: 125px;
 		z-index: $z-index-modal;
@@ -2185,7 +2203,7 @@ node-creation-selection-dialog {
 
 	#big-upload-button {
 		text-align: center;
-		max-height: 100px;
+		height:fit-content;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-around;
@@ -2378,7 +2396,7 @@ node-creation-selection-dialog {
 
 					color: $gray-darker;
 
-					> div, div.answer-destination {
+					div.answer-destination {
 						display: flex;
 						flex-direction: column;
 						justify-content: center;
@@ -2546,7 +2564,6 @@ node-creation-selection-dialog {
 		box-shadow: inset 0 2px 2px $gray-lighter;
 
 		button {
-			height: 100%;
 			padding: 5px 15px 5px 15px;
 		}
 
@@ -2576,9 +2593,6 @@ node-creation-selection-dialog {
 		}
 
 		button.item-button {
-			background: $blue;
-			color: $white;
-
 			margin: 0 $edit-popup-padding 0 0;
 
 			display: flex;
@@ -2586,18 +2600,15 @@ node-creation-selection-dialog {
 			justify-content: center;
 			align-items: center;
 			grid-gap: 10px;
-
-			.icon-backpack {
-				font-size: 2em;
-			}
-		}
-
-		button:hover {
-			background: $blue-lighter;
 		}
 
 		#add-sign {
 			font-size:24px;
+		}
+
+		img {
+			height: 45px;
+			width: 45px;
 		}
 	}
 

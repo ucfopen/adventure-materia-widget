@@ -123,7 +123,7 @@ button.show-inventory {
 	z-index: 100;
 	position: absolute;
 	right: 10px;
-	top: 60px;
+	top: 80px;
 
 	background: $blue-lighter;
 	color: $white;
@@ -164,10 +164,10 @@ button.show-inventory {
 
 @keyframes notif-bounce {
 	0% {
-		top: 60px;
+		top: 80px;
 	}
 	100% {
-		top: 65px;
+		top: 85px;
 	}
 }
 
@@ -617,7 +617,6 @@ h1 {
 				flex-wrap: wrap;
 				align-content: flex-start;
 				flex-grow:2;
-				height: 247px;
 				overflow: auto;
 
 				div.item {

@@ -45,7 +45,7 @@
 				<h2 class="inventory-header">Inventory Items</h2>
 				<div class="inventory-content">
 					<div class="inventory-items">
-						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)">
+						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0">
 							<span ng-if="item.new" class="new-item">NEW!</span>
 							<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
 							{{item.name}}
@@ -84,7 +84,7 @@
 				</div>
 				<p>Item(s) Removed: </p>
 				<div class="item" ng-repeat="item in removedItems track by $index" ng>
-					<span class="item-count">- {{item.count}}</span>
+					<span class="item-count">{{item.count}}</span>
 					<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
 					{{item.name}}
 				</div>

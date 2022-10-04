@@ -19,7 +19,6 @@ files:
 score:
   is_scorable: Yes
   score_module: Adventure
-  score_screen: scoreScreen.html
 meta_data:
   features:
     - Customizable

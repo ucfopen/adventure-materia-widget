@@ -455,23 +455,24 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					.transition()
 					.attr("r", 10)
 				)
-			
-			# Text inside required items circles
-			requiredItemsText = linkGroup.append("text")
-				.attr("class", (d) ->
+
+			lockIcon = linkGroup.append("svg:image")
+				.attr("class", (d) -> 
 					if (d.lock)
-						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and d.lock.requiredItems and d.lock.requiredItems[0])
+						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and (d.lock.requiredItems and d.lock.requiredItems[0]))
 							return "link-req-items show"
 						else
 							return "link-req-items hide"
 				)
-				.attr("dx", (d) ->
+				.attr("xlink:href", "/assets/creator-assets/lock.svg")
+				.attr("x", (d) ->
 					return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 5
 				)
-				.attr("dy", (d) ->
-					return (d.source.y + (d.source.y + d.target.y) / 2) / 2 + 5
+				.attr("y", (d) ->
+					return (d.source.y + (d.source.y + d.target.y) / 2) / 2 - 8
 				)
-				.text((d) -> (if d.lock and d.lock.requiredItems then d.lock.requiredItems.length))
+				.attr("width", 13)
+				.attr("height", 13)
 				.on("mouseover", (d, i) ->
 					$scope.onHover {data: d.lock}
 
@@ -486,6 +487,37 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					.transition()
 					.attr("r", 10)
 				)
+			
+			# # Text inside required items circles
+			# requiredItemsText = linkGroup.append("text")
+			# 	.attr("class", (d) ->
+			# 		if (d.lock)
+			# 			if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and d.lock.requiredItems and d.lock.requiredItems[0])
+			# 				return "link-req-items icon-lock show"
+			# 			else
+			# 				return "link-req-items icon-lock hide"
+			# 	)
+			# 	.attr("dx", (d) ->
+			# 		return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 5
+			# 	)
+			# 	.attr("dy", (d) ->
+			# 		return (d.source.y + (d.source.y + d.target.y) / 2) / 2 + 5
+			# 	)
+			# 	# .text((d) -> (if d.lock and d.lock.requiredItems then d.lock.requiredItems.length))
+			# 	.on("mouseover", (d, i) ->
+			# 		$scope.onHover {data: d.lock}
+
+			# 		d3.select(this.parentNode).select(".link-req-items")
+			# 		.transition()
+			# 		.attr("r", 20)
+			# 	)
+			# 	.on("mouseout", (d, i) ->
+			# 		$scope.onHoverOut {data: d.lock}
+
+			# 		d3.select(this.parentNode).select(".link-req-items")
+			# 		.transition()
+			# 		.attr("r", 10)
+			# 	)
 
 			
 			# Displaying the required items was too cluttered
@@ -2086,7 +2118,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			# Save the original item count for validation
 			if $scope.items
 				for item in $scope.items
-					item.tempCount = item.count
+					item.tempCount = Math.abs(item.count)
 
 			# Add items not already being used to the items available for selection
 			$scope.availableItems = []
@@ -2106,16 +2138,21 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.selectedItem = item
 			$scope.showDropdown = false
 
-		$scope.updateCount = (event, item) ->
+		$scope.updateCount = (event, item, takesItem) ->
 			console.log(item.tempCount)
 			console.log(item.count)
+
 			if item.tempCount
 				$scope.invalidQuantity = false
 				item.count = item.tempCount
+				if takesItem
+					item.count = item.tempCount * -1
 			else
 				$scope.invalidQuantity = true
+			console.log(item.tempCount)
+			console.log(item.count)
 
-		$scope.addItemToNode = (item) ->
+		$scope.addItemToNode = (item, positiveCount = true) ->
 			if item
 				# If item already exists in node, increment item count
 				for i in $scope.items
@@ -2123,12 +2160,18 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						i.count += 1
 						return
 				# Add item to node
-				newItem = {
-					...item
-					count: 1
-					tempCount: 1
-					numberOfUsesLeft: -999
-				}
+				if positiveCount
+					newItem = {
+						...item
+						count: 1
+						tempCount: 1
+					}
+				else
+					newItem = {
+						...item
+						count: -1
+						tempCount: 1
+					}
 				$scope.items.push(newItem)
 				# Remove item from the select dropdown
 				index = $scope.availableItems.indexOf(item)
