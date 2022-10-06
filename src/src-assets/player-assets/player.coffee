@@ -125,6 +125,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		# Add items to player's inventory
 		if $scope.question.options.items and $scope.question.options.items[0]
 			$scope.inventoryUpdate = true
+			$scope.showNew = true
 			$scope.showInventoryBtn = true
 
 			for q_i in $scope.question.options.items
@@ -198,7 +199,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					index : i
 					options : q_data.answers[i].options
 					requiredItems: q_data.answers[i].options.requiredItems || []
-					hideAnswer: q_data.answers[i].options.hideAnswer
+					hideAnswer: q_data.answers[i].options.hideAnswer || false
 
 				if answer.requiredItems[0]
 					$scope.showInventoryBtn = true
@@ -239,6 +240,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		$scope.showInventory = ! $scope.showInventory
 		$scope.inventoryUpdate = false
 		$scope.selectedItem = $scope.inventory[0]
+		$scope.showNew = false
 		$scope.hideNotif()
 
 	$scope.setSelectedItem = (item) ->

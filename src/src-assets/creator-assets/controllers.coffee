@@ -107,6 +107,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		x: 0
 		y: 0
 		pendingHide: false
+		answerText: ''
+		hideAnswer: false
 
 	$scope.validation =
 		show: false
@@ -312,14 +314,11 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		else
 			qset = treeSrv.createQSetFromTree $scope.treeData
 
-			console.log(qset)
-
 			qset.options.hidePlayerTitle = $scope.hidePlayerTitle
 			qset.options.scoreMode = $scope.scoreMode
 			qset.options.internalScoreMessage = $scope.internalScoreMessage
 			qset.options.inventoryItems = treeSrv.getInventoryItems()
 			qset.options.customIcons = treeSrv.getCustomIcons()
-			console.log(qset)
 			Materia.CreatorCore.save $scope.title, qset, 2
 
 	materiaCallbacks.onSaveComplete = (title, widget, qset, version) -> true
@@ -370,7 +369,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 					$scope.hoveredLock.y = data.y
 					$scope.hoveredLock.target = data.id
 					$scope.hoveredLock.requiredItems = data.requiredItems
-					$scope.hoveredLock.answer = data.answer
+					$scope.hoveredLock.answerText = data.answerText
+					$scope.hoveredLock.hideAnswer = data.hideAnswer
 			return
 		if data.type is "bridge" then return
 		if $scope.existingNodeSelectionMode is true then return

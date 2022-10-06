@@ -25,8 +25,9 @@
 
 		<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn"  ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" class="inventory-button">
 			<img src="assets/icons/BackPack64.png" ng-show="!showInventory"/>
+			<span ng-if="showNew" class="new-item">NEW!</span>
 		</button>
-		<div class="notif-message" ng-if="showNotif">
+		<!-- <div class="notif-message" ng-if="showNotif">
 			<p ng-if="question.options.items.length > 1">
 				Items updated!
 			</p>
@@ -34,7 +35,7 @@
 				<img ng-if="question.options.items[0].icon.url" ng-src="{{question.options.items[0].icon.url}}"/>
 				{{question.options.items[0].name}} has been added to your inventory!
 			</p>
-		</div>
+		</div> -->
 		<div class="inventory-tooltip" ng-show="showInventoryTooltip">
 			<p>Inventory</p>
 			<i class="arrow-right"></i>
@@ -164,7 +165,7 @@
 					ng-if="checkInventory(answer)[0]"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
-					tabindex="0">) {{answer.text}}<span> Requires item(s): <span ng-repeat="item in answer.requiredItems">{{item.name}} ({{item.count}})<span ng-show="!$last">, </span></span></button>
+					tabindex="0">) {{answer.text}}<span> You do not have enough items! Required: <span ng-repeat="item in answer.requiredItems">{{item.name}} ({{item.count}})<span ng-show="!$last">, </span></span></button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"

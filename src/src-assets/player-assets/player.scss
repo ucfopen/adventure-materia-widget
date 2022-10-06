@@ -115,6 +115,22 @@ button.show-inventory {
 	}
 }
 
+.new-item {
+	border-radius: 10px;
+	display: inline-block;
+	background-color: $red-lighter;
+	color: white;
+	font-size: 10px;
+	font-style: italic;
+	padding: 2px 5px;
+	margin: 0px 5px;
+	box-sizing:border-box;
+
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
 .notif-message {
 	animation: 'notif-bounce' 0.6s infinite;
 	animation-direction: alternate;

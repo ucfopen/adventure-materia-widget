@@ -217,7 +217,8 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						if answer.target is link.target.id
 							link.lock =
 								requiredItems: answer.requiredItems
-								answer: answer.text
+								answerText: answer.text
+								hideAnswer: answer.hideAnswer
 								x: link.source.x
 								y: link.source.y + (link.target.y - link.source.y)/2
 								id: link.target.id
@@ -464,7 +465,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						else
 							return "link-req-items hide"
 				)
-				.attr("xlink:href", "/assets/creator-assets/lock.svg")
+				.attr("xlink:href", "assets/creator-assets/lock.svg")
 				.attr("x", (d) ->
 					return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 5
 				)
@@ -487,74 +488,6 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					.transition()
 					.attr("r", 10)
 				)
-			
-			# # Text inside required items circles
-			# requiredItemsText = linkGroup.append("text")
-			# 	.attr("class", (d) ->
-			# 		if (d.lock)
-			# 			if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and d.lock.requiredItems and d.lock.requiredItems[0])
-			# 				return "link-req-items icon-lock show"
-			# 			else
-			# 				return "link-req-items icon-lock hide"
-			# 	)
-			# 	.attr("dx", (d) ->
-			# 		return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 5
-			# 	)
-			# 	.attr("dy", (d) ->
-			# 		return (d.source.y + (d.source.y + d.target.y) / 2) / 2 + 5
-			# 	)
-			# 	# .text((d) -> (if d.lock and d.lock.requiredItems then d.lock.requiredItems.length))
-			# 	.on("mouseover", (d, i) ->
-			# 		$scope.onHover {data: d.lock}
-
-			# 		d3.select(this.parentNode).select(".link-req-items")
-			# 		.transition()
-			# 		.attr("r", 20)
-			# 	)
-			# 	.on("mouseout", (d, i) ->
-			# 		$scope.onHoverOut {data: d.lock}
-
-			# 		d3.select(this.parentNode).select(".link-req-items")
-			# 		.transition()
-			# 		.attr("r", 10)
-			# 	)
-
-			
-			# Displaying the required items was too cluttered
-
-			# requiredItemsImages = linkGroup.each((e) ->
-			# 	parent = d3.select(this)
-			# 	if e.lock
-			# 		for item, index in e.lock.requiredItems
-			# 			if index < 6
-			# 				parent.append("svg:image")
-			# 				.attr("class", (d) ->
-			# 					if ((e.lock.sourceType is "mc" or e.lock.sourceType is "shortanswer" or e.lock.sourceType is "hotspot") and e.lock.requiredItems[0])
-			# 						return "link-req-items show"
-			# 					else
-			# 						return "link-req-items hide"
-			# 				)
-			# 				.attr("xlink:href", e.lock.requiredItems[index].icon.url
-			# 				)
-			# 				.attr("x", ((e.source.x + (e.source.x + e.target.x) / 2) / 2 - 10))
-			# 				.attr("y", ((e.source.y + (e.source.y + e.target.y) / 2) / 2 + 10) + 20 * index)
-			# 				.attr("width", "20px")
-			# 				.attr("height", "20px")
-			# 				.on("mouseover", (d) ->
-			# 					$scope.onHover {data: e.lock}
-
-			# 					d3.select(this.parentNode).select(".link-req-items")
-			# 					.transition()
-			# 					.attr("r", 20)
-			# 				)
-			# 				.on("mouseout", (d) ->
-			# 					$scope.onHoverOut {data: e.lock}
-
-			# 					d3.select(this.parentNode).select(".link-req-items")
-			# 					.transition()
-			# 					.attr("r", 10)
-			# 				) 
-			# )
 
 			nodeGroup = $scope.svg.selectAll("g.node")
 				.data(nodes)
@@ -715,6 +648,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 									.attr("y", -10 + dataPos[index][1])
 									.attr("width", "20px")
 									.attr("height", "20px")
+								g.append("circle")
+									.attr("cx", dataPos[index][0])
+									.attr("cy", dataPos[index][1])
+									.attr("r", "9")
+									.attr("stroke", if item.count > 0 then "green" else "red")
+									.attr("stroke-width", "1")
+									.attr("fill", "none")
+									.attr("style", "opacity: 0.2")
 								numUsedItems++
 							else 
 								numLeftoverItems++
@@ -1109,7 +1050,6 @@ Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 
 				if node.items
 					for item in node.items
-						console.log(item)
 						if item.count > 0
 							givesItems.push item
 						else if item.count < 0
@@ -2139,9 +2079,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.showDropdown = false
 
 		$scope.updateCount = (event, item, takesItem) ->
-			console.log(item.tempCount)
-			console.log(item.count)
-
 			if item.tempCount
 				$scope.invalidQuantity = false
 				item.count = item.tempCount
@@ -2149,8 +2086,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					item.count = item.tempCount * -1
 			else
 				$scope.invalidQuantity = true
-			console.log(item.tempCount)
-			console.log(item.count)
 
 		$scope.addItemToNode = (item, positiveCount = true) ->
 			if item

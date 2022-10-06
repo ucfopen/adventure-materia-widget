@@ -119,6 +119,12 @@ html, body {
 	border-top: 10px solid $gray-darker;
 }
 
+.arrow-top {
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-bottom: 10px solid $gray-darker;
+}
+
 button {
 	cursor: pointer;
 	height: 30px;
@@ -1039,7 +1045,6 @@ required-items-tooltip {
 		
 		img {
 			width: 20px;
-			height: 20px;
 		}
 	}
 }
@@ -1088,6 +1093,24 @@ required-items-tooltip {
 			h3 {
 				max-height: 2.5em;
 				overflow: hidden;
+			}
+
+			&.sub-heading {
+				justify-content: start;
+			}
+
+			.item-heading-icons {
+				display: flex;
+				align-items: center;
+	
+				img#arrow {
+					height: 20px;
+					width: 20px;
+				}
+				img {
+					height: 35px;
+					width: 35px;
+				}
 			}
 		}
 
@@ -1210,12 +1233,14 @@ required-items-tooltip {
 			}
 		}
 
-		> input {
-			flex-grow: 2;
+		.hide-answer-option {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
 		}
 
-		.hide-answer-option {
-			min-width: 200px;
+		> input {
+			flex-grow: 2;
 		}
 
 		&.answer-required-item > * {
@@ -1223,22 +1248,13 @@ required-items-tooltip {
 			justify-content: center;
 		}
 
-		// &.list-header {
-		// 	color: $gray-darker;
-		// 	border-bottom: 1px solid $blue-lightest;
-		// 	font-weight: bold;
-		// }
-
 		.item-icon {
 			display: flex;
 			flex-direction: column;
-			grid-gap: 20px;
 			align-items: center;
 			justify-content: center;
 			width: fit-content;
 			height: fit-content;
-			max-height: 64px;
-			//background-color:$gray-lighter;
 			border-radius: 2px;
 
 			span {
@@ -1254,8 +1270,8 @@ required-items-tooltip {
 			}
 
 			img {
-				max-height: 64px;
-				max-width: 64px;
+				max-height: 45px;
+				max-width: 45px;
 				object-fit: cover;
 			}
 
@@ -1525,6 +1541,11 @@ item-icon-selector {
 		grid-gap: 10px;
 		overflow: auto;
 	}
+
+	.options-bar {
+		flex-direction: column;
+	}
+
 }
 
 title-editor {
@@ -2053,7 +2074,7 @@ node-creation-selection-dialog {
 		}
 
 		.panel-right {
-			padding: 10px 20px;
+			padding: 10px;
 			max-width: 450px;
 		}
 	}
@@ -2079,21 +2100,52 @@ node-creation-selection-dialog {
 
 	.require-item-btn {
 		// width: 100%;
-		// height: 100%;
+		height: 100%;
 		position: relative;
 		display: flex;
-		flex-direction: column;
+		flex-direction: column-reverse;
 		justify-content: center;
 		align-items: center;
-		grid-gap: 2px;
+		grid-gap: 5px;
 		border-color: $white;
 		font-size: 14px;
-		max-width: 105px;
+		max-width: 115px;
+		
+		&#hotspot-require-item-btn {
+			height: auto;
+		}
+
+		div {
+			border-radius: 5px;
+			border: 1px dashed $gray-lighter;
+			position: relative;
+			height: 50px;
+			width: 50px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		&.requires-items {
+			div {
+				background-color: $gray-lighter;
+			}
+		}
 
 		.arrow-bottom {
 			position: absolute;
-			top: -15px;
+			top: -12px;
 			left: 30%;
+		}
+
+		.arrow-right {
+			position: absolute;
+			right: -17px;
+			top: 12px;
+
+			border-top: 13px solid transparent;
+			border-left: 10px solid $gray-darker;
+			border-bottom: 13px solid transparent;
 		}
 	}
 
@@ -2570,6 +2622,49 @@ node-creation-selection-dialog {
 		> div {
 			height: 35px;
 		}
+
+		.uploadButton {
+			position: relative;
+		}
+
+		.uploadImageIndicator {
+			animation: 'notif-bounce' 0.6s infinite;
+			animation-direction: alternate;
+			animation-timing-function: ease-in-out;
+		
+			z-index: 100;
+			position: absolute;
+			bottom: 60px;
+			left: -25px;
+		
+			background: $color-accent;
+			color: $white;
+			box-shadow: $shadow-dialog;
+		
+			border-radius: 5px;
+			padding: 15px;
+		
+			font-size: 16px;
+			font-weight: bold;
+			width: 150px;
+			text-align: center;
+		}
+
+		.arrow-bottom {
+			border-top-color: $color-accent;
+			position: absolute;
+			bottom: -10px;
+			left: 42%;
+		}
+
+		@keyframes notif-bounce {
+			0% {
+				bottom: 60px;
+			}
+			100% {
+				bottom: 65px;
+			}
+		}
 	}
 
 	.items-container {
@@ -2666,12 +2761,31 @@ node-creation-selection-dialog {
 		display: flex;
 		flex-direction: row;
 		flex-grow: 2;
+		overflow: hidden;
+
+		.no-media {
+			border: 2px dashed $gray-lighter;
+			background-color: $gray-lightest;
+
+			height: 75%;
+			width: 100%;
+			margin: 10px;
+
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 
 		.image-manager {
 			display: flex;
 			flex-direction: row-reverse;
 			flex-grow: 1;
-			height: 350px;
+			align-items: center;
+			height: 100%;
+
+			@media screen and (min-width: $node-creation-panels-width) {
+				flex-direction: row;
+			}
 		}
 
 		.image-container {
@@ -2781,6 +2895,12 @@ node-creation-selection-dialog {
 		background-color: rgba(0,0,0,0.25);
 		margin: auto;
 
+		@media screen and (min-width: $node-creation-panels-width) {
+			& {
+				height: 100%;
+			}
+		}
+
 		.toolbar-heading {
 			color: white;
 			padding: 5px 0;
@@ -2817,10 +2937,16 @@ node-creation-selection-dialog {
 						text-align: left;
 					}
 
-					.arrow-left {
+					.arrow-right {
 						top: 5px;
-						left: 195px;
+						right: 195px;
 						position: absolute;
+					}
+
+					@media screen and (max-width: $node-creation-panels-width) {
+						.arrow-right {
+							display: none;
+						}
 					}
 				}
 			}
@@ -2830,7 +2956,7 @@ node-creation-selection-dialog {
 			position: absolute;
 			width: 300px;
 
-			left: 200px;
+			right: 200px;
 			top: -2px;
 
 			z-index: $z-index-modal-dialog;
@@ -2882,7 +3008,7 @@ node-creation-selection-dialog {
 		}
 
 
-		//@media screen and (max-width: 1000px) {
+		@media screen and (max-width: $node-creation-panels-width) {
 			& {
 				position: absolute;
 				z-index: 100;
@@ -2907,7 +3033,7 @@ node-creation-selection-dialog {
 				left: 0;
 				top: auto;
 			}
-		//}
+		}
 	}
 
 	hotspot-answer-manager {
@@ -2968,7 +3094,7 @@ node-creation-selection-dialog {
 			
 		}
 
-		input {
+		input:not(#hide-answer) {
 			width: 90%;
 			height: 2em;
 
@@ -3013,6 +3139,10 @@ node-creation-selection-dialog {
 				margin: 1px;
 			}
 
+		}
+
+		.required-item-modal-hotspot .add-item {
+			flex-direction: column;
 		}
 
 		div.select-required-items {
