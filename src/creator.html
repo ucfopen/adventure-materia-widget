@@ -602,7 +602,7 @@
 												</button>
 											</div>
 											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-class="{'requires-items': answer.requiredItems[0]}" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
-												<div ng-class="{'unlocked': !answer.requiredItems[0]; 'locked': answer.requiredItems[0]}">
+												<div ng-class="{'unlocked': !answer.requiredItems[0], 'locked': answer.requiredItems[0]}">
 													<img src="assets/creator-assets/unlocked.png" ng-if="!answer.requiredItems[0]"/>
 													<img src="assets/creator-assets/lock.png" ng-if="answer.requiredItems[0]"/>
 													<i class="arrow-right"></i>
@@ -656,13 +656,12 @@
 												</button>
 											</div>
 											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
-												<span class="icon-unlocked" ng-if="!answer.requiredItems[0]"></span>
-												<span class="icon-lock" ng-if="answer.requiredItems[0]"></span>
-												<span>{{answer.requiredItems[0] ? 'Edit Required Items' : 'Require Items'}}</span>
-												<!-- <div class="required-item-tooltip tooltip-bottom" ng-show="answer.showTooltip">
-													{{answer.requiredItems[0] ? 'Edit Required Items' : 'Add Required Items'}}
-												</div> -->
-												<!-- <i class="arrow-bottom" ng-show="answer.showTooltip"></i> -->
+												<div ng-class="{'unlocked': !answer.requiredItems[0], 'locked': answer.requiredItems[0]}">
+													<img src="assets/creator-assets/unlocked.png" ng-if="!answer.requiredItems[0]"/>
+													<img src="assets/creator-assets/lock.png" ng-if="answer.requiredItems[0]"/>
+													<i class="arrow-right"></i>
+												</div>
+												<span>{{answer.requiredItems[0] ? 'Edit Required Items' : 'No Required Items'}}</span>
 											</button>
 										</div>
 									</div>
@@ -716,14 +715,14 @@
 													</dt>
 													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
 														<div class="option-contents">
-															<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+															<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
 															{{selectedItem.name}}
 														</div>
 														<i class="arrow-bottom"></i>
 													</dt>
 													<div class="options">
 														<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
-															<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+															<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 															{{item.name}}
 															</dt>
 													</div>
@@ -961,14 +960,14 @@
 													</dt>
 													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
 														<div class="option-contents">
-															<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+															<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
 															{{selectedItem.name}}
 														</div>
 														<i class="arrow-bottom"></i>
 													</dt>
 													<div class="options">
 														<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
-															<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+															<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 															{{item.name}}
 															</dt>
 													</div>
@@ -1121,14 +1120,14 @@
 										</dt>
 										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
 											<div class="option-contents">
-												<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+												<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
 												{{selectedItem.name}}
 											</div>
 											<i class="arrow-bottom"></i>
 										</dt>
 										<div class="options">
 											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
-												<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 												{{item.name}}
 												</dt>
 										</div>
@@ -1188,14 +1187,14 @@
 										</dt>
 										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
 											<div class="option-contents">
-												<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+												<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
 												{{selectedItem.name}}
 											</div>
 											<i class="arrow-bottom"></i>
 										</dt>
 										<div class="options">
 											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
-												<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 												{{item.name}}
 												</dt>
 										</div>
@@ -1308,6 +1307,12 @@
 												<div class="item-description" ng-if="item.description">
 													<span class="description">{{item.description}}</span>
 												</div>
+												<div class="apply-once-option" ng-if="showAdvancedOptions">
+													<input id="give-once" type="checkbox"
+													ng-model="item.giveOnce"
+													value="false" /> 
+													<label for="give-once">Give Only Once</label>
+												</div>
 											</div>
 											<div class="item-options" ng-class="{'show': hoverItem}">
 												
@@ -1347,6 +1352,12 @@
 												<div class="item-description" ng-if="item.description">
 													<span class="description">{{item.description}}</span>
 												</div>
+												<div class="apply-once-option"  ng-if="showAdvancedOptions">
+													<input id="give-once" type="checkbox"
+													ng-model="item.giveOnce"
+													value="false" /> 
+													<label for="give-once">Take Only Once</label>
+												</div>
 											</div>
 											<div class="item-options" ng-class="{'show': hoverItem}">
 												<div class="item-quantity">
@@ -1368,20 +1379,22 @@
 										</dt>
 										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
 											<div class="option-contents">
-												<img ng-if="selectedItem.icon.url" src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
+												<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
 												{{selectedItem.name}}
 											</div>
 											<i class="arrow-bottom"></i>
 										</dt>
 										<div class="options">
 											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
-												<img ng-if="item.icon.url" src="{{item.icon.url}}"/>
+												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 												{{item.name}}
 												</dt>
 										</div>
 									</dl>
 									<button class="give-item-button" ng-click="addItemToNode(selectedItem, 1)">Give Item</button>
 									<button ng-click="addItemToNode(selectedItem, 0)">Take Item</button>
+									<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
+									<label for="show-advanced">Show Advanced Options</label>
 								</div>
 							</div>
 						</div>
@@ -1403,13 +1416,13 @@
 					ng-show="tooltip.text || tooltip.givesItems[0] || tooltip.removedItems[0]">
 					<span class="tooltip-title"
 					ng-if="tooltip.text">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
-					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="item.icon.url" src="{{item.icon.url}}"/> {{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
-					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="item.icon.url" src="{{item.icon.url}}"/> {{item.name}} (Quantity: {{item.count ? item.count : -1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="item.icon.url"ng-src="{{item.icon.url}}" /> {{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="item.icon.url"ng-src="{{item.icon.url}}" /> {{item.name}} (Quantity: {{item.count ? item.count : -1}})</p>
 				</div>
 			</node-tooltips>
 			<required-items-tooltip ng-show="hoveredLock.showItems">
 				<span>The answer "{{hoveredLock.answerText}}" requires item(s):</span>
-				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="item.icon && item.icon.url" src="{{item.icon.url}}"/> {{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
+				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="item.icon && item.icon.url"ng-src="{{item.icon.url}}" /> {{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
 				<p ng-if="!hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-white.png"/></span>This answer will remain visible even if the player does not have the items.</p>
 				<p ng-if="hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-blocked-white.png"/></span>This answer will be invisible to the player if they do not have the items.</p>
 			</required-items-tooltip>

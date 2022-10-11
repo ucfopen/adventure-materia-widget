@@ -1150,6 +1150,7 @@ required-items-tooltip {
 		.selector {
 			display: flex;
 			flex-direction: row;
+			align-items: center;
 			grid-gap: 20px;
 			height: 35px;
 
@@ -1295,6 +1296,17 @@ required-items-tooltip {
 				width: 100%;
 				max-width: 350px;
 				box-sizing: border-box;
+			}
+
+			.apply-once-option {
+				display: flex;
+				align-items: center;
+				flex-direction: row;
+
+				input {
+					width: auto;
+					height: 1em;
+				}
 			}
 		}
 
@@ -1482,6 +1494,7 @@ item-icon-selector {
 		position: absolute;
 		top: 40px;
 		left: 120px;
+		width: 420px;
 
 		.arrow-left {
 			position: absolute;
@@ -1509,11 +1522,12 @@ item-icon-selector {
 
 			> div {
 				min-width: 50%;
+				display:flex;
+				flex-direction: column;
 			}
 
 			.list-items {
 				max-height: 100%;
-				overflow:hidden;
 			}
 		}
 	}
@@ -3099,7 +3113,6 @@ node-creation-selection-dialog {
 			height: 2em;
 
 			margin: 10px 2px;
-			padding-left: 15px;
 			box-sizing: border-box;
 
 			border: solid 1px #cccccc;

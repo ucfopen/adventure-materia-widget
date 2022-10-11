@@ -932,6 +932,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					count: 1
 					# numberOfUsesLeft: -999
 					icon: {}
+					giveOnce: true
 				treeSrv.incrementItemCount()
 				$scope.inventoryItems.push(newItem)
 
@@ -2054,6 +2055,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.showItemSelection = true
 			# Remove error message
 			$scope.invalidQuantity = false
+			console.log($scope.items)
 
 			# Save the original item count for validation
 			if $scope.items

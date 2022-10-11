@@ -66,6 +66,8 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.setLightboxZoom = (val) ->
 		$scope.lightboxZoom = val
 
+	$scope.visitedNodes = []
+
 	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
 		text: null
@@ -124,55 +126,61 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 		# Add items to player's inventory
 		if $scope.question.options.items and $scope.question.options.items[0]
-			$scope.inventoryUpdate = true
-			$scope.showNew = true
-			$scope.showInventoryBtn = true
-
 			for q_i in $scope.question.options.items
 				do (q_i) ->
 					hasItem = false
-					# Inventory update
-					if q_i.count < 0
-						$scope.removedItems.push(q_i)
-					else
-						$scope.addedItems.push(q_i)
-					# Check to see if player already has item
-					# If so, just update item count
-					for p_i, i in $scope.inventory
-						if q_i.id is p_i.id
-							hasItem = true
-							p_i.count += q_i.count
-							# Remove item from inventory
-							if (p_i.count <= 0)
-								$scope.inventory.splice i, 0
-					if (! hasItem)
-						newItem = {
-							...q_i
-							new: true
-							showDescription: false
-							numberOfUsesLeft: if q_i.numberOfUsesLeft then q_i.numberOfUsesLeft else -999
-							description: if q_i.description then q_i.description else ''
-							name: q_i.name
-							count: if q_i.count then q_i.count else 1
-							id: q_i.id
-							icon: {
-								...q_i.icon
-								url: if q_i.icon and q_i.icon.name then "assets/icons/#{q_i.icon.name}" else ''
+					console.log($scope.visitedNodes)
+					console.log($scope.question)
+					# Check if item is first visit only (giveOnce == true)
+					if !($scope.visitedNodes.some((n) => n.id is $scope.question.id) and q_i.giveOnce)
+						# Inventory update
+						if q_i.count < 0
+							$scope.removedItems.push(q_i)
+						else
+							$scope.addedItems.push(q_i)
+						# Check to see if player already has item
+						# If so, just update item count
+						for p_i, i in $scope.inventory
+							if q_i.id is p_i.id
+								hasItem = true
+								p_i.count += q_i.count
+								# Remove item from inventory
+								if (p_i.count <= 0)
+									$scope.inventory.splice i, 0
+						if (! hasItem)
+							newItem = {
+								...q_i
+								new: true
+								showDescription: false
+								numberOfUsesLeft: if q_i.numberOfUsesLeft then q_i.numberOfUsesLeft else -999
+								description: if q_i.description then q_i.description else ''
+								name: q_i.name
+								count: if q_i.count then q_i.count else 1
+								id: q_i.id
+								icon: {
+									...q_i.icon
+									url: if q_i.icon and q_i.icon.name then "assets/icons/#{q_i.icon.name}" else ''
+								}
 							}
-						}
-						$scope.inventory.push(newItem)
+							$scope.inventory.push(newItem)
 
-			if $scope.notifRegister isnt null then $timeout.cancel $scope.notifRegister
+			if ($scope.removedItems[0] || $scope.addedItems[0])
+				$scope.inventoryUpdate = true
+				$scope.showNew = true
+			
+				$scope.showInventoryBtn = true
 
-			if $scope.question.options.items.length > 0
-				$scope.showNotif = true
-			else
-				# Hide inventory notifications
-				$scope.hideNotif()
+				if $scope.notifRegister isnt null then $timeout.cancel $scope.notifRegister
 
-			$scope.notifRegister = $timeout (() ->
-				$scope.hideNotif()
-			), 10000
+				if $scope.question.options.items.length > 0
+					$scope.showNotif = true
+				else
+					# Hide inventory notifications
+					$scope.hideNotif()
+
+				$scope.notifRegister = $timeout (() ->
+					$scope.hideNotif()
+				), 10000
 
 		# Update number of uses for each item
 		# for i, index in $scope.inventory
@@ -208,7 +216,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 		# shuffle answer order if asked to do so
 		if q_data.options.randomize then $scope.answers = _shuffleIndices $scope.answers
-
+		
 		$scope.q_data = q_data
 
 		# TODO Add back in with Layout support
@@ -232,6 +240,8 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			else
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
 
+		$scope.visitedNodes.push(q_data.options.id)
+	
 	$scope.hideNotif = () ->
 		$scope.showNotif = false
 		$scope.notifMessage = ""
