@@ -748,10 +748,10 @@
 							id="hotspot-manager"
 							ng-if="displayNodeCreation == HOTSPOT">
 							<div class="image-manager">
-								<div ng-if="!mediaReady" class="no-media">
+								<div ng-show="!mediaReady" class="no-media">
 									<p>No Image Selected</p>
 								</div>
-								<div class="image-container" ng-if="mediaReady">
+								<div class="image-container" ng-show="mediaReady">
 									<!-- SVG canvas placed over the primary hotspot canvas for drawing a polygon -->
 									<svg id="polygon-svg-artboard"
 										ng-show="polygonDrawMode"
