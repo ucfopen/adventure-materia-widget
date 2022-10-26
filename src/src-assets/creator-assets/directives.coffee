@@ -432,8 +432,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					if (d.lock)
 						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and (d.lock.requiredItems and d.lock.requiredItems[0]))
 							return "link-req-items show"
-						else
-							return "link-req-items hide"
+					return "link-req-items hide"
 				)
 				.attr("r", "10")
 				.attr("cx", (d) ->
@@ -462,8 +461,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					if (d.lock)
 						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and (d.lock.requiredItems and d.lock.requiredItems[0]))
 							return "link-req-items show"
-						else
-							return "link-req-items hide"
+					return "link-req-items hide"
 				)
 				.attr("xlink:href", "assets/creator-assets/lock.svg")
 				.attr("x", (d) ->
