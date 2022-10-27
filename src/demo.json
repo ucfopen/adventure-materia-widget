@@ -24,33 +24,6 @@
                   }
                 }
               ],
-              "items": [
-            		{
-            			"name": "toothpick",
-            			"id": 0,
-                  "count": 45
-            		},
-            		{
-            			"name": "hairbrush",
-            			"id": 1,
-                  "count": 1
-            		},
-            		{
-            			"name": "roll of gauze",
-            			"id": 2,
-                  "count": 2
-            		},
-            		{
-            			"name": "sewing needle",
-            			"id": 3,
-                  "count": 2
-            		},
-            		{
-            			"name": "spectacles",
-            			"id": 4,
-                  "count": 1
-            		}
-              ],
               "options": {
                 "layout": 2,
                 "type": 1,

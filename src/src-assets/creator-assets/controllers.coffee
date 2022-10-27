@@ -116,6 +116,10 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	historyActions = treeHistorySrv.getActions()
 
+	# Gets index of item in inventory
+	$scope.getItemIndex = (item) ->
+		return treeSrv.getItemIndex(item.id)
+
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 		
 		# Returning from a suspended node creation screen, don't do anything
@@ -340,6 +344,11 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				...treeSrv.getCustomIcons(),
 				newIcon
 			]
+
+			# Scroll to uploaded icon
+			icons_list = document.querySelector('.icons-list')
+			icons_list.scrollTop = icons_list.scrollHeight
+
 			$scope.$apply()
 
 		else if $scope.editedNode

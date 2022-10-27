@@ -56,16 +56,22 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	decrementItemCount = ->
 		itemCount--
 
-	getInventoryItem = (id) ->
-		for item in inventoryItems
-			if item.id is id
-				return item
-
 	getInventoryItems = ->
 		inventoryItems
 
 	setInventoryItems = (val) ->
 		inventoryItems = val
+
+	generateItemID = ->
+		if (itemCount)
+			return Math.floor(inventoryItems[itemCount - 1].id + Math.random() * 2 + 1)
+		else
+			return Math.floor(Math.random() * 2 + 1)
+	
+	getItemIndex = (itemID) ->
+		for i, index in inventoryItems
+			if i.id is itemID
+				return index
 
 	# Methods for custom icons
 	getCustomIcons = ->
@@ -104,26 +110,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				node =  findNode tree.contents[i], id
 				if node isnt null then return node
 				i++
-		null
-
-	# Finds node and adds item or increments count if already in node
-	findNodeAndAddItem = (tree, id, item) ->
-		node = findNode tree, id
-
-		if node
-			node.items = node.items || []
-			# If item already exists in node, increment item count
-			for i in node.items
-				if item.id is i.id
-					i.count += 1
-					return
-			# Add item to node
-			newItem = {
-				...item
-				count: 1
-			}
-			node.items.push(newItem)
-			return
 		null
 
 	# Recursive function for adding a node to a specified parent node
@@ -462,46 +448,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 		return
 
-	updateAllItems = (tree, updatedItem) ->
-		if tree.items
-			for item, index in tree.items
-				do (item, index) ->
-					if item.id is updatedItem.id
-						tree.items[index] = {
-							...item
-							name: updatedItem.name
-							description: updatedItem.description
-							icon: updatedItem.icon
-						}
-
-		if tree.answers
-			for answer in tree.answers
-				if answer.requiredItems
-					for item, index in answer.requiredItems
-						do (item) ->
-							if item.id is updatedItem.id
-								answer.requiredItems[index] = {
-									...item
-									name: updatedItem.name
-									description: updatedItem.description
-									icon: updatedItem.icon
-								}
-
-		if !tree.contents then return
-
-		i = 0
-
-		while i < tree.contents.length
-
-			child = tree.contents[i]
-
-			updateAllItems child, updatedItem
-
-			i++
-
-		return
-
-	deleteItemFromAllNodes = (tree, deletedItem) ->
+	deleteItemReferencesFromAllNodes = (tree, deletedItem) ->
 		if tree.items
 			for item, index in tree.items
 				if item.id is deletedItem.id
@@ -524,7 +471,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 			child = tree.contents[i]
 
-			deleteItemFromAllNodes child, deletedItem
+			deleteItemReferencesFromAllNodes child, deletedItem
 
 			i++
 
@@ -932,18 +879,17 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	setItemCount : setItemCount
 	incrementItemCount : incrementItemCount
 	decrementItemCount : decrementItemCount
-	getInventoryItem: getInventoryItem
 	getInventoryItems: getInventoryItems
 	setInventoryItems: setInventoryItems
+	generateItemID : generateItemID
+	getItemIndex : getItemIndex
 	getCustomIcons: getCustomIcons
 	setCustomIcons: setCustomIcons
 	getMaxDepth : getMaxDepth
 	findAnswersWithTarget : findAnswersWithTarget
 	updateAllAnswerLinks : updateAllAnswerLinks
-	updateAllItems: updateAllItems
-	deleteItemFromAllNodes: deleteItemFromAllNodes
+	deleteItemReferencesFromAllNodes: deleteItemReferencesFromAllNodes
 	findNode : findNode
-	findNodeAndAddItem : findNodeAndAddItem
 	findAndAdd : findAndAdd
 	findAndReplace : findAndReplace
 	findAndAddInBetween : findAndAddInBetween

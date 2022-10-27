@@ -1,6 +1,5 @@
 /* Adventure 2.0 Creator Styles */
 
-@import '../../assets/item-assets/style.css';
 @import '../../assets/icomoon.css';
 
 /* Variable definitions */
@@ -687,7 +686,7 @@ button {
 	}
 }
 
-.inventory-items-preview {
+.inventory-items {
 	position: absolute;
 	top: 15px;
 	right: 15px;
@@ -1286,6 +1285,7 @@ required-items-tooltip {
 			flex-direction: column;
 			flex-grow: 2;
 			justify-content: center;
+			overflow: hidden;
 
 			.item-description {
 				color: $gray-darker;

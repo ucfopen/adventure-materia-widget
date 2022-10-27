@@ -634,13 +634,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				g = d3.select(this)
 				numLeftoverItems = 0
 				numUsedItems = 0
+				inventoryItems = treeSrv.getInventoryItems()
 				if e.items
 					index = 0
-					for item in e.items
+					for item, i in e.items
 						if index < dataPos.length - 1
-							if e.items[index].icon.url
+							if inventoryItems[i].icon.url
 								g.append("svg:image")
-									.attr("xlink:href", e.items[index].icon.url
+									.attr("xlink:href", inventoryItems[i].icon.url
 									)
 									.attr("x", -10 + dataPos[index][0])
 									.attr("y", -10 + dataPos[index][1])
@@ -880,23 +881,6 @@ Adventure.directive "titleEditor", [() ->
 				$scope.showBackgroundCover = true
 ]
 
-# Directive for dragging items
-Adventure.directive "draggableItemsBox", ['treeSrv', 'treeHistorySrv', '$rootScope', (treeSrv, treeHistorySrv, $rootScope) ->
-	restrict: "E",
-	link: ($scope, $element, $attrs) ->
-
-		$scope.dragItemEnd = (event) ->
-			# event.clientX and clientY are 0 in firefox
-			# so we will use the $rootScope.nodeDrop set from dragover event
-			if ($rootScope.nodeDrop)
-				item = treeSrv.getInventoryItem(event.target.dataset.id)
-
-				tree = treeSrv.get()
-				treeSrv.findNodeAndAddItem(tree, $rootScope.nodeDrop.data.id, item)
-				treeSrv.set tree
-
-]
-
 # Directive for editing items
 Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeHistorySrv) ->
 	restrict: "E",
@@ -909,10 +893,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				# Collapse any open item editors
 				$scope.editingIndex = -1
 
-		$scope.$watch "inventoryItems", (newVal, oldVal) ->
-			if newVal
-				treeSrv.setInventoryItems(newVal)
-
+		# Watch for new or removed items from inventoryItems
 		$scope.$watch "inventoryItems.length", (newVal, oldVal) ->
 			if newVal
 				treeSrv.setInventoryItems($scope.inventoryItems)
@@ -925,10 +906,9 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			if $scope.newItemName.trim() != ''
 				newItem =
 					name: $scope.newItemName.trim()
-					id: treeSrv.getItemCount()
+					id: treeSrv.generateItemID()
 					description: ''
 					count: 1
-					# numberOfUsesLeft: -999
 					icon: {}
 					giveOnce: true
 				treeSrv.incrementItemCount()
@@ -941,11 +921,9 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 		$scope.removeItemFromInventoryItems = (index, item) ->
 			if item in $scope.inventoryItems
 				$scope.inventoryItems.splice index, 1
-				treeSrv.deleteItemFromAllNodes $scope.treeData, item
-
-				treeSrv.set $scope.treeData
-				# Since we're using itemCount for IDs, don't decrement
-				# treeSrv.decrementItemCount()
+				treeSrv.deleteItemReferencesFromAllNodes $scope.treeData, item
+ 
+				treeSrv.decrementItemCount()
 
 				# Collapse any open item editors
 				$scope.editingIndex = -1
@@ -957,16 +935,11 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				$scope.editingIndex = index
 				$scope.currentItem = item
 			else
-				inventory = treeSrv.getInventoryItems()
-				# Reflect changes in tree
-				treeSrv.updateAllItems $scope.treeData, $scope.currentItem
-
-				treeSrv.set $scope.treeData
-
-				$scope.toast "Item '#{inventory[$scope.editingIndex].name}' saved!"
+				treeSrv.setInventoryItems($scope.inventoryItems)
+				$scope.toast "Item '#{$scope.inventoryItems[$scope.editingIndex].name}' saved!"
 				$scope.editingIndex = -1
 
-		$scope.toggleItemIconSelector = (item = null) ->
+		$scope.toggleItemIconSelector = (item = null, index = null) ->
 			if $scope.showItemIconSelector
 				$scope.showItemIconSelector = false
 				$scope.editingIcons = false
@@ -974,6 +947,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				$scope.showItemIconSelector = true
 				$scope.editingIcons = true
 				$scope.currentItem = item
+				$scope.editingIndex = index
 
 		$scope.handleIconClick = (icon) ->
 			if $scope.inventoryItems[$scope.editingIndex].icon is icon
@@ -982,11 +956,11 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			else
 				# Select icon
 				$scope.inventoryItems[$scope.editingIndex].icon = icon
-			treeSrv.updateAllItems $scope.treeData, $scope.currentItem
+				$scope.showItemIconSelector = false
 
 			treeSrv.set $scope.treeData
 
-		$scope.manageNewIcon = () ->
+		$scope.uploadIcon = () ->
 			Materia.CreatorCore.showMediaImporter()
 
 		$scope.removeSelectedIcon = () ->
@@ -994,9 +968,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			$scope.icons.splice $scope.icons.map((i) -> i.id).indexOf($scope.currentItem.icon.id), 1
 
 			# Remove icon from current item
-			$scope.inventoryItems[$scope.inventoryItems.indexOf($scope.currentItem)].icon = null
-
-			treeSrv.updateAllItems $scope.treeData, $scope.currentItem
+			$scope.inventoryItems[$scope.editingIndex].icon = null
 
 			treeSrv.set $scope.treeData
 
@@ -1009,9 +981,6 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				peek = treeHistorySrv.retrieveSnapshot(lastIndex)
 				if !treeHistorySrv.compareTrees(peek.tree, $scope.treeData)
 					treeHistorySrv.addToHistory $scope.treeData, historyActions.INVENTORY_EDITED, "Inventory Items Edited"
-					# Update item data across all nodes
-					for item in inventory
-						treeSrv.updateAllItems $scope.treeData, item
 
 					treeSrv.set $scope.treeData
 					
@@ -1076,7 +1045,6 @@ Adventure.directive "requiredItemsTooltip", ['treeSrv', (treeSrv) ->
 			if newVal isnt null
 
 				# Update the position of the tooltip container
-				# Crazy math is due to ensuring the dialog continues to position properly after panning and/or zooming the tree
 				xOffset = ($scope.hoveredLock.x * $scope.treeOffset.scale) + $scope.treeOffset.x + $scope.treeOffset.scaleXOffset + (35 * $scope.treeOffset.scale)
 				yOffset = ($scope.hoveredLock.y * $scope.treeOffset.scale) + ($scope.treeOffset.y - 5) + $scope.treeOffset.scaleYOffset
 				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
@@ -1949,10 +1917,11 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 							$scope.answers = []
 							$scope.newAnswer()
 
+				# 
 				if $scope.editedNode.items
-					$scope.items = $scope.editedNode.items
+					$scope.nodeItems = $scope.editedNode.items
 				else
-					$scope.items = []
+					$scope.nodeItems = []
 
 				if $scope.editedNode.media
 					if $scope.editedNode.media.type is "image"
@@ -2011,9 +1980,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.editedNode.answers = $scope.answers
 		), true
 
-		$scope.$watch "items", ((newVal, oldVal) ->
+		$scope.$watch "nodeItems", ((newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
-				$scope.editedNode.items = $scope.items
+				$scope.editedNode.items = $scope.nodeItems
 		), true
 
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
@@ -2045,116 +2014,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.inputUrl = ''
 			$scope.showImportTypeSelection = true
 
-		$scope.toggleItemPopup = () ->
-			$scope.showRequiredItems = false
-			if $scope.showItemSelection is true
-				$scope.showItemSelection = false
-				return
-			$scope.showItemSelection = true
-			# Remove error message
-			$scope.invalidQuantity = false
-			console.log($scope.items)
-
-			# Save the original item count for validation
-			if $scope.items
-				for item in $scope.items
-					item.tempCount = Math.abs(item.count)
-
-			# Add items not already being used to the items available for selection
-			$scope.availableItems = []
-			for item in $scope.inventoryItems
-				do (item) ->
-					used = false
-					for i in $scope.items
-						if item.id is i.id
-							used = true
-					if ! used
-						$scope.availableItems.push(item)
-
-			$scope.selectedItem = $scope.availableItems[0]
-
-
-		$scope.selectItem = (item) ->
-			$scope.selectedItem = item
-			$scope.showDropdown = false
-
-		$scope.updateCount = (event, item, takesItem) ->
-			if item.tempCount
-				$scope.invalidQuantity = false
-				item.count = item.tempCount
-				if takesItem
-					item.count = item.tempCount * -1
-			else
-				$scope.invalidQuantity = true
-
-		$scope.addItemToNode = (item, positiveCount = true) ->
-			if item
-				# If item already exists in node, increment item count
-				for i in $scope.items
-					if item.id is i.id
-						i.count += 1
-						return
-				# Add item to node
-				if positiveCount
-					newItem = {
-						...item
-						count: 1
-						tempCount: 1
-					}
-				else
-					newItem = {
-						...item
-						count: -1
-						tempCount: 1
-					}
-				$scope.items.push(newItem)
-				# Remove item from the select dropdown
-				index = $scope.availableItems.indexOf(item)
-				$scope.availableItems.splice index, 1
-				$scope.selectedItem = $scope.availableItems[0]
-
-		$scope.removeItemFromNode = (item, index) ->
-			$scope.items.splice index, 1
-			$scope.availableItems.push(item)
-			if (!$scope.availableItems[1]) 
-				$scope.selectedItem = item
-			$scope.showItemManagerDialog = false
-
-		$scope.addRequiredItemToAnswer = (item, answer) ->
-			if item
-				answer.requiredItems = answer.requiredItems || []
-
-				for i in answer.requiredItems when i.id is item.id
-					i.count += 1
-					return
-
-				newItem = {
-					...item
-					count: 1
-					tempCount: 1
-				}
-				answer.requiredItems.push(newItem)
-
-				# Remove item from the select dropdown
-				index = $scope.availableItems.indexOf(item)
-				$scope.availableItems.splice index, 1
-				$scope.selectedItem = $scope.availableItems[0]
-
-		$scope.flashItem = (answer, item) ->
-			for i, index in answer.requiredItems when i.id is item.id
-				$scope.itemIndex = index
-			$scope.flashItemBox = true
-			$timeout(() ->
-				$scope.flashItemBox = false
-			, 500)
-
-		$scope.checkIfUnreachable = (item, answer) ->
-			# TO DO
-			# Check for whether the player can get the
-			# required items needed to select this answer
-			# Display a warning in creator if not
-			return
-
 		# Changing z-indexes of windows inside hotspot manager on click
 		$scope.bringToFront = (event) ->
 			vis = document.querySelector('.visibility-manager')
@@ -2180,12 +2039,46 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				if(hotspot)
 					hotspot.style.zIndex = 100;
 
+		$scope.toggleNodeItemsModal = () ->
+			# Close node items modal
+			if $scope.showItemSelection is true
+				$scope.showItemSelection = false
+				return
+			# Open node items modal
+			$scope.showItemSelection = true
+			# Close required items modal
+			$scope.showRequiredItems = false
+						
+			# Remove error message
+			$scope.invalidQuantity = false
+
+			# Save the original item count for validation
+			if $scope.nodeItems
+				for item in $scope.nodeItems
+					item.tempCount = Math.abs(item.count)
+
+			# Add items not already being used to the items available for selection
+			$scope.availableItems = []
+			for item in $scope.inventoryItems
+				do (item) ->
+					used = false
+					for i in $scope.nodeItems
+						if item.id is i.id
+							used = true
+					if ! used
+						$scope.availableItems.push(item)
+
+			$scope.selectedItem = $scope.availableItems[0]
+
 		$scope.toggleRequiredItemsModal = (answer) ->
+			# Close required items modal
 			if ($scope.currentAnswer and $scope.currentAnswer is answer)
 				$scope.showRequiredItems = false
 				$scope.currentAnswer = null
+			# Open required items modal
 			else
 				$scope.showRequiredItems = true
+				# Close node items modal
 				$scope.showItemSelection = false
 				if document.querySelector('hotspot-answer-manager')
 					document.querySelector('hotspot-answer-manager').style.zIndex = 100;
@@ -2213,48 +2106,94 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.currentAnswer = answer
 				$scope.selectedItem = $scope.availableItems[0]
 
-		# drag doesn't work when item modals have position: fixed, instead of position: absolute
+		# Select item from available items dropdown
+		$scope.selectItem = (item) ->
+			$scope.selectedItem = item
+			$scope.showDropdown = false
 
-		# $scope.modalDragStart = (e) ->
-		# 	$scope.modal = document.querySelector('.item-modal')
-		# 	e.preventDefault()
+		# ng-pattern attribute validates quantity
+		# Display error message if quantity is invalid
+		# takesItem is true if this item is being removed from the player's inventory
+		$scope.updateCount = (event, item, takesItem) ->
+			if item.tempCount
+				$scope.invalidQuantity = false
+				item.count = item.tempCount
+				if takesItem
+					item.count = item.tempCount * -1
+			else
+				$scope.invalidQuantity = true
 
-		# 	$scope.mousePos =
-		# 		x: e.clientX
-		# 		y: e.clientY
+		# Adds item to node
+		$scope.addItemToNode = (item, positiveCount = true) ->
+			if item
+				# If item already exists in node, increment item count
+				for i in $scope.nodeItems
+					if item.id is i.id
+						i.count += 1
+						return
+				# Item will be given to player
+				if positiveCount
+					newItem = {
+						id: item.id
+						count: 1
+						tempCount: 1
+					}
+				# Item will be removed from player
+				else
+					newItem = {
+						id: item.id
+						count: -1
+						tempCount: 1
+					}
+				$scope.nodeItems.push(newItem)
+				# Remove item from the select dropdown
+				index = $scope.availableItems.indexOf(item)
+				$scope.availableItems.splice index, 1
+				$scope.selectedItem = $scope.availableItems[0]
 
-		# 	document.onmouseup = $scope.closeModalDragListeners
-		# 	document.onmousemove = $scope.modalDrag
+		# Remove item from node
+		$scope.removeItemFromNode = (item, index) ->
+			$scope.nodeItems.splice index, 1
 
+			# Add item back to available items
+			for parentItem in $scope.inventoryItems
+				if item.id is parentItem.id
+					$scope.availableItems.push(parentItem)
 
-		# $scope.modalDrag = (e) ->
-		# 	e.preventDefault();
-			
-		# 	xOffset = $scope.modal.offsetLeft - ($scope.mousePos.x - e.clientX)
-		# 	yOffset = $scope.modal.offsetTop - ($scope.mousePos.y - e.clientY)
+			if (!$scope.availableItems[1]) 
+				$scope.selectedItem = item
+			$scope.showItemManagerDialog = false
 
-		# 	console.log(xOffset)
-		# 	console.log(yOffset)
-			
-		# 	$scope.modal.style.top = xOffset + "px"
-		# 	$scope.modal.style.left = yOffset + "px"
-			
+		# Add a required item to answer
+		$scope.addRequiredItemToAnswer = (item, answer) ->
+			if item
+				answer.requiredItems = answer.requiredItems || []
 
-		# $scope.closeModalDragListeners = (e) ->
-		# 	e.preventDefault();
+				for i in answer.requiredItems when i.id is item.id
+					i.count += 1
+					return
 
-		# 	document.onmouseup = null;
-		# 	document.onmousemove= null;
+				# Required items will store the index of the item in inventoryItems and the count
+				newItem = {
+					id: item.id
+					count: 1
+					tempCount: 1
+				}
+				answer.requiredItems.push(newItem)
+
+				# Remove item from the available items dropdown
+				index = $scope.availableItems.indexOf(item)
+				$scope.availableItems.splice index, 1
+				$scope.selectedItem = $scope.availableItems[0]
 
 		$scope.removeRequiredItemFromAnswer = (item, answer) ->
-			# item.count -= 1
-			# if (item.count <= 0)
-			# 	answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
 			answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
 
-			# Add item to the select dropdown
+			# Add item to the available items dropdown
 			item.count = 1
-			$scope.availableItems.push(item)
+			for parentItem in $scope.inventoryItems
+				if item.id is parentItem.id
+					$scope.availableItems.push(parentItem)
 			$scope.selectedItem = $scope.availableItems[0]
 
 		$scope.newAnswer = (text = null) ->

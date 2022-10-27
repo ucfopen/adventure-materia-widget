@@ -24,7 +24,7 @@
 	<body id="body" ng-app="Adventure" ng-controller="AdventureController">
 
 		<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn"  ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" class="inventory-button">
-			<img src="assets/icons/BackPack64.png" ng-show="!showInventory"/>
+			<img src="assets/player-assets/BackPack64.png" ng-show="!showInventory"/>
 			<span ng-if="showNew" class="new-item">NEW!</span>
 		</button>
 		<!-- <div class="notif-message" ng-if="showNotif">

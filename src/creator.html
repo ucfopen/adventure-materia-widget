@@ -76,23 +76,14 @@
 					class="important-button"
 					ng-click="hideCoverAndModals()">Done</button>
 			</title-editor>
-			<draggable-items-box class="inventory-items-preview">
+			<div class="inventory-items">
 				<button class="item-editor-button" ng-click="showItemManager = true">
 					<span class="plus-sign" ng-show="!inventoryItems.length">+</span>
 					<div>
 						<p>{{inventoryItems.length ? 'Edit Inventory Items ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
 					</div>
 				</button>
-				<!-- <div class="items-drag-box">
-					<div ng-repeat="item in inventoryItems" draggable="true" ng-mousedown="dragItemStart($event)"
-					ondragend="angular.element(this).scope().dragItemEnd(event)"
-					data-id="{{item.id}}">
-					<div ng-repeat="item in inventoryItems">
-						<img class="item-icon-small" ng-if="item.icon.url" ng-src="{{item.icon.url}}"/>
-						<span>{{item.name}}</span>
-					</div>
-				</div> -->
-			</draggable-items-box>
+			</div>
 			
 			<item-manager ng-show="showItemManager" class="item-selection item-manager">
 				<div class="item-header">
@@ -110,11 +101,11 @@
 						ng-mouseover="hoverItem = true"
 						ng-mouseout="hoverItem = false"
 					>
-						<div class="item-icon">
+						<div class="item-icon" 
+						ng-click="toggleItemIconSelector(item, $index)">
 							<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
 							<button
 								ng-show="editingIndex == $index"
-								ng-click="toggleItemIconSelector(item)"
 							>Select Icon</button>
 						</div>
 						<div class="item-content">
@@ -162,7 +153,7 @@
 								<div>
 									<button type="button"
 										class="important-button"
-										ng-click="manageNewIcon()">Upload Icon</button>
+										ng-click="uploadIcon()">Upload Icon</button>
 									<button type="button" 
 									class="important-button delete-button" 
 									ng-click="removeSelectedIcon()" 
@@ -687,14 +678,14 @@
 												class="answer-required-item"
 											>
 												<div class="item-icon">
-													<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 												</div>
 												<div class="item-content">
 													<div class="item-name">
-														<span>{{item.name}}</span>
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 													</div>
 													<div class="item-description">
-														<span class="description">{{item.description}}</span>
+														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 													</div>
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
@@ -933,14 +924,14 @@
 												class="answer-required-item"
 											>
 												<div class="item-icon">
-													<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 												</div>
 												<div class="item-content">
 													<div class="item-name">
-														<span>{{item.name}}</span>
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 													</div>
 													<div class="item-description">
-														<span class="description">{{item.description}}</span>
+														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 													</div>
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
@@ -1039,27 +1030,27 @@
 										<div class="item-heading sub-heading">
 											<div class="item-heading-icons">
 												<img id="arrow" src="assets/creator-assets/redo2.png"/>
-												<img src="/assets/icons/BackPackIconMono2.png"/>
+												<img src="assets/creator-assets/BackPackIconMono2.png"/>
 											</div>
 											<h4>Give Player Items</h4>
 										</div>
 									</div>
 									<ul class="list-items">
 										<li
-											ng-repeat="item in items"
+											ng-repeat="item in nodeItems"
 											ng-mouseover="hoverItem = true"
 											ng-mouseout="hoverItem = false"
 											ng-if="item.count > 0"
 										>
 											<div class="item-icon">
-												<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 											</div>
 											<div class="item-content">
 												<div class="item-name">
-													<span>{{item.name}}</span>
+													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 												</div>
-												<div class="item-description" ng-if="item.description">
-													<span class="description">{{item.description}}</span>
+												<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 												</div>
 											</div>
 											<div class="item-options" ng-class="{'show': hoverItem}">
@@ -1077,7 +1068,7 @@
 									<div class="item-header">
 										<div class="item-heading sub-heading">
 											<div class="item-heading-icons">
-												<img src="/assets/icons/BackPackIconMono2.png"/>
+												<img src="assets/creator-assets/BackPackIconMono2.png"/>
 												<img id="arrow" src="assets/creator-assets/forward.png"/>
 											</div>
 											<h4>Take Player Items</h4>
@@ -1085,20 +1076,20 @@
 									</div>
 									<ul class="list-items">
 										<li
-											ng-repeat="item in items"
+											ng-repeat="item in nodeItems"
 											ng-mouseover="hoverItem = true"
 											ng-mouseout="hoverItem = false"
 											ng-if="item.count < 0"
 										>
 											<div class="item-icon">
-												<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 											</div>
 											<div class="item-content">
 												<div class="item-name">
-													<span>{{item.name}}</span>
+													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 												</div>
-												<div class="item-description" ng-if="item.description">
-													<span class="description">{{item.description}}</span>
+												<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 												</div>
 											</div>
 											<div class="item-options" ng-class="{'show': hoverItem}">
@@ -1159,14 +1150,14 @@
 									class="answer-required-item"
 								>
 									<div class="item-icon">
-										<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+										<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 									</div>
 									<div class="item-content">
 										<div class="item-name">
-											<span>{{item.name}}</span>
+											<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 										</div>
 										<div class="item-description">
-											<span class="description">{{item.description}}</span>
+											<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 										</div>
 									</div>
 									<div class="item-options" ng-class="{'show': hoverItem}">
@@ -1285,31 +1276,31 @@
 										<div class="item-heading sub-heading">
 											<div class="item-heading-icons">
 												<img id="arrow" src="assets/creator-assets/redo2.png"/>
-												<img src="/assets/icons/BackPackIconMono2.png"/>
+												<img src="assets/creator-assets/BackPackIconMono2.png"/>
 											</div>
 											<h4>Give Player Items</h4>
 										</div>
 									</div>
 									<ul class="list-items">
 										<li
-											ng-repeat="item in items"
+											ng-repeat="item in nodeItems"
 											ng-mouseover="hoverItem = true"
 											ng-mouseout="hoverItem = false"
 											ng-if="item.count > 0"
 										>
 											<div class="item-icon">
-												<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 											</div>
 											<div class="item-content">
 												<div class="item-name">
-													<span>{{item.name}}</span>
+													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 												</div>
-												<div class="item-description" ng-if="item.description">
-													<span class="description">{{item.description}}</span>
+												<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 												</div>
 												<div class="apply-once-option" ng-if="showAdvancedOptions">
 													<input id="give-once" type="checkbox"
-													ng-model="item.giveOnce"
+													ng-model="inventoryItems[getItemIndex(item)].giveOnce"
 													value="false" /> 
 													<label for="give-once">Give Only Once</label>
 												</div>
@@ -1329,7 +1320,7 @@
 									<div class="item-header">
 										<div class="item-heading sub-heading">
 											<div class="item-heading-icons">
-												<img src="/assets/icons/BackPackIconMono2.png"/>
+												<img src="assets/creator-assets/BackPackIconMono2.png"/>
 												<img id="arrow" src="assets/creator-assets/forward.png"/>
 											</div>
 											<h4>Take Player Items</h4>
@@ -1337,24 +1328,24 @@
 									</div>
 									<ul class="list-items">
 										<li
-											ng-repeat="item in items"
+											ng-repeat="item in nodeItems"
 											ng-mouseover="hoverItem = true"
 											ng-mouseout="hoverItem = false"
 											ng-if="item.count < 0"
 										>
 											<div class="item-icon">
-												<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 											</div>
 											<div class="item-content">
 												<div class="item-name">
-													<span>{{item.name}}</span>
+													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 												</div>
-												<div class="item-description" ng-if="item.description">
-													<span class="description">{{item.description}}</span>
+												<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 												</div>
 												<div class="apply-once-option"  ng-if="showAdvancedOptions">
 													<input id="give-once" type="checkbox"
-													ng-model="item.giveOnce"
+													ng-model="inventoryItems[getItemIndex(item)].giveOnce"
 													value="false" /> 
 													<label for="give-once">Take Only Once</label>
 												</div>
@@ -1400,7 +1391,7 @@
 						</div>
 						<button type="button"
 							class="item-button"
-							ng-click="toggleItemPopup()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>{{items[0] ? 'Edit Items' : 'Add Items'}}</span><img src="assets/icons/BackPackIconMono2.png"/>
+							ng-click="toggleNodeItemsModal()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>{{items[0] ? 'Edit Items' : 'Add Items'}}</span><img src="assets/creator-assets/BackPackIconMono2.png"/>
 						</button>
 						<button class="save-button important-button"
 							ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
@@ -1416,13 +1407,13 @@
 					ng-show="tooltip.text || tooltip.givesItems[0] || tooltip.removedItems[0]">
 					<span class="tooltip-title"
 					ng-if="tooltip.text">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
-					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="item.icon.url"ng-src="{{item.icon.url}}" /> {{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
-					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="item.icon.url"ng-src="{{item.icon.url}}" /> {{item.name}} (Quantity: {{item.count ? item.count : -1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : 1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : -1}})</p>
 				</div>
 			</node-tooltips>
 			<required-items-tooltip ng-show="hoveredLock.showItems">
 				<span>The answer "{{hoveredLock.answerText}}" requires item(s):</span>
-				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="item.icon && item.icon.url"ng-src="{{item.icon.url}}" /> {{item.name}} (Quantity: {{item.count ? item.count : 1}})</p>
+				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="inventoryItems[getItemIndex(item)].icon && inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : 1}})</p>
 				<p ng-if="!hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-white.png"/></span>This answer will remain visible even if the player does not have the items.</p>
 				<p ng-if="hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-blocked-white.png"/></span>This answer will be invisible to the player if they do not have the items.</p>
 			</required-items-tooltip>
