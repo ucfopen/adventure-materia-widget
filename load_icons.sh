@@ -1,5 +1,6 @@
 #! /bin/bash
-# Creates JSON file with the files in the icons folder
+# Creates JS file containing an array of icon data (icon name and url)
+# Used to bypass writing out 100 objects in the initIcons function in creator-assets/controllers.coffee 
 # ------------------------------------------------
 
 # Outputs list of file names into lsoutput.log
@@ -7,12 +8,12 @@ ls -a ./src/assets/icons > lsoutput.log
 
 last_line=$(wc -l < lsoutput.log)
 current_line_number=0
-json_output="./src/assets/icons.json"
+output="./src/assets/icons.js"
 
-JSON_FMT='\t\t{"name":"%s"},\n'
-JSON_FMT_LAST_LINE='\t\t{"name":"%s"}\n'
+FMT='{name:"%s",url:"%s"},'
+FMT_LAST_LINE='{name:"%s",url:"%s"}'
 
-printf '{\n\t"icons": [\n' > $json_output
+printf 'icons = [' > $output
 
 # Reads lsoutput.log and inserts each filename into JSON file
 while read -r CURRENT_LINE
@@ -20,14 +21,14 @@ while read -r CURRENT_LINE
     do
         if [[ $current_line_number -ne $last_line ]]; then 
             if [[ $CURRENT_LINE == *".png" ]]; then
-                printf "$JSON_FMT" "$CURRENT_LINE" >> $json_output
+                printf "$FMT" "$CURRENT_LINE" "assets/icons/$CURRENT_LINE" >> $output
             fi
         else
-            printf "$JSON_FMT_LAST_LINE" "$CURRENT_LINE" >> $json_output
+            printf "$FMT_LAST_LINE" "$CURRENT_LINE" "assets/icons/$CURRENT_LINE" >> $output
             break
         fi
 done < lsoutput.log
 
-printf "\t]\n}" >> $json_output
+printf "]" >> $output
 
 rm lsoutput.log
