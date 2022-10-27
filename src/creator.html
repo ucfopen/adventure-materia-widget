@@ -77,7 +77,7 @@
 					ng-click="hideCoverAndModals()">Done</button>
 			</title-editor>
 			<div class="inventory-items">
-				<button class="item-editor-button" ng-click="showItemManager = true">
+				<button class="item-editor-button" ng-click="openItemManager()">
 					<span class="plus-sign" ng-show="!inventoryItems.length">+</span>
 					<div>
 						<p>{{inventoryItems.length ? 'Edit Inventory Items ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
@@ -1299,10 +1299,10 @@
 													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 												</div>
 												<div class="apply-once-option" ng-if="showAdvancedOptions">
-													<input id="give-once" type="checkbox"
+													<input id="{{item.id}}-give-once" type="checkbox"
 													ng-model="inventoryItems[getItemIndex(item)].giveOnce"
 													value="false" /> 
-													<label for="give-once">Give Only Once</label>
+													<label for="{{item.id}}-give-once">Give Only Once</label>
 												</div>
 											</div>
 											<div class="item-options" ng-class="{'show': hoverItem}">
@@ -1344,10 +1344,10 @@
 													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 												</div>
 												<div class="apply-once-option"  ng-if="showAdvancedOptions">
-													<input id="give-once" type="checkbox"
+													<input id="{{item.id}}-give-once" type="checkbox"
 													ng-model="inventoryItems[getItemIndex(item)].giveOnce"
 													value="false" /> 
-													<label for="give-once">Take Only Once</label>
+													<label for="{{item.id}}-give-once">Take Only Once</label>
 												</div>
 											</div>
 											<div class="item-options" ng-class="{'show': hoverItem}">

@@ -886,13 +886,6 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
-		$scope.$watch "showItemManager", (newVal, oldVal) ->
-			if newVal
-				$scope.showInventoryBackgroundCover = true
-
-				# Collapse any open item editors
-				$scope.editingIndex = -1
-
 		# Watch for new or removed items from inventoryItems
 		$scope.$watch "inventoryItems.length", (newVal, oldVal) ->
 			if newVal
@@ -901,6 +894,12 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					"Edit items (#{$scope.inventoryItems.length})"
 
 		$scope.newItemName = ''
+
+		$scope.openItemManager = () ->
+			$scope.showItemManager = true
+			$scope.showInventoryBackgroundCover = true
+			# Collapse any open item editors
+			$scope.editingIndex = -1
 
 		$scope.addNewItem = () ->
 			if $scope.newItemName.trim() != ''
