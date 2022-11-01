@@ -27,15 +27,6 @@
 			<img src="assets/player-assets/BackPack64.png" ng-show="!showInventory"/>
 			<span ng-if="showNew" class="new-item">NEW!</span>
 		</button>
-		<!-- <div class="notif-message" ng-if="showNotif">
-			<p ng-if="question.options.items.length > 1">
-				Items updated!
-			</p>
-			<p ng-if="question.options.items.length == 1">
-				<img ng-if="question.options.items[0].icon.url" ng-src="{{question.options.items[0].icon.url}}"/>
-				{{question.options.items[0].name}} has been added to your inventory!
-			</p>
-		</div> -->
 		<div class="inventory-tooltip" ng-show="showInventoryTooltip">
 			<p>Inventory</p>
 			<i class="arrow-right"></i>
@@ -46,11 +37,11 @@
 				<h2 class="inventory-header">Inventory Items</h2>
 				<div class="inventory-content">
 					<div class="inventory-items">
-						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0">
+						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="itemSelection[getItemIndex(item)].count > 0">
 							<span ng-if="item.new" class="new-item">NEW!</span>
-							<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
 							{{item.name}}
-							<span class="item-count">{{item.count}}</span>
+							<span class="item-count">{{itemSelection[getItemIndex(item)].count}}</span>
 						</div>
 					</div>
 					<div class="item-description" ng-show="selectedItem">
@@ -64,7 +55,6 @@
 						<p>{{selectedItem.description ? selectedItem.description : (selectedItem.icon.alt ? selectedItem.icon.alt : 'No description')}}</p>
 						<h4>Count</h4>
 						<p>{{selectedItem.count}}</p>
-						<p ng-show="selectedItem.numberOfUsesLeft != -999">Number of Uses Left: {{selectedItem.numberOfUsesLeft}}<p>
 					</div>
 				</div>
 			</div>
@@ -79,15 +69,15 @@
 			<div class="update-content" tabindex="-1">
 				<p>Item(s) Added: </p>
 				<div class="item" ng-repeat="item in addedItems track by $index" ng>
-					<span class="item-count">+ {{item.count}}</span>
-					<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
-					{{item.name}}
+					<span class="item-count">+ {{itemSelection[getItemIndex(item)].count}}</span>
+					<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
+					{{itemSelection[getItemIndex(item)].name}}
 				</div>
 				<p>Item(s) Removed: </p>
 				<div class="item" ng-repeat="item in removedItems track by $index" ng>
-					<span class="item-count">{{item.count}}</span>
-					<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
-					{{item.name}}
+					<span class="item-count">{{itemSelection[getItemIndex(item)].count}}</span>
+					<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
+					{{itemSelection[getItemIndex(item)].name}}
 				</div>
 			</div>
 			<input class="trans-button"
@@ -165,7 +155,7 @@
 					ng-if="checkInventory(answer)[0]"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
-					tabindex="0">) {{answer.text}}<span> You do not have enough items! Required: <span ng-repeat="item in answer.requiredItems">{{item.name}} ({{item.count}})<span ng-show="!$last">, </span></span></button>
+					tabindex="0">) {{answer.text}}<span> You do not have enough items! Required: <span ng-repeat="item in answer.requiredItems">{{itemSelection[getItemIndex(item)].name}} ({{itemSelection[getItemIndex(item)].count}})<span ng-show="!$last">, </span></span></button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"

@@ -239,6 +239,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	materiaCallbacks.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 		showIntroDialog = false
+		console.log(qset)
 
 		if qset
 			# Convert the old qset prior to using it

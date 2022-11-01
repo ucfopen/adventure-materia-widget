@@ -31,6 +31,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.scoringDisabled = false
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 	$scope.inventory = []
+	$scope.itemSelection = []
 
 	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
@@ -40,6 +41,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			$scope.$apply ->
 				$scope.title = instance.name
 				$scope.qset = qset
+				$scope.itemSelection = qset.options.inventoryItems
 
 				manageQuestionScreen(qset.items[0].options.id)
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
@@ -131,10 +133,18 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					hasItem = false
 					console.log($scope.visitedNodes)
 					console.log($scope.question)
+					console.log(q_i)
+
+					# Get the item data using the id
+					item = null
+					for inventoryItem in $scope.itemSelection
+						if inventoryItem.id is q_i.id
+							item = inventoryItem
+
 					# Check if item is first visit only (giveOnce == true)
-					if !($scope.visitedNodes.some((n) => n.id is $scope.question.id) and q_i.giveOnce)
+					if !($scope.visitedNodes.some((n) => n.id is $scope.question.id) and item.giveOnce)
 						# Inventory update
-						if q_i.count < 0
+						if item.count < 0
 							$scope.removedItems.push(q_i)
 						else
 							$scope.addedItems.push(q_i)
@@ -151,46 +161,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							newItem = {
 								...q_i
 								new: true
-								showDescription: false
-								numberOfUsesLeft: if q_i.numberOfUsesLeft then q_i.numberOfUsesLeft else -999
-								description: if q_i.description then q_i.description else ''
-								name: q_i.name
-								count: if q_i.count then q_i.count else 1
-								id: q_i.id
-								icon: {
-									...q_i.icon
-									url: if q_i.icon and q_i.icon.name then "assets/icons/#{q_i.icon.name}" else ''
-								}
 							}
 							$scope.inventory.push(newItem)
 
 			if ($scope.removedItems[0] || $scope.addedItems[0])
 				$scope.inventoryUpdate = true
-				$scope.showNew = true
-			
-				$scope.showInventoryBtn = true
-
-				if $scope.notifRegister isnt null then $timeout.cancel $scope.notifRegister
-
-				if $scope.question.options.items.length > 0
-					$scope.showNotif = true
-				else
-					# Hide inventory notifications
-					$scope.hideNotif()
-
-				$scope.notifRegister = $timeout (() ->
-					$scope.hideNotif()
-				), 10000
-
-		# Update number of uses for each item
-		# for i, index in $scope.inventory
-		# 	# Skip items with unlimited use
-		# 	if (i.numberOfUsesLeft == -999)
-		# 		continue
-		# 	i.numberOfUsesLeft -= 1
-		# 	# Remove item if no uses left
-		# 	if (i.numberOfUsesLeft <= 0)
-		# 		$scope.inventory.splice index, 1
+				if $scope.addedItems[0]
+					$scope.showNew = true
 
 
 		$scope.answers = []
@@ -241,10 +218,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
 
 		$scope.visitedNodes.push(q_data.options.id)
-	
-	$scope.hideNotif = () ->
-		$scope.showNotif = false
-		$scope.notifMessage = ""
 
 	$scope.toggleInventory = () ->
 		$scope.showInventory = ! $scope.showInventory
@@ -254,7 +227,17 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		$scope.hideNotif()
 
 	$scope.setSelectedItem = (item) ->
-		$scope.selectedItem = item
+		for i, index in $scope.itemSelection
+				if i.id is item.id
+					# Display item details in right toolbar
+					$scope.selectedItem = i
+					# Remove new label from icon
+					item.new = false
+
+	$scope.getItemIndex = (item) ->
+		for i, index in $scope.itemSelection
+			if i.id is item.id
+				return index
 
 	# Checks to see if player inventory contains all required items
 	# Returns array of missing items
