@@ -692,13 +692,31 @@ button {
 	right: 15px;
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 	padding: 10px;
 	width: 165px;
 
+	&:hover {
+		cursor: pointer;
+	}
+
 	background-color: $white;
-	border: 1px solid $blue;
-	box-shadow: $shadow-dialog;
+	border: 1px solid $gray-lighter;
+	box-shadow: $shadow-small;
 	border-radius: 5px;
+
+	img {
+		transition: transform 0.4s;
+		width: 100px;
+	}
+
+	img:hover {
+		transform: scale(1.1);
+	}
+
+	p {
+		font-size: 14px;
+	}
 
 	.item-editor-button {
 		background-color: $blue;
@@ -1063,13 +1081,13 @@ required-items-tooltip {
 	z-index: $z-index-modal-dialog;
 
 	/** Show modal on screen widths < 1000px **/
-	@media screen and (max-width: $node-creation-panels-width) {
+	@media screen and (max-width: 1400px) {
 		&.item-panel {
 			display: none;
 		}
 	}
 	/** Show two panels on screen widths >= 1000px **/
-	@media screen and (min-width: $node-creation-panels-width) {
+	@media screen and (min-width: 1400px) {
 		&.item-modal {
 			display: none;
 		}
@@ -1421,6 +1439,10 @@ required-items-tooltip {
 		border-right-color: $white;
 		z-index: $z-index-modal-dialog;
 	}
+
+	.item-icon:hover {
+		cursor: pointer;
+	}
 }
 
 item-icon-selector {
@@ -1472,6 +1494,7 @@ item-icon-selector {
 .item-modal {
 	z-index: $z-index-modal-dialog;
 	background-color: $gray-lightest;
+	justify-content: space-between;
 
 	&.required-item-modal {
 		position: fixed;
@@ -1519,6 +1542,7 @@ item-icon-selector {
 			grid-gap: 10px;
 			overflow: auto;
 			overflow-x: hidden;
+			height: 100%;
 
 			> div {
 				min-width: 50%;
@@ -1554,6 +1578,7 @@ item-icon-selector {
 		justify-content: space-between;
 		grid-gap: 10px;
 		overflow: auto;
+		height: 100%;
 	}
 
 	.options-bar {
@@ -2380,6 +2405,8 @@ node-creation-selection-dialog {
 			display: flex;
 			flex-direction: column;
 			grid-gap: 10px;
+
+			height: 100%;
 
 			li {
 				width: 99%;

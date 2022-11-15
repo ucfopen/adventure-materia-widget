@@ -131,9 +131,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			for q_i in $scope.question.options.items
 				do (q_i) ->
 					hasItem = false
-					console.log($scope.visitedNodes)
-					console.log($scope.question)
-					console.log(q_i)
 
 					# Get the item data using the id
 					item = null
@@ -142,7 +139,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							item = inventoryItem
 
 					# Check if item is first visit only (giveOnce == true)
-					if !($scope.visitedNodes.some((n) => n.id is $scope.question.id) and item.giveOnce)
+					if (!$scope.visitedNodes.some((n) => n.id is $scope.question.id) and !item.giveOnce)
+						console.log(item)
+						
 						# Inventory update
 						if item.count < 0
 							$scope.removedItems.push(q_i)
