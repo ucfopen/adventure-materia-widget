@@ -609,6 +609,12 @@ button {
 		background: $red;
 		color: $white;
 
+		&.icon-cross {
+			height: 35px;
+			width: 35px;
+			padding: 0;
+		}
+
 		&:hover {
 			background: $red-lighter;
 		}
@@ -1028,7 +1034,7 @@ node-tooltips {
 		align-items: center;
 		grid-gap: 10px;
 		
-		img {
+		img, span {
 			width: 20px;
 			height: 20px;
 		}
@@ -1170,6 +1176,7 @@ required-items-tooltip {
 			align-items: center;
 			grid-gap: 20px;
 			height: 35px;
+			position: relative;
 
 			::-webkit-scrollbar {
 				background-color: $gray;
@@ -1188,6 +1195,12 @@ required-items-tooltip {
 
 			.arrow-bottom {
 				position: static;
+				border-top-color: $gray-lightest;
+			}
+
+			.arrow-top {
+				position: static;
+				border-bottom-color: $gray-lightest;
 			}
 
 			dt {
@@ -1197,10 +1210,12 @@ required-items-tooltip {
 				grid-gap: 10px;
 				padding: 0 10px;
 				min-height: 35px;
+				background-color: $gray-lightest;
 			}
 
 			.selected-item {
 				justify-content: space-between;
+				background-color: $gray-lighter;
 			}
 
 			.option-contents {
@@ -1216,16 +1231,17 @@ required-items-tooltip {
 
 			dl {
 				background-color: $gray-lighter;
-				border: 1px solid $gray-darker;
+				// border: 1px solid $gray-darker;
 				margin: 0;
 				position: absolute;
+				top: 0;
 				width: 200px;
-				border-radius: 5px;
+				border-radius: 10px;
+				overflow: hidden;
 			}
 
 			button {
 				min-width: 80px;
-				margin-top: 5px;
 			}
 
 			button:first-of-type {
@@ -1236,17 +1252,17 @@ required-items-tooltip {
 				width: 100px;
 				height: 2em;
 				justify-content: end;
+				background-color: $gray-lighter;
+				border-radius: 10px;
 			}
 
 			.options {
 				max-height: 150px;
 				overflow: auto;
 				scrollbar-color: $gray;
-				background-color: $gray-lighter;
 
 				>:hover {
-
-					background-color: $gray;
+					background-color: $gray-lighter;
 				}
 			}
 		}
@@ -2525,7 +2541,8 @@ node-creation-selection-dialog {
 				}
 
 				button.delete-button {
-					height: 30px;
+					height: 35px;
+					width: 35px;
 				}
 
 				button.answer-node-select, button.add-item {
@@ -2655,10 +2672,6 @@ node-creation-selection-dialog {
 		border-bottom-right-radius: 10px;
 
 		box-shadow: inset 0 2px 2px $gray-lighter;
-
-		button {
-			padding: 5px 15px 5px 15px;
-		}
 
 		> div {
 			height: 35px;

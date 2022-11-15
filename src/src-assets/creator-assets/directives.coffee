@@ -639,7 +639,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					index = 0
 					for item, i in e.items
 						if index < dataPos.length - 1
-							if inventoryItems[i].icon.url
+							if inventoryItems[i].icon && inventoryItems[i].icon.url
 								g.append("svg:image")
 									.attr("xlink:href", inventoryItems[i].icon.url
 									)
@@ -657,10 +657,10 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 									.attr("fill", "none")
 									.attr("style", "opacity: 0.2")
 								numUsedItems++
+								index++
 							else 
 								numLeftoverItems++
-							index++
-					numLeftoverItems += e.items.length - index
+					# numLeftoverItems += e.items.length - index
 					if numLeftoverItems > 0
 						g.append("text")
 							.attr("class", "leftover-items")
@@ -2111,6 +2111,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.selectedItem = item
 			$scope.showDropdown = false
 
+		$scope.toggleDropdownSelector = () ->
+			$scope.showDropdown = !$scope.showDropdown
+
 		# ng-pattern attribute validates quantity
 		# Display error message if quantity is invalid
 		# takesItem is true if this item is being removed from the player's inventory
@@ -2160,8 +2163,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				if item.id is parentItem.id
 					$scope.availableItems.push(parentItem)
 
-			if (!$scope.availableItems[1]) 
-				$scope.selectedItem = item
+			$scope.selectedItem = item
 			$scope.showItemManagerDialog = false
 
 		# Add a required item to answer
@@ -2185,6 +2187,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				index = $scope.availableItems.indexOf(item)
 				$scope.availableItems.splice index, 1
 				$scope.selectedItem = $scope.availableItems[0]
+
+				# Hide Dropdown
+				$scope.showDropdown = false
 
 		$scope.removeRequiredItemFromAnswer = (item, answer) ->
 			answer.requiredItems.splice answer.requiredItems.indexOf(item), 1

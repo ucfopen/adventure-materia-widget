@@ -118,7 +118,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	# Gets index of item in inventory
 	$scope.getItemIndex = (item) ->
-		return treeSrv.getItemIndex(item.id)
+		if (item)
+			return treeSrv.getItemIndex(item.id)
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 		

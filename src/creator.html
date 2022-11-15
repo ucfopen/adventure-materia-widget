@@ -700,15 +700,15 @@
 													<dt ng-if="!availableItems[0]" class="blank-selection">
 														<i class="arrow-bottom"></i>
 													</dt>
-													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 														<div class="option-contents">
-															<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
-															{{selectedItem.name}}
+															<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+															{{inventoryItems[getItemIndex(selectedItem)].name}}
 														</div>
-														<i class="arrow-bottom"></i>
+														<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
 													</dt>
-													<div class="options">
-														<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+													<div  class="options" ng-show="showDropdown">
+														<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
 															<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 															{{item.name}}
 															</dt>
@@ -945,15 +945,15 @@
 													<dt ng-if="!availableItems[0]" class="blank-selection">
 														<i class="arrow-bottom"></i>
 													</dt>
-													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 														<div class="option-contents">
-															<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
-															{{selectedItem.name}}
+															<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+															{{inventoryItems[getItemIndex(selectedItem)].name}}
 														</div>
-														<i class="arrow-bottom"></i>
+														<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
 													</dt>
-													<div class="options">
-														<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+													<div  class="options" ng-show="showDropdown">
+														<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
 															<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 															{{item.name}}
 															</dt>
@@ -1105,15 +1105,15 @@
 										<dt ng-if="!availableItems[0]" class="blank-selection">
 											<i class="arrow-bottom"></i>
 										</dt>
-										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 											<div class="option-contents">
-												<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
-												{{selectedItem.name}}
+												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+												{{inventoryItems[getItemIndex(selectedItem)].name}}
 											</div>
-											<i class="arrow-bottom"></i>
+											<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
 										</dt>
-										<div class="options">
-											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+										<div  class="options" ng-show="showDropdown">
+											<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
 												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 												{{item.name}}
 												</dt>
@@ -1172,15 +1172,15 @@
 										<dt ng-if="!availableItems[0]" class="blank-selection">
 											<i class="arrow-bottom"></i>
 										</dt>
-										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 											<div class="option-contents">
-												<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
-												{{selectedItem.name}}
+												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+												{{inventoryItems[getItemIndex(selectedItem)].name}}
 											</div>
-											<i class="arrow-bottom"></i>
+											<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
 										</dt>
-										<div class="options">
-											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+										<div  class="options" ng-show="showDropdown">
+											<dt ng-repeat="item in availableItems"  ng-click="selectItem(item)">
 												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 												{{item.name}}
 												</dt>
@@ -1298,7 +1298,7 @@
 													<input id="{{item.id}}-give-once" type="checkbox"
 													ng-model="inventoryItems[getItemIndex(item)].firstVisitOnly"
 													value="false" /> 
-													<label for="{{item.id}}-give-once">Give Only Once</label>
+													<label for="{{item.id}}-give-once">Give On First Visit  Only</label>
 												</div>
 											</div>
 											<div class="item-options" ng-class="{'show': hoverItem}">
@@ -1343,7 +1343,7 @@
 													<input id="{{item.id}}-give-once" type="checkbox"
 													ng-model="inventoryItems[getItemIndex(item)].firstVisitOnly"
 													value="false" /> 
-													<label for="{{item.id}}-give-once">Take Only Once</label>
+													<label for="{{item.id}}-give-once">Take on First Visit Only</label>
 												</div>
 											</div>
 											<div class="item-options" ng-class="{'show': hoverItem}">
@@ -1364,15 +1364,16 @@
 										<dt ng-if="!availableItems[0]" class="blank-selection">
 											<i class="arrow-bottom"></i>
 										</dt>
-										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="showDropdown = !showDropdown">
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 											<div class="option-contents">
-												<img ng-if="selectedItem.icon && selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" class="dropdownSelector"/>
-												{{selectedItem.name}}
+												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+												{{inventoryItems[getItemIndex(selectedItem)].name}}
 											</div>
-											<i class="arrow-bottom"></i>
+											<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
 										</dt>
-										<div class="options">
-											<dt ng-repeat="item in availableItems" ng-if="showDropdown" ng-click="selectItem(item)">
+										<div  class="options" ng-show="showDropdown">
+											<dt ng-repeat="item in availableItems"
+											ng-click="selectItem(item)">
 												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
 												{{item.name}}
 												</dt>
@@ -1380,8 +1381,8 @@
 									</dl>
 									<button class="give-item-button" ng-click="addItemToNode(selectedItem, 1)">Give Item</button>
 									<button ng-click="addItemToNode(selectedItem, 0)">Take Item</button>
-									<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
-									<label for="show-advanced">Show Advanced Options</label>
+									<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced" ng-show="nodeItems[0]"/>
+									<label for="show-advanced" ng-show="nodeItems[0]">Show Advanced Options</label>
 								</div>
 							</div>
 						</div>
@@ -1403,7 +1404,7 @@
 					ng-show="tooltip.text || tooltip.givesItems[0] || tooltip.removedItems[0]">
 					<span class="tooltip-title"
 					ng-if="tooltip.text">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
-					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : 1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /><span ng-if="!inventoryItems[getItemIndex(item)].icon.url"></span> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : 1}})</p>
 					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : -1}})</p>
 				</div>
 			</node-tooltips>
