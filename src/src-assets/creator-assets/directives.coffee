@@ -910,7 +910,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					description: ''
 					count: 1
 					icon: {}
-					giveOnce: true
+					firstVisitOnly: true
 				treeSrv.incrementItemCount()
 				$scope.inventoryItems.push(newItem)
 

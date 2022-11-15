@@ -40,7 +40,7 @@
 						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="itemSelection[getItemIndex(item)].count > 0">
 							<span ng-if="item.new" class="new-item">NEW!</span>
 							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
-							{{item.name}}
+							{{itemSelection[getItemIndex(item)].name}}
 							<span class="item-count">{{itemSelection[getItemIndex(item)].count}}</span>
 						</div>
 					</div>

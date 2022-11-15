@@ -1296,7 +1296,7 @@
 												</div>
 												<div class="apply-once-option" ng-if="showAdvancedOptions">
 													<input id="{{item.id}}-give-once" type="checkbox"
-													ng-model="inventoryItems[getItemIndex(item)].giveOnce"
+													ng-model="inventoryItems[getItemIndex(item)].firstVisitOnly"
 													value="false" /> 
 													<label for="{{item.id}}-give-once">Give Only Once</label>
 												</div>
@@ -1341,7 +1341,7 @@
 												</div>
 												<div class="apply-once-option"  ng-if="showAdvancedOptions">
 													<input id="{{item.id}}-give-once" type="checkbox"
-													ng-model="inventoryItems[getItemIndex(item)].giveOnce"
+													ng-model="inventoryItems[getItemIndex(item)].firstVisitOnly"
 													value="false" /> 
 													<label for="{{item.id}}-give-once">Take Only Once</label>
 												</div>
