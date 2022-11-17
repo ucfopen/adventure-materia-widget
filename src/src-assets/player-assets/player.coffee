@@ -130,6 +130,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if $scope.question.options.items and $scope.question.options.items[0]
 
 			$scope.showInventoryBtn = true
+			console.log($scope.question.options.items)
 
 			for q_i in $scope.question.options.items
 				do (q_i) ->
@@ -144,8 +145,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					# Check if item is first visit only and player has visited this node before
 					if (!$scope.visitedNodes.some((n) => n is $scope.question.id) || $scope.visitedNodes.some((n) => n is $scope.question.id) and !item.firstVisitOnly)
 						# Inventory update
-						if item.count < 0
-							$scope.removedItems.push(q_i)
+						if q_i.count < 0
+							# Only show removed items if player has the item in inventory
+							if $scope.inventory.some((i) => i.id is q_i.id)
+								$scope.removedItems.push(q_i)
 						else
 							$scope.addedItems.push(q_i)
 						# Check to see if player already has item
@@ -226,12 +229,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		$scope.showNew = false
 
 	$scope.setSelectedItem = (item) ->
-		for i, index in $scope.itemSelection
-				if i.id is item.id
-					# Display item details in right toolbar
-					$scope.selectedItem = i
-					# Remove new label from icon
-					item.new = false
+		# Display item details in right toolbar
+		$scope.selectedItem = item
+		# Remove new label from icon
+		item.new = false
 
 	$scope.getItemIndex = (item) ->
 		for i, index in $scope.itemSelection

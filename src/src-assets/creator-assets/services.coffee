@@ -545,7 +545,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 			if itemData.options.items
 				for item in itemData.options.items
-					if item.icon and ! item.icon.icomoon
+					if item.icon
 						item = {
 							...item.icon
 							materiaType: "asset"
@@ -565,7 +565,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if tree.pendingTarget then itemData.options.pendingTarget = tree.pendingTarget
 
 			angular.forEach tree.answers, (answer, index) ->
-
 				itemAnswerData =
 					text: answer.text
 					value: 0

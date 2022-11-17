@@ -826,6 +826,10 @@ h1 {
 			display: flex;
 			flex-direction: row;
 			align-items: center;
+
+			.item-count {
+				width: 50px;
+			}
 		}
 
 		img {

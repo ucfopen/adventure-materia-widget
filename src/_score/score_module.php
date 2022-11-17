@@ -80,9 +80,10 @@ class Score_Modules_Adventure extends Score_Module
 		return [
 			'data' => [
 				$this->get_ss_question($log, $q),
-				$this->get_ss_answer($log, $q),
+				$q->id,
+				$this->get_ss_answer($log, $q)
 			],
-			'data_style'    => ['question', 'response', 'answer'],
+			'data_style'    => ['question', 'question_id', 'response'],
 			'score'         => $score,
 			'feedback'      => $this->get_feedback($log, $q->answers),
 			'type'          => $log->type,
@@ -133,11 +134,11 @@ class Score_Modules_Adventure extends Score_Module
 
 		// return an array of tables
 		return [
-			[
-				'title'  => 'Where did you end up?',
-				'header' => [],
-				'table'  => $destination_table,
-			],
+			// [
+			// 	'title'  => 'Where did you end up?',
+			// 	'header' => [],
+			// 	'table'  => $destination_table,
+			// ],
 			[
 				'title'  => 'Responses:',
 				'header' => ['Question Score', 'The Question', 'Your Response'],

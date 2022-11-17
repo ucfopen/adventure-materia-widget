@@ -288,6 +288,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			return Materia.CreatorCore.cancelSave ''
 		else
 			qset = treeSrv.createQSetFromTree $scope.treeData
+			console.log(qset)
 
 			qset.options.hidePlayerTitle = $scope.hidePlayerTitle
 			qset.options.scoreMode = $scope.scoreMode

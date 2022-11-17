@@ -6,23 +6,65 @@ AdventureScorescreen.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$s
 	materiaCallbacks = {}
 
 	$scope.inventory = []
+	$scope.responses = []
 	$scope.itemSelection = []
 
 	$scope.setSelectedItem = (item) ->
 		$scope.selectedItem = item
 
 	$scope.getItemIndex = (item) ->
-		for i, index in $scope.itemSelection
-			if i.id is item.id
-				return index
+		if (item)
+			for i, index in $scope.itemSelection
+				if i.id is item.id
+					return index
+
+	$scope.getQuestion = (qset, id) ->
+		for i in qset.items
+			if i.id is id 
+				return i
+		return -1
+
+	$scope.createInventoryFromResponses = (qset, responses) ->
+		inventory = []
+
+		for r, index in responses
+			for responseItem in $scope.getQuestion(qset, r.data[1]).options.items
+				itemPresent = false
+				for item in inventory
+					if item.id is responseItem.id
+						item.count += responseItem.count
+						itemPresent = true
+				if !itemPresent
+					inventory.push(responseItem)
+
+		return inventory
+
+	$scope.createTable = (qset, scoreTable) ->
+		table = []
+		for response in scoreTable
+			items = $scope.getQuestion(qset, response.data[1]).options.items
+			row =
+				question: response.data[0]
+				answer: response.data[2]
+				feedback: response.feedback
+				items: $scope.getQuestion(qset, response.data[1]).options.items
+				gainedItems: if items.some((i) => i.count > 0) then true else false
+				lostItems: if items.some((i) => i.count < 0) then true else false
+			table.push(row)
+		return table
+
+
+	$scope.toggleInventoryDrawer = () ->
+		$scope.showInventory = !$scope.showInventory
 	
 	materiaCallbacks.start = (instance, qset, scoreTable, isPreview, qsetVersion) ->
-		console.log(qset)
-		console.log(scoreTable)
-		console.log(instance)
-		$scope.itemSelection = qset.options.inventoryItems
-		$scope.inventory = qset.options.inventoryItems
+		$scope.$apply -> 
+			$scope.inventory = $scope.createInventoryFromResponses(qset, scoreTable)
+			$scope.itemSelection = qset.options.inventoryItems || []
+			$scope.table = $scope.createTable(qset, scoreTable)
 
-	Materia.ScoreCore.start materiaCallbacks
+	Materia.ScoreCore.hideResultsTable()
+
+	return Materia.ScoreCore.start materiaCallbacks
 
 ]

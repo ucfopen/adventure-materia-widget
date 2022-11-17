@@ -24,29 +24,66 @@
 	</head>
 	<body ng-app="AdventureScorescreen">
 		<div class="content-frame" ng-controller="AdventureScoreCtrl">
-			<section class="inventory">
-                <h1 class="inventory-header">Inventory Items</h1>
-                <div class="inventory-content">
+			<section class="inventory" ng-if="itemSelection[0]">
+                <h1 class="inventory-header" ng-click="toggleInventoryDrawer()" ng-class="{'closed': !showInventory}">FINAL INVENTORY <i class="arrow-top"></i></h1>
+                <div class="inventory-content" ng-show="showInventory">
                     <div class="inventory-items">
                         <div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)">
-                            <span ng-if="item.new" class="new-item">NEW!</span><span ng-if="item.icon.icomoon" class="icon-{{item.icon.icomoon_name}}"></span>
-                            <img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
-                            {{item.name}}
+                            <img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
+                            {{itemSelection[getItemIndex(item)].name}} ({{item.count}})
                         </div>
                     </div>
-                    <div class="item-description" ng-show="selectedItem">
+                    <div class="item-description" ng-if="selectedItem">
                         <div class="item-header">
-                            <span ng-if="selectedItem.icon.icomoon" class="icon-{{selectedItem.icon.icomoon_name}}"></span>
-                            <img ng-if="selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" ng-alt="{{selectedItem.icon.alt}}"/>
+                            <img ng-if="itemSelection[getItemIndex(selectedItem)].icon.url" ng-src="{{itemSelection[getItemIndex(selectedItem)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(selectedItem)].icon.alt}}"/>
                             <h3>
-                                {{selectedItem.name}}
+                                {{itemSelection[getItemIndex(selectedItem)].name}}
                             </h3>
                         </div>
                         <h4>Description</h4>
-                        <p>{{selectedItem.description ? selectedItem.description : (selectedItem.icon.alt ? selectedItem.icon.alt : 'No description')}}</p>
+                        <p>{{itemSelection[getItemIndex(selectedItem)].description ? itemSelection[getItemIndex(selectedItem)].description : (itemSelection[getItemIndex(selectedItem)].icon.alt ? itemSelection[getItemIndex(selectedItem)].icon.alt : 'No description')}}</p>
                         <h4>Count</h4>
-                        <p>{{selectedItem.count}}</p>
-                        <p ng-show="selectedItem.numberOfUsesLeft != -999">Number of Uses Left: {{selectedItem.numberOfUsesLeft}}<p>
+                        <p>{{itemSelection[getItemIndex(selectedItem)].count}}</p>
+                    </div>
+                </div>
+            </section>
+            <h1 class="responses-heading">RESPONSES:</h1>
+            <section class="table">
+                <div class="table-header">
+                    <div></div>
+                    <div>The Question</div>
+                    <div>Your Response</div>
+                </div>
+                <div class="table-row" ng-repeat="row in table track by $index">
+                    <div class="row-details">
+                        <div class="row-number">
+                            <p>{{$index + 1}}</p>
+                        </div>
+                        <div class="row-question">{{row.question}}</div>
+                        <div class="row-answer">
+                            <p>{{row.answer}}</p>
+                            <div class="row-feedback" ng-if="row.feedback">
+                                <p>{{row.feedback}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-items" ng-if="row.items[0]">
+                        <h4  ng-if="row.gainedItems">Items Gained</h4>
+                        <div class="row-items-gained" ng-if="row.gainedItems">
+                            <div ng-repeat="item in row.items" ng-if="item.count > 0" class="row-item">
+                                <p>+ {{item.count}}</p>
+                                <img ng-show="itemSelection[getItemIndex(item)].icon && itemSelection[getItemIndex(item)].icon.url" src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
+                                <p>{{itemSelection[getItemIndex(item)].name}}</p>
+                            </div>
+                        </div>
+                        <h4 ng-if="row.lostItems">Items Lost</h4>
+                        <div class="row-items-lost" ng-if="row.lostItems">
+                            <div ng-repeat="item in row.items" ng-if="item.count < 0" class="row-item">
+                                <p>- {{-1*item.count}}</p>
+                                <img ng-show="itemSelection[getItemIndex(item)].icon && itemSelection[getItemIndex(item)].icon.url" src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
+                                <p>{{itemSelection[getItemIndex(item)].name}}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

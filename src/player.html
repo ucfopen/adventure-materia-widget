@@ -37,11 +37,11 @@
 				<h2 class="inventory-header">Inventory Items</h2>
 				<div class="inventory-content">
 					<div class="inventory-items">
-						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="itemSelection[getItemIndex(item)].count > 0">
+						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0">
 							<span ng-if="item.new" class="new-item">NEW!</span>
 							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
 							{{itemSelection[getItemIndex(item)].name}}
-							<span class="item-count">{{itemSelection[getItemIndex(item)].count}}</span>
+							<span class="item-count">{{item.count}}</span>
 						</div>
 					</div>
 					<div class="item-description" ng-show="selectedItem">
@@ -68,16 +68,16 @@
 			>
 			<div class="update-content" tabindex="-1">
 				<p>Item(s) Added: </p>
-				<div class="item" ng-repeat="item in addedItems track by $index" ng>
-					<span class="item-count">+ {{itemSelection[getItemIndex(item)].count}}</span>
+				<div class="item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0">
+					<span class="item-count">+ {{item.count}} </span>
 					<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
-					{{itemSelection[getItemIndex(item)].name}}
+					 {{itemSelection[getItemIndex(item)].name}}
 				</div>
 				<p>Item(s) Removed: </p>
-				<div class="item" ng-repeat="item in removedItems track by $index" ng>
-					<span class="item-count">{{itemSelection[getItemIndex(item)].count}}</span>
+				<div class="item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0">
+					<span class="item-count">- {{-1*item.count}}</span>
 					<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
-					{{itemSelection[getItemIndex(item)].name}}
+					 {{itemSelection[getItemIndex(item)].name}}
 				</div>
 			</div>
 			<input class="trans-button"
@@ -155,7 +155,7 @@
 					ng-if="checkInventory(answer)[0]"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
-					tabindex="0">) {{answer.text}}<span> You do not have enough items! Required: <span ng-repeat="item in answer.requiredItems">{{itemSelection[getItemIndex(item)].name}} ({{itemSelection[getItemIndex(item)].count}})<span ng-show="!$last">, </span></span></button>
+					tabindex="0">) {{answer.text}}<span> You do not have enough items! Required: <span ng-repeat="item in answer.requiredItems">{{itemSelection[getItemIndex(item)].name}} ({{item.count}})<span ng-show="!$last">, </span></span></button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"

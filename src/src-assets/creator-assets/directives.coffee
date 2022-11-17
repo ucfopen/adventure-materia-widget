@@ -2119,6 +2119,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 		# takesItem is true if this item is being removed from the player's inventory
 		$scope.updateCount = (event, item, takesItem) ->
 			if item.tempCount
+				#item.tempCount = parseInt(item.tempCount)
 				$scope.invalidQuantity = false
 				item.count = item.tempCount
 				if takesItem
