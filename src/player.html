@@ -155,7 +155,7 @@
 					ng-if="checkInventory(answer)[0]"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
-					tabindex="0">) {{answer.text}}<span> You do not have enough items! Required: <span ng-repeat="item in answer.requiredItems">{{itemSelection[getItemIndex(item)].name}} ({{item.count}})<span ng-show="!$last">, </span></span></button>
+					tabindex="0">) {{answer.text}}<span> You do not have the right amount of items! Required: <span ng-repeat="item in answer.requiredItems">{{itemSelection[getItemIndex(item)].name}} ({{!item.requiredIsMax ? 'at least ' : 'no more than '}}{{item.count}})<span ng-show="!$last">, </span></span></button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"
