@@ -8,6 +8,7 @@ AdventureScorescreen.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$s
 	$scope.inventory = []
 	$scope.responses = []
 	$scope.itemSelection = []
+	$scope.customTable = false
 
 	$scope.setSelectedItem = (item) ->
 		$scope.selectedItem = item
@@ -59,11 +60,19 @@ AdventureScorescreen.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$s
 	
 	materiaCallbacks.start = (instance, qset, scoreTable, isPreview, qsetVersion) ->
 		$scope.$apply -> 
-			$scope.inventory = $scope.createInventoryFromResponses(qset, scoreTable)
-			$scope.itemSelection = qset.options.inventoryItems || []
-			$scope.table = $scope.createTable(qset, scoreTable)
+			# console.log(instance)
+			# console.log(qset)
+			# console.log(scoreTable)
+			# $scope.inventory = $scope.createInventoryFromResponses(qset, scoreTable)
+			# $scope.itemSelection = qset.options.inventoryItems || []
+			# $scope.table = $scope.createTable(qset, scoreTable)
+			# console.log($scope.inventory)
+			# console.log($scope.itemSelection)
+			# console.log($scope.table)
+			
+			$scope.customTable = false
 
-	Materia.ScoreCore.hideResultsTable()
+	# Materia.ScoreCore.hideResultsTable()
 
 	return Materia.ScoreCore.start materiaCallbacks
 

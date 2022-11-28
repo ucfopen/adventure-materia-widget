@@ -24,7 +24,7 @@
 	</head>
 	<body ng-app="AdventureScorescreen">
 		<div class="content-frame" ng-controller="AdventureScoreCtrl">
-			<section class="inventory" ng-if="itemSelection[0]">
+			<section class="inventory" ng-if="itemSelection[0]" ng-if="customTable">
                 <h1 class="inventory-header" ng-click="toggleInventoryDrawer()" ng-class="{'closed': !showInventory}">FINAL INVENTORY <i class="arrow-top"></i></h1>
                 <div class="inventory-content" ng-show="showInventory">
                     <div class="inventory-items">
@@ -47,8 +47,8 @@
                     </div>
                 </div>
             </section>
-            <h1 class="responses-heading">RESPONSES:</h1>
-            <section class="table">
+            <h1 class="responses-heading" ng-if="customTable">RESPONSES:</h1>
+            <section class="table" ng-if="customTable">
                 <div class="table-header">
                     <div></div>
                     <div>The Question</div>

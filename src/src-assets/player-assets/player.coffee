@@ -246,7 +246,12 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		skip = false
 		angular.forEach answer.requiredItems, (item) ->
 			hasRequiredItem = $scope.inventory.some (playerItem) ->
-				playerItem.id is item.id and playerItem.count >= item.count
+				if playerItem.id is item.id 
+					if item.requiredIsMax and item.count >= playerItem.count
+						return true
+					else if !item.requiredIsMax and item.count <= playerItem.count
+						return true
+					return false
 			if ! hasRequiredItem
 				missingItems.push(item)
 		return missingItems

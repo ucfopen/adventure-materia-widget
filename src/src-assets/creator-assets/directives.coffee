@@ -639,9 +639,9 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					index = 0
 					for item, i in e.items
 						if index < dataPos.length - 1
-							if inventoryItems[i].icon && inventoryItems[i].icon.url
+							if inventoryItems[treeSrv.getItemIndex(item.id)].icon && inventoryItems[treeSrv.getItemIndex(item.id)].icon.url
 								g.append("svg:image")
-									.attr("xlink:href", inventoryItems[i].icon.url
+									.attr("xlink:href", inventoryItems[treeSrv.getItemIndex(item.id)].icon.url
 									)
 									.attr("x", -10 + dataPos[index][0])
 									.attr("y", -10 + dataPos[index][1])
@@ -910,7 +910,6 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					description: ''
 					count: 1
 					icon: {}
-					firstVisitOnly: true
 				treeSrv.incrementItemCount()
 				$scope.inventoryItems.push(newItem)
 
@@ -2141,6 +2140,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						id: item.id
 						count: 1
 						tempCount: 1
+						firstVisitOnly: false
 					}
 				# Item will be removed from player
 				else
@@ -2148,6 +2148,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						id: item.id
 						count: -1
 						tempCount: 1
+						firstVisitOnly: false
 					}
 				$scope.nodeItems.push(newItem)
 				# Remove item from the select dropdown
@@ -2176,11 +2177,12 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					i.count += 1
 					return
 
-				# Required items will store the index of the item in inventoryItems and the count
+				# Required items will store the index of the item in inventoryItems and the count and whether it is a max or a min
 				newItem = {
 					id: item.id
 					count: 1
 					tempCount: 1
+					requiredIsMax: false
 				}
 				answer.requiredItems.push(newItem)
 
