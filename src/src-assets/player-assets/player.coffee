@@ -233,6 +233,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		item.new = false
 
 	$scope.getItemIndex = (item) ->
+		if !item then return false
 		for i, index in $scope.itemSelection
 			if i.id is item.id
 				return index

@@ -37,7 +37,7 @@
 				<h2 class="inventory-header">Inventory Items</h2>
 				<div class="inventory-content">
 					<div class="inventory-items">
-						<div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0">
+						<div class="item" ng-class="{'selected' : item.id == selectedItem.id}" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0">
 							<span ng-if="item.new" class="new-item">NEW!</span>
 							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
 							{{itemSelection[getItemIndex(item)].name}}
@@ -46,15 +46,15 @@
 					</div>
 					<div class="item-description" ng-show="selectedItem">
 						<div class="item-header">
-							<img ng-if="selectedItem.icon.url" ng-src="{{selectedItem.icon.url}}" ng-alt="{{selectedItem.icon.alt}}"/>
+							<img ng-if="itemSelection[getItemIndex(selectedItem)].icon.url" ng-src="{{itemSelection[getItemIndex(selectedItem)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(selectedItem)].icon.url}}"/>
 							<h3>
-								{{selectedItem.name}}
+								{{itemSelection[getItemIndex(selectedItem)].name}}
 							</h3>
 						</div>
 						<h4>Description</h4>
-						<p>{{selectedItem.description ? selectedItem.description : (selectedItem.icon.alt ? selectedItem.icon.alt : 'No description')}}</p>
+						<p>{{itemSelection[getItemIndex(selectedItem)].description ? itemSelection[getItemIndex(selectedItem)].description : (itemSelection[getItemIndex(selectedItem)].icon.alt ? itemSelection[getItemIndex(selectedItem)].icon.alt : 'No description')}}</p>
 						<h4>Count</h4>
-						<p>{{selectedItem.count}}</p>
+						<p>{{itemSelection[getItemIndex(selectedItem)].count}}</p>
 					</div>
 				</div>
 			</div>
@@ -67,18 +67,22 @@
 			ng-class="{'show': inventoryUpdate}"
 			>
 			<div class="update-content" tabindex="-1">
-				<p>Item(s) Added: </p>
-				<div class="item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0">
-					<span class="item-count">+ {{item.count}} </span>
-					<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
-					 {{itemSelection[getItemIndex(item)].name}}
-				</div>
+				<section ng-if="addedItems.length > 0">
+					<p>Item(s) Added: </p>
+					<div class="item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0">
+						<span class="item-count">+ {{item.count}} </span>
+						<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
+						{{itemSelection[getItemIndex(item)].name}}
+					</div>
+				</section>
+				<section ng-if="removedItems.length > 0">
 				<p>Item(s) Removed: </p>
-				<div class="item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0">
-					<span class="item-count">- {{-1*item.count}}</span>
-					<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
-					 {{itemSelection[getItemIndex(item)].name}}
-				</div>
+					<div class="item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0">
+						<span class="item-count">- {{-1*item.count}}</span>
+						<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
+						{{itemSelection[getItemIndex(item)].name}}
+					</div>
+				</section>
 			</div>
 			<input class="trans-button"
 				type="button"

@@ -78,31 +78,37 @@ body {
 }
 
 .inventory-button {
-	width:64px;
-	height:64px;
-	background: transparent;
-	border: none;
-	border-radius:5px;
-	cursor: pointer;
-	z-index: 1001;
-	// Inventory z-index is 1000
-
 	display: inline-block;
 	position: absolute;
-	right: 10px;
-	top: 2px;
+	right: 9px;
+	top: 3px;
+	z-index: 1001;
+
+	width:62px;
+	height:62px;
+	padding: 8px;
+	
+	// Inventory z-index is 1000
 
 	font-size: 24px;
 	color: $blue;
 
+	background: $color-accent-highlight;
+	border: none;
+	border-radius:5px;
+	cursor: pointer;
 
 	&:focus {
 		background: rgba(0,0,0,0.1);
 	}
 
+	&:hover {
+		background: $blue-lightest;
+	}
+
 	img {
-		width: 64px;
-		height: 64px;
+		width: 48px;
+		height: 48px;
 	}
 }
 
@@ -113,7 +119,7 @@ button.show-inventory {
 	background: $white;
 
 	&:focus {
-		outline: thick solid $blue-focus;
+		outline: 3px solid $blue-focus;
 		background: $white;
 	}
 }
@@ -130,8 +136,8 @@ button.show-inventory {
 	box-sizing:border-box;
 
 	position: absolute;
-	left: 0;
-	top: 0;
+	left: -18px;
+	top: 2px;
 }
 
 .notif-message {
@@ -673,7 +679,7 @@ h1 {
 				div.item {
 					padding: 15px;
 					margin: 15px;
-					border-radius: 20px;
+					border-radius: 2px;
 					max-height: 25px;
 
 					position: relative;
@@ -683,19 +689,26 @@ h1 {
 					align-items: center;
 					grid-gap: 10px;
 
-					border: 2px solid $white;
-					background-color: $blue-lightest;
+					border: solid 1px $gray-lighter;
+					background-color: $color-primary;
+
+					&:hover {
+						cursor: pointer;
+						background: $blue-lightest;
+						
+						// box-shadow: $shadow-small-highlight;
+					}
+
+					&.selected {
+						background: $blue-lightest;
+						border: solid 1px $color-accent;
+					}
 
 					img {
 						width: 35px;
 						height: 35px;
 						object-fit: cover;
 					}
-				}
-
-				div.item:hover {
-					box-shadow: $shadow-dialog;
-					cursor: pointer;
 				}
 
 				.new-item {
@@ -733,7 +746,7 @@ h1 {
 
 			.item-description {
 				flex-grow: 1;
-				background-color: $blue-lightest;
+				background-color: $gray-lightest;
 				min-width: 200px;
 
 				h4 {
@@ -786,8 +799,8 @@ h1 {
 	right: 80px;
 	top: 10px;
 	z-index: 50;
-	background: white;
-	color: $blue;
+	background: $gray-darker;
+	color: $color-primary;
 	border-radius: 10px;
 	padding: 0 5px;
 	font-size: 12px;
@@ -795,8 +808,8 @@ h1 {
 	.arrow-right {
 		position: absolute;
 		right: -5px;
-		top: 10px;
-		border-left-color:white;
+		top: 8px;
+		border-left-color:$gray-darker;
 	}
 }
 
@@ -811,21 +824,23 @@ h1 {
 	margin-left: -270px;
 	margin-top: -170px;
 
-	border: 5px solid #999;
+	border: 2px solid $gray-lightest;
+	border-radius: 3px;
 	background: #fff;
+	box-shadow: $shadow-small;
 
 	opacity: 0;
 
 	&:before {
 		display: block;
 		font-size: 14px;
-		font-family: 'Lora';
+		// font-family: 'Lora';
 		font-weight: bold;
 		color: #555;
 		background: #fef6b1;
 		position: absolute;
-		left: -5px;
-		top: -25px;
+		left: 0px;
+		top: -22px;
 		padding: 0px 5px;
 	}
 
@@ -852,7 +867,7 @@ h1 {
 		font-weight: bold;
 
 		overflow-x: hidden;
-		overflow-y: scroll;
+		overflow-y: auto;
 	}
 
 	.update-content {
