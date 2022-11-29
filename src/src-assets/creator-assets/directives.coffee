@@ -465,7 +465,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				)
 				.attr("xlink:href", "assets/creator-assets/lock.svg")
 				.attr("x", (d) ->
-					return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 5
+					return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 4
 				)
 				.attr("y", (d) ->
 					return (d.source.y + (d.source.y + d.target.y) / 2) / 2 - 8

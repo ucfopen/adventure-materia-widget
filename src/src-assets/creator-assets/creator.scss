@@ -698,30 +698,43 @@ button {
 	right: 15px;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: right;
 	padding: 10px;
-	width: 165px;
 
-	&:hover {
-		cursor: pointer;
-	}
+	font-weight: bold;
 
 	background-color: $white;
 	border: 1px solid $gray-lighter;
 	box-shadow: $shadow-small;
 	border-radius: 5px;
 
-	img {
-		transition: transform 0.4s;
-		width: 100px;
+	&:hover {
+		cursor: pointer;
+		color: $color-accent;
+
+		img {
+			transform: scale(1.1);
+		}
 	}
 
-	img:hover {
-		transform: scale(1.1);
+	img {
+		position: absolute;
+		left: 5px;
+		top: 2px;
+		width: 32px;
+		height: 32px;
+
+		transition: transform 0.4s;
 	}
 
 	p {
+		display: inline-block;
+		// margin: 0 0 0 10px;
+		margin: 0;
+		padding-left: 37px;
 		font-size: 14px;
+
+		text-align: right;
 	}
 
 	.item-editor-button {
@@ -1159,7 +1172,7 @@ required-items-tooltip {
 		margin-bottom: 5px;
 		font-size: 11pt;
 
-		padding: 10px 10px 10px 0;
+		padding: 15px 10px;
 		margin-right: 2px;
 
 		-webkit-transition: background 0.5s;
@@ -1309,8 +1322,16 @@ required-items-tooltip {
 				object-fit: cover;
 			}
 
+			.no-icon {
+				width: 38px;
+				height: 38px;
+				border: dashed 2px $gray;
+				border-radius: 5px;
+			}
+
 			button {
 				min-width: 85px;
+				margin-top: 5px;
 			}
 		}
 
@@ -1330,6 +1351,10 @@ required-items-tooltip {
 				width: 100%;
 				max-width: 350px;
 				box-sizing: border-box;
+			}
+
+			.item-name {
+				font-weight: bold;
 			}
 
 			.apply-once-option {
@@ -1404,8 +1429,10 @@ required-items-tooltip {
 		}
 
 		&.selected {
-			color: $color-primary;
-			background: $color-accent;
+			border: solid 1px $gray-lighter;
+			border-radius: 10px;
+
+			background: rgba(255,255,255,0.5);
 		}
 	}
 
@@ -1940,7 +1967,7 @@ node-creation-selection-dialog {
 
 	text-align: center;
 
-	@media screen and (max-height: $edit-popup-less-height + 69) {
+	@media screen and (max-height: ($edit-popup-less-height + 69)) {
 		// height: 300px;
 		height: auto;
 	}
@@ -1964,7 +1991,7 @@ node-creation-selection-dialog {
 		margin: 0px;
 		padding: 0px;
 
-		@media screen and (max-height: $edit-popup-less-height + 69) {
+		@media screen and (max-height: ($edit-popup-less-height + 69)) {
 			display: block;
 
 			margin: 15px 0px 40px 0px;
@@ -1992,7 +2019,7 @@ node-creation-selection-dialog {
 			-webkit-transition: top 0.5s;
 			transition: top 0.5s;
 
-			@media screen and (max-height: $edit-popup-less-height + 69) {
+			@media screen and (max-height: ($edit-popup-less-height + 69)) {
 				width: 100px;
 				height: 100px;
 
@@ -2010,7 +2037,7 @@ node-creation-selection-dialog {
 			&:nth-child(odd) {
 				margin-right: 15px;
 
-				@media screen and (max-height: $edit-popup-less-height + 69) {
+				@media screen and (max-height: ($edit-popup-less-height + 69)) {
 					margin-left: 5px;
 					margin-right: 5px;
 				}
@@ -2040,7 +2067,7 @@ node-creation-selection-dialog {
 					margin-bottom: 15px;
 				}
 
-				@media screen and (max-height: $edit-popup-standard-height + 69) {
+				@media screen and (max-height: ($edit-popup-standard-height + 69)) {
 					width: 100px;
 					height: 100px;
 
@@ -2071,7 +2098,7 @@ node-creation-selection-dialog {
 
 				margin: 25px auto 15px auto;
 
-				@media screen and (max-height: $edit-popup-less-height + 69) {
+				@media screen and (max-height: ($edit-popup-less-height + 6)) {
 					width: 50px;
 					height: 50px;
 
@@ -2285,7 +2312,7 @@ node-creation-selection-dialog {
 			}
 		}
 
-		@media screen and (max-height: $edit-popup-standard-height + 69) {
+		@media screen and (max-height: ($edit-popup-standard-height + 69)) {
 			font-size: 1em;
 
 			transition: all 0.1s ease;
@@ -2734,7 +2761,7 @@ node-creation-selection-dialog {
 			&.lowered {
 				bottom: 10px;
 
-				@media screen and (max-height: $edit-popup-standard-height + 69) {
+				@media screen and (max-height: ($edit-popup-standard-height + 69)) {
 					bottom: 16px;
 					right: 50px;
 				}
@@ -2854,7 +2881,7 @@ node-creation-selection-dialog {
 
 			text-align: center;
 
-			@media screen and (max-height: $edit-popup-standard-height + 69) {
+			@media screen and (max-height: ($edit-popup-standard-height + 6)) {
 				margin-top: 0px;
 			}
 
