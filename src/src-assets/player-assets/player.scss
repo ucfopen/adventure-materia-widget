@@ -73,6 +73,10 @@ body {
 
 }
 
+.warning-text {
+	color: $red-lighter;
+}
+
 .inventory-button {
 	width:64px;
 	height:64px;
@@ -444,8 +448,12 @@ h1 {
 		overflow-y: auto;
 
 		.answer {
-			display:block;
+			display: flex;
+			align-items: center;
+			flex-direction: row;
 			margin-bottom:10px;
+			width: 100%;
+			gap: 15px;
 
 			color:#000000;
 
@@ -462,14 +470,41 @@ h1 {
 			counter-increment: q;
 			cursor: pointer;
 
-			&.nonselectable {
-				color: $gray-darker;
-				cursor: default;
+			> div {
+				display:flex;
+				align-items: center;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				width: 100%;
+				flex-direction: row;
 			}
 
-			&.nonselectable span {
+			.answer-required-items {
+				float: right;
+				display: flex;
+				align-items: center;
+				flex-direction: row;
+				font-size: 0.8em;
+			}
+			
+			.answer-required-items span {
+				display: flex;
+				align-items: center;
+				flex-direction: row;
+			}
+
+			img {
+				width: 35px;
+				height: 35px;
+			}
+
+			&.nonselectable {
+				cursor: default;
 				font-style: italic;
-				font-size: 16px;
+
+				.answer-required-items {
+					color: $red-lighter;
+				}
 			}
 
 			&:hover, &:focus {
@@ -478,6 +513,7 @@ h1 {
 
 			&:before {
 				content: counter(q, upper-alpha);
+				padding-right: 15px;
 			}
 
 			&:focus {

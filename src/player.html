@@ -148,14 +148,37 @@
 					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
-					tabindex="0">) {{answer.text}}</button>
+					tabindex="0">
+					<div>
+						{{answer.text}}
+						<div class="answer-required-items">
+							<span ng-repeat="item in answer.requiredItems">
+								<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
+								{{itemSelection[getItemIndex(item)].name}} ({{!item.requiredIsMax ? 'at least ' : 'no more than '}}{{item.count}})
+								<span ng-show="!$last">, </span>
+							</span>
+						</div>
+					</div>
+				</button>
 				<button
 					class="answer nonselectable"
 					ng-repeat="answer in answers"
-					ng-if="checkInventory(answer)[0]"
+					ng-if="checkInventory(answer)[0] && !answer.hideAnswer"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
-					tabindex="0">) {{answer.text}}<span> You do not have the right amount of items! Required: <span ng-repeat="item in answer.requiredItems">{{itemSelection[getItemIndex(item)].name}} ({{!item.requiredIsMax ? 'at least ' : 'no more than '}}{{item.count}})<span ng-show="!$last">, </span></span></button>
+					tabindex="0">
+					<div>
+						{{answer.text}}
+						<div class="answer-required-items">
+							<span>Requires item(s): </span>
+							<span ng-repeat="item in answer.requiredItems">
+								<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
+								{{itemSelection[getItemIndex(item)].name}} ({{!item.requiredIsMax ? 'at least ' : 'no more than '}}{{item.count}})
+								<span ng-show="!$last">, </span>
+							</span>
+						</div>
+					</div>
+				</button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"

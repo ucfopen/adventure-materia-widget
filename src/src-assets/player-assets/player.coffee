@@ -179,8 +179,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			for i in [0..q_data.answers.length-1]
 				continue if not q_data.answers[i]
 
-				continue if q_data.answers[i].options.hideAnswer
-
 				answer =
 					text : q_data.answers[i].text
 					link : q_data.answers[i].options.link
