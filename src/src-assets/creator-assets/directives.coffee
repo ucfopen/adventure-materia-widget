@@ -2069,9 +2069,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 			$scope.selectedItem = $scope.availableItems[0]
 
-		$scope.toggleRequiredItemsModal = (answer) ->
+		$scope.toggleRequiredItemsModal = (answer = null) ->
 			# Close required items modal
-			if ($scope.currentAnswer and $scope.currentAnswer is answer)
+			if (answer is null or $scope.currentAnswer and $scope.currentAnswer is answer)
 				$scope.showRequiredItems = false
 				$scope.currentAnswer = null
 			# Open required items modal

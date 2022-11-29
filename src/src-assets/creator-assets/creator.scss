@@ -1094,7 +1094,7 @@ required-items-tooltip {
 	display: flex;
 	flex-direction: column;
 	// max-height: 80%;
-	padding: 0 25px;
+	padding: 0 25px 25px 25px;
 	box-sizing: border-box;
 
 	z-index: $z-index-modal-dialog;
@@ -1174,6 +1174,9 @@ required-items-tooltip {
 
 		padding: 15px 10px;
 		margin-right: 2px;
+
+		border: solid 1px transparent;
+		box-sizing: border-box;
 
 		-webkit-transition: background 0.5s;
 		transition: background 0.5s;
@@ -1280,12 +1283,6 @@ required-items-tooltip {
 			}
 		}
 
-		.hide-answer-option {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-		}
-
 		> input {
 			flex-grow: 2;
 		}
@@ -1356,17 +1353,6 @@ required-items-tooltip {
 			.item-name {
 				font-weight: bold;
 			}
-
-			.apply-once-option {
-				display: flex;
-				align-items: center;
-				flex-direction: row;
-
-				input {
-					width: auto;
-					height: 1em;
-				}
-			}
 		}
 
 		.item-options {
@@ -1416,16 +1402,11 @@ required-items-tooltip {
 			align-items: center;
 		}
 
-		&:hover:not(.options-bar) {
-			// background: $color-selection-hover;
+		&:not(.options-bar):hover {
+			border: solid 1px $gray-lighter;
+			border-radius: 10px;
 
-			&.pointer {
-				cursor: pointer;
-			}
-
-			.item-options {
-				visibility: visible;
-			}
+			background: rgba(255,255,255,0.5);
 		}
 
 		&.selected {
@@ -1442,7 +1423,8 @@ required-items-tooltip {
 		padding: 10px 0px 0px 0px;
 		overflow: auto;
 		overflow-x: hidden;	
-		max-height: 300px;
+		height: 100%;
+		margin: 10px 0px;
 	}
 
 	input {
@@ -1454,6 +1436,19 @@ required-items-tooltip {
 		border-radius: 3px;
 	}
 
+	.advanced-option {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		align-items: center;
+		width: 100%;
+
+		input {
+			width: auto;
+			height: 1em;
+		}
+	}
+
 	button:not(.delete-button) {
 		background: $color-accent;
 		color: $color-primary;
@@ -1462,6 +1457,12 @@ required-items-tooltip {
 		&:hover {
 			background: $color-accent-highlight;
 		}
+	}
+
+	.save-button {
+		position: absolute;
+		right: 15px;
+		bottom: 50px;
 	}
 }
 
@@ -1475,6 +1476,10 @@ required-items-tooltip {
 	margin-top: 20px;
 
 	background-color: $gray-lightest;
+
+	.options-bar {
+		padding-right: 55px;
+	}
 
 	.arrow-left {
 		position: absolute;
@@ -1513,7 +1518,7 @@ item-icon-selector {
 			align-items: center;
 			justify-content: center;
 			margin: 0;
-			border: 2px solid transparent;
+			border: 1px solid transparent;
 			padding: 0;
 
 			img {
@@ -1554,6 +1559,10 @@ item-icon-selector {
 			top: 155px;
 			border-left-color: $gray-lightest;
 		}
+
+		.save-button {
+			bottom: 15px;
+		}
 	}
 
 	&.required-item-modal-hotspot {
@@ -1574,15 +1583,14 @@ item-icon-selector {
 		position: absolute;
 		height: 75%;
 		width: 85%;
-		bottom: 70px;
-		right: 40px;
+		bottom: 100px;
+		right: 30px;
 
 
 		.item-container {
 			display: flex;
 			flex-direction: row;
 			justify-content: space-between;
-			grid-gap: 10px;
 			overflow: auto;
 			overflow-x: hidden;
 			height: 100%;
@@ -1591,6 +1599,17 @@ item-icon-selector {
 				min-width: 50%;
 				display:flex;
 				flex-direction: column;
+				padding-right: 10px;
+				box-sizing: border-box;
+			}
+
+			.list-items li {
+				display:flex;
+				flex-direction: column;
+
+				> div {
+					display: flex;
+				}
 			}
 
 			.list-items {
@@ -1622,6 +1641,24 @@ item-icon-selector {
 		grid-gap: 10px;
 		overflow: auto;
 		height: 100%;
+
+		> div {
+			min-width: 50%;
+			display:flex;
+			flex-direction: column;
+			padding-right: 10px;
+			box-sizing: border-box;
+			flex-grow: 1;
+		}
+
+		.list-items li {
+			display:flex;
+			flex-direction: column;
+
+			> div {
+				display: flex;
+			}
+		}
 	}
 
 	.options-bar {
@@ -2440,7 +2477,7 @@ node-creation-selection-dialog {
 		overflow-y: scroll;
 		flex-grow: 2;
 
-		ul {
+		> ul {
 			list-style-type: none;
 			margin: 0px;
 			padding: 0px;
@@ -2451,7 +2488,7 @@ node-creation-selection-dialog {
 
 			height: 100%;
 
-			li {
+			> li {
 				width: 99%;
 				padding: 5px;
 				box-sizing: border-box;

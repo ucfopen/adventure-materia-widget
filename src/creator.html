@@ -174,10 +174,10 @@
 					<button type="button"
 						class="important-button"
 						ng-click="addNewItem()">Add</button>
-					<button type="button"
-						class="important-button save-button"
-						ng-click="saveAndCloseInventory()">Done</button>
 				</div>
+				<button type="button"
+				class="important-button save-button"
+				ng-click="saveAndCloseInventory()">Done</button>
 			</item-manager>
 			<debug-qset-generator ng-show="showQsetGenerator">
 				<h4>Generated QSet</h4>
@@ -692,7 +692,7 @@
 															<span>Quantity</span>
 															<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 0)"/>
 														</div>
-														<div class="required-is-max-option" ng-if="showAdvancedOptions">
+														<div class="advanced-option" ng-if="showAdvancedOptions">
 															<input id="{{item.id}}-limit" type="checkbox"
 															ng-model="item.requiredIsMax"
 															value="false" /> 
@@ -725,17 +725,24 @@
 												</dl>
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
-											<div class="hide-answer-option">
-												<input id="hide-answer" type="checkbox"
-												ng-model="currentAnswer.hideAnswer"
-												value="false" /> 
-												<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
-											</div>
-											<div>
-												<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
-												<label for="show-advanced">Show Advanced Options</label>
-											</div>
 										</div>
+
+										<div class="advanced-option">
+											<input id="hide-answer" type="checkbox"
+											ng-model="currentAnswer.hideAnswer"
+											value="false" /> 
+											<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
+										</div>
+										<div class="advanced-option">
+											<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
+											<label for="answer-show-advanced">Show Advanced Options</label>
+										</div>
+
+										<button class="save-button important-button"
+										ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+										type="button"
+										ng-click="toggleRequiredItemsModal()">Done
+										</button>
 										<!-- <i class="arrow-right"></i> -->
 									</div>
 
@@ -949,7 +956,7 @@
 															<span>Quantity</span>
 															<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 0)"/>
 														</div>
-														<div class="required-is-max-option" ng-if="showAdvancedOptions">
+														<div class="advanced-option" ng-if="showAdvancedOptions">
 															<input id="{{item.id}}-limit" type="checkbox"
 															ng-model="item.requiredIsMax"
 															value="false" /> 
@@ -982,18 +989,25 @@
 												</dl>
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
-											<div class="hide-answer-option">
-												<input type="checkbox" id="hide-answer"
-												ng-model="currentAnswer.hideAnswer"
-												value="false" /> 
-												<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
-											</div>
-											<div>
-												<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
-												<label for="show-advanced">Show Advanced Options</label>
-											</div>
+										</div>
+
+										<div class="advanced-option">
+											<input type="checkbox" id="hide-answer"
+											ng-model="currentAnswer.hideAnswer"
+											value="false" /> 
+											<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
+										</div>
+										<div class="advanced-option">
+											<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
+											<label for="answer-show-advanced">Show Advanced Options</label>
 										</div>
 										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
+										
+										<button class="save-button important-button"
+										ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+										type="button"
+										ng-click="toggleRequiredItemsModal()">Done
+										</button>
 									</div>
 									<button ng-show="inventoryItems[0]" class="require-item-btn" id="hotspot-require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = false" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false">
 										<span class="icon-unlocked" ng-if="!answers[hotspotAnswerManager.answerIndex].requiredItems[0]"></span>
@@ -1063,24 +1077,32 @@
 											ng-mouseout="hoverItem = false"
 											ng-if="item.count > 0"
 										>
-											<div class="item-icon">
-												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+											<div>
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+													<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
+													</div>
+												</div>
+												<div class="item-options" ng-class="{'show': hoverItem}">
+													
+													<div class="item-quantity">
+														<span>Quantity</span>
+														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 0)"/>
+													</div>
+													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+												</div>
 											</div>
-											<div class="item-content">
-												<div class="item-name">
-													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
-												</div>
-												<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
-													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-												</div>
-											</div>
-											<div class="item-options" ng-class="{'show': hoverItem}">
-												
-												<div class="item-quantity">
-													<span>Quantity</span>
-													<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 0)"/>
-												</div>
-												<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<input id="{{item.id}}-give-once" type="checkbox"
+												ng-model="item.firstVisitOnly"
+												value="false" /> 
+												<label for="{{item.id}}-give-once">Give On First Visit  Only</label>
 											</div>
 										</li>
 									</ul>
@@ -1102,23 +1124,32 @@
 											ng-mouseout="hoverItem = false"
 											ng-if="item.count < 0"
 										>
-											<div class="item-icon">
-												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+											<div>
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+													<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
+													</div>
+												</div>
+												<div class="item-options" ng-class="{'show': hoverItem}">
+													<div class="item-quantity">
+														<span>Quantity</span>
+														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 1)"/>
+													</div>
+													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+												</div>
 											</div>
-											<div class="item-content">
-												<div class="item-name">
-													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
-												</div>
-												<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
-													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-												</div>
-											</div>
-											<div class="item-options" ng-class="{'show': hoverItem}">
-												<div class="item-quantity">
-													<span>Quantity</span>
-													<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 1)"/>
-												</div>
-												<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<input id="{{item.id}}-give-once" type="checkbox"
+												ng-model="item.firstVisitOnly"
+												value="false" /> 
+												<label for="{{item.id}}-give-once">Take On First Visit  Only</label>
 											</div>
 										</li>
 									</ul>
@@ -1147,6 +1178,10 @@
 									<button class="give-item-button" ng-click="addItemToNode(selectedItem, 1)">Give Item</button>
 									<button class="take-item-button" ng-click="addItemToNode(selectedItem, 0)">Take Item</button>
 								</div>
+								<div class="advanced-option">
+									<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
+									<label for="show-advanced">Show Advanced Options</label>
+								</div>
 							</div>
 						</div>
 						<!-- required items panel for answer choices -->
@@ -1156,8 +1191,8 @@
 								<div class="item-heading">
 									<h3>Required Items for Answer</h3>
 									<span class="hide-popup icon-cross"
-									ng-click="showRequiredItems = false"
-									ng-keypress="$event.keyCode === 13 ? showRequiredItems = false : ''"
+									ng-click="toggleRequiredItemsModal()"
+									ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal() : ''"
 									tabindex="0"></span>
 								</div>
 								<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
@@ -1187,7 +1222,7 @@
 												<span>Quantity</span>
 												<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 0)"/>
 											</div>
-											<div class="required-is-max-option" ng-if="showAdvancedOptions">
+											<div class="advanced-option" ng-if="showAdvancedOptions">
 												<input id="{{item.id}}-limit" type="checkbox"
 												ng-model="item.requiredIsMax"
 												value="false" /> 
@@ -1220,16 +1255,17 @@
 									</dl>
 									<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 								</div>
-								<div class="hide-answer-option">
-									<input id="hide-answer" type="checkbox"
-									ng-model="currentAnswer.hideAnswer"
-									value="false" /> 
-									<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
-								</div>
-								<div>
-									<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
-									<label for="show-advanced">Show Advanced Options</label>
-								</div>
+							</div>
+
+							<div class="advanced-option">
+								<input id="hide-answer" type="checkbox"
+								ng-model="currentAnswer.hideAnswer"
+								value="false" /> 
+								<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
+							</div>
+							<div class="advanced-option">
+								<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
+								<label for="show-advanced">Show Advanced Options</label>
 							</div>
 						</div>
 					</div>
@@ -1320,30 +1356,33 @@
 											ng-mouseout="hoverItem = false"
 											ng-if="item.count > 0"
 										>
-											<div class="item-icon">
-												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+											<div>
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+													<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
+													</div>
+												</div>
+												<div class="item-options" ng-class="{'show': hoverItem}">
+													
+													<div class="item-quantity">
+														<span>Quantity</span>
+														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 0)"/>
+													</div>
+													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+												</div>
 											</div>
-											<div class="item-content">
-												<div class="item-name">
-													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
-												</div>
-												<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
-													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-												</div>
-												<div class="apply-once-option" ng-if="showAdvancedOptions">
-													<input id="{{item.id}}-give-once" type="checkbox"
-													ng-model="item.firstVisitOnly"
-													value="false" /> 
-													<label for="{{item.id}}-give-once">Give On First Visit  Only</label>
-												</div>
-											</div>
-											<div class="item-options" ng-class="{'show': hoverItem}">
-												
-												<div class="item-quantity">
-													<span>Quantity</span>
-													<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 0)"/>
-												</div>
-												<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<input id="{{item.id}}-give-once" type="checkbox"
+												ng-model="item.firstVisitOnly"
+												value="false" /> 
+												<label for="{{item.id}}-give-once">Give On First Visit  Only</label>
 											</div>
 										</li>
 									</ul>
@@ -1365,29 +1404,32 @@
 											ng-mouseout="hoverItem = false"
 											ng-if="item.count < 0"
 										>
-											<div class="item-icon">
-												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+											<div>
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+													<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
+													</div>
+												</div>
+												<div class="item-options" ng-class="{'show': hoverItem}">
+													<div class="item-quantity">
+														<span>Quantity</span>
+														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 1)"/>
+													</div>
+													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+												</div>
 											</div>
-											<div class="item-content">
-												<div class="item-name">
-													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
-												</div>
-												<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
-													<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-												</div>
-												<div class="apply-once-option"  ng-if="showAdvancedOptions">
-													<input id="{{item.id}}-give-once" type="checkbox"
-													ng-model="item.firstVisitOnly"
-													value="false" /> 
-													<label for="{{item.id}}-give-once">Take on First Visit Only</label>
-												</div>
-											</div>
-											<div class="item-options" ng-class="{'show': hoverItem}">
-												<div class="item-quantity">
-													<span>Quantity</span>
-													<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateCount(event, item, 1)"/>
-												</div>
-												<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+
+											<div class="advanced-option"  ng-if="showAdvancedOptions">
+												<input id="{{item.id}}-give-once" type="checkbox"
+												ng-model="item.firstVisitOnly"
+												value="false" /> 
+												<label for="{{item.id}}-give-once">Take on First Visit Only</label>
 											</div>
 										</li>
 									</ul>
@@ -1417,10 +1459,18 @@
 									</dl>
 									<button class="give-item-button" ng-click="addItemToNode(selectedItem, 1)">Give Item</button>
 									<button ng-click="addItemToNode(selectedItem, 0)">Take Item</button>
-									<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced" ng-show="nodeItems[0]"/>
-									<label for="show-advanced" ng-show="nodeItems[0]">Show Advanced Options</label>
+									<div class="advanced-option">
+										<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
+										<label for="show-advanced">Show Advanced Options</label>
+									</div>
 								</div>
 							</div>
+
+							<button class="save-button important-button"
+							ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+							type="button"
+							ng-click="showItemSelection = false">Done
+							</button>
 						</div>
 						<button type="button"
 							class="item-button"
@@ -1429,7 +1479,7 @@
 						<button class="save-button important-button"
 							ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 							type="button"
-							ng-click="saveAndClose()">Done
+							ng-click="showItemSelection = false">Done
 						</button>
 					</div>
 				</div>
