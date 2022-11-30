@@ -707,14 +707,14 @@
 											<div class="selector">
 												<dl ng-class="{'row': !availableItems[0] }">
 													<dt ng-if="!availableItems[0]" class="blank-selection">
-														<i class="arrow-bottom"></i>
+														<i class="arrow-top"></i>
 													</dt>
 													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 														<div class="option-contents">
 															<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
 															{{inventoryItems[getItemIndex(selectedItem)].name}}
 														</div>
-														<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
+														<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
 													</dt>
 													<div  class="options" ng-show="showDropdown">
 														<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
@@ -971,7 +971,7 @@
 											<div class="selector">
 												<dl ng-class="{'row': !availableItems[0] }">
 													<dt ng-if="!availableItems[0]" class="blank-selection">
-														<i class="arrow-bottom"></i>
+														<i class="arrow-top"></i>
 													</dt>
 													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 														<div class="option-contents">
@@ -1159,14 +1159,14 @@
 								<div class="selector">
 									<dl ng-class="{'row': !availableItems[0] }">
 										<dt ng-if="!availableItems[0]" class="blank-selection">
-											<i class="arrow-bottom"></i>
+											<i class="arrow-top"></i>
 										</dt>
 										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 											<div class="option-contents">
 												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
 												{{inventoryItems[getItemIndex(selectedItem)].name}}
 											</div>
-											<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
+											<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
 										</dt>
 										<div  class="options" ng-show="showDropdown">
 											<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
@@ -1237,14 +1237,14 @@
 								<div class="selector">
 									<dl ng-class="{'row': !availableItems[0] }">
 										<dt ng-if="!availableItems[0]" class="blank-selection">
-											<i class="arrow-bottom"></i>
+											<i class="arrow-top"></i>
 										</dt>
 										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 											<div class="option-contents">
 												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
 												{{inventoryItems[getItemIndex(selectedItem)].name}}
 											</div>
-											<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
+											<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
 										</dt>
 										<div  class="options" ng-show="showDropdown">
 											<dt ng-repeat="item in availableItems"  ng-click="selectItem(item)">
@@ -1440,14 +1440,14 @@
 								<div class="selector">
 									<dl ng-class="{'row': !availableItems[0] }">
 										<dt ng-if="!availableItems[0]" class="blank-selection">
-											<i class="arrow-bottom"></i>
+											<i class="arrow-top"></i>
 										</dt>
 										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 											<div class="option-contents">
 												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
 												{{inventoryItems[getItemIndex(selectedItem)].name}}
 											</div>
-											<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
+											<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
 										</dt>
 										<div  class="options" ng-show="showDropdown">
 											<dt ng-repeat="item in availableItems"
