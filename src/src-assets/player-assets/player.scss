@@ -241,7 +241,9 @@ h1 {
 	}
 
 	&.hotspot-mode {
+		padding: 5px 30px 10px 30px;
 		max-height: 65px;
+		white-space: normal;
 
 		h2 {
 			max-height: 65px;
