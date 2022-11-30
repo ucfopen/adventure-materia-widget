@@ -60,7 +60,7 @@
 			</div>
 		</div>
 
-		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
+		<div class="backgroundcover" ng-class="{ show: feedback || inventoryUpdate }"></div>
 
 		<div class="inventory-update"
 			ng-show="inventoryUpdate"
@@ -146,7 +146,7 @@
 				ng-show="type == MC">
 				<button
 					class="answer"
-					ng-if="!answer.hideAnswer && checkInventory(answer)[0]"
+					ng-if="!(answer.hideAnswer && checkInventory(answer).length)"
 					ng-class="{'nonselectable' : checkInventory(answer)[0]}"
 					ng-repeat="answer in answers"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"

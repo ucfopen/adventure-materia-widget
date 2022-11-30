@@ -57,6 +57,7 @@ body {
 .header {
 	display: none; // default is display:none so header doesn't "flash" when the title is supposed to be hidden. Thanks Angular!
 	width:100%;
+	min-height: 50px;
 	text-align:center;
 	background:$blue;
 	padding:10px 0px;
@@ -501,6 +502,10 @@ h1 {
 				}
 			}
 
+			.answer-text {
+				max-width: calc(100% - 34px);
+			}
+
 			.answer-required-items {
 				display: flex;
 				align-items: center;
@@ -521,7 +526,7 @@ h1 {
 					align-items: center;
 					flex-direction: row;
 					
-					margin-right: 5px;
+					margin: 5px 5px 5px 0;
 					padding: 5px;
 					
 					background: $color-primary;
@@ -532,6 +537,7 @@ h1 {
 					img {
 						width: 24px;
 						height: 24px;
+						margin-right: 5px;
 					}
 
 					.item-quantity {
@@ -898,6 +904,7 @@ h1 {
 			max-width: 45px;
 			max-height: 45px;
 			object-fit: cover;
+			margin-right: 5px;
 		}
 	}
 
