@@ -145,9 +145,12 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					# Check if item is first visit only and player has visited this node before
 					if (!$scope.visitedNodes.some((n) => n is $scope.question.id) || $scope.visitedNodes.some((n) => n is $scope.question.id) and !item.firstVisitOnly)
 						# Inventory update
-						if q_i.count < 0
+						if q_i.count < 0 or q_i.takeAll
 							# Only show removed items if player has the item in inventory
 							if $scope.inventory.some((i) => i.id is q_i.id)
+								# Can't take more than what is in player inventory
+								if q_i.tempCount > i.count or q_i.takeAll
+									q_i.count = -1 * i.count
 								$scope.removedItems.push(q_i)
 						else
 							$scope.addedItems.push(q_i)
@@ -159,14 +162,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 								p_i.count += q_i.count
 								# Remove item from inventory
 								if (p_i.count <= 0)
-									$scope.inventory.splice i, 0
+									$scope.inventory.splice i, 1
 						if (! hasItem)
 							newItem = {
 								...q_i
 								new: true
 							}
 							$scope.inventory.push(newItem)
-
 			if ($scope.removedItems[0] || $scope.addedItems[0])
 				$scope.inventoryUpdate = true
 				if $scope.addedItems[0]

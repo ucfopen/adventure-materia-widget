@@ -2141,6 +2141,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						count: 1
 						tempCount: 1
 						firstVisitOnly: false
+						takeAll: false
 					}
 				# Item will be removed from player
 				else
@@ -2149,6 +2150,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						count: -1
 						tempCount: 1
 						firstVisitOnly: false
+						takeAll: false
 					}
 				$scope.nodeItems.push(newItem)
 				# Remove item from the select dropdown

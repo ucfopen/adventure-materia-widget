@@ -1151,6 +1151,13 @@
 												value="false" /> 
 												<label for="{{item.id}}-give-once">Take On First Visit  Only</label>
 											</div>
+
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<input id="{{item.id}}-take-all" type="checkbox"
+												ng-model="item.takeAll"
+												value="false" /> 
+												<label for="{{item.id}}-take-all">Take All</label>
+											</div>
 										</li>
 									</ul>
 								</div>
@@ -1430,6 +1437,12 @@
 												ng-model="item.firstVisitOnly"
 												value="false" /> 
 												<label for="{{item.id}}-give-once">Take on First Visit Only</label>
+											</div>
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<input id="{{item.id}}-take-all" type="checkbox"
+												ng-model="item.takeAll"
+												value="false" /> 
+												<label for="{{item.id}}-take-all">Take All</label>
 											</div>
 										</li>
 									</ul>
