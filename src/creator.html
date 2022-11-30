@@ -1500,7 +1500,7 @@
 			<node-tooltips ng-show="hoveredNode.showTooltips">
 				<div class="tooltip"
 					ng-repeat="tooltip in hoveredNode.tooltips"
-					ng-show="tooltip.text || tooltip.givesItems[0] || tooltip.removedItems[0]">
+					ng-show="tooltip.text != 'N/A' || tooltip.givesItems[0] || tooltip.removedItems[0]">
 					<span class="tooltip-title"
 					ng-if="tooltip.text">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
 					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /><span ng-if="!inventoryItems[getItemIndex(item)].icon.url"></span> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : 1}})</p>

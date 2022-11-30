@@ -399,8 +399,13 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				newAnswer = {}
 				newAnswer.parent = tree.id
 
+				parentNode = findNode(tree, tree.id)
+
 				if answer.text isnt null and answer.text.length > 0 then newAnswer.text = answer.text
-				else newAnswer.text = "[No Answer Text]"
+				else if parentNode.type is "mc" or parentNode.type is "shortanswer" 
+					newAnswer.text = "[No Answer Text]"
+				else
+					newAnswer.text = "N/A"
 
 				answers.push newAnswer
 
