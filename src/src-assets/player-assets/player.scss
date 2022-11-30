@@ -93,14 +93,10 @@ body {
 	font-size: 24px;
 	color: $blue;
 
-	background: $color-accent-highlight;
+	background: rgba(0,0,0,0.1);
 	border: none;
 	border-radius:5px;
 	cursor: pointer;
-
-	&:focus {
-		background: rgba(0,0,0,0.1);
-	}
 
 	&:hover {
 		background: $blue-lightest;
@@ -449,6 +445,7 @@ h1 {
 		}
 	}
 	.mc {
+		position: relative;
 		max-height: 250px;
 
 		overflow-y: auto;
@@ -457,9 +454,10 @@ h1 {
 			display: flex;
 			align-items: center;
 			flex-direction: row;
-			margin-bottom:10px;
+			flex-wrap: wrap;
 			width: 100%;
-			gap: 15px;
+			margin-bottom:10px;
+			// padding-left: 20px;
 
 			color:#000000;
 
@@ -476,32 +474,22 @@ h1 {
 			counter-increment: q;
 			cursor: pointer;
 
-			> div {
-				display:flex;
-				align-items: center;
-				justify-content: space-between;
-				flex-wrap: wrap;
-				width: 100%;
-				flex-direction: row;
+			&:hover, &:focus {
+				color: $blue;
+				background: #fafafa;
 			}
 
-			.answer-required-items {
-				float: right;
-				display: flex;
-				align-items: center;
-				flex-direction: row;
-				font-size: 0.8em;
-			}
-			
-			.answer-required-items span {
-				display: flex;
-				align-items: center;
-				flex-direction: row;
+			&:before {
+				content: counter(q, upper-alpha) ")";
+				padding-right: 10px;
 			}
 
-			img {
-				width: 35px;
-				height: 35px;
+			&:focus {
+				outline: thick solid $blue-focus;
+			}
+
+			&:active {
+				outline: 0;
 			}
 
 			&.nonselectable {
@@ -513,21 +501,44 @@ h1 {
 				}
 			}
 
-			&:hover, &:focus {
-				color: $blue;
-			}
+			.answer-required-items {
+				display: flex;
+				align-items: center;
+				flex-direction: row;
+				font-size: 0.8em;
+				margin-left: auto;
 
-			&:before {
-				content: counter(q, upper-alpha);
-				padding-right: 15px;
-			}
+				&:before {
+					margin-left: 10px;
+					padding: 5px;
+					content: "Requires: ";
+					font-size: 0.8em;
+					font-style: italic;
+				}
 
-			&:focus {
-				outline: thick solid $blue-focus;
-			}
+				.required-item {
+					display: flex;
+					align-items: center;
+					flex-direction: row;
+					
+					margin-right: 5px;
+					padding: 5px;
+					
+					background: $color-primary;
+					border: solid 1px $gray-lighter;
+					// background: $gray-lightest;
+					border-radius: 3px;
+	
+					img {
+						width: 24px;
+						height: 24px;
+					}
 
-			&:active {
-				outline: 0;
+					.item-quantity {
+						margin-left: 5px;
+						font-size: 0.8em;
+					}
+				}
 			}
 		}
 	}

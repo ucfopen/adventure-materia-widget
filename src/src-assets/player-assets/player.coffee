@@ -267,7 +267,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		missingItems = $scope.checkInventory($scope.q_data.answers[index].options)
 
 		if missingItems[0]
-			string = missingItems.map((item) -> "#{item.name} (amount: #{item.count});")
+			string = missingItems.map((item) ->
+				" #{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{$scope.itemSelection[$scope.getItemIndex(item)].count})"
+			)
 			$scope.feedback = "Requires the items: #{string}"
 			return
 
