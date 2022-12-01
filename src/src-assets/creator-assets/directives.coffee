@@ -1015,7 +1015,7 @@ Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 				removedItems = []
 				givesItems = []
 
-				if node.items
+				if node.items?.length > 0
 					for item in node.items
 						if item.count > 0
 							givesItems.push item

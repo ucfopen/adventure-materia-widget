@@ -60,7 +60,7 @@
 			</div>
 		</div>
 
-		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
+		<div class="backgroundcover" ng-class="{ show: feedback || inventoryUpdate }"></div>
 
 		<div class="inventory-update"
 			ng-show="inventoryUpdate"
@@ -146,41 +146,20 @@
 				ng-show="type == MC">
 				<button
 					class="answer"
+					ng-if="!(answer.hideAnswer && checkInventory(answer).length)"
+					ng-class="{'nonselectable' : checkInventory(answer)[0]}"
 					ng-repeat="answer in answers"
-					ng-if="!checkInventory(answer)[0]"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
 					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
 					tabindex="0">
-					<div>
-						{{answer.text}}
-						<div class="answer-required-items">
-							<span ng-repeat="item in answer.requiredItems">
-								<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
-								{{itemSelection[getItemIndex(item)].name}} ({{!item.requiredIsMax ? 'at least ' : 'no more than '}}{{item.count}})
-								<span ng-show="!$last">, </span>
-							</span>
-						</div>
-					</div>
-				</button>
-				<button
-					class="answer nonselectable"
-					ng-repeat="answer in answers"
-					ng-if="checkInventory(answer)[0] && !answer.hideAnswer"
-					data-index="{{answer.index}}"
-					data-link="{{answer.link}}"
-					tabindex="0">
-					<div>
-						{{answer.text}}
-						<div class="answer-required-items">
-							<span>Requires item(s): </span>
-							<span ng-repeat="item in answer.requiredItems">
-								<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
-								{{itemSelection[getItemIndex(item)].name}} ({{!item.requiredIsMax ? 'at least ' : 'no more than '}}{{item.count}})
-								<span ng-show="!$last">, </span>
-							</span>
-						</div>
+					<span class="answer-text">{{answer.text}}</span>
+					<div class="answer-required-items" ng-if="answer.requiredItems.length">
+						<span class="required-item" ng-repeat="item in answer.requiredItems">
+							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
+							{{itemSelection[getItemIndex(item)].name}} <span class="item-quantity">({{!item.requiredIsMax ? 'at least ' : 'no more than '}}{{item.count}})</span>
+						</span>
 					</div>
 				</button>
 			</div>
