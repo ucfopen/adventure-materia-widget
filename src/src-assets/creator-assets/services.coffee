@@ -513,6 +513,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				inventoryItems: inventoryItems
 				customIcons: customIcons
 				itemCount: itemCount
+		console.log(qset)
+		return qset
 
 
 	formatTreeDataForQset = (tree, items) ->

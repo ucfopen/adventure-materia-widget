@@ -43,6 +43,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				$scope.qset = qset
 				$scope.itemSelection = qset.options.inventoryItems
 
+				console.log("qset: ")
+				console.log(qset)
+
 				manageQuestionScreen(qset.items[0].options.id)
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
@@ -88,6 +91,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if questionId is 0
 			q_data = $scope.qset.items[0]
 
+		console.log("question data: ")
+		console.log(q_data)
+
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else if q_data.questions[0].text != "" then $scope.layout = q_data.options.asset.align
 		else $scope.layout = "image-only"
@@ -130,7 +136,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if $scope.question.options.items and $scope.question.options.items[0]
 
 			$scope.showInventoryBtn = true
-			console.log($scope.question.options.items)
 
 			for q_i in $scope.question.options.items
 				do (q_i) ->
@@ -143,7 +148,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							item = inventoryItem
 
 					# Check if item is first visit only and player has visited this node before
-					if (!$scope.visitedNodes.some((n) => n is $scope.question.id) || $scope.visitedNodes.some((n) => n is $scope.question.id) and !item.firstVisitOnly)
+					if ($scope.visitedNodes.some((n) => n is $scope.question.id) and q_i.firstVisitOnly)
+						# Move to next item
+					else
 						# Inventory update
 						if q_i.count < 0 or q_i.takeAll
 							# Only show removed items if player has the item in inventory

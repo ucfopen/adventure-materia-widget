@@ -1,0 +1,3249 @@
+{
+"name": "Worst First Day",
+    "qset": {
+        "version": 1,
+        "data": {
+        "items": [
+            {
+            "items": [
+                {
+                    "materiaType": "question",
+                    "id": "9e3a4afb-ecb0-44ac-8b4c-27e3aaa203aa",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "Hey, you. You're finally awake.\n\nToday's your first day at your new job. Don't screw it up!"
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 44,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "d73af557-e516-4802-9faf-290aeb5037c4"
+                    }
+                    ],
+                    "options": {
+                    "id": 0,
+                    "parentId": -1,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": 10,
+                        "icon": null,
+                        "$$hashKey": "object:7792",
+                        "tempCount": 10
+                        },
+                        {
+                        "id": 21,
+                        "count": 10,
+                        "icon": null,
+                        "$$hashKey": "object:7793",
+                        "tempCount": 10
+                        },
+                        {
+                        "id": 12,
+                        "count": 1,
+                        "tempCount": 1,
+                        "$$hashKey": "object:9388"
+                        }
+                    ]
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "1a34a897-f20e-460b-81f0-3c3f2ce3b806",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You have three different modes of transportation. Which do you use to go to work?"
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "ATV Four Wheeler",
+                        "value": 0,
+                        "options": {
+                        "link": 48,
+                        "linkMode": "new",
+                        "feedback": "",
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "53e54bcc-57ba-4dd9-92e2-4c6b2a6154e7"
+                    },
+                    {
+                        "text": "Shuttle",
+                        "value": 0,
+                        "options": {
+                        "link": 45,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "38813b83-fd5e-4800-91e6-c585919df384"
+                    },
+                    {
+                        "text": "Dodge Charger",
+                        "value": 0,
+                        "options": {
+                        "link": 46,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "de584e95-7e91-4a75-8d82-a48a171ad2f6"
+                    }
+                    ],
+                    "options": {
+                    "id": 44,
+                    "parentId": 0,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "24385a63-9bdd-40c7-9143-c1c918e6c450",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You hop onto the ATV, turn the ignition, and head to work. It takes twenty minutes to get to work."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 42,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "c8f092e4-9a0f-4fc8-9b89-54cda5a10933"
+                    }
+                    ],
+                    "options": {
+                    "id": 48,
+                    "parentId": 44,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 16,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:7819",
+                        "tempCount": 1
+                        },
+                        {
+                        "id": 12,
+                        "count": 20,
+                        "tempCount": 20,
+                        "$$hashKey": "object:7896"
+                        }
+                    ]
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "5528b46b-f032-40e2-8b07-ca7cc8a61f72",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You pull into the parking lot only to find there are no more spaces left, except for a small vehicles only spot near the dumpsters."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Park your ATV by the dumpster.",
+                        "value": 0,
+                        "options": {
+                        "link": 56,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 16,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:4819"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "b1507642-3f15-4f1e-b677-d7fa81c71efa"
+                    },
+                    {
+                        "text": "Park your Dodge Charger by the dumpster.",
+                        "value": 0,
+                        "options": {
+                        "link": 51,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 18,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:9136"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "7b1a6fe4-63de-4ac2-b3af-02ffa6c3b38b"
+                    },
+                    {
+                        "text": "Park somewhere else.",
+                        "value": 0,
+                        "options": {
+                        "link": 52,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "3884529c-3d52-4ac9-9cbf-0ec49360e577"
+                    }
+                    ],
+                    "options": {
+                    "id": 42,
+                    "parentId": 48,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "bded8149-4227-41a0-a9ae-44d4d6d3cb01",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "Your ATV fits perfectly into the spot."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 1,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "948aa140-2e83-4b16-8b4f-9847b02584f6"
+                    }
+                    ],
+                    "options": {
+                    "id": 56,
+                    "parentId": 42,
+                    "type": "narrative",
+                    "items": []
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "10c8e913-8426-446c-abc8-a50b37b2803b",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You approach the door to the building and attempt to open it. It is locked."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Look around",
+                        "value": 0,
+                        "options": {
+                        "link": 2,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "90e0c527-a85c-489a-8b68-29c37aa59bae"
+                    },
+                    {
+                        "text": "Kick door",
+                        "value": 0,
+                        "options": {
+                        "link": 3,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "aa3b8e80-a1d3-43e3-9141-e06460028f17"
+                    },
+                    {
+                        "text": "Unlock door",
+                        "value": 0,
+                        "options": {
+                        "link": 4,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 3,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:6469"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "ae27940e-3bc8-425e-bff9-fe7cff04d9ab"
+                    },
+                    {
+                        "text": "Do nothing (wait)",
+                        "value": 0,
+                        "options": {
+                        "link": 9,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "dc30a050-46fa-43c2-8ffa-3d961c6f756b"
+                    },
+                    {
+                        "text": "You see a person walking towards you. Ask them for help.",
+                        "value": 0,
+                        "options": {
+                        "link": 24,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 12,
+                            "count": 30,
+                            "tempCount": 30,
+                            "$$hashKey": "object:6663"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "2b80a662-30f8-4ca3-b91f-8d5a05b97c14"
+                    }
+                    ],
+                    "options": {
+                    "id": 1,
+                    "parentId": 56,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "740541f4-a904-4f5d-bdde-bccbcd85ea25",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You look around."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Look under the mat for a key.",
+                        "value": 0,
+                        "options": {
+                        "link": 6,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "069dcb31-caaa-4b98-a068-c27519eb5b8c"
+                    },
+                    {
+                        "text": "You see a cat hop down from a tree and walk around the corner of the building. Follow the cat.",
+                        "value": 0,
+                        "options": {
+                        "link": 7,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "a857f706-4757-4870-91a4-7c85ea6af497"
+                    },
+                    {
+                        "text": "There is a vending machine next to the door. Buy something from the vending machine.",
+                        "value": 0,
+                        "options": {
+                        "link": 57,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 21,
+                            "count": 3,
+                            "tempCount": 3,
+                            "$$hashKey": "object:8171"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "80efd811-1e51-4cd9-bd4f-208d73d013f4"
+                    },
+                    {
+                        "text": "Go back to the door.",
+                        "value": 0,
+                        "options": {
+                        "link": 1,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": true
+                        },
+                        "id": "eec52bc7-c974-4652-b54f-48d8ae646ec7"
+                    }
+                    ],
+                    "options": {
+                    "id": 2,
+                    "parentId": 1,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false,
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "a5ad40ca-be0d-4ed1-b491-ee16bf385e8a",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You find a key under the mat. You make a mental note to talk to security later."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 1,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "4d36ec22-c61b-46bf-a936-13e07d36b6fa"
+                    }
+                    ],
+                    "options": {
+                    "id": 6,
+                    "parentId": 2,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 3,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:7721"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "a750a48f-5348-42fb-accb-207fbb22ae1b",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": ""
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 8,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "c3901036-5dba-439d-9e64-20f3c6df80ac"
+                    }
+                    ],
+                    "options": {
+                    "id": 7,
+                    "parentId": 2,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 4,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:7711"
+                        }
+                    ]
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "d936d1ed-2ef8-4b5f-820f-1d8de62952a1",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You approach a back entrance."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Enter the door.",
+                        "value": 0,
+                        "options": {
+                        "link": 13,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "f22d9700-9257-44f8-886b-6ff3739088e7"
+                    },
+                    {
+                        "text": "Pet the cat in thanks.",
+                        "value": 0,
+                        "options": {
+                        "link": 14,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "b00f4efc-bbd9-44ab-a6bb-e672badf4740"
+                    }
+                    ],
+                    "options": {
+                    "id": 8,
+                    "parentId": 7,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "f0cafec1-a17f-49de-a781-daa0ed1d3ded",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You open the door."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 15,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "b400b1ca-6141-4116-a391-3269ce3bdc73"
+                    }
+                    ],
+                    "options": {
+                    "id": 13,
+                    "parentId": 8,
+                    "type": "narrative",
+                    "items": [],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "baa54ac0-be77-4abf-a860-3c190d721080",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "The cat purrs in gratitude."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 15,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "a3001cb1-b856-4fa2-a8cf-d37c1048e38f"
+                    }
+                    ],
+                    "options": {
+                    "id": 14,
+                    "parentId": 8,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 4,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:7746"
+                        }
+                    ]
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "2b401052-88b2-41e7-98a1-e4689c0c4052",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "VIP Meeting Room"
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Juggle some carrots",
+                        "value": 0,
+                        "options": {
+                        "link": 18,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 29,
+                            "count": 3,
+                            "tempCount": 3,
+                            "$$hashKey": "object:16896"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "e9a18808-62cb-4b0a-baec-9cd070b7d889"
+                    },
+                    {
+                        "text": "Give dramatic, heartfelt speech",
+                        "value": 0,
+                        "options": {
+                        "link": 19,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 31,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:16874"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "7889e688-f53a-446d-80bb-00796c792c96"
+                    },
+                    {
+                        "text": "Say a dad joke",
+                        "value": 0,
+                        "options": {
+                        "link": 86,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "10b098be-2c89-4a59-b5a9-2814e1d95f92"
+                    },
+                    {
+                        "text": "Excuse yourself from the room",
+                        "value": 0,
+                        "options": {
+                        "link": 87,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "ae116960-3045-450b-92e3-352bab9b1eb4"
+                    },
+                    {
+                        "text": "Juggle some ice cream bars",
+                        "value": 0,
+                        "options": {
+                        "link": 108,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 23,
+                            "count": 3,
+                            "tempCount": 3,
+                            "$$hashKey": "object:6368"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "34cf586f-6b24-485a-a148-f481b7b743ab"
+                    },
+                    {
+                        "text": "Juggle some cheesesticks",
+                        "value": 0,
+                        "options": {
+                        "link": 109,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 27,
+                            "count": 3,
+                            "tempCount": 3,
+                            "$$hashKey": "object:6591"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "cb3821ee-83f9-466b-b751-9e41c49aa261"
+                    }
+                    ],
+                    "options": {
+                    "id": 15,
+                    "parentId": 14,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "201213c2-c93a-4ad4-b296-9dfc05591709",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "Your mind blanks. Unsure what to do, you decide to juggle. You fail utterly, you carrots falling to the ground. You never were a great juggler."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "9792eced-6566-4e02-88f7-fa581a2ed162"
+                    }
+                    ],
+                    "options": {
+                    "id": 18,
+                    "parentId": 15,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": -10,
+                        "icon": null
+                        },
+                        {
+                        "id": 29,
+                        "count": -10,
+                        "icon": null
+                        },
+                        {
+                        "id": 32,
+                        "count": 3,
+                        "icon": null
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "8002ab24-25a9-4b69-9347-b0039abc99f0",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You recall the company's mission statement and values from the pamphlet you read earlier. You give a dramatic, heartfelt speech, to which you receive an outstanding applause. The meeting leader shakes your hand and hands you a VIP card along with some awesome company swag!"
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "ca5b4afd-7b58-4ff9-ac42-bcc6e5021505"
+                    }
+                    ],
+                    "options": {
+                    "id": 19,
+                    "parentId": 15,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": 20,
+                        "icon": null,
+                        "$$hashKey": "object:5560"
+                        },
+                        {
+                        "id": 13,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:5561"
+                        }
+                    ]
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "d032fdbc-ed2a-4e3e-adb5-0fba201394eb",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "On your way to your desk, you meet your coworkers."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Offer them cheesesticks!",
+                        "value": 0,
+                        "options": {
+                        "link": 20,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 27,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:14779"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "bf205a18-0cc5-4a51-8924-785315463fc8"
+                    },
+                    {
+                        "text": "Offer them ice cream!",
+                        "value": 0,
+                        "options": {
+                        "link": 75,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 23,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:14832"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "c4adde6b-c135-4238-832e-d7b8903fac5d"
+                    },
+                    {
+                        "text": "Offer them coffee!",
+                        "value": 0,
+                        "options": {
+                        "link": 76,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 25,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:14891"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "e2414775-92cb-454b-87da-cbb9a282f84f"
+                    },
+                    {
+                        "text": "Offer them your dirty carrots!",
+                        "value": 0,
+                        "options": {
+                        "link": 77,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 32,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:17814"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "690b2796-4c3d-4957-884c-36be099ded4d"
+                    },
+                    {
+                        "text": "Offer them some of your swag!",
+                        "value": 0,
+                        "options": {
+                        "link": 78,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 13,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:15017"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "8db0e17e-7f36-456f-936d-1cf4d905679c"
+                    },
+                    {
+                        "text": "Go to your desk",
+                        "value": 0,
+                        "options": {
+                        "link": 80,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "b552d600-9852-45c5-a047-983a211b8462"
+                    },
+                    {
+                        "text": "Offer them dirty string cheese!",
+                        "value": 0,
+                        "options": {
+                        "link": 116,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 39,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:6844"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "f5bfd465-90d6-4122-af89-3e749342512b"
+                    },
+                    {
+                        "text": "Offer them melted ice cream!",
+                        "value": 0,
+                        "options": {
+                        "link": 115,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 38,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:6951"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "d4a43d43-0044-4e80-9d19-2e3f4c3e818f"
+                    }
+                    ],
+                    "options": {
+                    "id": 74,
+                    "parentId": 19,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "113eb2e7-4dae-41ea-9d74-65e792b9cc31",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You reach your desk at last. You find a sandwich alignment chart and a note reading: \"Welcome to the team! It is standard procedure for new employees to answer life's most important question. How do you define a sandwich? Choose wisely.\""
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "A BLT is a Sandwich",
+                        "value": 0,
+                        "options": {
+                        "link": 27,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 173,
+                            "y": 113,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "b8b10fe7-c0cc-497b-956e-697782f924c3"
+                    },
+                    {
+                        "text": "A Chip Butty is a Sandwich.",
+                        "value": 0,
+                        "options": {
+                        "link": 27,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 329,
+                            "y": 111,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "2f380d68-1b09-4393-8cbe-256b70e59aaa"
+                    },
+                    {
+                        "text": "Ice Cream Between Waffles is a Sandwich",
+                        "value": 0,
+                        "options": {
+                        "link": 27,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 474,
+                            "y": 115,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "c3fd4da4-69aa-4e1a-936a-e6f2809425a4"
+                    },
+                    {
+                        "text": "A sub is a sandwich.",
+                        "value": 0,
+                        "options": {
+                        "link": 30,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 169,
+                            "y": 220,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "b1bafc6a-ab66-457a-a6ed-1a276c956b76"
+                    },
+                    {
+                        "text": "A hot dog is a sandwich",
+                        "value": 0,
+                        "options": {
+                        "link": 30,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 322,
+                            "y": 214,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "44b07c13-1204-42f3-bcd5-e102397a316b"
+                    },
+                    {
+                        "text": "An ice cream taco is a sandwich.",
+                        "value": 0,
+                        "options": {
+                        "link": 30,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 471,
+                            "y": 216,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "7e2bad42-5fdb-4c09-8e97-ee28a666a498"
+                    },
+                    {
+                        "text": "A chicken wrap is a sandwich",
+                        "value": 0,
+                        "options": {
+                        "link": 30,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 171,
+                            "y": 322,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "b571ebbb-4789-4894-b37f-e726a11a2244"
+                    },
+                    {
+                        "text": "A Poptart is a Sandwich",
+                        "value": 0,
+                        "options": {
+                        "link": 70,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 471,
+                            "y": 316,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "f8c6f819-f420-47d5-bc54-d5b5bd834ba7"
+                    },
+                    {
+                        "text": "A sushi burrito is a sandwich",
+                        "value": 0,
+                        "options": {
+                        "link": 30,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false,
+                        "svg": {
+                            "type": "rect",
+                            "x": 317,
+                            "y": 317,
+                            "width": 100,
+                            "height": 75,
+                            "fill": "green",
+                            "stroke": 2,
+                            "scaleXOffset": 90,
+                            "scaleYOffset": 65,
+                            "scaleXFactor": 0,
+                            "scaleYFactor": 0
+                        }
+                        },
+                        "id": "3b21fa76-82d9-4d72-8115-c4482bcb70d9"
+                    }
+                    ],
+                    "options": {
+                    "id": 20,
+                    "parentId": 74,
+                    "type": "hotspot",
+                    "items": [],
+                    "asset": {
+                        "materiaType": "asset",
+                        "align": "right",
+                        "id": "OsvJo",
+                        "url": "https://materia.qa.cdl.ucf.edu/media/OsvJo",
+                        "type": "image",
+                        "alt": ""
+                    },
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "3393a482-1195-4699-a30d-e6344aeb7693",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You've chosen to define a sandwich as having two separate pieces of bread."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 93,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "9bcdf3cc-98ac-462b-ad9a-0e72fd744e18"
+                    }
+                    ],
+                    "options": {
+                    "id": 27,
+                    "parentId": 20,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 8,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:12341"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "a86f6ecc-6180-4fe9-b1f2-39c26df87975",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You're not exactly a sandwich purist, but you're not a radicalist either."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 93,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "a3733da8-4e38-4c2c-9fc8-9828580004fb"
+                    }
+                    ],
+                    "options": {
+                    "id": 30,
+                    "parentId": 20,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 10,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:6304"
+                        }
+                    ]
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "8a4c7dc0-c58e-469d-a24f-699cb6221159",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": ""
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "The cat you met from earlier suddenly reappears, beckoning you with its tail. Follow the cat.",
+                        "value": 0,
+                        "options": {
+                        "link": 95,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 4,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:20530"
+                            },
+                            {
+                            "id": 6,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:20583"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "e7a3b06d-c0b3-4da7-85af-abc1b33b09fd"
+                    },
+                    {
+                        "text": "Finish your training (best)",
+                        "value": 0,
+                        "options": {
+                        "link": 104,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 1,
+                            "count": 50,
+                            "tempCount": 50,
+                            "$$hashKey": "object:25074"
+                            },
+                            {
+                            "id": 4,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:25090"
+                            },
+                            {
+                            "id": 8,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:25105"
+                            },
+                            {
+                            "id": 13,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:25120"
+                            },
+                            {
+                            "id": 14,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:25135"
+                            },
+                            {
+                            "id": 19,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:25150"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "7ca5e1ca-de82-4e9f-a0a4-39ef874d353e"
+                    },
+                    {
+                        "text": "Finish your training (mid)",
+                        "value": 0,
+                        "options": {
+                        "link": 106,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "78c72da5-1253-4728-a11e-0e5b8caca2f9"
+                    },
+                    {
+                        "text": "Finish your training (worst)",
+                        "value": 0,
+                        "options": {
+                        "link": 107,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 34,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:25943"
+                            },
+                            {
+                            "id": 36,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:26833"
+                            },
+                            {
+                            "id": 32,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:26862"
+                            },
+                            {
+                            "id": 6,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:26875"
+                            },
+                            {
+                            "id": 1,
+                            "count": 30,
+                            "tempCount": 30,
+                            "$$hashKey": "object:11630"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "9a8865de-5e8c-4afc-8a65-9c75fe7a9208"
+                    }
+                    ],
+                    "options": {
+                    "id": 93,
+                    "parentId": 30,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "5b1fad59-c989-4577-86f7-d09bc997e20a",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "The cat leads you up, down, left, down, right, until you've completely forgotten where you are. At least, you descend some steps to a heavy black door with the words \"RSA Only\" written on it. You recognize this as the Radical Sandwich Anarchy."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Unlock the door.",
+                        "value": 0,
+                        "options": {
+                        "link": 101,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 3,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:8314"
+                            }
+                        ],
+                        "hideAnswer": false
+                        },
+                        "id": "c75067b7-490d-4fea-b68e-283db19bb4c2"
+                    },
+                    {
+                        "text": "Turn around. You've changed your mind!",
+                        "value": 0,
+                        "options": {
+                        "link": 93,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "cd5b5d14-571b-485e-8481-e774e1706a32"
+                    },
+                    {
+                        "text": "Ask the cat to open the door.",
+                        "value": 0,
+                        "options": {
+                        "link": 110,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 4,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:8599"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "aef83f60-a4c3-449f-9684-8e951b7f0351"
+                    },
+                    {
+                        "text": "Ask the cat to open the door.",
+                        "value": 0,
+                        "options": {
+                        "link": 121,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [
+                            {
+                            "id": 41,
+                            "count": 1,
+                            "tempCount": 1,
+                            "$$hashKey": "object:11602"
+                            }
+                        ],
+                        "hideAnswer": true
+                        },
+                        "id": "010e9e45-adc5-40c2-810a-b08f36b911cf"
+                    }
+                    ],
+                    "options": {
+                    "id": 95,
+                    "parentId": 93,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false,
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": null,
+                    "nodeId": 101,
+                    "type": "Adventure",
+                    "questions": [
+                    {
+                        "text": "You are indicted into the Radical Sandwich Anarchy and sworn to silence. You have a new mission, and that is to set sandwiches free."
+                    }
+                    ],
+                    "options": {
+                    "id": 101,
+                    "parentId": 95,
+                    "type": "end",
+                    "items": [],
+                    "finalScore": 100
+                    },
+                    "answers": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "e6b975af-7671-49be-97cb-634e98c80620",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "The cat scratches at the door. You hear sounds of movement on the other side before it opens, revealing darkness. On the floor sits a cake."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Turn around fast! This is just getting weird.",
+                        "value": 0,
+                        "options": {
+                        "link": 93,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "61e21a53-b28c-41fa-853f-883368ee849d"
+                    },
+                    {
+                        "text": "Obviously, that's not a cake, but a sandwich. You know what you have to do.",
+                        "value": 0,
+                        "options": {
+                        "link": 123,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "af37d7d7-e8fa-4115-be64-843b9b88ff3c"
+                    }
+                    ],
+                    "options": {
+                    "id": 110,
+                    "parentId": 95,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false,
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": null,
+                    "nodeId": 123,
+                    "type": "Adventure",
+                    "questions": [
+                    {
+                        "text": "You send out a message to your coworkers that lunch is on you, and you're having sandwiches. You smile to yourself. This is only the beginning."
+                    }
+                    ],
+                    "options": {
+                    "id": 123,
+                    "parentId": 110,
+                    "type": "end",
+                    "items": [],
+                    "finalScore": 100
+                    },
+                    "answers": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "c29be9fe-4054-49cb-a5ce-027e2d180e70",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "The cat just stares at you. Their eyes glitter with what you believe is amusement."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 95,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "af688d5c-9cb8-49e7-9d41-144ff8d2d6d2"
+                    }
+                    ],
+                    "options": {
+                    "id": 121,
+                    "parentId": 95,
+                    "type": "narrative",
+                    "items": [],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": null,
+                    "nodeId": 104,
+                    "type": "Adventure",
+                    "questions": [
+                    {
+                        "text": "At the end of your training, your boss sends you an email. \"Congratulations! You are our very first employee to have received a raise on their first day. Thank you for going above and beyond, and we very much look forward to working with you!\""
+                    }
+                    ],
+                    "options": {
+                    "id": 104,
+                    "parentId": 93,
+                    "type": "end",
+                    "items": [],
+                    "finalScore": 100
+                    },
+                    "answers": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": null,
+                    "nodeId": 106,
+                    "type": "Adventure",
+                    "questions": [
+                    {
+                        "text": "Congratulations! You've completed your first day of work with relatively few troubles."
+                    }
+                    ],
+                    "options": {
+                    "id": 106,
+                    "parentId": 93,
+                    "type": "end",
+                    "items": [],
+                    "finalScore": 100
+                    },
+                    "answers": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": null,
+                    "nodeId": 107,
+                    "type": "Adventure",
+                    "questions": [
+                    {
+                        "text": "Your boss informs you that you are not a good fit for the job."
+                    }
+                    ],
+                    "options": {
+                    "id": 107,
+                    "parentId": 93,
+                    "type": "end",
+                    "items": [],
+                    "finalScore": 100
+                    },
+                    "answers": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "a7cd0031-ea11-4117-b186-bdc08cf639d1",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You've chosen to define a sandwich on your own terms."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 93,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "434bae99-facb-4e9b-80e8-f4fdede95649"
+                    }
+                    ],
+                    "options": {
+                    "id": 70,
+                    "parentId": 20,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 6,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:6314"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "b4d19d55-38ec-4026-af79-d640cc245249",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You give everyone an ice cream bar. They seem to really like you."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "fb85f942-befc-40e9-81f8-5005f28fa75f"
+                    }
+                    ],
+                    "options": {
+                    "id": 75,
+                    "parentId": 74,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": 10,
+                        "icon": null
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "db213538-9a37-4674-ac95-39a905ba1b95",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You give everyone a coffee. They seem to like you."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "2f44fe51-6a8d-424e-bedf-1d612b949ecc"
+                    }
+                    ],
+                    "options": {
+                    "id": 76,
+                    "parentId": 74,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": 10,
+                        "icon": null,
+                        "$$hashKey": "object:6348"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "3c658c6a-6363-4677-b234-8a3aeff67273",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You offer your coworkers your dirty carrots. \"Ewwwwww!\" They don't actually say, but you can see the disgust plainly on their faces."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "4f2964f6-df38-4577-8a1f-0fd1151dbc55"
+                    }
+                    ],
+                    "options": {
+                    "id": 77,
+                    "parentId": 74,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": -10,
+                        "icon": null,
+                        "$$hashKey": "object:7080"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "7c517aaa-9800-48b5-aef4-53d65b468481",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You offer them some of your swag. They are amazed and seem to really like you."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "5ac04c7c-c2f4-4163-bacc-4e767d90a5ec"
+                    }
+                    ],
+                    "options": {
+                    "id": 78,
+                    "parentId": 74,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": 20,
+                        "icon": null,
+                        "$$hashKey": "object:6326"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "bf73ede4-be73-4d80-9950-ba5fab1f2243",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You go to your desk."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 20,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "0db05df3-a00e-4470-a1d3-61b614352d30"
+                    }
+                    ],
+                    "options": {
+                    "id": 80,
+                    "parentId": 74,
+                    "type": "narrative",
+                    "items": [],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "a1a915ab-78cf-45c4-b605-b8a691e4735a",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "Your coworkers shake their head."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "97ebe0b3-570f-415e-9019-9d76e0d05e42"
+                    }
+                    ],
+                    "options": {
+                    "id": 115,
+                    "parentId": 74,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 36,
+                        "count": 1,
+                        "tempCount": 1,
+                        "$$hashKey": "object:7125"
+                        },
+                        {
+                        "id": 1,
+                        "count": -5,
+                        "tempCount": 5,
+                        "$$hashKey": "object:7171"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "cbfc442d-35f8-4717-91cf-e0978e909891",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "Your coworkers take the string cheese."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "af980d2c-f9dd-4fb7-b01d-fa5ac66aab0f"
+                    }
+                    ],
+                    "options": {
+                    "id": 116,
+                    "parentId": 74,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": -5,
+                        "tempCount": 5,
+                        "$$hashKey": "object:7310"
+                        },
+                        {
+                        "id": 36,
+                        "count": 1,
+                        "tempCount": 1,
+                        "$$hashKey": "object:7319"
+                        },
+                        {
+                        "id": 39,
+                        "count": -10,
+                        "tempCount": 10,
+                        "$$hashKey": "object:7505"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "6d5058f6-d234-4975-a241-b666fb07aa59",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "Why did the cranberry sauce turn red?\n\n\n...\n\n\n\"It saw the turkey dressing!\"\n\nThe room groans in unison. The VIP leader points to the door."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "8a0ff56d-af31-4e48-8392-57b1eeb5c218"
+                    }
+                    ],
+                    "options": {
+                    "id": 86,
+                    "parentId": 15,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": -10,
+                        "icon": null
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "024375e5-60e4-4ae5-928a-e92c5e924831",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You stand awkwardly for a few minutes before excusing yourself from the room."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 74,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "adbb43a6-2acf-4df0-ab74-6112cfc6220e"
+                    }
+                    ],
+                    "options": {
+                    "id": 87,
+                    "parentId": 15,
+                    "type": "narrative",
+                    "items": [],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "4d579598-c2dd-412a-aea0-94b08583613b",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "The ice cream bars melt from the exertion."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 15,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "a8678842-b7f9-46a6-9cc7-7d8b078d2b31"
+                    }
+                    ],
+                    "options": {
+                    "id": 108,
+                    "parentId": 15,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 38,
+                        "count": 1,
+                        "tempCount": 1,
+                        "$$hashKey": "object:6141"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "2945d65f-5ad9-4dda-a716-12ab8768bc01",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "The string cheeses slip out of your sweaty palms and land on the ground."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 15,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "d3048899-61fa-4b8d-9475-835c7dcd887c"
+                    }
+                    ],
+                    "options": {
+                    "id": 109,
+                    "parentId": 15,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 39,
+                        "count": 1,
+                        "tempCount": 1,
+                        "$$hashKey": "object:6204"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "41fd0467-3078-4e3d-a39a-18f83c5a5ce7",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "There are only four items left. What do you buy?"
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Monster Coffee! You need the energy boost.",
+                        "value": 0,
+                        "options": {
+                        "link": 58,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "93de22d6-6cc1-4d61-b93f-16446a6ccdb0"
+                    },
+                    {
+                        "text": "Cheesesticks! Some protein couldn't hurt.",
+                        "value": 0,
+                        "options": {
+                        "link": 59,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "d0b5f87f-b75a-4668-a573-c4926280bab7"
+                    },
+                    {
+                        "text": "Carrots! Vitamins and stuff.",
+                        "value": 0,
+                        "options": {
+                        "link": 60,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "6e931990-c8b6-4e98-a583-981d99c669b2"
+                    },
+                    {
+                        "text": "Ice Cream Bar! You deserve a treat.",
+                        "value": 0,
+                        "options": {
+                        "link": 61,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "c5309d1d-c21d-4175-a70f-16ad02c18b6a"
+                    },
+                    {
+                        "text": "Nothing! Go back to looking around.",
+                        "value": 0,
+                        "options": {
+                        "link": 2,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "3ab1d412-85b2-4449-b5c8-d95e52a189da"
+                    }
+                    ],
+                    "options": {
+                    "id": 57,
+                    "parentId": 2,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false,
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "f4c5e5d0-af51-42ba-abb6-97259b8db790",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You buy a coffee."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 57,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "c0488723-ed1a-4e9c-a2ef-834f15760d8f"
+                    }
+                    ],
+                    "options": {
+                    "id": 58,
+                    "parentId": 57,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 25,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:6088"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "52de8536-f945-4d62-a95a-145738535604",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You buy a cheesestick."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 57,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "b1ae29d7-c95e-4630-85a2-c51665d0465f"
+                    }
+                    ],
+                    "options": {
+                    "id": 59,
+                    "parentId": 57,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 27,
+                        "count": 3,
+                        "icon": null,
+                        "$$hashKey": "object:7652"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "38fca275-3a4a-466b-9497-ba5de30aac51",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You buy carrots."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 57,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "f9c288a0-9ae5-4adb-936e-c83b711501d6"
+                    }
+                    ],
+                    "options": {
+                    "id": 60,
+                    "parentId": 57,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 29,
+                        "count": 3,
+                        "icon": null,
+                        "$$hashKey": "object:7642"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "c41c7477-acc7-4e8a-9230-1444bdd0ec2d",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "It's your lucky day! The vending machine accidentally pushes more than one ice cream bars out."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 57,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "578ea248-8256-489f-bc2d-2f36c1b34cc6"
+                    }
+                    ],
+                    "options": {
+                    "id": 61,
+                    "parentId": 57,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 23,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:7680"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "a8538c0d-a71a-4b2c-8b3f-64f9bca94325",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": ""
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 1,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "108b2f37-b4fb-435d-bb55-463c9eda2790"
+                    }
+                    ],
+                    "options": {
+                    "id": 3,
+                    "parentId": 1,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": -10,
+                        "icon": null
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "26861bfb-7a68-4d0d-9d20-1557c050322e",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "The lock turns with a satisfying click."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": "Head to your desk.",
+                        "value": 0,
+                        "options": {
+                        "link": 119,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "9ddba1ab-20c7-44e0-b9da-bffcdc23955e"
+                    },
+                    {
+                        "text": "Go to the RSA door",
+                        "value": 0,
+                        "options": {
+                        "link": 120,
+                        "linkMode": "new",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "0f7cfe05-6ad6-4d49-a9f5-27b1b44e253f"
+                    }
+                    ],
+                    "options": {
+                    "id": 4,
+                    "parentId": 1,
+                    "type": "mc",
+                    "items": [],
+                    "randomize": false
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": null,
+                    "nodeId": 119,
+                    "type": "Adventure",
+                    "questions": [
+                    {
+                        "text": ""
+                    }
+                    ],
+                    "options": {
+                    "id": 119,
+                    "parentId": 4,
+                    "type": "blank",
+                    "items": []
+                    },
+                    "answers": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": null,
+                    "nodeId": 120,
+                    "type": "Adventure",
+                    "questions": [
+                    {
+                        "text": ""
+                    }
+                    ],
+                    "options": {
+                    "id": 120,
+                    "parentId": 4,
+                    "type": "blank",
+                    "items": []
+                    },
+                    "answers": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "51731daf-339c-49e3-9806-f1fdbe72b816",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You wait."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 1,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "f28e10d7-2b95-4592-9441-243054612fbf"
+                    }
+                    ],
+                    "options": {
+                    "id": 9,
+                    "parentId": 1,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 12,
+                        "count": 5,
+                        "icon": null,
+                        "$$hashKey": "object:8590"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "a05215f5-751d-42af-88e4-96379bf2279e",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": ""
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 20,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "67b9d13b-9337-4b24-834d-7195e9cb0a9d"
+                    }
+                    ],
+                    "options": {
+                    "id": 24,
+                    "parentId": 1,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 1,
+                        "count": 10,
+                        "icon": null,
+                        "$$hashKey": "object:9783"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "2b31c561-d038-4bd7-aaca-555cc93b6c73",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "The confidence you felt earlier remains. Of course you can fit your Dodge Charger into the very, very small spot. After all, you don't want to be late to work.\n\nYou manage to squeeze your Dodge Charger in, but not without knocking off your right side mirror and scraping your back right bumper.\n\nGood thing is, you're fifteen minutes early."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 1,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "24e7c20e-c4f8-45de-a17d-dec3ecbeb198"
+                    }
+                    ],
+                    "options": {
+                    "id": 51,
+                    "parentId": 42,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 18,
+                        "count": -1,
+                        "icon": null,
+                        "$$hashKey": "object:8407",
+                        "tempCount": 1
+                        },
+                        {
+                        "id": 34,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:7838",
+                        "tempCount": 1
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "7bbbb302-406d-438b-bcf4-0235463c42ca",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You find a parking spot in the lot two blocks over. It sets you 10 minutes behind schedule."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 1,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "523798bd-9db2-4b8e-a233-5424850c9840"
+                    }
+                    ],
+                    "options": {
+                    "id": 52,
+                    "parentId": 42,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 12,
+                        "count": 10,
+                        "tempCount": 10,
+                        "$$hashKey": "object:9025"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "9ad564fe-2e33-4318-85e3-9f8ecd133287",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You decide to take the shuttle. It takes 5 minutes to arrive at your stop, 20 minutes to get there, and 5 minutes to get to your building. You're five minutes late, but at least you saved on fuel emissions and gas money!"
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 1,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "6452ee12-354e-4f5a-bf44-2945306a966d"
+                    }
+                    ],
+                    "options": {
+                    "id": 45,
+                    "parentId": 44,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 19,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:7809",
+                        "tempCount": 1
+                        },
+                        {
+                        "id": 12,
+                        "count": 30,
+                        "tempCount": 30,
+                        "$$hashKey": "object:8041"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                },
+                {
+                    "materiaType": "question",
+                    "id": "51c9c253-0e4e-4aa8-8983-6dedc31600b5",
+                    "type": "Adventure",
+                    "created_at": 1669820818,
+                    "questions": [
+                    {
+                        "text": "You slide into your Dodge Charger and turn the ignition. The engine rumbles to a start before leveling off to a purr. You're feeling READY. You head to work. It takes you only five minutes."
+                    }
+                    ],
+                    "answers": [
+                    {
+                        "text": null,
+                        "value": 0,
+                        "options": {
+                        "link": 42,
+                        "linkMode": "existing",
+                        "feedback": null,
+                        "requiredItems": [],
+                        "hideAnswer": false
+                        },
+                        "id": "6bdcad7b-8791-4d45-9bee-c5a9ce63dc50"
+                    }
+                    ],
+                    "options": {
+                    "id": 46,
+                    "parentId": 44,
+                    "type": "narrative",
+                    "items": [
+                        {
+                        "id": 18,
+                        "count": 1,
+                        "icon": null,
+                        "$$hashKey": "object:8098",
+                        "tempCount": 1
+                        },
+                        {
+                        "id": 12,
+                        "count": 5,
+                        "tempCount": 5,
+                        "$$hashKey": "object:8126"
+                        }
+                    ],
+                    "hasLinkToOther": true
+                    },
+                    "assets": []
+                }
+                ],
+                "options": {
+                "nodeCount": 125,
+                "inventoryItems": [
+                    {
+                    "name": "Reputation",
+                    "id": 1,
+                    "description": "",
+                    "count": 1,
+                    "icon": {
+                        "name": "Heart64.png",
+                        "url": "assets/icons/Heart64.png",
+                        "$$hashKey": "object:89"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:665"
+                    },
+                    {
+                    "name": "Keys",
+                    "id": 3,
+                    "description": "One of the keys unlocks the entrance to the building. The other has the words \"RSA\" written on it.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Keys75.png",
+                        "url": "assets/icons/Keys75.png",
+                        "$$hashKey": "object:95"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:666"
+                    },
+                    {
+                    "name": "Friendly Cat",
+                    "id": 4,
+                    "description": "She won't stop rubbing against your legs. The tag on her collar reads, \"RSA\".",
+                    "count": 1,
+                    "icon": {
+                        "name": "Cat64.png",
+                        "url": "assets/icons/Cat64.png",
+                        "$$hashKey": "object:66"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:1673"
+                    },
+                    {
+                    "name": "Radical Sandwich Anarchist",
+                    "id": 6,
+                    "description": "",
+                    "count": 1,
+                    "icon": {
+                        "name": "Pizza64.png",
+                        "url": "assets/icons/Pizza64.png",
+                        "$$hashKey": "object:122"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:1674"
+                    },
+                    {
+                    "name": "Pure Sandwich Elitist",
+                    "id": 8,
+                    "description": "",
+                    "count": 1,
+                    "icon": {
+                        "name": "Sandwich64.png",
+                        "url": "assets/icons/Sandwich64.png",
+                        "$$hashKey": "object:133"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:1675"
+                    },
+                    {
+                    "name": "Neutral Sandwich Bystander",
+                    "id": 10,
+                    "description": "",
+                    "count": 1,
+                    "icon": {
+                        "name": "Hotdog64.png",
+                        "url": "assets/icons/Hotdog64.png",
+                        "$$hashKey": "object:91"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:1676"
+                    },
+                    {
+                    "name": "Time",
+                    "id": 12,
+                    "description": "How much time has passed.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Stopwatch64.png",
+                        "url": "assets/icons/Stopwatch64.png",
+                        "$$hashKey": "object:147"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:2316"
+                    },
+                    {
+                    "name": "VIP Card",
+                    "id": 13,
+                    "description": "The words \"Very Important Person\" are embossed in gold lettering on a marbled white background. You feel very important.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Card64.png",
+                        "url": "assets/icons/Card64.png",
+                        "$$hashKey": "object:34"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:2418"
+                    },
+                    {
+                    "name": "Friendly Coworkers",
+                    "id": 14,
+                    "description": "Your coworkers like you!",
+                    "count": 1,
+                    "icon": {
+                        "name": "PaintingPortrait64.png",
+                        "url": "assets/icons/PaintingPortrait64.png",
+                        "$$hashKey": "object:83"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:5688"
+                    },
+                    {
+                    "name": "ATV Four Wheeler",
+                    "id": 16,
+                    "description": "A beautiful red, dirt-caked, high-performance 4-stroke ATV.",
+                    "count": 1,
+                    "icon": {
+                        "is_custom": true,
+                        "type": "image",
+                        "url": "https://materia.qa.cdl.ucf.edu/media/AYsyG",
+                        "id": "AYsyG",
+                        "alt": "",
+                        "$$hashKey": "object:4233"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:4393"
+                    },
+                    {
+                    "name": "Dodge Charger",
+                    "id": 18,
+                    "description": "A brand-new, pristine Dodge Charger with a 7.19% auto loan interest rate. You have no doubts you'll pay it off.",
+                    "count": 1,
+                    "icon": {
+                        "is_custom": true,
+                        "type": "image",
+                        "url": "https://materia.qa.cdl.ucf.edu/media/4zMFk",
+                        "id": "4zMFk",
+                        "alt": "",
+                        "$$hashKey": "object:4271"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:4394"
+                    },
+                    {
+                    "name": "Shuttle",
+                    "id": 19,
+                    "description": "Saving gas.",
+                    "count": 1,
+                    "icon": {
+                        "is_custom": true,
+                        "type": "image",
+                        "url": "https://materia.qa.cdl.ucf.edu/media/WKztA",
+                        "id": "WKztA",
+                        "alt": "",
+                        "$$hashKey": "object:4309"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:4395"
+                    },
+                    {
+                    "name": "Money",
+                    "id": 21,
+                    "description": "You need this to buy things.",
+                    "count": 1,
+                    "icon": {
+                        "name": "BundleOfPlants64.png",
+                        "url": "assets/icons/BundleOfPlants64.png",
+                        "$$hashKey": "object:31"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:8158"
+                    },
+                    {
+                    "name": "Ice Cream Bar",
+                    "id": 23,
+                    "description": "A delicious treat with a nearing expiration date. Eat it fast!",
+                    "count": 1,
+                    "icon": {
+                        "name": "IceCream64.png",
+                        "url": "assets/icons/IceCream64.png",
+                        "$$hashKey": "object:66"
+                    },
+                    "firstVisitOnly": false,
+                    "$$hashKey": "object:9634"
+                    },
+                    {
+                    "name": "Monster Coffee",
+                    "id": 25,
+                    "description": "Brain fuel.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Coffee64.png",
+                        "url": "assets/icons/Coffee64.png",
+                        "$$hashKey": "object:43"
+                    },
+                    "firstVisitOnly": false,
+                    "$$hashKey": "object:9635"
+                    },
+                    {
+                    "name": "String Cheese",
+                    "id": 27,
+                    "description": "How many strings must you peel before you finish?",
+                    "count": 1,
+                    "icon": {
+                        "name": "Cheese64.png",
+                        "url": "assets/icons/Cheese64.png",
+                        "$$hashKey": "object:41"
+                    },
+                    "firstVisitOnly": false,
+                    "$$hashKey": "object:9636"
+                    },
+                    {
+                    "name": "Carrots",
+                    "id": 29,
+                    "description": "A healthy treat. You can feel your eyesight improving just by looking at them.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Carrot64.png",
+                        "url": "assets/icons/Carrot64.png",
+                        "$$hashKey": "object:39"
+                    },
+                    "firstVisitOnly": false,
+                    "$$hashKey": "object:9637"
+                    },
+                    {
+                    "name": "Company Pamphlet",
+                    "id": 31,
+                    "description": "\"We here at Adventure Headquarters aspire to create sustainable and life-changing products...\"",
+                    "count": 1,
+                    "icon": {
+                        "name": "Pamphlet64.png",
+                        "url": "assets/icons/Pamphlet64.png",
+                        "$$hashKey": "object:86"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:16861"
+                    },
+                    {
+                    "name": "Dirty Carrots",
+                    "id": 32,
+                    "description": "Your once beautiful carrots are now dirty.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Carrot64.png",
+                        "url": "assets/icons/Carrot64.png",
+                        "$$hashKey": "object:39"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:17396"
+                    },
+                    {
+                    "name": "Scraped Dodge Charger",
+                    "id": 34,
+                    "description": "A nasty scratch trails down the passenger side of your new car. Don't worry, it won't increase your auto loan interest rate!",
+                    "count": 1,
+                    "icon": {
+                        "is_custom": true,
+                        "type": "image",
+                        "url": "https://materia.qa.cdl.ucf.edu/media/4zMFk",
+                        "id": "4zMFk",
+                        "alt": "",
+                        "$$hashKey": "object:4271"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:24464"
+                    },
+                    {
+                    "name": "Angry Coworkers",
+                    "id": 36,
+                    "description": "Your coworkers don't like you very much.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Match64.png",
+                        "url": "assets/icons/Match64.png",
+                        "$$hashKey": "object:90"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:26776"
+                    },
+                    {
+                    "name": "Melted Ice Cream Bars",
+                    "id": 38,
+                    "description": "Womp womp.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Oval64.png",
+                        "url": "assets/icons/Oval64.png",
+                        "$$hashKey": "object:95"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:6097"
+                    },
+                    {
+                    "name": "Dirty String Cheese",
+                    "id": 39,
+                    "description": "Uh oh. Your string cheese now has dirt on them.",
+                    "count": 1,
+                    "icon": {
+                        "name": "Cheese64.png",
+                        "url": "assets/icons/Cheese64.png",
+                        "$$hashKey": "object:53"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:6098"
+                    },
+                    {
+                    "name": "Cat",
+                    "id": 41,
+                    "description": "An orange tabby cat. The tag on her collar reads, \"RSA\".",
+                    "count": 1,
+                    "icon": {
+                        "name": "Cat64.png",
+                        "url": "assets/icons/Cat64.png",
+                        "$$hashKey": "object:52"
+                    },
+                    "firstVisitOnly": true,
+                    "$$hashKey": "object:11573"
+                    }
+                ],
+                "customIcons": [
+                    {
+                    "is_custom": true,
+                    "type": "image",
+                    "url": "https://materia.qa.cdl.ucf.edu/media/De0Ui",
+                    "id": "De0Ui",
+                    "alt": "",
+                    "$$hashKey": "object:4195"
+                    },
+                    {
+                    "is_custom": true,
+                    "type": "image",
+                    "url": "https://materia.qa.cdl.ucf.edu/media/AYsyG",
+                    "id": "AYsyG",
+                    "alt": "",
+                    "$$hashKey": "object:4233"
+                    },
+                    {
+                    "is_custom": true,
+                    "type": "image",
+                    "url": "https://materia.qa.cdl.ucf.edu/media/4zMFk",
+                    "id": "4zMFk",
+                    "alt": "",
+                    "$$hashKey": "object:4271"
+                    },
+                    {
+                    "is_custom": true,
+                    "type": "image",
+                    "url": "https://materia.qa.cdl.ucf.edu/media/WKztA",
+                    "id": "WKztA",
+                    "alt": "",
+                    "$$hashKey": "object:4309"
+                    }
+                ],
+                "itemCount": 24,
+                "hidePlayerTitle": false,
+                "scoreMode": "Normal",
+                "internalScoreMessage": ""
+                },
+                "id": "37285"
+            }
+        ],
+        "options": []
+    }
+    ],
+    "options": []
+        }
+}
+
+  
