@@ -622,6 +622,10 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		if qset.options.icons then setIcons qset.options.icons
 
 		angular.forEach qset.items, (item, index) ->
+
+			# this is to exclusively handle how the mwdk treats the start node's id: 0 property in its qset options
+			if index == 0 and item.options.id.match(/^(mwdk-mock-id-[A-Za-z0-9\-]+)$/)[0] then item.options.id = 0
+
 			node =
 				id: item.options.id
 				name: integerToLetters item.options.id
