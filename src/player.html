@@ -73,6 +73,9 @@
 						<span class="item-count">+ {{item.count}} </span>
 						<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
 						{{itemSelection[getItemIndex(item)].name}}
+						<p class="item-description">
+							{{itemSelection[getItemIndex(item)].description}}
+						</p>
 					</div>
 				</section>
 				<section ng-if="removedItems.length > 0">
@@ -81,6 +84,9 @@
 						<span class="item-count">- {{-1*item.count}}</span>
 						<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
 						{{itemSelection[getItemIndex(item)].name}}
+						<div class="item-description"> 
+							{{itemSelection[getItemIndex(item)].description}}
+						</div>
 					</div>
 				</section>
 			</div>
