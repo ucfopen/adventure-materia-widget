@@ -22,14 +22,45 @@
 		<script src="assets/legacyQsetSrv.js"></script>
 	</head>
 	<body id="body" ng-app="Adventure" ng-controller="AdventureController">
+		
+		<div class="inventory-button-container">
+			<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn"  ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" class="inventory-button">
+				<img src="assets/player-assets/BackPack64.png" ng-show="!showInventory"/>
+				<span ng-if="showNew" class="new-item">NEW!</span>
+			</button>
+			<div class="inventory-tooltip" ng-show="showInventoryTooltip">
+				<p>Inventory</p>
+				<i class="arrow-right"></i>
+			</div>
+			<div class="inventory-update"
+				ng-show="inventoryUpdate"
+				ng-class="{'show': inventoryUpdate}"
+				>
 
-		<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn"  ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" class="inventory-button">
-			<img src="assets/player-assets/BackPack64.png" ng-show="!showInventory"/>
-			<span ng-if="showNew" class="new-item">NEW!</span>
-		</button>
-		<div class="inventory-tooltip" ng-show="showInventoryTooltip">
-			<p>Inventory</p>
-			<i class="arrow-right"></i>
+				<i class="arrow-top"></i>
+				<div class="update-content" tabindex="-1">
+					<section ng-if="addedItems.length > 0">
+						<div class="item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0" ng-click="toggleInventory(item)">
+							<span class="item-count">+ {{item.count}} </span>
+							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
+							<p class="item-name">{{itemSelection[getItemIndex(item)].name}}</p>
+							<p class="item-description">
+								{{itemSelection[getItemIndex(item)].description}}
+							</p>
+						</div>
+					</section>
+					<section ng-if="removedItems.length > 0">
+						<div class="item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0" ng-click="toggleInventory(item)">
+							<span class="item-count">- {{-1*item.count}}</span>
+							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
+							<p class="item-name">{{itemSelection[getItemIndex(item)].name}}</p>
+							<div class="item-description"> 
+								{{itemSelection[getItemIndex(item)].description}}
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
 		</div>
 
 		<div class="inventory" ng-class="{ show: showInventory }">
@@ -60,41 +91,9 @@
 			</div>
 		</div>
 
-		<div class="backgroundcover" ng-class="{ show: feedback || inventoryUpdate }"></div>
+		<div class="backgroundcover" ng-class="{ show: feedback || inventoryUpdate }" ng-click="inventoryUpdate = false;"></div>
 
-		<div class="inventory-update"
-			ng-show="inventoryUpdate"
-			ng-class="{'show': inventoryUpdate}"
-			>
-			<div class="update-content" tabindex="-1">
-				<section ng-if="addedItems.length > 0">
-					<p>Item(s) Added: </p>
-					<div class="item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0">
-						<span class="item-count">+ {{item.count}} </span>
-						<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
-						{{itemSelection[getItemIndex(item)].name}}
-						<p class="item-description">
-							{{itemSelection[getItemIndex(item)].description}}
-						</p>
-					</div>
-				</section>
-				<section ng-if="removedItems.length > 0">
-				<p>Item(s) Removed: </p>
-					<div class="item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0">
-						<span class="item-count">- {{-1*item.count}}</span>
-						<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
-						{{itemSelection[getItemIndex(item)].name}}
-						<div class="item-description"> 
-							{{itemSelection[getItemIndex(item)].description}}
-						</div>
-					</div>
-				</section>
-			</div>
-			<input class="trans-button"
-				type="button"
-				value="OK"
-				ng-click="inventoryUpdate = false">
-		</div>
+		
 
 		<div class="feedback"
 			ng-class="{ show: feedback }"

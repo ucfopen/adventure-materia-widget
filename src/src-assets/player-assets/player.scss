@@ -21,6 +21,9 @@ $gray: #888888;
 $gray-lighter: #cccccc;
 $gray-lightest: #eaeaea;
 
+$green: #7ce678;
+$green-lighter: rgb(115, 206, 112);
+$green-darker: rgb(115, 206, 112);
 
 $background: $gray-lighter;
 $color-primary: $white;
@@ -182,6 +185,12 @@ button.show-inventory {
 	border-top: 13px solid transparent;
 	border-left: 8px solid $color-accent;
 	border-bottom: 13px solid transparent;
+}
+
+.arrow-top {
+	border-left: 15px solid transparent;
+	border-right: 15px solid transparent;
+	border-bottom: 15px solid $gray-darker;
 }
 
 @keyframes notif-bounce {
@@ -832,7 +841,7 @@ h1 {
 	}
 }
 
-.feedback, .inventory-update {
+.feedback {
 	position: absolute;
 	z-index: -1;
 	top: 50%;
@@ -876,7 +885,7 @@ h1 {
 		opacity: 1;
 	}
 
-	.feedback-content, .update-content {
+	.feedback-content {
 		width: 500px;
 		height: 190px;
 
@@ -889,6 +898,37 @@ h1 {
 		overflow-y: auto;
 	}
 
+}
+.inventory-button-container {
+	position: relative;
+}
+
+.inventory-update {
+	z-index: -1;
+	position: absolute;
+	width: 75%;
+	right: 10px;
+	top: 75px;
+
+	border-radius: 10px;
+	background: #fff;
+	box-shadow: $shadow-small;
+
+	font-size: 24px;
+	font-weight: bold;
+
+	&.show {
+		z-index: 1000;
+		opacity: 1;
+	}
+
+	.arrow-top {
+		border-bottom-color: $white;
+		position: absolute;
+		right: 15px;
+		top: -10px;
+	}
+
 	.update-content {
 		font-size: 14px;
 
@@ -896,13 +936,27 @@ h1 {
 			display: flex;
 			flex-direction: row;
 			align-items: center;
+			border-radius: 10px;
+
+			padding: 10px;
+			margin: 10px 0;
 
 			.item-count {
-				width: 50px;
+				min-width: 30px;
+			}
+
+			.item-name {
+				min-width: 50px;
 			}
 
 			.item-description {
 				padding-left: 20px;
+				font-style: italic;
+			}
+
+			&:hover {
+				color: $blue;
+				cursor: pointer;
 			}
 		}
 
@@ -914,11 +968,18 @@ h1 {
 		}
 	}
 
-	input {
-		position: absolute;
-		left: 50%;
-		width: 120px;
-		margin: 14px 0px 14px -60px;
+
+	.update-buttons {
+		display: flex;
+		flex-direction: row;
+		gap: 20px;
+		justify-content: space-around;
+		padding: 10px;
+
+		input {
+			width: fit-content;
+			padding: 10px;
+		}
 	}
 }
 

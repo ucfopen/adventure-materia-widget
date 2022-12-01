@@ -139,6 +139,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 			for q_i in $scope.question.options.items
 				do (q_i) ->
+					console.log(q_i)
 					hasItem = false
 
 					# Get the item data using the id
@@ -164,12 +165,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 						# Check to see if player already has item
 						# If so, just update item count
 						for p_i, i in $scope.inventory
-							if q_i.id is p_i.id
-								hasItem = true
-								p_i.count += q_i.count
-								# Remove item from inventory
-								if (p_i.count <= 0)
-									$scope.inventory.splice i, 1
+							if (p_i)
+								if q_i.id is p_i.id
+									hasItem = true
+									p_i.count += q_i.count
+									# Remove item from inventory
+									if (p_i.count <= 0)
+										$scope.inventory.splice i, 1
 						if (! hasItem)
 							newItem = {
 								...q_i
@@ -229,10 +231,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 		$scope.visitedNodes.push(q_data.options.id)
 
-	$scope.toggleInventory = () ->
+	$scope.toggleInventory = (item = null) ->
 		$scope.showInventory = ! $scope.showInventory
 		$scope.inventoryUpdate = false
-		$scope.selectedItem = $scope.inventory[0]
+		$scope.selectedItem = $scope.inventory[$scope.getItemIndex(item)] || $scope.inventory[0]
 		$scope.showNew = false
 
 	$scope.setSelectedItem = (item) ->
