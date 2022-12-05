@@ -1099,19 +1099,17 @@ required-items-tooltip {
 	}
 }
 
-.item-selection {
-	border-radius: 10px;
-	background: $gray-lightest;
-
-	box-shadow: 0px 0px 5px #888;
-
+.item-selection, .item-manager {
 	display: flex;
 	flex-direction: column;
-	// max-height: 80%;
-	padding: 0 25px 25px 25px;
+	z-index: $z-index-modal-dialog;
+
+	padding: 5px 25px 25px 25px;
 	box-sizing: border-box;
 
-	z-index: $z-index-modal-dialog;
+	border-radius: 2px;
+
+	box-shadow: 0px 0px 5px #888;
 
 	/** Show modal on screen widths < 1000px **/
 	@media screen and (max-width: 1400px) {
@@ -1127,9 +1125,6 @@ required-items-tooltip {
 	}
 
 	.item-header {
-
-		border-top-left-radius: 5px;
-		border-top-right-radius: 5px;
 		border-bottom: 1px solid $gray-lighter;
 
 		.item-heading {
@@ -1173,7 +1168,7 @@ required-items-tooltip {
 		}
 
 		.item-instructions {
-			padding-bottom: 10px;
+			margin: 0 0 10px 0;
 			font-size: 14px;
 		}
 
@@ -1183,22 +1178,21 @@ required-items-tooltip {
 	}
 
 	ul li, .options-bar {
-		margin-bottom: 5px;
-		font-size: 11pt;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
 
+		margin-bottom: 5px;
 		padding: 15px 10px;
 		margin-right: 2px;
+
+		font-size: 11pt;
 
 		border: solid 1px transparent;
 		box-sizing: border-box;
 
 		-webkit-transition: background 0.5s;
 		transition: background 0.5s;
-
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		gap: 10px;
 
 		.selector {
 			display: flex;
@@ -1207,6 +1201,7 @@ required-items-tooltip {
 			grid-gap: 20px;
 			height: 35px;
 			position: relative;
+			margin-bottom: 10px;
 
 			::-webkit-scrollbar {
 				background-color: $gray;
@@ -1314,6 +1309,7 @@ required-items-tooltip {
 			width: fit-content;
 			height: fit-content;
 			border-radius: 2px;
+			margin-right: 10px;
 
 			span {
 				text-align: center;
@@ -1413,7 +1409,7 @@ required-items-tooltip {
 		}
 
 		&.options-bar {
-			align-items: center;
+			padding: 10px 55px 0 10px;
 		}
 
 		&:not(.options-bar):hover {
@@ -1433,12 +1429,69 @@ required-items-tooltip {
 
 	ul.list-items {
 		list-style-type: none;
-		margin: 0px;
 		padding: 10px 0px 0px 0px;
 		overflow: auto;
 		overflow-x: hidden;	
 		height: 100%;
-		margin: 10px 0px;
+		margin: 0;
+
+		li {
+
+			item-icon-selector {
+				position: absolute;
+				top: 10px;
+				left: 120px;
+				z-index: $z-index-modal;
+				width: 75%;
+				max-height: 500px !important;
+				padding-bottom: 10px;
+				background: $gray-lightest;
+			
+				.item-header {
+					color: $black;
+					background: $gray-lightest;
+				}
+
+				button.save-button {
+					bottom: 16px;
+				}
+			
+				ul.icons-list {
+					overflow: auto;
+					display: flex;
+					flex-direction: row;
+					flex-wrap: wrap;
+					grid-gap: 10px;
+					padding-left: 25px;
+			
+					li {
+						width: fit-content;
+						height: fit-content;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						margin: 0;
+						border: 1px solid transparent;
+						padding: 0;
+			
+						img {
+							max-height: 64px;
+							max-width: 64px;
+							object-fit: cover;
+						}
+			
+						&:hover {
+							cursor: pointer;
+							background-color: $gray-lighter;
+						}
+			
+						&.selectedIcon {
+							background-color: $blue-focus;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	input {
@@ -1475,9 +1528,13 @@ required-items-tooltip {
 
 	.save-button {
 		position: absolute;
-		right: 15px;
-		bottom: 50px;
+		right: 20px;
+		bottom: 35px;
 	}
+}
+
+.item-selection {
+	
 }
 
 .item-manager {
@@ -1488,68 +1545,43 @@ required-items-tooltip {
 	margin: auto;
 	z-index: $z-index-modal;
 	margin-top: 20px;
+	padding-top: 63px;
+	background-color: $color-primary;
 
-	background-color: $gray-lightest;
+	.item-header {
+		position: absolute;
+		width: calc(100% - 50px);
+		min-height: 63px;
+		top: 0;
+		left: 0;
+
+		padding: 0 25px;
+		color: $color-primary;
+		background: $color-accent;
+		border-top-left-radius: 2px;
+		border-top-right-radius: 2px;
+	}
+
+	ul li {
+		flex-direction: row;
+	}
 
 	.options-bar {
+		flex-direction: row;
+		gap: 10px;
+		align-items: center;
 		padding-right: 55px;
 	}
 
 	.arrow-left {
 		position: absolute;
 		left: 112px;
-		border-right-color: $white;
+		border-right-color: $gray-lightest;
 		z-index: $z-index-modal-dialog;
 	}
 
 	.item-icon:hover {
 		cursor: pointer;
-	}
-}
-
-item-icon-selector {
-	position: absolute;
-	bottom: 0;
-	top: 0;
-	left: 120px;
-	z-index: $z-index-modal;
-	width: 75%;
-	max-height: 500px !important;
-	background: $white !important;
-
-	ul.icons-list {
-		overflow: auto;
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		grid-gap: 10px;
-		padding-left: 25px;
-
-		li {
-			width: fit-content;
-			height: fit-content;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			margin: 0;
-			border: 1px solid transparent;
-			padding: 0;
-
-			img {
-				max-height: 64px;
-				max-width: 64px;
-				object-fit: cover;
-			}
-
-			&:hover {
-				cursor: pointer;
-				background-color: $gray-lighter;
-			}
-
-			&.selectedIcon {
-				background-color: $blue-focus;
-			}
-		}
 	}
 }
 

@@ -84,10 +84,10 @@
 				<p>{{inventoryItems.length ? 'Manage Inventory ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
 			</div>
 			
-			<item-manager ng-show="showItemManager" class="item-selection item-manager">
+			<item-manager ng-show="showItemManager" class="item-manager">
 				<div class="item-header">
 					<div class="item-heading">
-						<h4>Edit Items</h4>
+						<h4>Manage Inventory</h4>
 						<span class="hide-popup icon-cross"
 						ng-click="saveAndCloseInventory()"
 						ng-keypress="$event.keyCode === 13 ? saveAndCloseInventory() : ''"
@@ -140,7 +140,7 @@
 						<item-icon-selector ng-show="showItemIconSelector && currentItem == item" class="item-selection">
 							<div class="item-header">
 								<div class="item-heading">
-									<h4>Icon Selector</h4>
+									<h4>Select or Upload an Icon</h4>
 								</div>
 							</div>
 							<ul class="icons-list">
@@ -728,17 +728,16 @@
 												</dl>
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
-										</div>
-
-										<div class="advanced-option">
-											<input id="hide-answer" type="checkbox"
-											ng-model="currentAnswer.hideAnswer"
-											value="false" /> 
-											<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
-										</div>
-										<div class="advanced-option">
-											<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
-											<label for="answer-show-advanced">Show Advanced Options</label>
+											<div class="advanced-option">
+												<input id="hide-answer" type="checkbox"
+												ng-model="currentAnswer.hideAnswer"
+												value="false" /> 
+												<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
+											</div>
+											<div class="advanced-option">
+												<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
+												<label for="answer-show-advanced">Show Advanced Options</label>
+											</div>
 										</div>
 
 										<button class="save-button important-button"
