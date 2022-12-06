@@ -133,14 +133,15 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			$scope.showInventoryBtn = true
 			
 			# Format items
-			for q_i in $scope.question.options.items
-				do (q_i) ->
-					item =
-						id: q_i.id
-						count: q_i.count || 1
-						takeAll: q_i.takeAll || false
-						firstVisitOnly: q_i.firstVisitOnly || false
-					$scope.questionItems.push item
+			if $scope.question.options.items
+				for q_i in $scope.question.options.items
+					do (q_i) ->
+						item =
+							id: q_i.id
+							count: q_i.count || 1
+							takeAll: q_i.takeAll || false
+							firstVisitOnly: q_i.firstVisitOnly || false
+						$scope.questionItems.push item
 
 			for q_i in $scope.questionItems
 				do (q_i) ->
@@ -191,14 +192,15 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				requiredItems = []
 
 				# Format items
-				for r in q_data.answers[i].options.requiredItems
-					do (r) ->
-						item =
-							id: r.id
-							minCount: r.minCount || r.tempMinCount || 1
-							maxCount: r.maxCount || r.tempMaxCount || r.minCount || r.tempMinCount || 1
-							uncappedMax: r.uncappedMax || true
-						requiredItems.push item
+				if q_data.answers[i].options.requiredItems
+					for r in q_data.answers[i].options.requiredItems
+						do (r) ->
+							item =
+								id: r.id
+								minCount: r.minCount || r.tempMinCount || 1
+								maxCount: r.maxCount || r.tempMaxCount || r.minCount || r.tempMinCount || 1
+								uncappedMax: r.uncappedMax || true
+							requiredItems.push item
 
 				answer =
 					text : q_data.answers[i].text

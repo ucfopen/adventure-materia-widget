@@ -559,16 +559,16 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 			angular.forEach tree.answers, (answer, index) ->
 				requiredItemsData = []
-				console.log(answer)
-				
-				for item in answer.requiredItems
-					do (item) ->
-						formattedItem =
-							id: item.id
-							minCount: item.minCount || item.tempMinCount || 1
-							maxCount: item.maxCount || item.tempMaxCount || 1
-							uncappedMax: item.uncappedMax || true
-						requiredItemsData.push formattedItem
+
+				if answer.requiredItems
+					for item in answer.requiredItems
+						do (item) ->
+							formattedItem =
+								id: item.id
+								minCount: item.minCount || item.tempMinCount || 1
+								maxCount: item.maxCount || item.tempMaxCount || 1
+								uncappedMax: item.uncappedMax || true
+							requiredItemsData.push formattedItem
 
 				itemAnswerData =
 					text: answer.text
@@ -665,14 +665,15 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 				requiredItemsData = []
 				
-				for item in answer.options.requiredItems
-					do (item) ->
-						formattedItem =
-							id: item.id
-							minCount: item.minCount || item.tempMinCount || 1
-							maxCount: item.maxCount || item.tempMaxCount || 1
-							uncappedMax: item.uncappedMax || true
-						requiredItemsData.push formattedItem
+				if answer.options.requiredItems
+					for item in answer.options.requiredItems
+						do (item) ->
+							formattedItem =
+								id: item.id
+								minCount: item.minCount || item.tempMinCount || 1
+								maxCount: item.maxCount || item.tempMaxCount || 1
+								uncappedMax: item.uncappedMax || true
+							requiredItemsData.push formattedItem
 
 				nodeAnswer =
 					text: answer.text
