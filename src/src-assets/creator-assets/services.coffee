@@ -663,6 +663,17 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 				unless node.answers then node.answers = []
 
+				requiredItemsData = []
+				
+				for item in answer.options.requiredItems
+					do (item) ->
+						formattedItem =
+							id: item.id
+							minCount: item.minCount || item.tempMinCount || 1
+							maxCount: item.maxCount || item.tempMaxCount || 1
+							uncappedMax: item.uncappedMax || true
+						requiredItemsData.push formattedItem
+
 				nodeAnswer =
 					text: answer.text
 					value: answer.value
@@ -670,7 +681,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					linkMode: answer.options.linkMode
 					feedback: answer.options.feedback
 					id: generateAnswerHash()
-					requiredItems: answer.options.requiredItems
+					requiredItems: requiredItemsData
 					hideAnswer: answer.options.hideAnswer
 
 				switch item.options.type
@@ -692,6 +703,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					nodeItem =
 						id: inventoryItem.id
 						count: inventoryItem.count || 1
+						firstVisitOnly: inventoryItem.firstVisitOnly || false
+						takeAll: inventoryItem.takeAll || false
 
 					node.items.push nodeItem
 
@@ -715,8 +728,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if orphans.length and i >= orphans.length and orphans.length isnt previousCount
 				i = 0
 				previousCount = orphans.length
-
-		# tree.inventoryItems = qset.options.inventoryItems || []
 
 		tree
 
