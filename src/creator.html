@@ -719,8 +719,8 @@
 													</dt>
 													<div  class="options" ng-show="showDropdown">
 														<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
-															<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
-															{{item.name}}
+															<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" />
+															{{inventoryItems[getItemIndex(item)].name}}
 															</dt>
 													</div>
 												</dl>
@@ -976,15 +976,15 @@
 													</dt>
 													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
 														<div class="option-contents">
-															<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+															<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
 															{{inventoryItems[getItemIndex(selectedItem)].name}}
 														</div>
 														<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
 													</dt>
 													<div  class="options" ng-show="showDropdown">
 														<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
-															<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
-															{{item.name}}
+															<img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" />
+															{{inventoryItems[getItemIndex(item)].name}}
 															</dt>
 													</div>
 												</dl>

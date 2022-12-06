@@ -8,7 +8,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.SHORTANS = "shortanswer"
 	$scope.HOTSPOT = "hotspot"
 	$scope.TRANS = "transitional"
-	$scope.RESTRICTED = "restricted"
+	# $scope.RESTRICTED = "restricted"
 	$scope.NARR = "narrative" # May not be required
 	$scope.END = "end" # May not be required
 	$scope.OVER = "over" # the imaginary node after end nodes, representing the end of the widget
@@ -225,7 +225,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			when $scope.MC then handleMultipleChoice q_data
 			when $scope.HOTSPOT then handleHotspot q_data
 			when $scope.SHORTANS then handleShortAnswer q_data
-			when $scope.RESTRICTED then handleRestrictedNode q_data
+			# when $scope.RESTRICTED then handleRestrictedNode q_data
 			else
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
 
@@ -275,7 +275,12 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 		if missingItems[0]
 			string = missingItems.map((item) ->
-				" #{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{$scope.itemSelection[$scope.getItemIndex(item)].count})"
+				range = ""
+				if item.minCount < item.maxCount
+					range = item.minCount + "-" + item.maxCount
+				else
+					range = item.minCount
+				" #{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range})"
 			)
 			$scope.feedback = "Requires the items: #{string}"
 			return
@@ -335,7 +340,12 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					missingItems = $scope.checkInventory($scope.q_data.answers[i].options)
 
 					if missingItems[0]
-						string = missingItems.map((item) -> "#{item.name} (amount: #{item.count});")
+						range = ""
+						if item.minCount < item.maxCount
+							range = item.minCount + "-" + item.maxCount
+						else
+							range = item.minCount
+						string = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range});")
 						$scope.feedback = "Requires the items: #{string}"
 						return
 
@@ -420,12 +430,12 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		$scope.link = -1
 		Materia.Score.submitFinalScoreFromClient null, "Blank Destination! Be sure to edit or remove this node before publishing.", 100
 
-	handleRestrictedNode = () ->
-		$scope.type = $scope.RESTRICTED
-		$scope.layout = "text-only"
-		itemArray = item.name for item in $scope.question.requiredItems
-		$scope.question.text = "[Destination requires item(s): [#{itemArray.toString(', ')}]]"
-		$scope.link = $scope.question.options.parentId
+	# handleRestrictedNode = () ->
+	# 	$scope.type = $scope.RESTRICTED
+	# 	$scope.layout = "text-only"
+	# 	itemArray = item.name for item in $scope.question.requiredItems
+	# 	$scope.question.text = "[Destination requires item(s): [#{itemArray.toString(', ')}]]"
+	# 	$scope.link = $scope.question.options.parentId
 
 	# Submit the user's response to the logs
 	_logProgress = ->

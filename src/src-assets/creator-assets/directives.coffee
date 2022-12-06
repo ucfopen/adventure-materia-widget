@@ -910,7 +910,6 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					description: ''
 					count: 1
 					icon: {}
-				treeSrv.incrementItemCount()
 				$scope.inventoryItems.push(newItem)
 
 				$scope.newItemName = ''
@@ -921,8 +920,6 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			if item in $scope.inventoryItems
 				$scope.inventoryItems.splice index, 1
 				treeSrv.deleteItemReferencesFromAllNodes $scope.treeData, item
- 
-				treeSrv.decrementItemCount()
 
 				# Collapse any open item editors
 				$scope.editingIndex = -1

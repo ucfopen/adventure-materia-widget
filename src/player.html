@@ -148,7 +148,7 @@
 				'transitional-mode' : question.type == NARR || question.type == END}"
 			ng-hide="question.type == OVER">
 			<div class="mc"
-				ng-show="type == MC">
+				ng-show="question.type == MC">
 				<button
 					class="answer"
 					ng-if="!(answer.hideAnswer && checkInventory(answer).length)"
@@ -168,7 +168,7 @@
 					</div>
 				</button>
 			</div>
-			<div class="sa"ng-show="type == SHORTANS">
+			<div class="sa"ng-show="question.type == SHORTANS">
 				<input type="text"
 					class="short-answer"
 					ng-model="response"
@@ -179,7 +179,7 @@
 					ng-click="handleShortAnswerInput()"
 					tabindex="0" />
 			</div>
-			<div class="hotspot" ng-if="type == HOTSPOT">
+			<div class="hotspot" ng-if="question.type == HOTSPOT">
 				<!-- label element for the hotspot label text, if it exists -->
 				<div class="hotspot-label"
 					id="hotspot-label"
@@ -260,7 +260,7 @@
 				</svg>
 				<img ng-if="question.options.asset.type === 'image'" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" ng-src="{{question.image}}">
 			</div>
-			<div class="trans" ng-if="type == TRANS || type == RESTRICTED">
+			<div class="trans" ng-if="question.type == NARR">
 				<input type="button"
 					class="trans-button"
 					ng-class='{ left: question.layout == 2, right: question.layout == 3 }'

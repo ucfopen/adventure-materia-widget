@@ -18,9 +18,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	# Iterator that generates node IDs
 	count = 1
 
-	# Iterator that generates item IDs
-	itemCount = 0
-
 	inventoryItems = []
 
 	customIcons = []
@@ -43,19 +40,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	incrementNodeCount = ->
 		count++
 
-	# Methods for inventory item count
-	getItemCount = ->
-		itemCount
-
-	setItemCount = (val) ->
-		itemCount = val
-
-	incrementItemCount = ->
-		itemCount++
-
-	decrementItemCount = ->
-		itemCount--
-
 	getInventoryItems = ->
 		inventoryItems
 
@@ -63,8 +47,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		inventoryItems = val
 
 	generateItemID = ->
-		if (itemCount)
-			return Math.floor(inventoryItems[itemCount - 1].id + Math.random() * 2 + 1)
+		if (inventoryItems[0])
+			return Math.floor(inventoryItems[inventoryItems.length - 1].id + Math.random() * 2 + 1)
 		else
 			return Math.floor(Math.random() * 2 + 1)
 	
@@ -512,7 +496,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				nodeCount: count
 				inventoryItems: inventoryItems
 				customIcons: customIcons
-				itemCount: itemCount
 		console.log(qset)
 		return qset
 
@@ -549,14 +532,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 				if tree.media.type is 'image'
 					itemData.options.asset.alt = if tree.media.alt then tree.media.alt else ''
-
-			if itemData.options.items
-				for item in itemData.options.items
-					if item.icon
-						item = {
-							...item.icon
-							materiaType: "asset"
-						}
 
 			switch tree.type
 				when "mc"
@@ -614,8 +589,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		tree = {}
 
 		if qset.options.nodeCount then setNodeCount qset.options.nodeCount
-
-		if qset.options.itemCount then setItemCount qset.options.itemCount
 
 		if qset.options.inventoryItems then setInventoryItems qset.options.inventoryItems
 
@@ -694,10 +667,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				angular.forEach item.options.items, (inventoryItem, index) ->
 					unless node.items then node.items = []
 					nodeItem =
-						name: inventoryItem.name
 						id: inventoryItem.id
 						count: inventoryItem.count || 1
-						icon: inventoryItem.icon || null
 
 					node.items.push nodeItem
 
@@ -885,10 +856,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	getNodeCount : getNodeCount
 	setNodeCount : setNodeCount
 	incrementNodeCount : incrementNodeCount
-	getItemCount : getItemCount
-	setItemCount : setItemCount
-	incrementItemCount : incrementItemCount
-	decrementItemCount : decrementItemCount
 	getInventoryItems: getInventoryItems
 	setInventoryItems: setInventoryItems
 	generateItemID : generateItemID

@@ -679,7 +679,7 @@ h1 {
 		display: flex;
 		flex-direction: column;
 
-		border-radius: 5px;
+		border-radius: 10px;
 		background: #fff;
 
 		.inventory-header {
@@ -688,6 +688,8 @@ h1 {
 			padding:10px 0px;
 			margin: 0;
 			color: $white;
+			border-radius: 10px 10px 0px 0px;
+
 		}
 
 		.inventory-content {
@@ -707,7 +709,7 @@ h1 {
 				div.item {
 					padding: 15px;
 					margin: 15px;
-					border-radius: 2px;
+					border-radius: 10px;
 					max-height: 25px;
 
 					position: relative;
@@ -776,6 +778,7 @@ h1 {
 				flex-grow: 1;
 				background-color: $gray-lightest;
 				min-width: 200px;
+				border-radius: 10px;
 
 				h4 {
 					margin: 0 0 10px 0;
@@ -799,7 +802,6 @@ h1 {
 					margin: 0;
 					padding: 10px;
 					color: $white;
-
 					img {
 						width: 35px;
 						height: 35px;
@@ -851,6 +853,11 @@ h1 {
 
 	margin-left: -270px;
 	margin-top: -170px;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
 
 	border: 2px solid $gray-lightest;
 	border-radius: 3px;
@@ -920,6 +927,7 @@ h1 {
 	&.show {
 		z-index: 1000;
 		opacity: 1;
+		box-shadow: $gray-darker 0px 7px 15px;
 	}
 
 	.arrow-top {
