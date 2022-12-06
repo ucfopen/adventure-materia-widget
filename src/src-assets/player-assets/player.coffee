@@ -393,7 +393,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 				return false
 
-	$scope.closeFeedback = (advance) ->
+	$scope.closeFeedback = () ->
 		if $scope.feedback.length > 0 # prevent multiple calls to manageQuestionScreen from firing due to the scope cycle not updating fast enough
 			$scope.feedback = ""
 			if $scope.next
