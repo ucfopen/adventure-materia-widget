@@ -2049,7 +2049,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.showRequiredItems = false
 						
 			# Remove error message
-			$scope.invalidQuantity = false
+			$scope.invalidQuantity = null
 
 			# Save the original item count for validation
 			if $scope.nodeItems
@@ -2070,9 +2070,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.selectedItem = $scope.availableItems[0]
 
 		$scope.toggleRequiredItemsModal = (answer = null) ->
+			$scope.showRequiredItems = !$scope.showRequiredItems
 			# Close required items modal
-			if (answer is null or $scope.currentAnswer and $scope.currentAnswer is answer)
-				$scope.showRequiredItems = false
+			if (answer is null)
 				$scope.currentAnswer = null
 			# Open required items modal
 			else
@@ -2083,12 +2083,13 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					document.querySelector('hotspot-answer-manager').style.zIndex = 100;
 
 				# Remove error message
-				$scope.invalidQuantity = false
+				$scope.invalidQuantity = null
 
 				# Save the original item count in case of invalid input
 				if answer.requiredItems
 					for item in answer.requiredItems
-						item.tempCount = item.count
+						item.tempMinCount = item.minCount
+						item.tempMaxCount = item.maxCount
 
 				# Add items not already being used to the items available for selection
 				$scope.availableItems = []
@@ -2116,15 +2117,39 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 		# ng-pattern attribute validates quantity
 		# Display error message if quantity is invalid
 		# takesItem is true if this item is being removed from the player's inventory
-		$scope.updateCount = (event, item, takesItem) ->
+		$scope.updateMinCount = (event, item) ->
+			if item.tempMinCount
+				$scope.invalidQuantity = null
+				if (item.tempMinCount > item.tempMaxCount)
+					$scope.invalidQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
+					if (item.tempMaxCount > 0) 
+						item.minCount = item.tempMaxCount
+				else
+					item.minCount = item.tempMinCount
+			else
+				$scope.invalidQuantity = "Invalid quantity."
+
+		$scope.updateMaxCount = (event, item) ->
+			if item.tempMaxCount
+				$scope.invalidQuantity = null
+				if (item.tempMinCount > item.tempMaxCount)
+					$scope.invalidQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
+					if (item.tempMinCount > 0) 
+						item.maxCount = item.tempMinCount
+				else
+					item.maxCount = item.tempMaxCount
+			else
+				$scope.invalidQuantity = "Invalid quantity."
+
+		$scope.updateNodeItemCount = (event, item, takesItem) ->
 			if item.tempCount
-				#item.tempCount = parseInt(item.tempCount)
-				$scope.invalidQuantity = false
+				$scope.invalidQuantity = null
 				item.count = item.tempCount
 				if takesItem
+					# Can only be true if editing node items
 					item.count = item.tempCount * -1
 			else
-				$scope.invalidQuantity = true
+				$scope.invalidQuantity = "Invalid quantity. Quantity must be greater than 0."
 
 		# Adds item to node
 		$scope.addItemToNode = (item, positiveCount = true) ->
@@ -2175,16 +2200,17 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			if item
 				answer.requiredItems = answer.requiredItems || []
 
-				for i in answer.requiredItems when i.id is item.id
-					i.count += 1
-					return
+				# for i in answer.requiredItems when i.id is item.id
+				# 	i.count += 1
+				# 	return
 
-				# Required items will store the index of the item in inventoryItems and the count and whether it is a max or a min
+				# Required items will store the index of the item in inventoryItems and the minimum and maximum required amount
 				newItem = {
 					id: item.id
-					count: 1
-					tempCount: 1
-					requiredIsMax: false
+					minCount: 1
+					maxCount: 1
+					tempMinCount: 1
+					tempMaxCount: 1
 				}
 				answer.requiredItems.push(newItem)
 

@@ -257,9 +257,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		angular.forEach answer.requiredItems, (item) ->
 			hasRequiredItem = $scope.inventory.some (playerItem) ->
 				if playerItem.id is item.id 
-					if item.requiredIsMax and item.count >= playerItem.count
-						return true
-					else if !item.requiredIsMax and item.count <= playerItem.count
+					if playerItem.count >= item.minCount and playerItem.count <= item.maxCount
 						return true
 					return false
 			if ! hasRequiredItem
