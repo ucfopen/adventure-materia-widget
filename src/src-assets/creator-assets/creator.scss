@@ -1182,6 +1182,7 @@ required-items-tooltip {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
+		align-items: center;
 		gap: 5px;
 
 		margin-bottom: 5px;
@@ -1203,7 +1204,6 @@ required-items-tooltip {
 			grid-gap: 20px;
 			height: 35px;
 			position: relative;
-			margin-bottom: 10px;
 
 			::-webkit-scrollbar {
 				background-color: $gray;
@@ -1387,9 +1387,14 @@ required-items-tooltip {
 				grid-gap: 10px;
 				align-items: center;
 
+
 				input {
 					width: 70px;
 					box-sizing: border-box;
+
+					&.uncapped-max-option {
+						width: auto;
+					}
 				}
 
 				.ng-invalid-pattern {
@@ -1505,19 +1510,6 @@ required-items-tooltip {
 		border-radius: 3px;
 	}
 
-	.advanced-option {
-		display: flex;
-		align-items: center;
-		flex-direction: row;
-		align-items: center;
-		width: 100%;
-
-		input {
-			width: auto;
-			height: 1em;
-		}
-	}
-
 	button:not(.delete-button) {
 		background: $color-accent;
 		color: $color-primary;
@@ -1532,6 +1524,40 @@ required-items-tooltip {
 		position: absolute;
 		right: 20px;
 		bottom: 33px;
+	}
+
+
+	.advanced-option {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		align-items: center;
+		width: 100%;
+		gap: 5px;
+
+		input {
+			width: auto;
+			height: 1em;
+		}
+
+		button {
+			background-color: $white;
+			padding: 5px;
+			height: auto;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			color: $gray-darker;
+
+			img {
+				width: 25px;
+				height: 25px;
+			}
+
+			&:hover {
+				background-color: $gray-lightest;
+			}
+		}
 	}
 }
 

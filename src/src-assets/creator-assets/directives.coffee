@@ -2087,6 +2087,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					for item in answer.requiredItems
 						item.tempMinCount = item.minCount
 						item.tempMaxCount = item.maxCount
+						item.uncappedMax = item.uncappedMax
 
 				# Add items not already being used to the items available for selection
 				$scope.availableItems = []
@@ -2117,7 +2118,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 		$scope.updateMinCount = (event, item) ->
 			if item.tempMinCount
 				$scope.invalidQuantity = null
-				if (item.tempMinCount > item.tempMaxCount)
+				if (!item.uncappedMax and item.tempMinCount > item.tempMaxCount)
 					$scope.invalidQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
 					if (item.tempMaxCount > 0) 
 						item.minCount = item.tempMaxCount
@@ -2208,6 +2209,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					maxCount: 1
 					tempMinCount: 1
 					tempMaxCount: 1
+					uncappedMax: true
 				}
 				answer.requiredItems.push(newItem)
 

@@ -151,8 +151,8 @@
 				ng-show="question.type == MC">
 				<button
 					class="answer"
-					ng-if="!(answer.hideAnswer && checkInventory(answer).length)"
-					ng-class="{'nonselectable' : checkInventory(answer)[0]}"
+					ng-if="!(answer.hideAnswer && checkInventory(answer.requiredItems).length)"
+					ng-class="{'nonselectable' : checkInventory(answer.requiredItems)[0]}"
 					ng-repeat="answer in answers"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
 					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
@@ -163,7 +163,7 @@
 					<div class="answer-required-items" ng-if="answer.requiredItems.length">
 						<span class="required-item" ng-repeat="item in answer.requiredItems">
 							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
-							{{itemSelection[getItemIndex(item)].name}} <span class="item-quantity">({{item.minCount == item.maxCount ? item.minCount : item.minCount + " - " + item.maxCount}})</span>
+							{{itemSelection[getItemIndex(item)].name}} <span class="item-quantity" ng-show="!item.uncappedMax">({{item.minCount == item.maxCount ? item.minCount : item.minCount + " - " + item.maxCount}})</span><span class="item-quantity" ng-show="item.uncappedMax">({{item.minCount}})</span>
 						</span>
 					</div>
 				</button>

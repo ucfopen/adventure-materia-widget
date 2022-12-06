@@ -695,9 +695,13 @@
 															<label for="increase-min-count-${item.id}">Min Quantity</label>
 															<input ng-focus = "event = $event" id="increase-min-count-${item.id}" type="number" ng-model="item.tempMinCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateMinCount(event, item)"/>
 														</div>
-														<div class="item-quantity">
+														<div class="item-quantity" ng-show="!item.uncappedMax">
 															<label for="increase-max-count-${item.id">Max Quantity</label>
 															<input ng-focus = "event = $event" id="increase-max-count-${item.id}"  type="number" ng-model="item.tempMaxCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateMaxCount(event, item)"/>
+														</div>
+														<div class="item-quantity">
+															<input ng-focus = "event = $event" id="unlimited-option-${item.id}"  type="checkbox" ng-model="item.uncappedMax" value="true" class=" uncapped-max-option">
+															<label for="unlimited-option-${item.id}">Unlimited Max</label>
 														</div>
 													</div>
 													<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
@@ -727,10 +731,16 @@
 												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 											</div>
 											<div class="advanced-option">
-												<input id="hide-answer" type="checkbox"
+												<button ng-click="currentAnswer.hideAnswer = !currentAnswer.hideAnswer">
+													<img ng-if="!currentAnswer.hideAnswer" src="assets/creator-assets/eye.png"/>
+													<img ng-if="currentAnswer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
+													<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
+													<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
+												</button>
+												<!-- <input id="hide-answer" type="checkbox"
 												ng-model="currentAnswer.hideAnswer"
 												value="false" /> 
-												<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
+												<label for="hide-answer">Hide Answer if Player Does Not Have Items</label> -->
 											</div>
 											<!-- <div class="advanced-option">
 												<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
@@ -958,9 +968,13 @@
 															<label for="increase-min-count-${item.id}">Min Quantity</label>
 															<input ng-focus = "event = $event" id="increase-min-count-${item.id}" type="number" ng-model="item.tempMinCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateMinCount(event, item)"/>
 														</div>
-														<div class="item-quantity">
-															<label for="increase-max-count-${item.id">Max Quantity</label>
+														<div class="item-quantity" ng-show="!item.uncappedMax">
+															<label for="increase-max-count-${item.id}">Max Quantity</label>
 															<input ng-focus = "event = $event" id="increase-max-count-${item.id}"  type="number" ng-model="item.tempMaxCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateMaxCount(event, item)"/>
+														</div>
+														<div class="item-quantity">
+															<input ng-focus = "event = $event" id="unlimited-option-${item.id}"  type="checkbox" ng-model="item.uncappedMax" value="true" class=" uncapped-max-option">
+															<label for="unlimited-option-${item.id}">Unlimited Max</label>
 														</div>
 													</div>
 													</div>
@@ -993,10 +1007,17 @@
 										</div>
 
 										<div class="advanced-option">
-											<input type="checkbox" id="hide-answer"
+
+											<button ng-click="currentAnswer.hideAnswer = !currentAnswer.hideAnswer">
+												<img ng-if="!currentAnswer.hideAnswer" src="assets/creator-assets/eye.png"/>
+												<img ng-if="currentAnswer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
+												<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
+												<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
+											</button>
+											<!-- <input type="checkbox" id="hide-answer"
 											ng-model="currentAnswer.hideAnswer"
 											value="false" /> 
-											<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
+											<label for="hide-answer">Hide Answer if Player Does Not Have Items</label> -->
 										</div>
 										<!-- <div class="advanced-option">
 											<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
@@ -1232,9 +1253,13 @@
 													<label for="increase-min-count-${item.id}">Min Quantity</label>
 													<input ng-focus = "event = $event" id="increase-min-count-${item.id}" type="number" ng-model="item.tempMinCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateMinCount(event, item)"/>
 												</div>
-												<div class="item-quantity">
-													<label for="increase-max-count-${item.id">Max Quantity</label>
+												<div class="item-quantity" ng-show="!item.uncappedMax">
+													<label for="increase-max-count-${item.id}">Max Quantity</label>
 													<input ng-focus = "event = $event" id="increase-max-count-${item.id}"  type="number" ng-model="item.tempMaxCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateMaxCount(event, item)"/>
+												</div>
+												<div class="item-quantity">
+													<input ng-focus = "event = $event" id="unlimited-option-${item.id}"  type="checkbox" ng-model="item.uncappedMax" value="true" class=" uncapped-max-option">
+													<label for="unlimited-option-${item.id}">Unlimited Max</label>
 												</div>
 											</div>
 										</div>
@@ -1267,10 +1292,17 @@
 							</div>
 
 							<div class="advanced-option">
-								<input id="hide-answer" type="checkbox"
+
+								<button ng-click="currentAnswer.hideAnswer = !currentAnswer.hideAnswer">
+									<img ng-if="!currentAnswer.hideAnswer" src="assets/creator-assets/eye.png"/>
+									<img ng-if="currentAnswer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
+									<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
+									<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
+								</button>
+								<!-- <input id="hide-answer" type="checkbox"
 								ng-model="currentAnswer.hideAnswer"
 								value="false" /> 
-								<label for="hide-answer">Hide Answer if Player Does Not Have Items</label>
+								<label for="hide-answer">Hide Answer if Player Does Not Have Items</label> -->
 							</div>
 							<!-- <div class="advanced-option">
 								<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>

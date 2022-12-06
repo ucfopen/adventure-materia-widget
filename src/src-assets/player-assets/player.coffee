@@ -43,9 +43,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				$scope.qset = qset
 				$scope.itemSelection = qset.options.inventoryItems
 
-				console.log("qset: ")
-				console.log(qset)
-
 				manageQuestionScreen(qset.items[0].options.id)
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
@@ -91,9 +88,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if questionId is 0
 			q_data = $scope.qset.items[0]
 
-		console.log("question data: ")
-		console.log(q_data)
-
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else if q_data.questions[0].text != "" then $scope.layout = q_data.options.asset.align
 		else $scope.layout = "image-only"
@@ -131,22 +125,26 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		$scope.addedItems = []
 		$scope.removedItems = []
 		$scope.inventoryUpdate = false
+		$scope.questionItems = []
 
 		# Add items to player's inventory
 		if $scope.question.options.items and $scope.question.options.items[0]
 
 			$scope.showInventoryBtn = true
-
+			
+			# Format items
 			for q_i in $scope.question.options.items
 				do (q_i) ->
-					console.log(q_i)
-					hasItem = false
+					item =
+						id: q_i.id
+						count: q_i.count || 1
+						takeAll: q_i.takeAll || false
+						firstVisitOnly: q_i.firstVisitOnly || false
+					$scope.questionItems.push item
 
-					# Get the item data using the id
-					item = null
-					for inventoryItem in $scope.itemSelection
-						if inventoryItem.id is q_i.id
-							item = inventoryItem
+			for q_i in $scope.questionItems
+				do (q_i) ->
+					hasItem = false
 
 					# Check if item is first visit only and player has visited this node before
 					if ($scope.visitedNodes.some((n) => n is $scope.question.id) and q_i.firstVisitOnly)
@@ -157,15 +155,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							# Only show removed items if player has the item in inventory
 							if $scope.inventory.some((i) => i.id is q_i.id)
 								# Can't take more than what is in player inventory
-								if q_i.tempCount > i.count or q_i.takeAll
+								if Math.abs(q_i.count) > i.count or q_i.takeAll
 									q_i.count = -1 * i.count
 								$scope.removedItems.push(q_i)
 						else
 							$scope.addedItems.push(q_i)
 						# Check to see if player already has item
 						# If so, just update item count
-						console.log("Player inventory")
-						console.log($scope.inventory)
 						for p_i, i in $scope.inventory
 							if (p_i.id)
 								if q_i.id is p_i.id
@@ -192,12 +188,24 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			for i in [0..q_data.answers.length-1]
 				continue if not q_data.answers[i]
 
+				requiredItems = []
+
+				# Format items
+				for r in q_data.answers[i].options.requiredItems
+					do (r) ->
+						item =
+							id: r.id
+							minCount: r.minCount || 1
+							maxCount: r.maxCount || r.minCount || 1
+							uncappedMax: r.uncappedMax || true
+						requiredItems.push item
+
 				answer =
 					text : q_data.answers[i].text
 					link : q_data.answers[i].options.link
 					index : i
 					options : q_data.answers[i].options
-					requiredItems: q_data.answers[i].options.requiredItems || []
+					requiredItems: requiredItems
 					hideAnswer: q_data.answers[i].options.hideAnswer || false
 
 				if answer.requiredItems[0]
@@ -253,14 +261,16 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	# Checks to see if player inventory contains all required items
 	# Returns array of missing items
-	$scope.checkInventory = (answer) ->
+	$scope.checkInventory = (requiredItems) ->
 		missingItems = []
-		skip = false
-		angular.forEach answer.requiredItems, (item) ->
+		angular.forEach requiredItems, (item) ->
 			hasRequiredItem = $scope.inventory.some (playerItem) ->
 				if playerItem.id is item.id 
-					if playerItem.count >= item.minCount and playerItem.count <= item.maxCount
-						return true
+					if playerItem.count >= item.minCount
+						if item.uncappedMax
+							return true
+						else if playerItem.count <= item.maxCount
+							return true
 					return false
 			if ! hasRequiredItem
 				missingItems.push(item)
@@ -273,7 +283,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 		$scope.selectedAnswer = $scope.q_data.answers[index].text
 
-		missingItems = $scope.checkInventory($scope.q_data.answers[index].options)
+		missingItems = $scope.checkInventory($scope.answers[index].requiredItems)
 
 		if missingItems[0]
 			string = missingItems.map((item) ->
@@ -285,6 +295,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				" #{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range})"
 			)
 			$scope.feedback = "Requires the items: #{string}"
+			$scope.next = null
 			return
 
 		# Disable the hotspot label before moving on, if it's a hotspot
@@ -339,7 +350,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 				if match is response
 
-					missingItems = $scope.checkInventory($scope.q_data.answers[i].options)
+					missingItems = $scope.checkInventory($scope.answers.requiredItems)
 
 					if missingItems[0]
 						range = ""
@@ -380,10 +391,11 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 				return false
 
-	$scope.closeFeedback = ->
+	$scope.closeFeedback = (advance) ->
 		if $scope.feedback.length > 0 # prevent multiple calls to manageQuestionScreen from firing due to the scope cycle not updating fast enough
 			$scope.feedback = ""
-			manageQuestionScreen $scope.next
+			if $scope.next
+				manageQuestionScreen $scope.next
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
