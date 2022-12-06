@@ -164,8 +164,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							$scope.addedItems.push(q_i)
 						# Check to see if player already has item
 						# If so, just update item count
+						console.log("Player inventory")
+						console.log($scope.inventory)
 						for p_i, i in $scope.inventory
-							if (p_i)
+							if (p_i.id)
 								if q_i.id is p_i.id
 									hasItem = true
 									p_i.count += q_i.count
