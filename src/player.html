@@ -50,7 +50,7 @@
 						</div>
 					</section>
 					<section ng-if="removedItems.length > 0">
-						<div class="item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0" ng-click="toggleInventory(item)">
+						<div class="item removed-item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0" ng-click="toggleInventory(item)">
 							<span class="item-count">- {{-1*item.count}}</span>
 							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
 							<p class="item-name">{{itemSelection[getItemIndex(item)].name}}</p>

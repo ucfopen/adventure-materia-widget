@@ -195,8 +195,8 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					do (r) ->
 						item =
 							id: r.id
-							minCount: r.minCount || 1
-							maxCount: r.maxCount || r.minCount || 1
+							minCount: r.minCount || r.tempMinCount || 1
+							maxCount: r.maxCount || r.tempMaxCount || r.minCount || r.tempMinCount || 1
 							uncappedMax: r.uncappedMax || true
 						requiredItems.push item
 

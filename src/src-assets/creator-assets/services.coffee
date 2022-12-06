@@ -503,6 +503,17 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	formatTreeDataForQset = (tree, items) ->
 
 		if !tree.children or (($filter('filter')(items, {nodeId : tree.id}, true)).length is 0)
+
+			questionItemData = []
+			if tree.items
+				for item in tree.items
+					formattedItem =
+						id: item.id
+						count: item.count || 1
+						firstVisitOnly: item.firstVisitOnly || false
+						takeAll: item.takeAll || false
+					questionItemData.push(formattedItem)
+
 			itemData =
 				materiaType: "question"
 				id: null
@@ -514,7 +525,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					parentId: tree.parentId
 					type: tree.type
 					redirectId: tree.redirectId
-					items: if tree.items then tree.items else []
+					items: questionItemData
 				answers: []
 
 			question =
@@ -547,6 +558,18 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if tree.pendingTarget then itemData.options.pendingTarget = tree.pendingTarget
 
 			angular.forEach tree.answers, (answer, index) ->
+				requiredItemsData = []
+				console.log(answer)
+				
+				for item in answer.requiredItems
+					do (item) ->
+						formattedItem =
+							id: item.id
+							minCount: item.minCount || item.tempMinCount || 1
+							maxCount: item.maxCount || item.tempMaxCount || 1
+							uncappedMax: item.uncappedMax || true
+						requiredItemsData.push formattedItem
+
 				itemAnswerData =
 					text: answer.text
 					value: 0
@@ -554,7 +577,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						link: answer.target
 						linkMode: answer.linkMode
 						feedback: answer.feedback
-						requiredItems: answer.requiredItems
+						requiredItems: requiredItemsData
 						hideAnswer: answer.hideAnswer
 
 				switch tree.type

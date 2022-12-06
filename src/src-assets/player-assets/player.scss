@@ -967,6 +967,10 @@ h1 {
 				color: $blue;
 				cursor: pointer;
 			}
+
+			&.removed-item {
+				color: $red;
+			}
 		}
 
 		img {
