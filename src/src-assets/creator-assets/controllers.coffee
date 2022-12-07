@@ -207,7 +207,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 		$scope.showScoreModeDialog = false
 		$scope.showImportTypeSelection = false
 		$scope.showItemSelection = false
-		$scope.showRequiredItems = false
+		$scope.toggleRequiredItemsModal(null)
 		$scope.showItemManager = false
 		$scope.showItemIconSelector = false
 		$scope.editingIcons = false

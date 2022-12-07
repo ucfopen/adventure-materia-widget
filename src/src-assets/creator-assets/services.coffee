@@ -664,15 +664,15 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				unless node.answers then node.answers = []
 
 				requiredItemsData = []
-				
+
 				if answer.options.requiredItems
-					for item in answer.options.requiredItems
-						do (item) ->
+					for i in answer.options.requiredItems
+						do (i) ->
 							formattedItem =
-								id: item.id
-								minCount: item.minCount || item.tempMinCount || 1
-								maxCount: item.maxCount || item.tempMaxCount || 1
-								uncappedMax: item.uncappedMax || true
+								id: i.id
+								minCount: i.minCount || i.tempMinCount || 1
+								maxCount: i.maxCount || i.tempMaxCount || 1
+								uncappedMax: i.uncappedMax || true
 							requiredItemsData.push formattedItem
 
 				nodeAnswer =

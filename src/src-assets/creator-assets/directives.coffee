@@ -935,15 +935,18 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 				$scope.toast "Item '#{$scope.inventoryItems[$scope.editingIndex].name}' saved!"
 				$scope.editingIndex = -1
 
-		$scope.toggleItemIconSelector = (item = null, index = null) ->
-			if $scope.showItemIconSelector
+		$scope.toggleItemIconSelector = (editingItemIcon = null, index = null) ->
+			# If closing icon selector for the item user is currently editing
+			if $scope.editingItemIcon is editingItemIcon and $scope.showItemIconSelector
 				$scope.showItemIconSelector = false
-				$scope.editingIcons = false
+				$scope.editingItemIcon = null
+			# If opening icon selector
 			else
+				$scope.editingItemIcon = editingItemIcon
 				$scope.showItemIconSelector = true
-				$scope.editingIcons = true
-				$scope.currentItem = item
+				# Make sure Item Editor is open too
 				$scope.editingIndex = index
+
 
 		$scope.handleIconClick = (icon) ->
 			if $scope.inventoryItems[$scope.editingIndex].icon is icon
@@ -2043,7 +2046,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			# Open node items modal
 			$scope.showItemSelection = true
 			# Close required items modal
-			$scope.showRequiredItems = false
+			$scope.toggleRequiredItemsModal(null)
 						
 			# Remove error message
 			$scope.invalidQuantity = null
@@ -2067,15 +2070,24 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.selectedItem = $scope.availableItems[0]
 
 		$scope.toggleRequiredItemsModal = (answer = null) ->
-			$scope.showRequiredItems = !$scope.showRequiredItems
-			# Close required items modal
-			if (answer is null)
+			# Same answer, close the modal
+			if $scope.currentAnswer is answer
 				$scope.currentAnswer = null
-			# Open required items modal
+			# Different answer
 			else
+				$scope.currentAnswer = answer
+
+			# If current answer is not null, open modal
+			if $scope.currentAnswer
 				$scope.showRequiredItems = true
+			# Else close the modal
+			else
+				$scope.showRequiredItems = false
+			
+			if $scope.showRequiredItems
 				# Close node items modal
 				$scope.showItemSelection = false
+
 				if document.querySelector('hotspot-answer-manager')
 					document.querySelector('hotspot-answer-manager').style.zIndex = 100;
 
@@ -2101,7 +2113,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						if ! used
 							$scope.availableItems.push(item)
 
-				$scope.currentAnswer = answer
 				$scope.selectedItem = $scope.availableItems[0]
 
 		# Select item from available items dropdown
@@ -2676,9 +2687,6 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (lega
 					$scope.hotspotAnswerManager.answerIndex = null
 				else
 					$scope.hotspotAnswerManager.show = true
-					# $scope.showRequiredItems = false
-					# $scope.showItemSelection = false
-
 					# The hotspot answer manager will appear adjacent to the cursor
 					# Pass it the cursor location, which is tweaked in the answer manager's directive before being applied
 					$scope.hotspotAnswerManager.x = evt.clientX
