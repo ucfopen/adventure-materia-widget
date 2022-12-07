@@ -561,13 +561,13 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				requiredItemsData = []
 
 				if answer.requiredItems
-					for item in answer.requiredItems
-						do (item) ->
+					for i in answer.requiredItems
+						do (i) ->
 							formattedItem =
 								id: item.id
-								minCount: item.minCount || item.tempMinCount || 1
-								maxCount: item.maxCount || item.tempMaxCount || 1
-								uncappedMax: item.uncappedMax || true
+								minCount: i.minCount || i.tempMinCount || 1
+								maxCount: i.maxCount || i.tempMaxCount || 1
+								uncappedMax: i.uncappedMax || (i.maxCount || i.tempMaxCount ? false : true)
 							requiredItemsData.push formattedItem
 
 				itemAnswerData =
@@ -672,7 +672,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 								id: i.id
 								minCount: i.minCount || i.tempMinCount || 1
 								maxCount: i.maxCount || i.tempMaxCount || 1
-								uncappedMax: i.uncappedMax || true
+								uncappedMax: i.uncappedMax || (i.maxCount || i.tempMaxCount ? false : true)
 							requiredItemsData.push formattedItem
 
 				nodeAnswer =
