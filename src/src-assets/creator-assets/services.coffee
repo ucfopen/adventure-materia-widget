@@ -496,7 +496,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				nodeCount: count
 				inventoryItems: inventoryItems
 				customIcons: customIcons
-		console.log(qset)
 		return qset
 
 
@@ -509,9 +508,9 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				for item in tree.items
 					formattedItem =
 						id: item.id
-						count: item.count || 1
-						firstVisitOnly: item.firstVisitOnly || false
-						takeAll: item.takeAll || false
+						count: item.count or 1
+						firstVisitOnly: item.firstVisitOnly or false
+						takeAll: item.takeAll or false
 					questionItemData.push(formattedItem)
 
 			itemData =
@@ -564,10 +563,12 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					for i in answer.requiredItems
 						do (i) ->
 							formattedItem =
-								id: item.id
-								minCount: i.minCount || i.tempMinCount || 1
-								maxCount: i.maxCount || i.tempMaxCount || 1
-								uncappedMax: i.uncappedMax || (i.maxCount || i.tempMaxCount ? false : true)
+								id: i.id
+								range: i.range || ""
+								minCount: i.minCount or i.tempMinCount or if i.noMin then -1 else 1
+								maxCount: i.maxCount or i.tempMaxCount or if i.uncappedMax then -1 else 1
+								uncappedMax: if (i.uncappedMax is not null) then  i.uncappedMax else (if (i.maxCount or i.tempMaxCount) then false else true)
+								noMin: if (i.noMin is not null) then i.noMin else (if (i.minCount or i.tempMinCount) then false else true)
 							requiredItemsData.push formattedItem
 
 				itemAnswerData =
@@ -670,9 +671,11 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						do (i) ->
 							formattedItem =
 								id: i.id
-								minCount: i.minCount || i.tempMinCount || 1
-								maxCount: i.maxCount || i.tempMaxCount || 1
-								uncappedMax: i.uncappedMax || (i.maxCount || i.tempMaxCount ? false : true)
+								range: i.range || ""
+								minCount: i.minCount or i.tempMinCount or if i.noMin then -1 else 1
+								maxCount: i.maxCount or i.tempMaxCount or if i.uncappedMax then -1 else 1
+								uncappedMax: if (i.uncappedMax is not null) then  i.uncappedMax else (if (i.maxCount or i.tempMaxCount) then false else true)
+								noMin: if (i.noMin is not null) then i.noMin else (if (i.minCount or i.tempMinCount) then false else true)
 							requiredItemsData.push formattedItem
 
 				nodeAnswer =
@@ -703,9 +706,9 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					unless node.items then node.items = []
 					nodeItem =
 						id: inventoryItem.id
-						count: inventoryItem.count || 1
-						firstVisitOnly: inventoryItem.firstVisitOnly || false
-						takeAll: inventoryItem.takeAll || false
+						count: inventoryItem.count or 1
+						firstVisitOnly: inventoryItem.firstVisitOnly or false
+						takeAll: inventoryItem.takeAll or false
 
 					node.items.push nodeItem
 

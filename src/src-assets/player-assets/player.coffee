@@ -163,8 +163,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							$scope.addedItems.push(q_i)
 						# Check to see if player already has item
 						# If so, just update item count
-						console.log("Player Inventory: ")
-						console.log($scope.inventory)
 						for p_i, i in $scope.inventory
 							if p_i.id
 								if q_i.id is p_i.id
@@ -200,9 +198,11 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 						do (r) ->
 							item =
 								id: r.id
-								minCount: r.minCount || r.tempMinCount || 1
-								maxCount: r.maxCount || r.tempMaxCount || r.minCount || r.tempMinCount || 1
-								uncappedMax: r.uncappedMax || true
+								range: r.range || ""
+								minCount: r.minCount or r.tempMinCount or if r.noMin then -1 else 1
+								maxCount: r.maxCount or r.tempMaxCount or if r.uncappedMax then -1 else 1
+								uncappedMax: if (r.uncappedMax is not null) then  r.uncappedMax else (if (r.maxCount or r.tempMaxCount) then false else true)
+								noMin: if (r.noMin is not null) then r.noMin else (if (r.minCount or r.tempMinCount) then false else true)
 							requiredItems.push item
 
 				answer =
@@ -269,16 +269,21 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.checkInventory = (requiredItems) ->
 		missingItems = []
 		angular.forEach requiredItems, (item) ->
+			hasItemInInventory = false
 			hasRequiredItem = $scope.inventory.some (playerItem) ->
 				if playerItem.id is item.id 
-					if playerItem.count >= item.minCount
-						if item.uncappedMax
-							return true
-						else if playerItem.count <= item.maxCount
+					hasItemInInventory = true
+					# Check if player has more than the min
+					if playerItem.count >= item.minCount or item.noMin
+						# Check if player has less than the max
+						if playerItem.count <= item.maxCount or item.uncappedMax
 							return true
 					return false
+			# Check if player doesn't have item but there is no minimum
+			if ! hasItemInInventory and item.noMin
+				hasRequiredItem = true
 			if ! hasRequiredItem
-				missingItems.push(item)
+				missingItems.push(item.id)
 		return missingItems
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
@@ -291,15 +296,15 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		missingItems = $scope.checkInventory($scope.answers[index].requiredItems)
 
 		if missingItems[0]
-			string = missingItems.map((item) ->
-				range = ""
-				if item.minCount < item.maxCount
-					range = item.minCount + "-" + item.maxCount
-				else
-					range = item.minCount
-				" #{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range})"
-			)
-			$scope.feedback = "Requires the items: #{string}"
+			# string = missingItems.map((item) ->
+			# 	range = ""
+			# 	if item.minCount < item.maxCount
+			# 		range = item.minCount + "-" + item.maxCount
+			# 	else
+			# 		range = item.minCount
+			# 	" #{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range})"
+			# )
+			# $scope.feedback = "Requires the items: #{string}"
 			$scope.next = null
 			return
 
@@ -358,13 +363,14 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					missingItems = $scope.checkInventory($scope.answers.requiredItems)
 
 					if missingItems[0]
-						range = ""
-						if item.minCount < item.maxCount
-							range = item.minCount + "-" + item.maxCount
-						else
-							range = item.minCount
-						string = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range});")
-						$scope.feedback = "Requires the items: #{string}"
+						# range = ""
+						# if item.minCount < item.maxCount
+						# 	range = item.minCount + "-" + item.maxCount
+						# else
+						# 	range = item.minCount
+						# string = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range});")
+						# $scope.feedback = "Requires the items: #{string}"
+						$scope.next = null
 						return
 
 					link = ~~$scope.q_data.answers[i].options.link # is parsing required?

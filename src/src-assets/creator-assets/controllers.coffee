@@ -240,7 +240,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	materiaCallbacks.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 		showIntroDialog = false
-		console.log(qset)
 
 		if qset
 			# Convert the old qset prior to using it
@@ -288,7 +287,6 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			return Materia.CreatorCore.cancelSave ''
 		else
 			qset = treeSrv.createQSetFromTree $scope.treeData
-			console.log(qset)
 
 			qset.options.hidePlayerTitle = $scope.hidePlayerTitle
 			qset.options.scoreMode = $scope.scoreMode

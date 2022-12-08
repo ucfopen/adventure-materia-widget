@@ -1976,6 +1976,18 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 		$scope.$watch "answers", ((newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
+				for answer in $scope.answers
+					if answer.requiredItems
+						for r in answer.requiredItems
+							do (r) ->
+								if r.uncappedMax and r.noMin
+									r.range = "any amount"
+								else if r.uncappedMax
+									r.range = "at least #{r.minCount}"
+								else if r.noMin
+									r.range = "no more than #{r.maxCount}"
+								else
+									r.range = "#{r.minCount} - #{r.maxCount}"
 				$scope.editedNode.answers = $scope.answers
 		), true
 
@@ -2093,13 +2105,11 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 				# Remove error message
 				$scope.invalidQuantity = null
-
 				# Save the original item count in case of invalid input
 				if answer.requiredItems
 					for item in answer.requiredItems
 						item.tempMinCount = item.minCount
 						item.tempMaxCount = item.maxCount
-						item.uncappedMax = item.uncappedMax
 
 				# Add items not already being used to the items available for selection
 				$scope.availableItems = []
@@ -2221,6 +2231,8 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					tempMinCount: 1
 					tempMaxCount: 1
 					uncappedMax: true
+					noMin: false
+					range: ""
 				}
 				answer.requiredItems.push(newItem)
 

@@ -1323,9 +1323,13 @@ required-items-tooltip {
 			flex-grow: 2;
 		}
 
-		&.answer-required-item > * {
-			align-content: center;
-			justify-content: center;
+		.item-details {
+			display: flex;
+			flex-direction: row;
+			max-width: 88%;
+			align-items: center;
+			width: 100%;
+			gap: 10px;
 		}
 
 		.item-icon {
@@ -1368,9 +1372,6 @@ required-items-tooltip {
 				margin-top: 5px;
 			}
 		}
-		.item-details {
-			width: 100%;
-		}
 
 		.item-content {
 			display: flex;
@@ -1382,6 +1383,8 @@ required-items-tooltip {
 			.item-description {
 				color: $gray-darker;
 				font-style: italic;
+				overflow: auto;
+				max-height: 100px;
 			}
 
 			textarea, input {
@@ -1397,17 +1400,24 @@ required-items-tooltip {
 
 		.item-options {
 			display: flex;
-			justify-content: space-between;
+			justify-content: end;
+			flex-grow: 1;
 			align-items: center;
 			gap: 10px;
 
 			.item-quantity-options {
 				display: flex;
-				flex-direction: row;
+				flex-direction: column;
 				grid-gap: 10px;
-				align-items: center;
-				flex-wrap: wrap;
 				justify-content: end;
+
+				.item-minimum, .item-maximum {
+					display: flex;
+					flex-direction: row;
+					grid-gap: 10px;
+					align-items: center;
+					justify-content: end;
+				}
 			}
 
 			.item-quantity {
@@ -1416,12 +1426,11 @@ required-items-tooltip {
 				grid-gap: 10px;
 				align-items: center;
 
-
 				input {
 					width: 70px;
 					box-sizing: border-box;
 
-					&.uncapped-max-option {
+					&.uncapped-max-option, &.no-minimum-option {
 						width: auto;
 					}
 				}
@@ -1552,7 +1561,7 @@ required-items-tooltip {
 		align-items: center;
 		flex-direction: row;
 		justify-content: center;
-		gap: 5px;
+		gap: 15px;
 		padding: 0 10px;
 
 		input {
@@ -1561,14 +1570,13 @@ required-items-tooltip {
 		}
 
 		button.hide-answer-button {
-			background-color: $white;
 			display: flex;
 			flex-direction: row;
 			align-items: center;
 			color: $gray-darker;
 			gap: 20px;
 			padding: 20px;
-			width: 300px;
+			background-color: $white;
 
 			img {
 				width: 25px;
@@ -1640,7 +1648,7 @@ required-items-tooltip {
 	&.required-item-modal {
 		position: fixed;
 		height: 63%;
-		width: 55%;
+		width: 56%;
 		top: 120px;
 		left: -200px;
 		right: 0;
@@ -1726,6 +1734,9 @@ required-items-tooltip {
 	min-width: 300px;
 	z-index: 200;
 
+	.item-details {
+		flex-wrap: wrap;
+	}
 
 	.item-container {
 		display: flex;

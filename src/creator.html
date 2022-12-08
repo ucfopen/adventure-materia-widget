@@ -671,41 +671,50 @@
 											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
 											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">{{invalidQuantity}}</p>
 										</div>
-										<ul class="list-items give-items">
+										<ul class="list-items">
 											<li
 												ng-repeat="item in currentAnswer.requiredItems"
 												ng-mouseover="hoverItem = true"
 												ng-mouseout="hoverItem = false"
 												class="answer-required-item"
 											>
-												<div class="item-icon">
-													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
-												</div>
-												<div class="item-content">
-													<div class="item-name">
-														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+												<div class="item-details">
+													<div class="item-icon">
+														<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 													</div>
-													<div class="item-description">
-														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-													</div>
-												</div>
-												<div class="item-options" ng-class="{'show': hoverItem}">
-													<div class="item-quantity-options">
-														<div class="item-quantity">
-															<label for="increase-min-count-{{item.id}}">Min Quantity</label>
-															<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount" ng-pattern="/^[0-9]+[0-9]*$/" ng-change="updateMinCount(event, item)"/>
+													<div class="item-content">
+														<div class="item-name">
+															<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 														</div>
-														<div class="item-quantity" ng-show="!item.uncappedMax">
-															<label for="increase-max-count-{{item.id}}">Max Quantity</label>
-															<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount" ng-pattern="/^[0-9]+[0-9]*$/" ng-change="updateMaxCount(event, item)"/>
-														</div>
-														<div class="item-quantity">
-															<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" value="true" class=" uncapped-max-option">
-															<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+														<div class="item-description">
+															<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 														</div>
 													</div>
-													<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+													<div class="item-options" ng-class="{'show': hoverItem}">
+														<div class="item-quantity-options">
+															<div class="item-minimum">
+																<div class="item-quantity" ng-show="!item.noMin">
+																	<label for="increase-min-count-{{item.id}}">Min Quantity</label>
+																	<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="1"  ng-change="updateMinCount(event, item)"/>
+																</div><div class="item-quantity">
+																	<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option">
+																	<label for="no-minimum-option-{{item.id}}">Zero Minimum</label>
+																</div>
+															</div>
+															<div class="item-maximum">
+																<div class="item-quantity" ng-show="!item.uncappedMax">
+																	<label for="increase-max-count-{{item.id}}">Max Quantity</label>
+																	<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="1"  ng-change="updateMaxCount(event, item)"/>
+																</div>
+																<div class="item-quantity">
+																	<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option">
+																	<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+																</div>
+															</div>
+														</div>
+													</div>
 												</div>
+												<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 											</li>
 										</ul>
 										<div class="options-bar add-item">
@@ -736,9 +745,9 @@
 												<button ng-click="currentAnswer.hideAnswer = !currentAnswer.hideAnswer" ng-class="{'hide-answer': currentAnswer.hideAnswer}" class="hide-answer-button">
 													<img ng-if="!currentAnswer.hideAnswer" src="assets/creator-assets/eye.png"/>
 													<img ng-if="currentAnswer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
-													<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
-													<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
 												</button>
+												<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
+												<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
 											</div>
 
 											<button class="save-button important-button"
@@ -951,34 +960,43 @@
 												ng-mouseout="hoverItem = false"
 												class="answer-required-item"
 											>
-												<div class="item-icon">
-													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
-												</div>
-												<div class="item-content">
-													<div class="item-name">
-														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+												<div class="item-details">
+													<div class="item-icon">
+														<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 													</div>
-													<div class="item-description">
-														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-													</div>
-												</div>
-												<div class="item-options" ng-class="{'show': hoverItem}">
-													<div class="item-quantity-options">
-														<div class="item-quantity">
-															<label for="increase-min-count-{{item.id}}">Min Quantity</label>
-															<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount" ng-pattern="/^[0-9]+[0-9]*$/" ng-change="updateMinCount(event, item)"/>
+													<div class="item-content">
+														<div class="item-name">
+															<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 														</div>
-														<div class="item-quantity" ng-show="!item.uncappedMax">
-															<label for="increase-max-count-{{item.id}}">Max Quantity</label>
-															<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount" ng-pattern="/^[0-9]+[0-9]*$/" ng-change="updateMaxCount(event, item)"/>
-														</div>
-														<div class="item-quantity">
-															<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" value="true" class=" uncapped-max-option">
-															<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+														<div class="item-description">
+															<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 														</div>
 													</div>
-													<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+													<div class="item-options" ng-class="{'show': hoverItem}">
+														<div class="item-quantity-options">
+															<div class="item-minimum">
+																<div class="item-quantity" ng-show="!item.noMin">
+																	<label for="increase-min-count-{{item.id}}">Min Quantity</label>
+																	<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="1"  ng-change="updateMinCount(event, item)"/>
+																</div><div class="item-quantity">
+																	<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option">
+																	<label for="no-minimum-option-{{item.id}}">Zero Minimum</label>
+																</div>
+															</div>
+															<div class="item-maximum">
+																<div class="item-quantity" ng-show="!item.uncappedMax">
+																	<label for="increase-max-count-{{item.id}}">Max Quantity</label>
+																	<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="1"  ng-change="updateMaxCount(event, item)"/>
+																</div>
+																<div class="item-quantity">
+																	<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option">
+																	<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+																</div>
+															</div>
+														</div>
+													</div>
 												</div>
+												<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 											</li>
 										</ul>
 										<div class="options-bar add-item">
@@ -1011,9 +1029,9 @@
 												<button ng-click="currentAnswer.hideAnswer = !currentAnswer.hideAnswer" ng-class="{'hide-answer': currentAnswer.hideAnswer}"  class="hide-answer-button">
 													<img ng-if="!currentAnswer.hideAnswer" src="assets/creator-assets/eye.png"/>
 													<img ng-if="currentAnswer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
-													<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
-													<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
 												</button>
+												<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
+												<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
 												<!-- <input type="checkbox" id="hide-answer"
 												ng-model="currentAnswer.hideAnswer"
 												value="false" /> 
@@ -1118,7 +1136,7 @@
 													
 													<div class="item-quantity">
 														<span>Quantity</span>
-														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 0)"/>
+														<input ng-focus = "event = $event" class="increase-count" type="number" min="1" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 0)"/>
 													</div>
 													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
 												</div>
@@ -1237,34 +1255,43 @@
 									ng-mouseout="hoverItem = false"
 									class="answer-required-item"
 								>
-									<div class="item-icon">
-										<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
-									</div>
-									<div class="item-content">
-										<div class="item-name">
-											<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+									<div class="item-details">
+										<div class="item-icon">
+											<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
 										</div>
-										<div class="item-description">
-											<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-										</div>
-									</div>
-									<div class="item-options" ng-class="{'show': hoverItem}">
-										<div class="item-quantity-options">
-											<div class="item-quantity">
-												<label for="increase-min-count-{{item.id}}">Min Quantity</label>
-												<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount" ng-pattern="/^[0-9]+[0-9]*$/" ng-change="updateMinCount(event, item)"/>
+										<div class="item-content">
+											<div class="item-name">
+												<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 											</div>
-											<div class="item-quantity" ng-show="!item.uncappedMax">
-												<label for="increase-max-count-{{item.id}}">Max Quantity</label>
-												<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount" ng-pattern="/^[0-9]+[0-9]*$/" ng-change="updateMaxCount(event, item)"/>
-											</div>
-											<div class="item-quantity">
-												<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" value="true" class=" uncapped-max-option">
-												<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+											<div class="item-description">
+												<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 											</div>
 										</div>
-										<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+										<div class="item-options" ng-class="{'show': hoverItem}">
+											<div class="item-quantity-options">
+												<div class="item-minimum">
+													<div class="item-quantity" ng-show="!item.noMin">
+														<label for="increase-min-count-{{item.id}}">Min Quantity</label>
+														<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="1"  ng-change="updateMinCount(event, item)"/>
+													</div><div class="item-quantity">
+														<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option">
+														<label for="no-minimum-option-{{item.id}}">Zero Minimum</label>
+													</div>
+												</div>
+												<div class="item-maximum">
+													<div class="item-quantity" ng-show="!item.uncappedMax">
+														<label for="increase-max-count-{{item.id}}">Max Quantity</label>
+														<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="1"  ng-change="updateMaxCount(event, item)"/>
+													</div>
+													<div class="item-quantity">
+														<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option">
+														<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+													</div>
+												</div>
+											</div>
+										</div>
 									</div>
+									<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 								</li>
 							</ul>
 							<div class="options-bar add-item">
@@ -1298,9 +1325,9 @@
 									<button ng-click="currentAnswer.hideAnswer = !currentAnswer.hideAnswer" ng-class="{'hide-answer': currentAnswer.hideAnswer}" class="hide-answer-button">
 										<img ng-if="!currentAnswer.hideAnswer" src="assets/creator-assets/eye.png"/>
 										<img ng-if="currentAnswer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
-										<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
-										<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
 									</button>
+									<p ng-show="currentAnswer.hideAnswer">Answer will be hidden to players without items.</p>
+									<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
 									<!-- <input id="hide-answer" type="checkbox"
 									ng-model="currentAnswer.hideAnswer"
 									value="false" /> 
@@ -1348,7 +1375,7 @@
 								ng-class="{'invalid' : !finalScoreForm.$valid}"
 								ng-model="finalScore"
 								placeholder="100"
-								min="0"
+								min="1"
 								max="100" />
 						</final-score-box>
 						<span>%</span>
@@ -1544,7 +1571,7 @@
 			</node-tooltips>
 			<required-items-tooltip ng-show="hoveredLock.showItems">
 				<span>The answer "{{hoveredLock.answerText}}" requires item(s):</span>
-				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="inventoryItems[getItemIndex(item)].icon && inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.minCount == item.maxCount ? item.minCount : item.minCount + " - " + item.maxCount}})</p>
+				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="inventoryItems[getItemIndex(item)].icon && inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.range}})</p>
 				<p ng-if="!hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-white.png"/></span>This answer will remain visible even if the player does not have the items.</p>
 				<p ng-if="hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-blocked-white.png"/></span>This answer will be invisible to the player if they do not have the items.</p>
 			</required-items-tooltip>
