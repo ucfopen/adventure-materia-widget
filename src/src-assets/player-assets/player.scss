@@ -193,6 +193,12 @@ button.show-inventory {
 	border-bottom: 15px solid $gray-darker;
 }
 
+.arrow-left {
+	border-top: 13px solid transparent;
+	border-right: 8px solid $blue-lighter;
+	border-bottom: 13px solid transparent;
+}
+
 @keyframes notif-bounce {
 	0% {
 		top: 80px;
@@ -698,6 +704,7 @@ h1 {
 			flex-direction: row;
 			align-items: stretch;
 			height: 100%;
+			overflow: auto;
 
 			.inventory-items {
 				display: flex;
@@ -779,12 +786,13 @@ h1 {
 				flex-grow: 1;
 				background-color: $gray-lightest;
 				min-width: 200px;
+				max-width: 50%;
 				border-radius: 10px;
 
 				h4 {
 					margin: 0 0 10px 0;
-					padding-left: 10px;
-					border-bottom: 1px solid $blue-lighter;
+					padding: 10px;
+					border-bottom: 1px solid $gray-lighter;
 					font-size: 14px;
 				}
 
@@ -798,11 +806,18 @@ h1 {
 					flex-direction: row;
 					grid-gap: 20px;
 					align-items: center;
+					position: relative;
 
 					background: $blue-lighter;
 					margin: 0;
 					padding: 10px;
 					color: $white;
+
+					.arrow-left {
+						position: absolute;
+						left: -8px;
+					}
+
 					img {
 						width: 35px;
 						height: 35px;
@@ -943,12 +958,17 @@ h1 {
 
 		.item {
 			display: flex;
-			flex-direction: row;
-			align-items: center;
+			flex-direction: column;
 			border-radius: 10px;
 
 			padding: 10px;
 			margin: 10px 0;
+
+			.item-first {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
 
 			.item-count {
 				min-width: 30px;
@@ -958,7 +978,7 @@ h1 {
 				min-width: 50px;
 			}
 
-			.item-description {
+			.item-update-description {
 				padding-left: 20px;
 				font-style: italic;
 			}
