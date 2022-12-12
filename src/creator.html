@@ -751,6 +751,11 @@
 												<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
 											</div>
 
+											<div class="advanced-option">
+												<input type="checkbox" ng-model="answer.hideRequiredItems" id="hide-required-items"/>
+												<label for="hide-required-items">Hide Required Items</label>
+											</div>
+
 											<button class="save-button important-button"
 											ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 											type="button"
@@ -1568,7 +1573,7 @@
 					ng-repeat="tooltip in hoveredNode.tooltips" ng-show="tooltip.text != 'N/A' || tooltip.givesItems[0] || tooltip.removedItems[0]">
 					<span class="tooltip-title" ng-if="tooltip.text">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
 					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /><span ng-if="!inventoryItems[getItemIndex(item)].icon.url"></span> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : 1}})</p>
-					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : -1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.takeAll ? 'All' : (item.count ? item.count : -1)}})</p>
 				</div>
 			</node-tooltips>
 			<required-items-tooltip ng-show="hoveredLock.showItems">

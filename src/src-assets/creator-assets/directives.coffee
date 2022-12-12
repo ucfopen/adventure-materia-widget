@@ -2285,6 +2285,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				id: treeSrv.generateAnswerHash()
 				requiredItems: []
 				hideAnswer: false
+				hideRequiredItems: false
 
 			# Add a matches and case sensitivity property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS

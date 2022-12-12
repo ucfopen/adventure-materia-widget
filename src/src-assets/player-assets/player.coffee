@@ -190,7 +190,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				continue if not q_data.answers[i]
 
 				requiredItems = []
-
 				# Format items
 				if q_data.answers[i].options.requiredItems
 					for r in q_data.answers[i].options.requiredItems
@@ -198,14 +197,18 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							console.log(r)
 							# Format properties for pre-existing items without said properties
 							# If minCount isn't set, set it to 1
-							minCount = if r.noMin then -1 else r.minCount or r.tempMinCount or r.count or 1
+							minCount = r.minCount or r.tempMinCount or r.count or 1
+							# Past versions had maxCount set to -1 for no minimum values
+							if minCount < 1 then minCount = 1
 
 							# If maxCount isn't set, set it to uncapped
-							maxCount = if r.uncappedMax then -1 else r.maxCount or r.tempMaxCount or -1
+							maxCount = r.maxCount or r.tempMaxCount or 1
+							# Past versions had maxCount set to -1 for uncapped values
+							if maxCount < 1 then maxCount = minCount
 
-							uncappedMax = if r.uncappedMax or maxCount is -1 then true else false
+							uncappedMax = if (r.uncappedMax isnt null) then r.uncappedMax else false
 
-							noMin = if r.noMin or minCount is -1 then true else false
+							noMin = if (r.noMin isnt null) then r.noMin else false
 
 							item =
 								id: r.id
@@ -236,6 +239,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					options : q_data.answers[i].options
 					requiredItems: requiredItems
 					hideAnswer: q_data.answers[i].options.hideAnswer || false
+					hideRequiredItems: q_data.answers[i].options.hideRequiredItems || false
 
 				if answer.requiredItems[0]
 					$scope.showInventoryBtn = true

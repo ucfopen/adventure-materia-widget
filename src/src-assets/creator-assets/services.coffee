@@ -564,18 +564,19 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				if answer.requiredItems
 					for i in answer.requiredItems
 						do (i) ->
+							console.log(i)
 							# Format properties for pre-existing items without said properties
 							# If minCount isn't set, set it to 1
-							minCount = if i.noMin then -1 else i.minCount or i.tempMinCount or i.count or 1
+							minCount = i.minCount or i.tempMinCount or i.count or 1
+							if minCount < 1 then minCount = 1
 
-							# If maxCount isn't set, set it to uncapped
-							maxCount = if i.uncappedMax then -1 else i.maxCount or i.tempMaxCount or -1
+							# If maxCount isn't set, set it to 1
+							maxCount = i.maxCount or i.tempMaxCount or 1
+							if maxCount < 1 then maxCount = minCount
 
-							# If maxCount is -1, that means it is uncapped
-							uncappedMax = if i.uncappedMax or maxCount is -1 then true else false
+							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
 
-							# If minCount is -1, that means it has no minimum 
-							noMin = if i.noMin or minCount is -1 then true else false
+							noMin = if (i.noMin isnt null) then i.noMin else false
 
 							range = i.range
 							if ! range or range is ""
@@ -597,6 +598,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 								noMin: noMin
 
 							requiredItemsData.push formattedItem
+							console.log(formattedItem)
 
 				itemAnswerData =
 					text: answer.text
@@ -606,7 +608,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						linkMode: answer.linkMode
 						feedback: answer.feedback
 						requiredItems: requiredItemsData
-						hideAnswer: answer.hideAnswer
+						hideAnswer: answer.hideAnswer or false
+						hideRequiredItems: answer.hideRequiredItems or false
 
 				switch tree.type
 					when "shortanswer"
@@ -696,18 +699,19 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				if answer.options.requiredItems
 					for i in answer.options.requiredItems
 						do (i) ->
+							console.log(i)
 							# Format properties for pre-existing items without said properties
 							# If minCount isn't set, set it to 1
-							minCount = if i.noMin then -1 else i.minCount or i.tempMinCount or i.count or 1
+							minCount = i.minCount or i.tempMinCount or i.count or 1
+							if minCount < 1 then minCount = 1
 
-							# If maxCount isn't set, set it to uncapped
-							maxCount = if i.uncappedMax then -1 else i.maxCount or i.tempMaxCount or -1
+							# If maxCount isn't set, set it to 1
+							maxCount = i.maxCount or i.tempMaxCount or 1
+							if maxCount < 1 then maxCount = minCount
 
-							# If maxCount is -1, that means it is uncapped
-							uncappedMax = if i.uncappedMax or maxCount is -1 then true else false
+							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
 
-							# If minCount is -1, that means it has no minimum 
-							noMin = if i.noMin or minCount is -1 then true else false
+							noMin = if (i.noMin isnt null) then i.noMin else false
 
 							range = i.range
 							if ! range or range is ""
@@ -730,6 +734,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 
 							requiredItemsData.push formattedItem
+							console.log(formattedItem)
 
 				nodeAnswer =
 					text: answer.text
@@ -740,6 +745,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					id: generateAnswerHash()
 					requiredItems: requiredItemsData
 					hideAnswer: answer.options.hideAnswer or false
+					hideRequiredItems: answer.options.hideRequiredItems or false
 
 				switch item.options.type
 					when "shortanswer"
