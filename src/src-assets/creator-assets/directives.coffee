@@ -2124,6 +2124,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 							$scope.availableItems.push(item)
 
 				$scope.selectedItem = $scope.availableItems[0]
+				console.log($scope.showItemSelection)
 
 		# Select item from available items dropdown
 		$scope.selectItem = (item) ->
@@ -2224,6 +2225,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				# 	return
 
 				# Required items will store the index of the item in inventoryItems and the minimum and maximum required amount
+				# Default is minimum = 1, maximum = uncapped
 				newItem = {
 					id: item.id
 					minCount: 1

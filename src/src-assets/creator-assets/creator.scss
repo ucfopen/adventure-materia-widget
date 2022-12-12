@@ -1095,7 +1095,7 @@ required-items-tooltip {
 
 .item-selection, .item-manager {
 	opacity: 0;
-	height: 0 !important;
+	height: 0;
 	overflow: hidden;
 	max-height: 90%;
 	z-index: -1;
@@ -1104,7 +1104,6 @@ required-items-tooltip {
 	&.show {
 		opacity: 1;
 		overflow: visible;
-		height: auto !important;
 		transition: opacity 0.3s ease;
 		padding: 5px 25px 25px 25px;
 		z-index: $z-index-modal-dialog;
@@ -1117,6 +1116,7 @@ required-items-tooltip {
 	}
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 
 	/** Show modal on screen widths < 1000px **/
 	@media screen and (max-width: 1400px) {
@@ -1189,7 +1189,7 @@ required-items-tooltip {
 		flex-direction: row;
 		justify-content: space-between;
 		gap: 5px;
-		align-items: center;
+		align-items: start;
 		flex-wrap: wrap;
 
 		margin-bottom: 5px;
@@ -1326,10 +1326,21 @@ required-items-tooltip {
 		.item-details {
 			display: flex;
 			flex-direction: row;
-			max-width: 88%;
 			align-items: center;
 			width: 100%;
 			gap: 10px;
+			position: relative;
+			padding-right: 50px;
+			box-sizing: border-box;
+
+			.delete-button {
+				position: absolute;
+				top: 5px;
+				right: 0;
+				height: 30px;
+				width: 30px;
+				padding: 0;
+			}
 		}
 
 		.item-icon {
@@ -1377,7 +1388,7 @@ required-items-tooltip {
 			display: flex;
 			flex-direction: column;
 			flex-grow: 2;
-			max-width: 75%;
+			max-width: 70%;
 			justify-content: center;
 
 			.item-description {
@@ -1475,60 +1486,6 @@ required-items-tooltip {
 		overflow-x: hidden;	
 		height: 100%;
 		margin: 0;
-
-		li {
-
-			item-icon-selector {
-				position: absolute;
-				top: 10px;
-				left: 120px;
-				z-index: $z-index-modal;
-				width: 75%;
-				max-height: 500px !important;
-				padding-bottom: 10px;
-				background: $gray-lightest;
-			
-				.item-header {
-					color: $black;
-					background: $gray-lightest;
-				}
-			
-				ul.icons-list {
-					overflow: auto;
-					display: flex;
-					flex-direction: row;
-					flex-wrap: wrap;
-					grid-gap: 10px;
-					padding-left: 25px;
-			
-					li {
-						width: fit-content;
-						height: fit-content;
-						display: flex;
-						align-items: center;
-						justify-content: center;
-						margin: 0;
-						border: 1px solid transparent;
-						padding: 0;
-			
-						img {
-							max-height: 64px;
-							max-width: 64px;
-							object-fit: cover;
-						}
-			
-						&:hover {
-							cursor: pointer;
-							background-color: $gray-lighter;
-						}
-			
-						&.selectedIcon {
-							background-color: $blue-focus;
-						}
-					}
-				}
-			}
-		}
 	}
 
 	input {
@@ -1599,9 +1556,10 @@ required-items-tooltip {
 .item-manager {
 
 	&.show {
-		position: relative;
+		position: absolute;
+		left: 25%;
 		width: 80%;
-		height: 80%;
+		height: 80% !important;
 		max-width: 700px;
 		margin: auto;
 		z-index: $z-index-modal;
@@ -1610,7 +1568,7 @@ required-items-tooltip {
 		background-color: $color-primary;
 	}
 
-	.item-header {
+	> .item-header {
 		position: absolute;
 		width: calc(100% - 50px);
 		min-height: 63px;
@@ -1624,8 +1582,8 @@ required-items-tooltip {
 		border-top-right-radius: 2px;
 	}
 
-	ul li {
-		flex-direction: row;
+	.list-items {
+		padding-top: 70px;
 	}
 
 	.arrow-left {
@@ -1640,14 +1598,69 @@ required-items-tooltip {
 	}
 }
 
-.item-modal {
-	z-index: $z-index-modal-dialog;
-	background-color: $gray-lightest;
-	justify-content: space-between;
 
-	&.required-item-modal {
+item-icon-selector {
+	position: absolute !important;
+	top: 10px;
+	left: 120px;
+	z-index: $z-index-modal;
+	width: 75%;
+	max-height: 500px !important;
+	padding-bottom: 10px;
+	background: $gray-lightest;
+
+	&.show {
+
+		height: 100% !important;
+	}
+
+	.item-header {
+		color: $black;
+		background: $gray-lightest;
+	}
+
+	ul.icons-list {
+		overflow: auto;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		grid-gap: 10px;
+		padding-left: 25px;
+
+		li {
+			width: fit-content;
+			height: fit-content;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0;
+			border: 1px solid transparent;
+			padding: 0;
+
+			img {
+				max-height: 64px;
+				max-width: 64px;
+				object-fit: cover;
+			}
+
+			&:hover {
+				cursor: pointer;
+				background-color: $gray-lighter;
+			}
+
+			&.selectedIcon {
+				background-color: $blue-focus;
+			}
+		}
+	}
+}
+
+.item-modal {
+	background-color: $gray-lightest;
+
+	&.required-item-modal.show {
 		position: fixed;
-		height: 63%;
+		height: 63% !important;
 		width: 56%;
 		top: 120px;
 		left: -200px;
@@ -1680,43 +1693,12 @@ required-items-tooltip {
 		}
 	}
 
-	&.give-item-modal {
+	&.give-item-modal.show {
 		position: absolute;
-		height: 75%;
+		height: 75% !important;
 		width: 88%;
 		bottom: 100px;
 		right: 30px;
-
-
-		.item-container {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			overflow: auto;
-			overflow-x: hidden;
-			height: 100%;
-
-			> div {
-				min-width: 50%;
-				display:flex;
-				flex-direction: column;
-				padding-right: 10px;
-				box-sizing: border-box;
-			}
-
-			.list-items li {
-				display:flex;
-				flex-direction: column;
-
-				> div {
-					display: flex;
-				}
-			}
-
-			.list-items {
-				max-height: 100%;
-			}
-		}
 	}
 
 	.arrow-bottom {
@@ -1728,43 +1710,53 @@ required-items-tooltip {
 }
 
 .item-panel {
-	position: relative;
-	height: 100%;
-	max-height: 100%;
-	min-width: 300px;
-	z-index: 200;
+
+	&.show {
+		height: 100% !important;
+		max-height: 100%;
+		min-width: 300px;
+	}
 
 	.item-details {
 		flex-wrap: wrap;
 	}
 
 	.item-container {
-		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
 		grid-gap: 10px;
-		overflow: auto;
-		height: 100%;
+	}
+
+}
+
+/* For give-item and required-item modals and panels */
+.item-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	overflow: auto;
+	overflow-x: hidden;
+	height: 100%;
+
+	> div {
+		min-width: 50%;
+		display:flex;
+		flex-direction: column;
+		padding-right: 10px;
+		box-sizing: border-box;
+	}
+
+	.list-items li {
+		display:flex;
+		flex-direction: column;
 
 		> div {
-			min-width: 50%;
-			display:flex;
-			flex-direction: column;
-			padding-right: 10px;
-			box-sizing: border-box;
-			flex-grow: 1;
-		}
-
-		.list-items li {
-			display:flex;
-			flex-direction: column;
-
-			> div {
-				display: flex;
-			}
+			display: flex;
 		}
 	}
 
+	.list-items {
+		max-height: 100%;
+	}
 }
 
 title-editor {
@@ -2833,7 +2825,7 @@ node-creation-selection-dialog {
 	.continuity-container {
 		padding: 5px 15px;
 
-		overflow-y: auto;
+		// overflow-y: auto;
 
 
 		span {

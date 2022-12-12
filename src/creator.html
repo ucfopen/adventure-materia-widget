@@ -686,9 +686,9 @@
 														<div class="item-name">
 															<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 														</div>
-														<div class="item-description">
+														<!-- <div class="item-description">
 															<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-														</div>
+														</div> -->
 													</div>
 													<div class="item-options" ng-class="{'show': hoverItem}">
 														<div class="item-quantity-options">
@@ -713,8 +713,9 @@
 															</div>
 														</div>
 													</div>
+
+													<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 												</div>
-												<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 											</li>
 										</ul>
 										<div class="options-bar add-item">
@@ -968,9 +969,9 @@
 														<div class="item-name">
 															<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 														</div>
-														<div class="item-description">
+														<!-- <div class="item-description">
 															<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-														</div>
+														</div> -->
 													</div>
 													<div class="item-options" ng-class="{'show': hoverItem}">
 														<div class="item-quantity-options">
@@ -995,8 +996,9 @@
 															</div>
 														</div>
 													</div>
+													<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 												</div>
-												<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+												
 											</li>
 										</ul>
 										<div class="options-bar add-item">
@@ -1128,9 +1130,9 @@
 													<div class="item-name">
 														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 													</div>
-													<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+													<!-- <div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
 														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-													</div>
+													</div> -->
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
 													
@@ -1175,9 +1177,9 @@
 													<div class="item-name">
 														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 													</div>
-													<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+													<!-- <div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
 														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-													</div>
+													</div> -->
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
 													<div class="item-quantity">
@@ -1263,9 +1265,9 @@
 											<div class="item-name">
 												<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 											</div>
-											<div class="item-description">
+											<!-- <div class="item-description">
 												<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-											</div>
+											</div> -->
 										</div>
 										<div class="item-options" ng-class="{'show': hoverItem}">
 											<div class="item-quantity-options">
@@ -1290,8 +1292,8 @@
 												</div>
 											</div>
 										</div>
+										<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 									</div>
-									<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 								</li>
 							</ul>
 							<div class="options-bar add-item">
@@ -1383,7 +1385,7 @@
 					<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NONSCORING">
 						<span>End Points do not provide scores when the widget is in Non-Scoring mode.</span>
 					</div>
-					<div class="add-answer-options">
+					<div class="add-answer-options" ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS ">
 						<button class="add-answer important-button"
 							type="button"
 							ng-click="newAnswer()"
@@ -1396,14 +1398,14 @@
 					</div>
 					<div class="items-container">
 						<!-- item selection for individual nodes -->
-						<div item-selection class="item-selection item-modal give-item-modal"
+						<div item-selection ng-if="showItemSelection" class="item-selection item-modal give-item-modal"
 						ng-click="bringToFront($event)"  ng-class="{ show : showItemSelection}"
 						ng-mousedown="modalDragStart($event)">
 							<div class="item-header">
 								<div class="item-heading">
 									<h3>Items for {{editedNode.type.charAt(0).toUpperCase() + editedNode.type.slice(1)}}</h3>
 									<span class="hide-popup icon-cross"
-									ng-click="showItemSelection = false"
+									ng-click="toggleNodeItemsModal()"
 									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
 									tabindex="0"></span>
 								</div>
@@ -1435,9 +1437,9 @@
 													<div class="item-name">
 														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 													</div>
-													<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+													<!-- <div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
 														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-													</div>
+													</div> -->
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
 													
@@ -1483,9 +1485,9 @@
 													<div class="item-name">
 														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
 													</div>
-													<div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
+													<!-- <div class="item-description" ng-if="inventoryItems[getItemIndex(item)].description">
 														<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
-													</div>
+													</div> -->
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
 													<div class="item-quantity">
@@ -1545,7 +1547,7 @@
 								<button class="save-button important-button"
 								ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 								type="button"
-								ng-click="showItemSelection = false">Done
+								ng-click="toggleNodeItemsModal()">Done
 								</button>
 							</div>
 						</div>

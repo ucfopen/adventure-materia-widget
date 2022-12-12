@@ -496,6 +496,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				nodeCount: count
 				inventoryItems: inventoryItems
 				customIcons: customIcons
+
+		console.log(qset)
 		return qset
 
 
@@ -562,13 +564,38 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				if answer.requiredItems
 					for i in answer.requiredItems
 						do (i) ->
+							# Format properties for pre-existing items without said properties
+							# If minCount isn't set, set it to 1
+							minCount = if i.noMin then -1 else i.minCount or i.tempMinCount or i.count or 1
+
+							# If maxCount isn't set, set it to uncapped
+							maxCount = if i.uncappedMax then -1 else i.maxCount or i.tempMaxCount or -1
+
+							# If maxCount is -1, that means it is uncapped
+							uncappedMax = if i.uncappedMax or maxCount is -1 then true else false
+
+							# If minCount is -1, that means it has no minimum 
+							noMin = if i.noMin or minCount is -1 then true else false
+
+							range = i.range
+							if ! range or range is ""
+								if uncappedMax and noMin
+									range = "any amount"
+								else if uncappedMax
+									range = "at least #{minCount}"
+								else if noMin
+									range = "no more than #{maxCount}"
+								else
+									range = "#{minCount} - #{maxCount}"
+
 							formattedItem =
 								id: i.id
-								range: i.range || ""
-								minCount: i.minCount or i.tempMinCount or if i.noMin then -1 else 1
-								maxCount: i.maxCount or i.tempMaxCount or if i.uncappedMax then -1 else 1
-								uncappedMax: if (i.uncappedMax is not null) then  i.uncappedMax else (if (i.maxCount or i.tempMaxCount) then false else true)
-								noMin: if (i.noMin is not null) then i.noMin else (if (i.minCount or i.tempMinCount) then false else true)
+								range: range
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+								noMin: noMin
+
 							requiredItemsData.push formattedItem
 
 				itemAnswerData =
@@ -608,7 +635,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		return items
 
 	createTreeDataFromQset = (qset) ->
-
+		console.log(qset)
 		orphans = []
 		tree = {}
 
@@ -669,13 +696,39 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				if answer.options.requiredItems
 					for i in answer.options.requiredItems
 						do (i) ->
+							# Format properties for pre-existing items without said properties
+							# If minCount isn't set, set it to 1
+							minCount = if i.noMin then -1 else i.minCount or i.tempMinCount or i.count or 1
+
+							# If maxCount isn't set, set it to uncapped
+							maxCount = if i.uncappedMax then -1 else i.maxCount or i.tempMaxCount or -1
+
+							# If maxCount is -1, that means it is uncapped
+							uncappedMax = if i.uncappedMax or maxCount is -1 then true else false
+
+							# If minCount is -1, that means it has no minimum 
+							noMin = if i.noMin or minCount is -1 then true else false
+
+							range = i.range
+							if ! range or range is ""
+								if uncappedMax and noMin
+									range = "any amount"
+								else if uncappedMax
+									range = "at least #{minCount}"
+								else if noMin
+									range = "no more than #{maxCount}"
+								else
+									range = "#{minCount} - #{maxCount}"
+
 							formattedItem =
 								id: i.id
-								range: i.range || ""
-								minCount: i.minCount or i.tempMinCount or if i.noMin then -1 else 1
-								maxCount: i.maxCount or i.tempMaxCount or if i.uncappedMax then -1 else 1
-								uncappedMax: if (i.uncappedMax is not null) then  i.uncappedMax else (if (i.maxCount or i.tempMaxCount) then false else true)
-								noMin: if (i.noMin is not null) then i.noMin else (if (i.minCount or i.tempMinCount) then false else true)
+								range: range
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+								noMin: noMin
+
+
 							requiredItemsData.push formattedItem
 
 				nodeAnswer =
@@ -686,7 +739,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					feedback: answer.options.feedback
 					id: generateAnswerHash()
 					requiredItems: requiredItemsData
-					hideAnswer: answer.options.hideAnswer
+					hideAnswer: answer.options.hideAnswer or false
 
 				switch item.options.type
 					when "shortanswer"
@@ -732,7 +785,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if orphans.length and i >= orphans.length and orphans.length isnt previousCount
 				i = 0
 				previousCount = orphans.length
-
+		console.log(tree)
 		tree
 
 	validateTreeOnStart = (tree) ->

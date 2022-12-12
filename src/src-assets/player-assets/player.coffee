@@ -163,8 +163,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							$scope.addedItems.push(q_i)
 						# Check to see if player already has item
 						# If so, just update item count
+						console.log($scope.inventory)
 						for p_i, i in $scope.inventory
-							if p_i.id
+							if p_i and p_i.id
 								if q_i.id is p_i.id
 									hasItem = true
 									p_i.count += q_i.count
@@ -196,13 +197,38 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				if q_data.answers[i].options.requiredItems
 					for r in q_data.answers[i].options.requiredItems
 						do (r) ->
+							console.log(r)
+							# Format properties for pre-existing items without said properties
+							# If minCount isn't set, set it to 1
+							minCount = if r.noMin then -1 else r.minCount or r.tempMinCount or r.count or 1
+
+							# If maxCount isn't set, set it to uncapped
+							maxCount = if r.uncappedMax then -1 else r.maxCount or r.tempMaxCount or -1
+
+							uncappedMax = if r.uncappedMax or maxCount is -1 then true else false
+
+							noMin = if r.noMin or minCount is -1 then true else false
+
 							item =
 								id: r.id
 								range: r.range || ""
-								minCount: r.minCount or r.tempMinCount or if r.noMin then -1 else 1
-								maxCount: r.maxCount or r.tempMaxCount or if r.uncappedMax then -1 else 1
-								uncappedMax: if (r.uncappedMax is not null) then  r.uncappedMax else (if (r.maxCount or r.tempMaxCount) then false else true)
-								noMin: if (r.noMin is not null) then r.noMin else (if (r.minCount or r.tempMinCount) then false else true)
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+								noMin: noMin
+							
+							# Format range for pre-existing items without the range property
+							if item.range is ""
+								if item.uncappedMax and item.noMin
+									item.range = "any amount"
+								else if item.uncappedMax
+									item.range = "at least #{item.minCount}"
+								else if item.noMin
+									item.range = "no more than #{item.maxCount}"
+								else
+									item.range = "#{item.minCount} - #{item.maxCount}"
+							
+							console.log(item)
 							requiredItems.push item
 
 				answer =
