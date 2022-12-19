@@ -42,8 +42,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				$scope.title = instance.name
 				$scope.qset = qset
 				$scope.itemSelection = qset.options.inventoryItems
+				$scope.startID = qset.items[0].options.id
 
-				manageQuestionScreen(qset.items[0].options.id)
+				if qset.options.startID isnt 0
+					$scope.startID = qset.options.startID
+
+				manageQuestionScreen($scope.startID)
+
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
 

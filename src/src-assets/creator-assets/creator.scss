@@ -314,7 +314,7 @@ header.title-header {
 		cursor: pointer;
 	}
 
-	div.header-options-box {
+	.header-options-box {
 
 		float: right;
 		margin-top: -6px;
@@ -1684,6 +1684,11 @@ item-icon-selector {
 		top: 40px;
 		left: 120px;
 		width: 420px;
+
+		&.show {
+			height: auto;
+			max-height: none;
+		}
 
 		.arrow-left {
 			position: absolute;
@@ -3211,7 +3216,7 @@ node-creation-selection-dialog {
 			
 		}
 
-		input:not(#hide-answer) {
+		#hotspot-label-input {
 			width: 90%;
 			height: 2em;
 
@@ -3259,6 +3264,8 @@ node-creation-selection-dialog {
 
 		.required-item-modal-hotspot .add-item {
 			flex-direction: column;
+			align-items: start;
+			height: auto;
 		}
 
 		div.select-required-items {

@@ -497,7 +497,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				inventoryItems: inventoryItems
 				customIcons: customIcons
 
-		console.log(qset)
 		return qset
 
 
@@ -564,7 +563,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				if answer.requiredItems
 					for i in answer.requiredItems
 						do (i) ->
-							console.log(i)
 							# Format properties for pre-existing items without said properties
 							# If minCount isn't set, set it to 1
 							minCount = i.minCount or i.tempMinCount or i.count or 1
@@ -598,7 +596,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 								noMin: noMin
 
 							requiredItemsData.push formattedItem
-							console.log(formattedItem)
 
 				itemAnswerData =
 					text: answer.text
@@ -638,7 +635,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		return items
 
 	createTreeDataFromQset = (qset) ->
-		console.log(qset)
 		orphans = []
 		tree = {}
 
@@ -699,7 +695,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				if answer.options.requiredItems
 					for i in answer.options.requiredItems
 						do (i) ->
-							console.log(i)
 							# Format properties for pre-existing items without said properties
 							# If minCount isn't set, set it to 1
 							minCount = i.minCount or i.tempMinCount or i.count or 1
@@ -734,7 +729,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 
 							requiredItemsData.push formattedItem
-							console.log(formattedItem)
 
 				nodeAnswer =
 					text: answer.text
@@ -791,7 +785,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if orphans.length and i >= orphans.length and orphans.length isnt previousCount
 				i = 0
 				previousCount = orphans.length
-		console.log(tree)
 		tree
 
 	validateTreeOnStart = (tree) ->

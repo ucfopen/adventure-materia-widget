@@ -36,6 +36,13 @@
 			<img class="logo" src="assets/creator-assets/materialogo.png" alt="Materia Logo" />
 			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
 			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
+			<preview-node-selector class="header-options-box">
+				<p>Start Preview On</p>
+				<button type="button"
+					class="preview-node-select"
+					ng-click="selectPreviewNode()">{{ integerToLetters(startID) }}
+				</button>
+			</preview-node-selector>
 			<div class="header-options-box">
 				<p>Hide Title When Playing Widget</p>
 				<div class="options-check-slide fancy-toggle">
@@ -698,7 +705,7 @@
 																	<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="1"  ng-change="updateMinCount(event, item)"/>
 																</div><div class="item-quantity">
 																	<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option">
-																	<label for="no-minimum-option-{{item.id}}">Zero Minimum</label>
+																	<label for="no-minimum-option-{{item.id}}">No Minimum</label>
 																</div>
 															</div>
 															<div class="item-maximum">
@@ -751,10 +758,10 @@
 												<p ng-show="!currentAnswer.hideAnswer">Answer will be visible to all players.</p>
 											</div>
 
-											<div class="advanced-option">
+											<!-- <div class="advanced-option">
 												<input type="checkbox" ng-model="answer.hideRequiredItems" id="hide-required-items"/>
 												<label for="hide-required-items">Hide Required Items</label>
-											</div>
+											</div> -->
 
 											<button class="save-button important-button"
 											ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
@@ -938,7 +945,7 @@
 									ng-keypress="$event.keyCode === 13 ? hotspotAnswerManager.show = false : ''"
 									tabindex="0"></span>
 								</div>
-								<input type="text" placeholder="Enter hotspot label here."
+								<input type="text" id="hotspot-label-input" placeholder="Enter hotspot label here."
 									ng-model="answers[hotspotAnswerManager.answerIndex].text"/>
 								<textarea class="feedback-box"
 									placeholder="Enter optional feedback here."
@@ -986,7 +993,7 @@
 																	<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="1"  ng-change="updateMinCount(event, item)"/>
 																</div><div class="item-quantity">
 																	<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option">
-																	<label for="no-minimum-option-{{item.id}}">Zero Minimum</label>
+																	<label for="no-minimum-option-{{item.id}}">No Minimum</label>
 																</div>
 															</div>
 															<div class="item-maximum">
@@ -1051,12 +1058,19 @@
 										</div>
 										
 										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
-										
-										<button class="save-button important-button"
+										<!-- <div class="advanced-option">
+											<button ng-click="currentAnswer.hideRequiredItems = !currentAnswer.hideRequiredItems" ng-class="{'hide-answer': answer.hideRequiredItems}"  class="hide-answer-button">
+												<img ng-if="!currentAnswer.hideRequiredItems" src="assets/creator-assets/eye.png"/>
+												<img ng-if="currentAnswer.hideRequiredItems" src="assets/creator-assets/eye-blocked.png"/>
+											</button>
+											<input type="checkbox" ng-model="currentAnswer.hideRequiredItems" id="hide-required-items"/>
+											<label for="hide-required-items">Hide Required Items</label>
+										</div> -->
+										<!-- <button class="save-button important-button"
 										ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 										type="button"
 										ng-click="toggleRequiredItemsModal()">Done
-										</button>
+										</button> -->
 									</div>
 
 									<button ng-show="inventoryItems[0]" class="require-item-btn" id="hotspot-require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = false" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false">
@@ -1282,7 +1296,7 @@
 														<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="1"  ng-change="updateMinCount(event, item)"/>
 													</div><div class="item-quantity">
 														<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option">
-														<label for="no-minimum-option-{{item.id}}">Zero Minimum</label>
+														<label for="no-minimum-option-{{item.id}}">No Minimum</label>
 													</div>
 												</div>
 												<div class="item-maximum">
@@ -1340,6 +1354,12 @@
 									value="false" /> 
 									<label for="hide-answer">Hide Answer if Player Does Not Have Items</label> -->
 								</div>
+
+
+								<!-- <div class="advanced-option">
+									<input type="checkbox" ng-model="answer.hideRequiredItems" id="hide-required-items"/>
+									<label for="hide-required-items">Hide Required Items</label>
+								</div> -->
 								<!-- <div class="advanced-option">
 									<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
 									<label for="show-advanced">Show Advanced Options</label>
@@ -1644,7 +1664,7 @@
 						ng-click="hideCoverAndModals()">Done</button>
 				</div>
 			</div>
-			<tree-history ng-class="{ 'minimized':minimized, 'disabled': (existingNodeSelectionMode || copyNodeMode)}" ng-disabled="existingNodeSelectionMode || copyNodeMode">
+			<tree-history ng-class="{ 'minimized':minimized, 'disabled': (existingNodeSelectionMode || copyNodeMode || previewNodeSelectionMode)}" ng-disabled="existingNodeSelectionMode || copyNodeMode || previewNodeSelectionMode">
 				<div class="undo-redo-options">
 					<button ng-click="undoAction()" ng-disabled="historyPosition <= 0">Undo</button>
 					<button ng-click="redoAction()" ng-disabled="historyPosition >= historySize-1">Redo</button>

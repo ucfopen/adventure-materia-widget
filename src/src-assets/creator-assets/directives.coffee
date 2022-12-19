@@ -83,6 +83,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 		$scope.svg = null
 		$scope.copyMode = false
 		$scope.existingLinkMode = false
+		$scope.previewNodeMode = false
 
 		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
 		$scope.windowHeight = document.getElementById("adventure-container").offsetHeight
@@ -107,6 +108,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 		$scope.$on "mode.existingLink.complete", (evt) ->
 			$scope.existingLinkMode = false
+			$scope.render treeSrv.get()
+
+		$scope.$on "mode.previewNodeSelectionMode", (evt) ->
+			$scope.previewNodeMode = true
+			$scope.render treeSrv.get()
+
+		$scope.$on "mode.previewNodeSelectionMode.complete", (evt) ->
+			$scope.previewNodeMode = false
 			$scope.render treeSrv.get()
 
 		$scope.render = (data) ->
@@ -230,7 +239,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 			angular.forEach links, (link, index) ->
 
 				# Don't create bridge nodes if copyMode or existingLinkMode are enabled
-				if $scope.copyMode or $scope.existingLinkMode then return
+				if $scope.copyMode or $scope.existingLinkMode or $scope.previewNodeMode then return
 
 				source = link.source
 				target = link.target
@@ -374,7 +383,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					)
 
 					# don't attempt the following calculations if in copyMode or existingLinkMode! These nodes will not exist
-					if $scope.copyMode or $scope.existingLinkMode then return
+					if $scope.copyMode or $scope.existingLinkMode or $scope.previewNodeMode then return
 
 					# Do some fancy math to find the midpoint of the curve once it's been computed
 					# This must happen AFTER the path is generated for the link
@@ -1100,7 +1109,7 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 			$scope.rollBackToSnapshot $scope.historyPosition
 
 		$scope.rollBackToSnapshot = (index) ->
-			if $scope.existingNodeSelectionMode or $scope.copyNodeMode then return false
+			if $scope.existingNodeSelectionMode or $scope.copyNodeMode or $scope.previewNodeSelectionMode then return false
 			snapshot = treeHistorySrv.retrieveSnapshot index
 			tree = treeSrv.createTreeDataFromQset JSON.parse snapshot.tree
 			inventoryItems = (JSON.parse snapshot.tree).options.inventoryItems
@@ -1561,6 +1570,45 @@ Adventure.directive "nodeCreationSelectionDialog", ['treeSrv', (treeSrv) ->
 				$scope.showCreationDialog = true
 
 			$scope.showBackgroundCover = true
+]
+
+# Directive for choosing node to begin preview on
+Adventure.directive "previewNodeSelector", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+		$scope.selectPreviewNode = () ->
+			# Suspend the node creation screen so the user can select a node
+			$scope.showBackgroundCover = false
+			$scope.nodeTools.show = false
+			$scope.displayNodeCreation = "suspended"
+
+			# Set the node selection mode so click events are handled differently than normal
+			$scope.previewNodeSelectionMode = true
+
+			# Notify the treeViz directive to redraw the tree in the new mode
+			$rootScope.$broadcast "mode.previewNodeSelectionMode"
+			treeSrv.set $scope.treeData
+
+			$scope.displayModeManager "Select the node the preview should start on.", "Cancel", ->
+				$scope.cancelModeManager()
+				$rootScope.$broadcast "mode.previewNodeSelectionMode.complete"
+				$scope.previewNodeSelectionMode = false
+				$scope.displayNodeCreation = "none"
+				$scope.showBackgroundCover = false
+				deregister()
+			
+			deregister = $scope.$watch "previewNodeSelected", (newVal, oldVal) ->
+				if (newVal)
+					$scope.previewNodeSelectionMode = false
+					$scope.previewNodeSelected = null
+					$scope.displayNodeCreation = "none"
+					$scope.cancelModeManager()
+					$scope.resetNewNodeManager()
+
+					$scope.startID = newVal.id
+
+					deregister()
+
 ]
 
 # Dialog for selecting what kind of node a given answer should target
@@ -2124,7 +2172,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 							$scope.availableItems.push(item)
 
 				$scope.selectedItem = $scope.availableItems[0]
-				console.log($scope.showItemSelection)
 
 		# Select item from available items dropdown
 		$scope.selectItem = (item) ->

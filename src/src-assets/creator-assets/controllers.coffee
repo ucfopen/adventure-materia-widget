@@ -34,6 +34,8 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	$scope.hidePlayerTitle = false
 
+	$scope.startID = 0
+
 	# NodeTools is an object that holds the parameters for the nodeTools modal, works in tandem with the nodeToolsDialog directive
 	$scope.nodeTools =
 		show: false
@@ -67,6 +69,9 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 
 	$scope.copyNodeMode = false
 	$scope.copyNodeTarget = null
+
+	$scope.previewNodeSelectionMode = false
+	$scope.previewNodeSelected = null
 
 	# This instantiation of treeData is required. It populates the "Start" node.
 	$scope.treeData =
@@ -250,7 +255,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
-
+				
 				treeSrv.setInventoryItems qset.options.inventoryItems || []
 
 				$scope.inventoryItems = qset.options.inventoryItems || []
@@ -289,6 +294,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			qset = treeSrv.createQSetFromTree $scope.treeData
 
 			qset.options.hidePlayerTitle = $scope.hidePlayerTitle
+			qset.options.startID = $scope.startID
 			qset.options.scoreMode = $scope.scoreMode
 			qset.options.internalScoreMessage = $scope.internalScoreMessage
 			qset.options.inventoryItems = treeSrv.getInventoryItems()
@@ -422,6 +428,11 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				$scope.copyNodeTarget = data
 				$scope.copyNodeMode = false
 
+		else if $scope.previewNodeSelectionMode
+			$scope.$apply () ->
+				$scope.previewNodeSelected = data
+				$scope.previewNodeSelectionMode = false
+
 		else # Default selection behavior
 			$scope.$apply () ->
 				$scope.nodeTools.show = !$scope.nodeTools.show
@@ -502,6 +513,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 	$scope.generateDebugQset = ->
 		qset = treeSrv.createQSetFromTree $scope.treeData
 		qset.options.hidePlayerTitle = $scope.hidePlayerTitle
+		qset.options.startID = $scope.startID
 		qset.options.scoreMode = $scope.scoreMode
 		qset.options.internalScoreMessage = $scope.internalScoreMessage
 		qset.options.inventoryItems = treeSrv.getInventoryItems()
