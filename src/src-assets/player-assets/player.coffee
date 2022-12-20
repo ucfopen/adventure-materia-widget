@@ -201,7 +201,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				if q_data.answers[i].options.requiredItems
 					for r in q_data.answers[i].options.requiredItems
 						do (r) ->
-							console.log(r)
 							# Format properties for pre-existing items without said properties
 							# If minCount isn't set, set it to 1
 							minCount = r.minCount or r.tempMinCount or r.count or 1
@@ -236,7 +235,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 								else
 									item.range = "#{item.minCount} - #{item.maxCount}"
 							
-							console.log(item)
 							requiredItems.push item
 
 				answer =
@@ -301,7 +299,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	$scope.hasNotSilentItem = (items) ->
 		for i in items
-			console.log(items)
 			if ! $scope.itemSelection[$scope.getItemIndex(i)].isSilent
 				return true
 		return false
