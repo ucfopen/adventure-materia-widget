@@ -1393,12 +1393,51 @@ required-items-tooltip {
 
 			.item-description {
 				color: $gray-darker;
-				font-style: italic;
 				overflow: auto;
-				max-height: 100px;
+				max-height: 120px;
+				p {
+					font-style: italic;
+				}
 			}
 
-			textarea, input {
+			.advanced-button {
+				color: $blue;
+				display: flex;
+				align-items: center;
+				gap: 5px;
+
+				&:hover {
+					text-decoration: underline;
+					cursor: pointer;
+				}
+
+				.arrow-bottom {
+					border-left: 7px solid transparent;
+					border-right: 7px solid transparent;
+					border-top: 7px solid $blue;
+				}
+
+				.arrow-top {
+					border-left: 7px solid transparent;
+					border-right: 7px solid transparent;
+					border-bottom: 7px solid $blue;
+				}
+			}
+
+			.silent-option {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 5px;
+				padding-top: 5px;
+
+				img {
+					height: 20px;
+					width: 20px;
+				}
+			}
+
+			textarea, input[type="text"] {
 				width: 100%;
 				max-width: 350px;
 				box-sizing: border-box;

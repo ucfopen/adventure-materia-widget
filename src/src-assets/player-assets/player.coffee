@@ -163,9 +163,11 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 								# Can't take more than what is in player inventory
 								if Math.abs(q_i.count) > i.count or q_i.takeAll
 									q_i.count = -1 * i.count
-								$scope.removedItems.push(q_i)
+								if ! $scope.itemSelection[$scope.getItemIndex(q_i)].isSilent
+									$scope.removedItems.push(q_i)
 						else
-							$scope.addedItems.push(q_i)
+							if ! $scope.itemSelection[$scope.getItemIndex(q_i)].isSilent
+								$scope.addedItems.push(q_i)
 						# Check to see if player already has item
 						# If so, just update item count
 						for p_i, i in $scope.inventory
@@ -244,7 +246,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					options : q_data.answers[i].options
 					requiredItems: requiredItems
 					hideAnswer: q_data.answers[i].options.hideAnswer || false
-					hideRequiredItems: q_data.answers[i].options.hideRequiredItems || false
+					# hideRequiredItems: q_data.answers[i].options.hideRequiredItems || false
 
 				if answer.requiredItems[0]
 					$scope.showInventoryBtn = true
@@ -282,7 +284,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.toggleInventory = (item = null) ->
 		$scope.showInventory = ! $scope.showInventory
 		$scope.inventoryUpdate = false
-		$scope.selectedItem = $scope.inventory[$scope.getItemIndex(item)] || $scope.inventory[0]
+		$scope.selectedItem = $scope.inventory[$scope.getItemIndex(item)] || null
 		$scope.showNew = false
 
 	$scope.setSelectedItem = (item) ->
@@ -296,6 +298,12 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		for i, index in $scope.itemSelection
 			if i.id is item.id
 				return index
+
+	$scope.hasNotSilentItem = (items) ->
+		for i in items
+			if ! $scope.itemSelection[$scope.getItemIndex(i)].isSilent
+				return true
+		return false
 
 	# Checks to see if player inventory contains all required items
 	# Returns array of missing items

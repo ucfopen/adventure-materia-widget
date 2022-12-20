@@ -72,7 +72,7 @@
 				<h2 class="inventory-header">Inventory Items</h2>
 				<div class="inventory-content">
 					<div class="inventory-items">
-						<div class="item" ng-class="{'selected' : item.id == selectedItem.id}" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0">
+						<div class="item" ng-class="{'selected' : item.id == selectedItem.id}" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0 && !itemSelection[getItemIndex(item)].isSilent">
 							<span ng-if="item.new" class="new-item">NEW!</span>
 							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
 							{{itemSelection[getItemIndex(item)].name}}
@@ -165,8 +165,8 @@
 					data-link="{{answer.link}}"
 					tabindex="0">
 					<span class="answer-text">{{answer.text}}</span>
-					<div class="answer-required-items" ng-if="answer.requiredItems.length && !answer.hideRequiredItems">
-						<span class="required-item" ng-repeat="item in answer.requiredItems" ng-class="{'missing-item': checkInventory(answer.requiredItems).includes(item.id)}">
+					<div class="answer-required-items" ng-if="answer.requiredItems.length && hasNotSilentItem(answer.requiredItems)">
+						<span class="required-item" ng-repeat="item in answer.requiredItems" ng-show="!itemSelection[getItemIndex(item)].isSilent" ng-class="{'missing-item': checkInventory(answer.requiredItems).includes(item.id)}">
 							<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
 							{{itemSelection[getItemIndex(item)].name}} <span class="item-quantity">({{item.range}})</span>
 						</span>

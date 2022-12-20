@@ -135,6 +135,15 @@
 									placeholder="(Optional) Enter Item Description Here"
 									enter-submit="handleEditItem(item, $index, $event)"
 									auto-select></textarea>
+								<p class="advanced-button" ng-click="showSilentOption = !showSilentOption" ng-show="editingIndex == $index">Advanced <i class="arrow-bottom" ng-show="!showSilentOption"></i><i class="arrow-top" ng-show="showSilentOption"></i></p>
+								<div ng-show="showSilentOption && editingIndex == $index" class="silent-option">
+									<input type="checkbox" id="{{item.id}}-silent-item" ng-model="item.isSilent"/>
+									<label for="{{item.id}}-silent-item">Silent Item</label>
+								</div>
+								<div ng-show="item.isSilent && editingIndex != $index"  class="silent-option">
+									<img src="assets/creator-assets/eye-blocked.png"/>
+									<p>Silent Item</p>
+								</div>
 							</div>
 						</div>
 						<div class="item-options">

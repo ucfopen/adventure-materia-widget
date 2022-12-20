@@ -910,6 +910,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 			$scope.showInventoryBackgroundCover = true
 			# Collapse any open item editors
 			$scope.editingIndex = -1
+			$scope.showSilentOption = false
 
 		$scope.addNewItem = () ->
 			if $scope.newItemName.trim() != ''
@@ -2332,7 +2333,7 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				id: treeSrv.generateAnswerHash()
 				requiredItems: []
 				hideAnswer: false
-				hideRequiredItems: false
+				# hideRequiredItems: false
 
 			# Add a matches and case sensitivity property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
