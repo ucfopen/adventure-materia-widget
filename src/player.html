@@ -40,7 +40,7 @@
 				<i class="arrow-top"></i>
 				<div class="update-content" tabindex="-1">
 					<section ng-if="addedItems.length > 0">
-						<div class="item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0" ng-click="toggleInventory(item)">
+						<div class="item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0 && !itemSelection[getItemIndex(item)].isSilent" ng-click="toggleInventory(item)">
 							<div class="item-first">
 								<span class="item-count">+ {{item.count}} </span>
 								<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
@@ -52,7 +52,7 @@
 						</div>
 					</section>
 					<section ng-if="removedItems.length > 0">
-						<div class="item removed-item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0" ng-click="toggleInventory(item)">
+						<div class="item removed-item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0 && !itemSelection[getItemIndex(item)].isSilent"" ng-click="toggleInventory(item)">
 							<div class="item-first">
 								<span class="item-count">- {{-1*item.count}}</span>
 								<img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>

@@ -301,6 +301,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	$scope.hasNotSilentItem = (items) ->
 		for i in items
+			console.log(items)
 			if ! $scope.itemSelection[$scope.getItemIndex(i)].isSilent
 				return true
 		return false

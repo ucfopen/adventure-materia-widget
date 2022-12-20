@@ -920,6 +920,7 @@ Adventure.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeH
 					description: ''
 					count: 1
 					icon: {}
+					isSilent: false
 				$scope.inventoryItems.push(newItem)
 
 				$scope.newItemName = ''
