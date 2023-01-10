@@ -720,18 +720,19 @@
 															<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 														</div> -->
 													</div>
+
+													<div class="item-minimum">
+														<div class="item-quantity">
+															<label for="increase-min-count-{{item.id}}">Min Quantity</label>
+															<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+														</div>
+														<!-- <div class="item-quantity" ng-show="showAdvancedOptions">
+															<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option"  ng-change="updateMinCount(event, item)">
+															<label for="no-minimum-option-{{item.id}}">No Minimum</label>
+														</div> -->
+													</div>
 													<div class="item-options" ng-class="{'show': hoverItem}">
 														<div class="item-quantity-options">
-															<div class="item-minimum">
-																<div class="item-quantity">
-																	<label for="increase-min-count-{{item.id}}">Min Quantity</label>
-																	<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
-																</div>
-																<!-- <div class="item-quantity" ng-show="showAdvancedOptions">
-																	<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option"  ng-change="updateMinCount(event, item)">
-																	<label for="no-minimum-option-{{item.id}}">No Minimum</label>
-																</div> -->
-															</div>
 															<div class="item-maximum" ng-show="showAdvancedOptions">
 																<div class="item-quantity" ng-show="!item.uncappedMax">
 																	<label for="increase-max-count-{{item.id}}">Max Quantity</label>
@@ -1012,19 +1013,19 @@
 															<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 														</div> -->
 													</div>
+
+													<div class="item-minimum">
+														<div class="item-quantity">
+															<label for="increase-min-count-{{item.id}}">Min Quantity</label>
+															<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+														</div>
+														<!-- <div class="item-quantity" ng-show="showAdvancedOptions">
+															<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option"  ng-change="updateMinCount(event, item)">
+															<label for="no-minimum-option-{{item.id}}">No Minimum</label>
+														</div> -->
+													</div>
 													<div class="item-options" ng-class="{'show': hoverItem}">
-														
 														<div class="item-quantity-options">
-															<div class="item-minimum">
-																<div class="item-quantity">
-																	<label for="increase-min-count-{{item.id}}">Min Quantity</label>
-																	<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
-																</div>
-																<!-- <div class="item-quantity" ng-show="showAdvancedOptions">
-																	<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option"  ng-change="updateMinCount(event, item)">
-																	<label for="no-minimum-option-{{item.id}}">No Minimum</label>
-																</div> -->
-															</div>
 															<div class="item-maximum" ng-show="showAdvancedOptions">
 																<div class="item-quantity" ng-show="!item.uncappedMax">
 																	<label for="increase-max-count-{{item.id}}">Max Quantity</label>
@@ -1317,19 +1318,18 @@
 												<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 											</div> -->
 										</div>
+										<div class="item-minimum">
+											<div class="item-quantity">
+												<label for="increase-min-count-{{item.id}}">Min Quantity</label>
+												<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+											</div>
+											<!-- <div class="item-quantity" ng-show="showAdvancedOptions">
+												<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option"  ng-change="updateMinCount(event, item)">
+												<label for="no-minimum-option-{{item.id}}">No Minimum</label>
+											</div> -->
+										</div>
 										<div class="item-options" ng-class="{'show': hoverItem}">
-											
 											<div class="item-quantity-options">
-												<div class="item-minimum">
-													<div class="item-quantity">
-														<label for="increase-min-count-{{item.id}}">Min Quantity</label>
-														<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
-													</div>
-													<!-- <div class="item-quantity" ng-show="showAdvancedOptions">
-														<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option"  ng-change="updateMinCount(event, item)">
-														<label for="no-minimum-option-{{item.id}}">No Minimum</label>
-													</div> -->
-												</div>
 												<div class="item-maximum" ng-show="showAdvancedOptions">
 													<div class="item-quantity" ng-show="!item.uncappedMax">
 														<label for="increase-max-count-{{item.id}}">Max Quantity</label>
