@@ -163,10 +163,10 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 								# Can't take more than what is in player inventory
 								if Math.abs(q_i.count) > i.count or q_i.takeAll
 									q_i.count = -1 * i.count
-								if ! $scope.itemSelection[$scope.getItemIndex(q_i)].isSilent
+								if ! $scope.itemSelection[$scope.getItemIndex(q_i.id)].isSilent
 									$scope.removedItems.push(q_i)
 						else
-							if ! $scope.itemSelection[$scope.getItemIndex(q_i)].isSilent
+							if ! $scope.itemSelection[$scope.getItemIndex(q_i.id)].isSilent
 								$scope.addedItems.push(q_i)
 						# Check to see if player already has item
 						# If so, just update item count
@@ -282,7 +282,8 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.toggleInventory = (item = null) ->
 		$scope.showInventory = ! $scope.showInventory
 		$scope.inventoryUpdate = false
-		$scope.selectedItem = $scope.inventory[$scope.getItemIndex(item)] || null
+		if item
+			$scope.selectedItem = $scope.inventory[$scope.getItemIndex(item.id)] || null
 		$scope.showNew = false
 
 	$scope.setSelectedItem = (item) ->
@@ -291,15 +292,15 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		# Remove new label from icon
 		item.new = false
 
-	$scope.getItemIndex = (item) ->
-		if !item then return false
+	$scope.getItemIndex = (itemId) ->
+		if !itemId then return false
 		for i, index in $scope.itemSelection
-			if i.id is item.id
+			if i.id is itemId
 				return index
 
 	$scope.hasNotSilentItem = (items) ->
 		for i in items
-			if ! $scope.itemSelection[$scope.getItemIndex(i)].isSilent
+			if ! $scope.itemSelection[$scope.getItemIndex(i.id)].isSilent
 				return true
 		return false
 
@@ -332,18 +333,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 		$scope.selectedAnswer = $scope.q_data.answers[index].text
 
-		missingItems = $scope.checkInventory($scope.answers[index].requiredItems)
+		requiredItems = $scope.answers[index].requiredItems || $scope.answers[index].options.requiredItems
+
+		missingItems = $scope.checkInventory(requiredItems)
 
 		if missingItems[0]
-			# string = missingItems.map((item) ->
-			# 	range = ""
-			# 	if item.minCount < item.maxCount
-			# 		range = item.minCount + "-" + item.maxCount
-			# 	else
-			# 		range = item.minCount
-			# 	" #{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range})"
-			# )
-			# $scope.feedback = "Requires the items: #{string}"
+			string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
+			$scope.feedback = "Answer requires the items: #{string}"
 			$scope.next = null
 			return
 
@@ -398,17 +394,12 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 					response = response.toLowerCase()
 
 				if match is response
-
-					missingItems = $scope.checkInventory($scope.answers.requiredItems)
+					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
+					missingItems = $scope.checkInventory(requiredItems)
 
 					if missingItems[0]
-						# range = ""
-						# if item.minCount < item.maxCount
-						# 	range = item.minCount + "-" + item.maxCount
-						# else
-						# 	range = item.minCount
-						# string = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item)].name} (amount: #{range});")
-						# $scope.feedback = "Requires the items: #{string}"
+						string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
+						$scope.feedback = "Answer requires the items: #{string}"
 						$scope.next = null
 						return
 
