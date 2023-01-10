@@ -1931,6 +1931,9 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
+		# initialize showAdvancedOptions for requiredItemsModal
+		$scope.showAdvancedOptions = false
+
 		$scope.$on "editedNode.target.changed", (evt) ->
 
 			if $scope.editedNode
@@ -2030,12 +2033,14 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					if answer.requiredItems
 						for r in answer.requiredItems
 							do (r) ->
-								if r.uncappedMax and r.noMin
+								if r.uncappedMax and r.minCount is 0
 									r.range = "any amount"
 								else if r.uncappedMax
 									r.range = "at least #{r.minCount}"
-								else if r.noMin
+								else if r.minCount is 0
 									r.range = "no more than #{r.maxCount}"
+								else if r.minCount is r.maxCount
+									r.range = "#{r.minCount}"
 								else
 									r.range = "#{r.minCount} - #{r.maxCount}"
 				$scope.editedNode.answers = $scope.answers
@@ -2158,8 +2163,15 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				# Save the original item count in case of invalid input
 				if answer.requiredItems
 					for item in answer.requiredItems
+						console.log(item)
 						item.tempMinCount = item.minCount
 						item.tempMaxCount = item.maxCount
+
+						# Show advanced options on start only if advanced options are enabled
+						if !item.uncappedMax
+							$scope.showAdvancedOptions = true
+						else
+							$scope.showAdvancedOptions = false
 
 				# Add items not already being used to the items available for selection
 				$scope.availableItems = []
@@ -2187,28 +2199,33 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 		# Display error message if quantity is invalid
 		# takesItem is true if this item is being removed from the player's inventory
 		$scope.updateMinCount = (event, item) ->
-			if item.tempMinCount
+			if item.tempMinCount > -1
 				$scope.invalidQuantity = null
 				if (!item.uncappedMax and item.tempMinCount > item.tempMaxCount)
-					$scope.invalidQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
-					if (item.tempMaxCount > 0) 
+					$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
+					if (item.tempMaxCount > -1) 
 						item.minCount = item.tempMaxCount
 				else
 					item.minCount = item.tempMinCount
+					$scope.invalidMaxQuantity = null
 			else
-				$scope.invalidQuantity = "Invalid quantity."
+				$scope.invalidQuantity = "Invalid min quantity."
 
 		$scope.updateMaxCount = (event, item) ->
-			if item.tempMaxCount
-				$scope.invalidQuantity = null
-				if (item.tempMinCount > item.tempMaxCount)
-					$scope.invalidQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
-					if (item.tempMinCount > 0) 
-						item.maxCount = item.tempMinCount
+			if !item.uncappedMax
+				if item.tempMaxCount > -1
+					$scope.invalidMaxQuantity = null
+					if (item.tempMinCount > item.tempMaxCount)
+						$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
+						if (item.tempMinCount > -1) 
+							item.maxCount = item.tempMinCount
+					else
+						item.maxCount = item.tempMaxCount
+						$scope.invalidQuantity = null
 				else
-					item.maxCount = item.tempMaxCount
+					$scope.invalidMaxQuantity = "Invalid max quantity."
 			else
-				$scope.invalidQuantity = "Invalid quantity."
+				$scope.invalidMaxQuantity = null
 
 		$scope.updateNodeItemCount = (event, item, takesItem) ->
 			if item.tempCount
@@ -2282,7 +2299,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 					tempMinCount: 1
 					tempMaxCount: 1
 					uncappedMax: true
-					noMin: false
 					range: ""
 				}
 				answer.requiredItems.push(newItem)
@@ -2882,7 +2898,7 @@ Adventure.directive "hotspotAnswerManager", [() ->
 				bounds = angular.element($element)[0].getBoundingClientRect()
 				# Bounds
 				managerMaxHeight = 400
-				managerMaxWidth = 400
+				managerMaxWidth = 500
 				container = document.getElementById("adventure-container").getBoundingClientRect()
 
 				# Move the manager so its back into frame if it's out of bounds

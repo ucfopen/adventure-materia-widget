@@ -203,18 +203,27 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 						do (r) ->
 							# Format properties for pre-existing items without said properties
 							# If minCount isn't set, set it to 1
-							minCount = r.minCount or r.tempMinCount or r.count or 1
-							# Past versions had maxCount set to -1 for no minimum values
-							if minCount < 1 then minCount = 1
+							if r.minCount > -1
+								minCount = r.minCount 
+							else if r.tempMinCount > -1
+								minCount = r.tempMinCount 
+							else if r.count
+								minCount = r.count
+							else
+								minCount = 1
 
 							# If maxCount isn't set, set it to uncapped
-							maxCount = r.maxCount or r.tempMaxCount or 1
-							# Past versions had maxCount set to -1 for uncapped values
-							if maxCount < 1 then maxCount = minCount
+							if r.maxCount > -1
+								maxCount = r.maxCount 
+							else if r.tempMaxCount > -1
+								maxCount = r.tempMaxCount 
+							else if r.count
+								maxCount = r.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
 
 							uncappedMax = if (r.uncappedMax isnt null) then r.uncappedMax else false
-
-							noMin = if (r.noMin isnt null) then r.noMin else false
 
 							item =
 								id: r.id
@@ -222,16 +231,17 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 								minCount: minCount
 								maxCount: maxCount
 								uncappedMax: uncappedMax
-								noMin: noMin
 							
 							# Format range for pre-existing items without the range property
 							if item.range is ""
-								if item.uncappedMax and item.noMin
+								if item.uncappedMax and item.minCount is 0
 									item.range = "any amount"
 								else if item.uncappedMax
 									item.range = "at least #{item.minCount}"
-								else if item.noMin
+								else if item.minCount is 0
 									item.range = "no more than #{item.maxCount}"
+								else if item.minCount is item.maxCount
+									item.range = "#{item.minCount}"
 								else
 									item.range = "#{item.minCount} - #{item.maxCount}"
 							
@@ -314,13 +324,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				if playerItem.id is item.id 
 					hasItemInInventory = true
 					# Check if player has more than the min
-					if playerItem.count >= item.minCount or item.noMin
+					if playerItem.count >= item.minCount
 						# Check if player has less than the max
 						if playerItem.count <= item.maxCount or item.uncappedMax
 							return true
 					return false
 			# Check if player doesn't have item but there is no minimum
-			if ! hasItemInInventory and item.noMin
+			if ! hasItemInInventory and item.minCount is 0
 				hasRequiredItem = true
 			if ! hasRequiredItem
 				missingItems.push(item.id)
@@ -338,8 +348,8 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		missingItems = $scope.checkInventory(requiredItems)
 
 		if missingItems[0]
-			string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
-			$scope.feedback = "Answer requires the items: #{string}"
+			# string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
+			# $scope.feedback = "Answer requires the items: #{string}"
 			$scope.next = null
 			return
 

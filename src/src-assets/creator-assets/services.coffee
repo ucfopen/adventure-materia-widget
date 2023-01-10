@@ -564,26 +564,39 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					for i in answer.requiredItems
 						do (i) ->
 							# Format properties for pre-existing items without said properties
-							# If minCount isn't set, set it to 1
-							minCount = i.minCount or i.tempMinCount or i.count or 1
-							if minCount < 1 then minCount = 1
-
-							# If maxCount isn't set, set it to 1
-							maxCount = i.maxCount or i.tempMaxCount or 1
-							if maxCount < 1 then maxCount = minCount
+							
+							if i.minCount > -1
+								minCount = i.minCount 
+							else if i.tempMinCount > -1
+								minCount = i.tempMinCount 
+							else if i.count
+								minCount = i.count
+							else
+								# If minCount isn't set, set it to 1
+								minCount = 1
+							
+							if i.maxCount > -1
+								maxCount = i.maxCount 
+							else if i.tempMaxCount > -1
+								maxCount = i.tempMaxCount 
+							else if i.count
+								maxCount = i.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
 
 							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
-
-							noMin = if (i.noMin isnt null) then i.noMin else false
-
+							
 							range = i.range
 							if ! range or range is ""
-								if uncappedMax and noMin
+								if uncappedMax and minCount is 0
 									range = "any amount"
 								else if uncappedMax
 									range = "at least #{minCount}"
-								else if noMin
+								else if minCount is 0
 									range = "no more than #{maxCount}"
+								else if minCount is maxCount
+									range = "#{minCount}"
 								else
 									range = "#{minCount} - #{maxCount}"
 
@@ -593,7 +606,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 								minCount: minCount
 								maxCount: maxCount
 								uncappedMax: uncappedMax
-								noMin: noMin
 
 							requiredItemsData.push formattedItem
 
@@ -696,26 +708,39 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					for i in answer.options.requiredItems
 						do (i) ->
 							# Format properties for pre-existing items without said properties
-							# If minCount isn't set, set it to 1
-							minCount = i.minCount or i.tempMinCount or i.count or 1
-							if minCount < 1 then minCount = 1
+							
+							if i.minCount > -1
+								minCount = i.minCount 
+							else if i.tempMinCount > -1
+								minCount = i.tempMinCount 
+							else if i.count
+								minCount = i.count
+							else
+								# If minCount isn't set, set it to 1
+								minCount = 1
 
-							# If maxCount isn't set, set it to 1
-							maxCount = i.maxCount or i.tempMaxCount or 1
-							if maxCount < 1 then maxCount = minCount
+							if i.maxCount > -1
+								maxCount = i.maxCount 
+							else if i.tempMaxCount > -1
+								maxCount = i.tempMaxCount 
+							else if i.count
+								maxCount = i.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
 
 							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
 
-							noMin = if (i.noMin isnt null) then i.noMin else false
-
 							range = i.range
 							if ! range or range is ""
-								if uncappedMax and noMin
+								if uncappedMax and minCount is 0
 									range = "any amount"
 								else if uncappedMax
 									range = "at least #{minCount}"
-								else if noMin
+								else if minCount is 0
 									range = "no more than #{maxCount}"
+								else if minCount is maxCount
+									range = "#{minCount}"
 								else
 									range = "#{minCount} - #{maxCount}"
 
@@ -725,7 +750,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 								minCount: minCount
 								maxCount: maxCount
 								uncappedMax: uncappedMax
-								noMin: noMin
 
 
 							requiredItemsData.push formattedItem

@@ -631,6 +631,39 @@ button {
 			background: $gray;
 		}
 	}
+
+
+	&.hide-answer-button {
+		height: 35px;
+		width: 35px;
+		padding: 5px 0 0 0;
+		position: relative;
+
+		img {
+			height: 25px;
+			width: 25px;
+		}
+
+		.hide-answer-tooltip {
+			position: absolute;
+			top: 45px;
+			width: 100px;
+			background: $blue;
+			color: $white;
+			border-radius: 5px;
+			padding: 5px;
+
+			&::before {
+				position: absolute;
+				top: -8px;
+				left: 10px;
+				content: "";
+				border-left: 10px solid transparent;
+				border-right: 10px solid transparent;
+				border-bottom: 10px solid $blue;
+			}
+		}
+	}
 }
 
 .mode-header {
@@ -1468,6 +1501,18 @@ required-items-tooltip {
 					align-items: center;
 					justify-content: end;
 				}
+				.quantity-explanation {
+					font-style: italic;
+
+					code {
+						font-style:normal;
+						background: $gray-lighter;
+						padding: 2px 5px;
+						border: 1px solid $white;
+						border-radius: 3px;
+						display: inline-block;
+					}
+				}
 			}
 
 			.item-quantity {
@@ -1722,7 +1767,7 @@ item-icon-selector {
 		position: absolute;
 		top: 40px;
 		left: 120px;
-		width: 420px;
+		width: 500px;
 
 		&.show {
 			height: auto;
@@ -2559,12 +2604,46 @@ node-creation-selection-dialog {
 
 				border-radius: 5px;
 
-				.answer-textareas {
-					flex-grow: 1;
-
+				.answer-textareas, .answer-removal-options {
 					display: flex;
 					flex-direction: column;
 					grid-gap: 10px;
+					
+					.hide-answer-button {
+						height: 35px;
+						width: 35px;
+						padding: 5px 0 0 0;
+						position: relative;
+
+						img {
+							height: 25px;
+							width: 25px;
+						}
+
+						.hide-answer-tooltip {
+							position: absolute;
+							top: 45px;
+							width: 100px;
+							background: $blue;
+							color: $white;
+							border-radius: 5px;
+							padding: 5px;
+
+							&::before {
+								position: absolute;
+								top: -8px;
+								left: 10px;
+								content: "";
+								border-left: 10px solid transparent;
+								border-right: 10px solid transparent;
+								border-bottom: 10px solid $blue;
+							}
+						}
+					}
+				}
+
+				.answer-textareas {
+					flex-grow: 1;
 					justify-content: space-between;
 
 					.match-options {
@@ -3325,6 +3404,7 @@ node-creation-selection-dialog {
 
 			button {
 				margin-right: 4px;
+				height: 35px;
 			}
 		}
 
