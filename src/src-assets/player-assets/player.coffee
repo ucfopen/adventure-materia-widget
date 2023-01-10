@@ -44,7 +44,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 				$scope.itemSelection = qset.options.inventoryItems
 				$scope.startID = qset.items[0].options.id
 
-				if qset.options.startID isnt 0
+				if qset.options.startID isnt 0 and qset.options.startID
 					$scope.startID = qset.options.startID
 
 				manageQuestionScreen($scope.startID)
