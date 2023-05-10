@@ -1686,6 +1686,16 @@ required-items-tooltip {
 		border-top-right-radius: 2px;
 	}
 
+	.inventory-introduction {
+		text-align: center;
+		color: $gray-darker;
+
+		span {
+			display: block;
+			margin-bottom: 10px;
+		}
+	}
+
 	.list-items {
 		padding-top: 70px;
 	}
