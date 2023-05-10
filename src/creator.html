@@ -613,7 +613,7 @@
 												<button type="button"
 													class="answer-node-select"
 													ng-class="{'managed' : answer.id == newNodeManager.answerId}"
-													>{{ integerToLetters(answer.target) }}
+													><span class="node-label">{{ integerToLetters(answer.target) }}</span>
 												</button>
 											</div>
 											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-class="{'requires-items': answer.requiredItems[0]}" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
@@ -1143,12 +1143,13 @@
 						ng-click="bringToFront($event)">
 							<div class="item-header">
 								<div class="item-heading">
-									<h3>Items for {{editedNode.type.charAt(0).toUpperCase() + editedNode.type.slice(1)}}</h3>
+									<h3>Items for {{integerToLetters(editedNode.id)}}</h3>
 									<span class="hide-popup icon-cross"
 									ng-click="showItemSelection = false"
 									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
 									tabindex="0"></span>
 								</div>
+								<span class="instructions">Select an item via the drop-down, then choose whether the item will be given to the player or taken from them.</span>
 								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">{{invalidQuantity}}</p>
 								<p class="item-instructions invalid-quantity-message"  ng-if="invalidMaxQuantity">{{invalidMaxQuantity}}</p>
 							</div>
@@ -1453,7 +1454,8 @@
 						ng-mousedown="modalDragStart($event)">
 							<div class="item-header">
 								<div class="item-heading">
-									<h3>Items for {{editedNode.type.charAt(0).toUpperCase() + editedNode.type.slice(1)}}</h3>
+									<h3>Items for {{integerToLetters(editedNode.id)}}</h3>
+									<span class="instructions">Select an item via the drop-down, then choose whether the item will be given to the player or taken from them.</span>
 									<span class="hide-popup icon-cross"
 									ng-click="toggleNodeItemsModal()"
 									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
@@ -1563,7 +1565,7 @@
 											</div>
 										</li>
 									</ul>
-									<p class="item-instructions"><strong>Note: </strong>This will only take items if the player has them already in their inventory.</p>
+									<p class="item-instructions"><strong>Note: </strong>This will only take items if the player has them in their inventory.</p>
 								</div>
 							</div>
 							<div class="options-bar add-item">

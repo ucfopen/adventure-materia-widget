@@ -1176,12 +1176,24 @@ required-items-tooltip {
 			grid-gap: 10px;
 
 			h3 {
+				display: block;
 				max-height: 2.5em;
 				overflow: hidden;
 			}
 
+			span.instructions {
+				display: block;
+				font-size: 12px;
+				font-style: italic;
+				color: $gray-darker;
+			}
+
 			&.sub-heading {
 				justify-content: start;
+
+				h4 {
+					margin: 1em 0;
+				}
 			}
 
 			.item-heading-icons {
@@ -1209,12 +1221,17 @@ required-items-tooltip {
 
 		.item-instructions {
 			margin: 0 0 10px 0;
-			font-size: 14px;
 		}
 
 		.invalid-quantity-message {
 			color: $red;
 		}
+	}
+
+	.item-instructions {
+		font-size: 12px;
+		font-style: italic;
+		color: $gray-darker;
 	}
 
 	ul li, .options-bar {
@@ -1225,11 +1242,9 @@ required-items-tooltip {
 		align-items: start;
 		flex-wrap: wrap;
 
-		margin-bottom: 5px;
-		padding: 15px 10px;
-		margin-right: 2px;
+		padding: 10px;
 
-		font-size: 11pt;
+		font-size: 14px;
 
 		border: solid 1px transparent;
 		box-sizing: border-box;
@@ -1240,6 +1255,8 @@ required-items-tooltip {
 		&.options-bar {
 			align-items: center;
 			min-width: 425px;
+			padding-bottom: 0px;
+			margin: 0;
 		}
 
 		.icon-uploader-options {
@@ -1363,15 +1380,11 @@ required-items-tooltip {
 			width: 100%;
 			gap: 10px;
 			position: relative;
-			padding-right: 50px;
 			box-sizing: border-box;
 
 			.delete-button {
-				position: absolute;
-				top: 5px;
-				right: 0;
-				height: 30px;
-				width: 30px;
+				height: 24px;
+				width: 24px;
 				padding: 0;
 			}
 		}
@@ -1483,7 +1496,7 @@ required-items-tooltip {
 
 		.item-minimum {
 			input {
-				width: 70px;
+				width: 50px;
 				height: 1em;
 			}
 		}
@@ -1506,9 +1519,9 @@ required-items-tooltip {
 					flex-direction: row;
 					grid-gap: 10px;
 					align-items: center;
-					justify-content: end;
 				}
 				.quantity-explanation {
+					font-size: 12px;
 					font-style: italic;
 
 					code {
@@ -1747,7 +1760,7 @@ item-icon-selector {
 }
 
 .item-modal {
-	background-color: $gray-lightest;
+	background-color: $color-primary;
 
 	&.required-item-modal.show {
 		position: fixed;
@@ -1821,6 +1834,22 @@ item-icon-selector {
 		flex-direction: column;
 		grid-gap: 10px;
 	}
+
+	.item-header {
+		span.instructions {
+			display: block;
+			font-size: 12px;
+			font-style: italic;
+			color: $gray-darker;
+			margin-bottom: 0.5em;
+		}
+
+		h4 {
+			margin: 1em 0;
+		}
+	}
+
+	
 
 }
 
@@ -2728,6 +2757,10 @@ node-creation-selection-dialog {
 						&:hover {
 							background: $color-accent-highlight;
 							cursor: pointer;
+
+							.node-label {
+								background: $color-accent-highlight;
+							}
 						}
 					}
 				}
@@ -2758,12 +2791,20 @@ node-creation-selection-dialog {
 					height: 45px;
 					width: 45px;
 					display: flex;
-					flex-direction: column;
+					flex-direction: row;
 					justify-content: center;
 					border-radius: 50%;
 					border: 1px solid $white;
 					background-color: transparent;
 					font-size: 24px;
+
+					overflow-x: visible;
+
+					.node-label {
+						display: block;
+						width:fit-content;
+						background: $color-accent;
+					}
 				}
 
 				.answer-items {
