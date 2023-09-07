@@ -9,9 +9,9 @@
     "micromarkdown": "^0.3.0"
   },
   "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack -p",
-    "build-dev": "webpack",
+    "start": "mwdk-start",
+    "build": "mwdk-build-prod",
+    "build-dev": "mwdk-build-dev",
     "test": "echo 'tests not implemented",
     "test-ci": "echo 'tests not implemented'"
   },

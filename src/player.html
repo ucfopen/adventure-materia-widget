@@ -6,7 +6,7 @@
 
 		<!-- STYLESHEETS -->
 		<link href='//fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="assets/player-assets/player.css">
+		<link rel="stylesheet" type="text/css" href="player.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script src="materia.enginecore.js"></script>
@@ -16,13 +16,9 @@
 		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.8.2/angular-sanitize.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-aria/1.8.2/angular-aria.min.js"></script>
 		<script src="assets/micromarkdown.min.js"></script>
-
-		<!-- MAIN PLAYER SCRIPT -->
-		<script src="assets/player-assets/player.js"></script>
-		<script src="assets/legacyQsetSrv.js"></script>
 	</head>
-	<body id="body" ng-app="Adventure" ng-controller="AdventureController">
-		
+	<body id="body" ng-controller="AdventureController">
+
 		<div class="inventory-button-container">
 			<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn"  ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" class="inventory-button">
 				<img src="assets/player-assets/BackPack64.png" ng-show="!showInventory"/>
@@ -58,7 +54,7 @@
 								<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
 								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
 							</div>
-							<div class="item-description"> 
+							<div class="item-description">
 								{{itemSelection[getItemIndex(item.id)].description}}
 							</div>
 						</div>
@@ -98,7 +94,7 @@
 
 		<div class="backgroundcover" ng-class="{ show: feedback || inventoryUpdate }" ng-click="inventoryUpdate = false;"></div>
 
-		
+
 
 		<div class="feedback"
 			ng-class="{ show: feedback }"
@@ -284,5 +280,8 @@
 				<iframe class="lightbox-video" ng-if="question.options.asset.type == 'video'" ng-src="{{question.video}}" frameborder="0" allowfullscreen></iframe>
 			</div>
 		</section>
+
+		<!-- MAIN PLAYER SCRIPT -->
+		<script src="player.js"></script>
 	</body>
 </html>

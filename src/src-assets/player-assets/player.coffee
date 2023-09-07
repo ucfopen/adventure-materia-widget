@@ -1,7 +1,7 @@
-Adventure = angular.module('Adventure', ['ngAria', 'ngSanitize'])
+angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 ## CONTROLLER ##
-Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce, $timeout) ->
+.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce, $timeout) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -136,7 +136,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if $scope.question.options.items and $scope.question.options.items[0]
 
 			$scope.showInventoryBtn = true
-			
+
 			# Format items
 			if $scope.question.options.items
 				for q_i in $scope.question.options.items
@@ -175,7 +175,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 								if q_i.id is p_i.id
 									hasItem = true
 									p_i.count += q_i.count
-						
+
 						$scope.inventory = $scope.inventory.filter((p_i) -> p_i.count > 0)
 
 						if (! hasItem)
@@ -204,9 +204,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 							# Format properties for pre-existing items without said properties
 							# If minCount isn't set, set it to 1
 							if r.minCount > -1
-								minCount = r.minCount 
+								minCount = r.minCount
 							else if r.tempMinCount > -1
-								minCount = r.tempMinCount 
+								minCount = r.tempMinCount
 							else if r.count
 								minCount = r.count
 							else
@@ -214,9 +214,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 							# If maxCount isn't set, set it to uncapped
 							if r.maxCount > -1
-								maxCount = r.maxCount 
+								maxCount = r.maxCount
 							else if r.tempMaxCount > -1
-								maxCount = r.tempMaxCount 
+								maxCount = r.tempMaxCount
 							else if r.count
 								maxCount = r.count
 							else
@@ -231,7 +231,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 								minCount: minCount
 								maxCount: maxCount
 								uncappedMax: uncappedMax
-							
+
 							# Format range for pre-existing items without the range property
 							if item.range is ""
 								if item.uncappedMax and item.minCount is 0
@@ -244,7 +244,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 									item.range = "#{item.minCount}"
 								else
 									item.range = "#{item.minCount} - #{item.maxCount}"
-							
+
 							requiredItems.push item
 
 				answer =
@@ -263,7 +263,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 		# shuffle answer order if asked to do so
 		if q_data.options.randomize then $scope.answers = _shuffleIndices $scope.answers
-		
+
 		$scope.q_data = q_data
 
 		# TODO Add back in with Layout support
@@ -321,7 +321,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		angular.forEach requiredItems, (item) ->
 			hasItemInInventory = false
 			hasRequiredItem = $scope.inventory.some (playerItem) ->
-				if playerItem.id is item.id 
+				if playerItem.id is item.id
 					hasItemInInventory = true
 					# Check if player has more than the min
 					if playerItem.count >= item.minCount
@@ -481,7 +481,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		link = null
 		if $scope.question.type is $scope.END
 			link = -1
-			Materia.Score.submitFinalScoreFromClient q_data.id, q_data.questions[0].text, q_data.options.finalScore
+			Materia.Score.submitFinalScoreFromClient q_data.options.id, q_data.questions[0].text, q_data.options.finalScore
 		else
 			link = q_data.answers[0].options.link
 
@@ -561,7 +561,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 
 ## DIRECTIVES ##
-Adventure.directive "ngEnter", [() ->
+.directive "ngEnter", [() ->
 	return (scope, element, attrs) ->
 		element.bind("keypress", (event) ->
 			if(event.which == 13 or event.which == 10)
@@ -573,7 +573,7 @@ Adventure.directive "ngEnter", [() ->
 ]
 
 # Font will progressively step down from 22px to 12px depending on question length after a threshold is reached
-Adventure.directive "autoTextScale", [() ->
+.directive "autoTextScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -614,7 +614,7 @@ Adventure.directive "autoTextScale", [() ->
 # Scales the height of the question box dynamically based on the height of the answer box
 # Ensures the negative space is effectively filled up with question text
 # Only used for MC, since MC is the only node type with variable answer container heights
-Adventure.directive "dynamicScale", [() ->
+.directive "dynamicScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -648,7 +648,7 @@ Adventure.directive "dynamicScale", [() ->
 # Images in the player are subject to a number of constraints that makes scaling them logically complicated
 # Scaling is dependent on width of accompanying text, available height (constrained by header & answer container), and horiz/vertical layout
 # Logic must be applied AFTER image has loaded in order to properly query width and height
-Adventure.directive "dynamicMediaScale", [() ->
+.directive "dynamicMediaScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -703,7 +703,7 @@ Adventure.directive "dynamicMediaScale", [() ->
 ]
 
 # Handles the visibility of individual hotspots
-Adventure.directive "visibilityManager", [() ->
+.directive "visibilityManager", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -726,7 +726,7 @@ Adventure.directive "visibilityManager", [() ->
 						$attrs.$set "style", style
 ]
 
-Adventure.directive "labelManager", ['$timeout', ($timeout) ->
+.directive "labelManager", ['$timeout', ($timeout) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -766,7 +766,7 @@ Adventure.directive "labelManager", ['$timeout', ($timeout) ->
 			$scope.hotspotLabelTarget.y = null
 ]
 
-Adventure.directive "focusManager", [() ->
+.directive "focusManager", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -777,7 +777,7 @@ Adventure.directive "focusManager", [() ->
 			$element[0].focus()
 ]
 
-Adventure.directive "feedbackFocusManager", [() ->
+.directive "feedbackFocusManager", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -786,7 +786,7 @@ Adventure.directive "feedbackFocusManager", [() ->
 			if newVal and newVal.length > 0 then $element[0].focus()
 ]
 
-Adventure.directive "lightboxFocusManager", ['$timeout', ($timeout) ->
+.directive "lightboxFocusManager", ['$timeout', ($timeout) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 

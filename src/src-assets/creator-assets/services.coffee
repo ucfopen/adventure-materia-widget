@@ -1,5 +1,5 @@
-Adventure = angular.module "Adventure"
-Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv', ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
+angular.module "Adventure"
+.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv', ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 
 	# TreeData is being initialized in -two- places right now.
 	# This one may or may not be required.
@@ -51,7 +51,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			return Math.floor(inventoryItems[inventoryItems.length - 1].id + Math.random() * 2 + 1)
 		else
 			return Math.floor(Math.random() * 2 + 1)
-	
+
 	getItemIndex = (itemID) ->
 		for i, index in inventoryItems
 			if i.id is itemID
@@ -386,7 +386,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				parentNode = findNode(tree, tree.id)
 
 				if answer.text isnt null and answer.text.length > 0 then newAnswer.text = answer.text
-				else if parentNode.type is "mc" or parentNode.type is "shortanswer" 
+				else if parentNode.type is "mc" or parentNode.type is "shortanswer"
 					newAnswer.text = "[No Answer Text]"
 				else
 					newAnswer.text = "N/A"
@@ -464,7 +464,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 			i++
 
-		
+
 		return
 
 	# Probably deprecated??
@@ -564,21 +564,21 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					for i in answer.requiredItems
 						do (i) ->
 							# Format properties for pre-existing items without said properties
-							
+
 							if i.minCount > -1
-								minCount = i.minCount 
+								minCount = i.minCount
 							else if i.tempMinCount > -1
-								minCount = i.tempMinCount 
+								minCount = i.tempMinCount
 							else if i.count
 								minCount = i.count
 							else
 								# If minCount isn't set, set it to 1
 								minCount = 1
-							
+
 							if i.maxCount > -1
-								maxCount = i.maxCount 
+								maxCount = i.maxCount
 							else if i.tempMaxCount > -1
-								maxCount = i.tempMaxCount 
+								maxCount = i.tempMaxCount
 							else if i.count
 								maxCount = i.count
 							else
@@ -586,7 +586,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 								maxCount = minCount
 
 							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
-							
+
 							range = i.range
 							if ! range or range is ""
 								if uncappedMax and minCount is 0
@@ -708,11 +708,11 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					for i in answer.options.requiredItems
 						do (i) ->
 							# Format properties for pre-existing items without said properties
-							
+
 							if i.minCount > -1
-								minCount = i.minCount 
+								minCount = i.minCount
 							else if i.tempMinCount > -1
-								minCount = i.tempMinCount 
+								minCount = i.tempMinCount
 							else if i.count
 								minCount = i.count
 							else
@@ -720,9 +720,9 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 								minCount = 1
 
 							if i.maxCount > -1
-								maxCount = i.maxCount 
+								maxCount = i.maxCount
 							else if i.tempMaxCount > -1
-								maxCount = i.tempMaxCount 
+								maxCount = i.tempMaxCount
 							else if i.count
 								maxCount = i.count
 							else
@@ -1000,7 +1000,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 # action constants have no direct application currently, but are implemented for potential future features
 # various user actions result in addToHistory being called to store the tree AFTER the action has been performed, with some contextual information
 # note that the action history is not stored to the qset and is lost if the creator is reloaded or upon exit
-Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
+.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
 
 	HISTORY_LIMIT = 20
 
@@ -1057,7 +1057,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		diff = JSON.stringify treeSrv.createQSetFromTree diff
 		return source == diff
 
-	
+
 
 	getActions : getActions
 	getHistory : getHistory

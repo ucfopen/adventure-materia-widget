@@ -1,5 +1,5 @@
-Adventure = angular.module "Adventure"
-Adventure.service "legacyQsetSrv", [() ->
+angular.module "Adventure"
+.service "legacyQsetSrv", [() ->
 
 	legacyScaleFactor = null
 	imageOffsetX = null
@@ -21,6 +21,7 @@ Adventure.service "legacyQsetSrv", [() ->
 
 			item.type = "Adventure"
 			item.nodeId = item.options.id
+			item.id = item.options.id
 
 			delete item.assets
 
@@ -251,3 +252,5 @@ Adventure.service "legacyQsetSrv", [() ->
 	convertOldQset : convertOldQset
 	handleLegacyScale : handleLegacyScale
 ]
+
+angular.bootstrap(document, ['Adventure'])
