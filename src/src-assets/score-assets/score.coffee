@@ -1,7 +1,7 @@
-AdventureScorescreen = angular.module('AdventureScorescreen', ['ngSanitize'])
+angular.module('AdventureScorescreen', ['ngSanitize'])
 
 ## CONTROLLER ##
-AdventureScorescreen.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', ($scope, $sanitize, $sce) ->
+.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', ($scope, $sanitize, $sce) ->
 
 	materiaCallbacks = {}
 
@@ -21,7 +21,7 @@ AdventureScorescreen.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$s
 
 	$scope.getQuestion = (qset, id) ->
 		for i in qset.items
-			if i.id is id 
+			if i.id is id
 				return i
 		return -1
 
@@ -57,9 +57,9 @@ AdventureScorescreen.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$s
 
 	$scope.toggleInventoryDrawer = () ->
 		$scope.showInventory = !$scope.showInventory
-	
+
 	materiaCallbacks.start = (instance, qset, scoreTable, isPreview, qsetVersion) ->
-		$scope.$apply -> 
+		$scope.$apply ->
 			# console.log(instance)
 			# console.log(qset)
 			# console.log(scoreTable)
@@ -69,7 +69,7 @@ AdventureScorescreen.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$s
 			# console.log($scope.inventory)
 			# console.log($scope.itemSelection)
 			# console.log($scope.table)
-			
+
 			$scope.customTable = false
 
 	# Materia.ScoreCore.hideResultsTable()
@@ -77,3 +77,5 @@ AdventureScorescreen.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$s
 	return Materia.ScoreCore.start materiaCallbacks
 
 ]
+
+angular.bootstrap(document, ['AdventureScorescreen'])
