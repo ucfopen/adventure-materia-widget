@@ -4171,7 +4171,7 @@ js-yaml@^4.1.0:
     argparse "^2.0.1"
 
 jsesc@^2.5.1:
-  version "2.5.2"
+  version "~3.0.0"
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-2.5.2.tgz#80564d2e483dacf6e8ef209650a67df3f0c283a4"
   integrity sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==
 
@@ -4404,8 +4404,54 @@ make-fetch-happen@^11.0.0, make-fetch-happen@^11.0.1, make-fetch-happen@^11.0.3,
     socks-proxy-agent "^7.0.0"
     ssri "^10.0.0"
 
+<<<<<<< Updated upstream
 materia-widget-development-kit@../../MWDK4:
   version "2.5.2"
+=======
+map-cache@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/map-cache/-/map-cache-0.2.2.tgz#c32abd0bd6525d9b051645bb4f26ac5dc98a0dbf"
+  integrity sha512-8y/eV9QQZCiyn1SprXSrCmqJN0yNRATe+PO8ztwqrvrbdRLA3eYJF0yaR0YayLWkMbsQSKWS9N2gPcGEc4UsZg==
+
+map-obj@^1.0.0, map-obj@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
+  integrity sha512-7N/q3lyZ+LVCp7PzuxrJr4KMbBE2hW7BT7YNia330OFxIf4d3r5zVpicP2650l7CPN6RM9zOJRl3NGpqSiw3Eg==
+
+map-visit@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/map-visit/-/map-visit-1.0.0.tgz#ecdca8f13144e660f1b5bd41f12f3479d98dfb8f"
+  integrity sha512-4y7uGv8bd2WdM9vpQsiQNo41Ln1NvhvDRuVt0k2JZQ+ezN2uaQes7lZeZ+QQUHOLQAtDaBJ+7wCbi+ab/KFs+w==
+  dependencies:
+    object-visit "^1.0.0"
+
+markdown-loader@^5.0.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/markdown-loader/-/markdown-loader-5.2.0.tgz#814535790e76b7d861fcf37a16ab03945a64bbc7"
+  integrity sha512-+vAtBlMdmMY3ERSOUIIek/DwCv939nHvoYISUwwTC7q+caVlQmf7KhhMozbfAcgL/7njGjWxhMgI7nLaz9+KRQ==
+  dependencies:
+    loader-utils "^1.2.3"
+    marked "^0.7.0"
+
+marked@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.7.0.tgz#b64201f051d271b1edc10a04d1ae9b74bb8e5c0e"
+  integrity sha512-c+yYdCZJQrsRjTPhUx7VKkApw9bwDkNbHUKo1ovgcfDjb2kc8rLuRbIFyXL5WOEUwzSSKo3IXpph2K6DqB/KZg==
+
+materia-server-client-assets@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/materia-server-client-assets/-/materia-server-client-assets-2.1.0.tgz#8e10383296804fab2b7c2b25358ede26e9e9024c"
+  integrity sha512-osOIJ7xlf5cQJwOxA6JUD499gs3arjDTB7vKTUM68icg6gDq+kmhfFGE+XcBFQuoI/HTcqN9JR/TsA+Z5n5Rqg==
+  dependencies:
+    angular "1.6.9"
+    js-snakecase "^1.2.0"
+    ngmodal ucfcdl/ngModal#v1.2.2
+
+materia-widget-development-kit@2.5.2:
+  version "~3.0.0"
+  resolved "https://registry.yarnpkg.com/materia-widget-development-kit/-/materia-widget-development-kit-2.5.2.tgz#831c7852bf2021cce8ed80a2b92d6153532b92f3"
+  integrity sha512-rth0CHtNm1R+5f1poDjHpx5iGzPTw9PjBexlp8KoBr/NaOFEPP8SCxZtBq2YltwRUcH3MOukLoa4k+566uTRXQ==
+>>>>>>> Stashed changes
   dependencies:
     "@babel/core" "^7.20.12"
     "@babel/preset-env" "^7.20.2"
@@ -4703,10 +4749,26 @@ neo-async@^2.6.0, neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
+<<<<<<< Updated upstream
 no-case@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/no-case/-/no-case-3.0.4.tgz#d361fd5c9800f558551a8369fc0dcd4662b6124d"
   integrity sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==
+=======
+next-tick@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"
+  integrity sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==
+
+ngmodal@ucfcdl/ngModal#v1.2.2:
+  version "1.2.2"
+  resolved "https://codeload.github.com/ucfcdl/ngModal/tar.gz/6abad982bdb8f258ffcdc20316a907c2292399d2"
+
+no-case@^2.2.0:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/no-case/-/no-case-2.3.2.tgz#60b813396be39b3f1288a4c1ed5d1e7d28b464ac"
+  integrity sha512-rmTZ9kz+f3rCvK2TD1Ue/oZlns7OGoIWP4fc3llxxRXlOkHKoWPPWJOfFYpITabSow43QJbRIoHQXtt10VldyQ==
+>>>>>>> Stashed changes
   dependencies:
     lower-case "^2.0.2"
     tslib "^2.0.3"
