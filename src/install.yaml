@@ -31,3 +31,5 @@ meta_data:
     Build branching scenarios where your student's choices lead them down different paths.
   about: >
     An advanced flexible scenario-building tool.
+  accessibility_keyboard: Full
+  accessibility_reader: Full
