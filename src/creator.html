@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="Adventure">
+<html>
 	<head>
 		<title>Create an Adventure Widget</title>
 		<meta charset="utf-8" />
@@ -8,7 +8,7 @@
 		<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900,400italic' rel='stylesheet' type='text/css'>
 
 		<!-- STYLESHEETS -->
-		<link rel="stylesheet" type="text/css" href="assets/creator-assets/creator.css">
+		<link rel="stylesheet" type="text/css" href="creator.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script src="materia.creatorcore.js"></script>
@@ -19,10 +19,6 @@
 		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-sanitize.min.js'></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
 		<script src="//cdn.skypack.dev/d3-drag@3" charset="utf-8"></script>
-
-		<!-- MAIN CREATOR SCRIPT -->
-		<script src="assets/creator-assets/creator.js"></script>
-		<script src="assets/legacyQsetSrv.js"></script>
 
 	</head>
 	<body ng-controller="AdventureCtrl" id="body">
@@ -90,7 +86,7 @@
 				<img src="assets/creator-assets/BackPackIcon.png"/>
 				<p>{{inventoryItems.length ? 'Manage Inventory ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
 			</div>
-			
+
 			<item-manager class="item-manager" ng-class="{ show: showItemManager }">
 				<div class="item-header">
 					<div class="item-heading">
@@ -114,7 +110,7 @@
 						ng-mouseover="hoverItem = true"
 						ng-mouseout="hoverItem = false"
 					>
-						<div class="item-icon" 
+						<div class="item-icon"
 						ng-click="toggleItemIconSelector(item, $index)">
 							<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
 							<div ng-if="item.icon.url == undefined" class="no-icon"></div>
@@ -166,8 +162,8 @@
 								</div>
 							</div>
 							<ul class="icons-list">
-								<li ng-class="{'selectedIcon' : currentItem.icon == icon}" 
-								ng-repeat="icon in icons" 
+								<li ng-class="{'selectedIcon' : currentItem.icon == icon}"
+								ng-repeat="icon in icons"
 								ng-click="handleIconClick(icon)">
 									<img ng-if="icon.url" ng-src="{{icon.url}}" ng-alt="{{icon.alt}}"/>
 								</li>
@@ -177,9 +173,9 @@
 									<button type="button"
 										class="important-button"
 										ng-click="uploadIcon()">Upload Icon</button>
-									<button type="button" 
-									class="important-button delete-button" 
-									ng-click="removeSelectedIcon()" 
+									<button type="button"
+									class="important-button delete-button"
+									ng-click="removeSelectedIcon()"
 									ng-if="currentItem.icon.is_custom">Remove Selected Icon</button>
 								</div>
 								<button type="button"
@@ -595,8 +591,8 @@
 									</div>
 
 								</li>
-								<li ng-repeat="answer in answers" 
-								ng-show="displayNodeCreation == MC || displayNodeCreation == SHORTANS && $index > 0" 
+								<li ng-repeat="answer in answers"
+								ng-show="displayNodeCreation == MC || displayNodeCreation == SHORTANS && $index > 0"
 								ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}">
 									<div ng-if="displayNodeCreation == MC" class="answer">
 										<div class="answer-removal-options">
@@ -805,7 +801,7 @@
 											</div> -->
 											<!-- <input id="hide-answer" type="checkbox"
 											ng-model="currentAnswer.hideAnswer"
-											value="false" /> 
+											value="false" />
 											<label for="hide-answer">Hide Answer if Player Does Not Have Items</label> -->
 										</div>
 
@@ -970,7 +966,7 @@
 							data-pos-y="{{hotspotAnswerManager.y}}"
 							ng-click="bringToFront($event)"
 							>
-								<div class="hotspot-answer-header" 
+								<div class="hotspot-answer-header"
 								ng-mousedown="dragStart($event)">
 									<h4>Manage This Hotspot</h4>
 									<span class="hide-popup icon-cross"
@@ -987,7 +983,7 @@
 									<!-- required items modal for hotspot -->
 									<div class="item-selection item-modal required-item-modal-hotspot" ng-class="{ show : showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]}"
 									ng-click="bringToFront($event)">
-										<div class="item-header"  
+										<div class="item-header"
 										ng-mousedown="modalDragStart($event)">
 											<div class="item-heading">
 												<h3>Required Items for Hotspot</h3>
@@ -1053,7 +1049,7 @@
 													</div>
 													<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 												</div>
-												
+
 											</li>
 										</ul>
 										<div class="options-bar add-item">
@@ -1085,7 +1081,7 @@
 												<label for="answer-show-advanced">Show Advanced Options</label>
 											</div>
 										</div>
-										
+
 										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
 										<!-- <div class="advanced-option">
 											<button ng-click="currentAnswer.hideRequiredItems = !currentAnswer.hideRequiredItems" ng-class="{'hide-answer': answer.hideRequiredItems}"  class="hide-answer-button">
@@ -1190,7 +1186,7 @@
 													</div> -->
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
-													
+
 													<div class="item-quantity">
 														<span>Quantity</span>
 														<input ng-focus = "event = $event" class="increase-count" type="number" min="1" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 0)"/>
@@ -1201,7 +1197,7 @@
 											<div class="advanced-option" ng-if="showAdvancedOptions">
 												<input id="{{item.id}}-give-once" type="checkbox"
 												ng-model="item.firstVisitOnly"
-												value="false" /> 
+												value="false" />
 												<label for="{{item.id}}-give-once">Give On First Visit  Only</label>
 											</div>
 										</li>
@@ -1248,14 +1244,14 @@
 											<div class="advanced-option" ng-if="showAdvancedOptions">
 												<input id="{{item.id}}-give-once" type="checkbox"
 												ng-model="item.firstVisitOnly"
-												value="false" /> 
+												value="false" />
 												<label for="{{item.id}}-give-once">Take On First Visit  Only</label>
 											</div>
 
 											<div class="advanced-option" ng-if="showAdvancedOptions">
 												<input id="{{item.id}}-take-all" type="checkbox"
 												ng-model="item.takeAll"
-												value="false" /> 
+												value="false" />
 												<label for="{{item.id}}-take-all">Take All</label>
 											</div>
 										</li>
@@ -1292,7 +1288,7 @@
 							</div>
 						</div>
 						<!-- required items panel for answer choices -->
-						<div class="item-selection item-panel" 
+						<div class="item-selection item-panel"
 						ng-click="bringToFront($event)" ng-class="{ show : showRequiredItems}">
 							<div class="item-header">
 								<div class="item-heading">
@@ -1383,7 +1379,7 @@
 									<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
 								</div>
 							</div>
-							
+
 
 							<div class="advanced-option-bar">
 
@@ -1501,7 +1497,7 @@
 													</div> -->
 												</div>
 												<div class="item-options" ng-class="{'show': hoverItem}">
-													
+
 													<div class="item-quantity">
 														<span>Quantity</span>
 														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 0)"/>
@@ -1513,7 +1509,7 @@
 											<div class="advanced-option" ng-if="showAdvancedOptions">
 												<input id="{{item.id}}-give-once" type="checkbox"
 												ng-model="item.firstVisitOnly"
-												value="false" /> 
+												value="false" />
 												<label for="{{item.id}}-give-once">Give On First Visit  Only</label>
 											</div>
 										</li>
@@ -1560,13 +1556,13 @@
 											<div class="advanced-option"  ng-if="showAdvancedOptions">
 												<input id="{{item.id}}-give-once" type="checkbox"
 												ng-model="item.firstVisitOnly"
-												value="false" /> 
+												value="false" />
 												<label for="{{item.id}}-give-once">Take on First Visit Only</label>
 											</div>
 											<div class="advanced-option" ng-if="showAdvancedOptions">
 												<input id="{{item.id}}-take-all" type="checkbox"
 												ng-model="item.takeAll"
-												value="false" /> 
+												value="false" />
 												<label for="{{item.id}}-take-all">Take All</label>
 											</div>
 										</li>
@@ -1728,5 +1724,8 @@
 				node-click="nodeSelected(data)"
 				bg-click="bgClicked()"></tree-visualization>
 		</div>
+
+		<!-- MAIN CREATOR SCRIPT -->
+		<script src="creator.js"></script>
 	</body>
 </html>

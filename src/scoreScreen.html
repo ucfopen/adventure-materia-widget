@@ -1,3 +1,4 @@
+<!--UNFINISHED-->
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -18,11 +19,8 @@
 		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.8.2/angular-sanitize.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-aria/1.8.2/angular-aria.min.js"></script>
 		<script src="assets/micromarkdown.min.js"></script>
-
-		<!-- MAIN WIDGET SCRIPT -->
-		<script src="assets/score-assets/scoreScreen.js"></script>
 	</head>
-	<body ng-app="AdventureScorescreen">
+	<body>
 		<div class="content-frame" ng-controller="AdventureScoreCtrl">
 			<section class="inventory" ng-if="itemSelection[0]" ng-if="customTable">
                 <h1 class="inventory-header" ng-click="toggleInventoryDrawer()" ng-class="{'closed': !showInventory}">FINAL INVENTORY <i class="arrow-top"></i></h1>
@@ -88,5 +86,8 @@
                 </div>
             </section>
 		</div>
+
+		<!-- MAIN WIDGET SCRIPT -->
+		<script src="scoreScreen.js"></script>
 	</body>
 </html>

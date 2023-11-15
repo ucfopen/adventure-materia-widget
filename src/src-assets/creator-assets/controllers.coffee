@@ -1,5 +1,5 @@
-Adventure = angular.module "Adventure"
-Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sce', '$sanitize', 'treeSrv', 'treeHistorySrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sce, $sanitize, treeSrv, treeHistorySrv, legacyQsetSrv) ->
+angular.module "Adventure"
+.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootScope', '$timeout', '$sce', '$sanitize', 'treeSrv', 'treeHistorySrv', 'legacyQsetSrv',($scope, $filter, $compile, $rootScope, $timeout, $sce, $sanitize, treeSrv, treeHistorySrv, legacyQsetSrv) ->
 	materiaCallbacks = {}
 
 	# Define constants for node screen types
@@ -127,7 +127,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			return treeSrv.getItemIndex(item.id)
 
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
-		
+
 		# Returning from a suspended node creation screen, don't do anything
 		if oldVal is "suspended" then return
 
@@ -254,7 +254,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
-				
+
 				treeSrv.setInventoryItems qset.options.inventoryItems || []
 
 				$scope.inventoryItems = qset.options.inventoryItems || []
@@ -386,7 +386,7 @@ Adventure.controller "AdventureCtrl", ['$scope', '$filter', '$compile', '$rootSc
 			else if $scope.hoveredLock.target isnt data.id
 				$scope.hoveredLock.showItems = false
 			return
-		
+
 		if data.type is "bridge" then return
 		if $scope.existingNodeSelectionMode is true then return
 

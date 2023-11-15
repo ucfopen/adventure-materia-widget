@@ -72,7 +72,7 @@ return [
 					$cur_csv['question_text'] = "";
 					foreach ($questions as $q)
 					{
-						$clean_str = str_replace(["\r","\n", ","], "", $q->questions[0]['text']);
+						$clean_str = is_string($q->questions[0]['text']) ? str_replace(["\r","\n", ","], "", $q->questions[0]['text']) : "";
 
 						if (strlen($clean_str) > 80)
 						{
@@ -124,7 +124,7 @@ return [
 						if (array_search($r['item_id'], $cur_csv['questions']) !== FALSE)
 						{
 							$position = array_search($r['item_id'], $cur_csv['questions']);
-							$logs[5 + $position] = str_replace(["\r","\n", ","], "", $r['text']);
+							$logs[5 + $position] = is_string($r['text']) ? str_replace(["\r","\n", ","], "", $r['text']) : "";
 						}
 					}
 				}
@@ -136,7 +136,7 @@ return [
 			// Return the csv zip.
 			$tempname = tempnam('/tmp', 'materia_raw_log_csv');
 			$zip = new \ZipArchive();
-			$zip->open($tempname);
+			$zip->open($tempname, \ZipArchive::OVERWRITE);
 			foreach ($csvs as $key => $csv)
 			{
 				$string = $headers . $csv['question_text'] . "\r\n" . implode("\r\n", $csv['rows']);
