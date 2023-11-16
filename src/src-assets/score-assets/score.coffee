@@ -1,6 +1,8 @@
 angular.module('AdventureScorescreen', ['ngSanitize'])
 
 ## CONTROLLER ##
+
+## UNFINISHED ##
 .controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', ($scope, $sanitize, $sce) ->
 
 	materiaCallbacks = {}

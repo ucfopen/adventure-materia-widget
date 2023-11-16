@@ -906,6 +906,7 @@ angular.module "Adventure"
 
 		$scope.openItemManager = () ->
 			$scope.showItemManager = true
+			document.getElementById("item-manager").removeAttribute("inert")
 			$scope.showInventoryBackgroundCover = true
 			# Collapse any open item editors
 			$scope.editingIndex = -1
@@ -2114,6 +2115,15 @@ angular.module "Adventure"
 			# Close required items modal
 			$scope.toggleRequiredItemsModal(null)
 
+			# Show advanced options on start only if advanced options are enabled
+			for item in $scope.nodeItems
+				do (item) ->
+					if item.takeAll or item.firstVisitOnly
+						$scope.showAdvancedOptions = true
+						return
+					else
+						$scope.showAdvancedOptions = false
+
 			# Remove error message
 			$scope.invalidQuantity = null
 
@@ -2162,7 +2172,6 @@ angular.module "Adventure"
 				# Save the original item count in case of invalid input
 				if answer.requiredItems
 					for item in answer.requiredItems
-						console.log(item)
 						item.tempMinCount = item.minCount
 						item.tempMaxCount = item.maxCount
 
@@ -2474,6 +2483,7 @@ angular.module "Adventure"
 
 		$scope.saveAndClose = ->
 			$scope.hideCoverAndModals()
+			$scope.showAdvancedOptions = false
 			# auto-hide set to false here because the timer in the displayNodeCreation $watch will handle it
 			$scope.toast "Destination " + $scope.editedNode.name + " saved!", false
 ]

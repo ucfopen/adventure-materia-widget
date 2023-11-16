@@ -67,6 +67,16 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 	$scope.setLightboxTarget = (val) ->
 		$scope.lightboxTarget = val
+		if ($scope.lightboxTarget == -1)
+			document.getElementById("inventory").removeAttribute("inert")
+			document.querySelector(".container").removeAttribute("inert")
+			document.querySelector(".lightbox").setAttribute("inert", "true")
+			document.querySelector(".inventory-button-container").removeAttribute("inert")
+		else
+			document.getElementById("inventory").setAttribute("inert", "true")
+			document.querySelector(".container").setAttribute("inert", "true")
+			document.querySelector(".lightbox").removeAttribute("inert")
+			document.querySelector(".inventory-button-container").setAttribute("inert", "true")
 
 	$scope.lightboxZoom = 0
 
@@ -184,11 +194,28 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 								new: true
 							}
 							$scope.inventory.push(newItem)
+			# Clear inventory updates
+			$scope.inventoryUpdateMessage = ""
+
 			if ($scope.removedItems[0] || $scope.addedItems[0])
 				$scope.inventoryUpdate = true
-				if $scope.addedItems[0]
-					$scope.showNew = true
+				document.getElementById("inventory-update").removeAttribute("inert")
 
+				addedItemsExist = $scope.addedItems[0]
+				removedItemsExist = $scope.removedItems[0]
+
+				if addedItemsExist
+					$scope.showNew = true
+					addedItemsMessage = "#{$scope.addedItems.length} new items added: #{($scope.addedItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{item.count})")).join(', ')}. "
+				else
+					addedItemsMessage = ""
+
+				if removedItemsExist
+					removedItemsMessage = "#{$scope.removedItems.length} items removed: #{($scope.removedItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{item.count})")).join(', ') }. "
+				else
+					removedItemsMessage = ""
+
+				$scope.inventoryUpdateMessage = "Updates to inventory: " + addedItemsMessage + removedItemsMessage
 
 		$scope.answers = []
 
@@ -289,9 +316,25 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		$scope.visitedNodes.push(q_data.options.id)
 
+	$scope.dismissUpdates = () ->
+		$scope.inventoryUpdate = false
+		document.getElementById("inventory-update").setAttribute("inert", true)
+		$scope.showNew = false
+
 	$scope.toggleInventory = (item = null) ->
 		$scope.showInventory = ! $scope.showInventory
+		if ! $scope.showInventory
+			document.getElementById("inventory").setAttribute("inert", "true")
+			document.querySelector(".container").removeAttribute("inert")
+			document.querySelector(".feedback").removeAttribute("inert")
+			document.querySelector(".lightbox").removeAttribute("inert")
+		else
+			document.getElementById("inventory").removeAttribute("inert")
+			document.querySelector(".container").setAttribute("inert", "true")
+			document.querySelector(".feedback").setAttribute("inert", "true")
+			document.querySelector(".lightbox").setAttribute("inert", "true")
 		$scope.inventoryUpdate = false
+		document.getElementById("inventory-update").setAttribute("inert", true)
 		if item
 			$scope.selectedItem = $scope.inventory[$scope.getItemIndex(item.id)] || null
 		$scope.showNew = false
@@ -318,6 +361,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	# Returns array of missing items
 	$scope.checkInventory = (requiredItems) ->
 		missingItems = []
+		if (! requiredItems)
+			return []
 		angular.forEach requiredItems, (item) ->
 			hasItemInInventory = false
 			hasRequiredItem = $scope.inventory.some (playerItem) ->
@@ -739,6 +784,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 			if answer.text then $scope.hotspotLabelTarget.text = answer.text
 			else return false
+
+			$scope.hotspotLabelTarget.ariaLabel = answer.text + (if $scope.checkInventory(answer.requiredItems).length > 0 then ' Cannot select. ' else ' ')
+			requiredItemString = answer.requiredItems.map((item) -> $scope.itemSelection[$scope.getItemIndex(item.id)].name + ' (amount: ' + item.range + ')').join(', ')
+			$scope.hotspotLabelTarget.ariaLabel += (if (answer.requiredItems && answer.requiredItems.length > 0) then ('Required Items: ' + requiredItemString) else '')
 
 			container = document.getElementById "body"
 

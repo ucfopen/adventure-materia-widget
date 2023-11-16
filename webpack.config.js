@@ -41,8 +41,8 @@ const entries = {
 		srcPath+"src-assets/creator-assets/creator.scss",
 		srcPath+"src-assets/creator-assets/app.coffee",
 		srcPath+"src-assets/creator-assets/services.coffee",
-		srcPath+"src-assets/creator-assets/directives.coffee",
 		srcPath+"src-assets/creator-assets/controllers.coffee",
+		srcPath+"src-assets/creator-assets/directives.coffee",
 		srcPath+"src-assets/legacyQsetSrv.coffee"
 	],
 	"scoreScreen": [

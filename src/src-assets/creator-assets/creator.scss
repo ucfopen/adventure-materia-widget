@@ -786,12 +786,12 @@ button {
 		flex-direction: column;
 		align-items: center;
 		height: fit-content;
-	
+
 		&:hover {
 			background-color: $blue-lighter;
 			color: $white;
 		}
-	
+
 		.plus-sign {
 			font-size: 3em;
 		}
@@ -1087,7 +1087,7 @@ node-tooltips {
 		flex-direction: row;
 		align-items: center;
 		grid-gap: 10px;
-		
+
 		img, span {
 			width: 20px;
 			height: 20px;
@@ -1119,7 +1119,7 @@ required-items-tooltip {
 		flex-direction: row;
 		align-items: center;
 		grid-gap: 10px;
-		
+
 		img {
 			width: 20px;
 		}
@@ -1140,11 +1140,11 @@ required-items-tooltip {
 		transition: opacity 0.3s ease;
 		padding: 5px 25px 25px 25px;
 		z-index: $z-index-modal-dialog;
-	
+
 		box-sizing: border-box;
-	
+
 		border-radius: 2px;
-	
+
 		box-shadow: 0px 0px 5px #888;
 	}
 	display: flex;
@@ -1199,7 +1199,7 @@ required-items-tooltip {
 			.item-heading-icons {
 				display: flex;
 				align-items: center;
-	
+
 				img#arrow {
 					height: 20px;
 					width: 20px;
@@ -1503,10 +1503,11 @@ required-items-tooltip {
 
 		.item-options {
 			display: flex;
-			justify-content: end;
 			flex-grow: 1;
 			align-items: center;
 			gap: 10px;
+			flex-wrap: wrap;
+			justify-content: end;
 
 			.item-quantity-options {
 				display: flex;
@@ -1587,7 +1588,7 @@ required-items-tooltip {
 		list-style-type: none;
 		padding: 10px 0px 0px 0px;
 		overflow: auto;
-		overflow-x: hidden;	
+		overflow-x: hidden;
 		height: 100%;
 		margin: 0;
 	}
@@ -1849,7 +1850,7 @@ item-icon-selector {
 		}
 	}
 
-	
+
 
 }
 
@@ -2315,7 +2316,7 @@ node-creation-selection-dialog {
 			overflow: hidden;
 
 			@media screen and (min-width: $node-creation-panels-width) {
-				
+
 				&.tiny {
 					flex-direction: row;
 				}
@@ -2323,7 +2324,7 @@ node-creation-selection-dialog {
 				&.column {
 					flex-direction: column;
 				}
-				
+
 			}
 		}
 
@@ -2364,7 +2365,7 @@ node-creation-selection-dialog {
 		border-color: $white;
 		font-size: 14px;
 		max-width: 115px;
-		
+
 		&#hotspot-require-item-btn {
 			height: auto;
 		}
@@ -2429,7 +2430,7 @@ node-creation-selection-dialog {
 		left: 40%;
 		border-left: 10px solid transparent;
 		border-right: 10px solid transparent;
-		
+
 		border-bottom: 10px solid $gray-darker;
 	}
 
@@ -2608,7 +2609,7 @@ node-creation-selection-dialog {
 		margin: 10px 10px 0px 10px;
 		padding: 5px;
 
-		max-height: 500px; 
+		max-height: 500px;
 		overflow-y: scroll;
 		flex-grow: 2;
 
@@ -2644,7 +2645,7 @@ node-creation-selection-dialog {
 					display: flex;
 					flex-direction: column;
 					grid-gap: 10px;
-					
+
 					.hide-answer-button {
 						height: 35px;
 						width: 35px;
@@ -2779,7 +2780,8 @@ node-creation-selection-dialog {
 
 				button.delete-button {
 					height: 35px;
-					width: 35px;
+					min-width: 35px;
+					max-width: 35px;
 				}
 
 				button.answer-node-select, button.add-item {
@@ -2930,20 +2932,20 @@ node-creation-selection-dialog {
 			animation: 'notif-bounce' 0.6s infinite;
 			animation-direction: alternate;
 			animation-timing-function: ease-in-out;
-		
+
 			z-index: 100;
 			position: absolute;
 			bottom: 60px;
 			left: -25px;
-		
+
 			background: $color-accent;
 			color: $white;
 			box-shadow: $shadow-dialog;
-		
+
 			border-radius: 5px;
 			border: none;
 			padding: 15px;
-		
+
 			font-size: 16px;
 			font-weight: bold;
 			width: 150px;
@@ -3199,7 +3201,7 @@ node-creation-selection-dialog {
 			flex-direction: column;
 			grid-gap: 5px;
 			padding-left: 1px;
-			
+
 			input.hotspot-alt-text {
 				background: rgba(255,255,255,0.9);
 				height: 2em;
@@ -3303,7 +3305,7 @@ node-creation-selection-dialog {
 				bottom: 0;
 				left: 0;
 				right: 0;
-			}	
+			}
 
 			hotspot-toolbar {
 				> ul {
@@ -3356,7 +3358,7 @@ node-creation-selection-dialog {
 			box-sizing: border-box;
 			margin: 0px;
 			padding: 10px 10px 10px 25px;
-	
+
 			color: $color-primary;
 			background: $color-accent;
 
@@ -3379,7 +3381,7 @@ node-creation-selection-dialog {
 				}
 			}
 
-			
+
 		}
 
 		#hotspot-label-input {

@@ -57,6 +57,18 @@ body {
 	height: 593px; // determined from the height parameter in install.yaml
 }
 
+.reader-instructions {
+	opacity: 0;
+	position: absolute;
+	width: 0;
+	height: 0;
+}
+
+*:focus {
+	border: 3px solid $blue-focus;
+	border-radius: 5px;
+}
+
 .header {
 	display: none; // default is display:none so header doesn't "flash" when the title is supposed to be hidden. Thanks Angular!
 	width:100%;
@@ -91,19 +103,21 @@ body {
 	width:62px;
 	height:62px;
 	padding: 8px;
-	
+
 	// Inventory z-index is 1000
 
 	font-size: 24px;
 	color: $blue;
 
 	background: rgba(0,0,0,0.1);
-	border: none;
+	border: 3px solid transparent;
+	box-sizing: border-box;
 	border-radius:5px;
 	cursor: pointer;
 
-	&:hover {
+	&:hover, &:focus {
 		background: $blue-lightest;
+		border: 3px solid $blue-focus;
 	}
 
 	img {
@@ -113,8 +127,8 @@ body {
 }
 
 button.show-inventory {
-	width:40px;
-	height:40px;
+	width:45px;
+	height:45px;
 	top: 10px;
 	background: $white;
 
@@ -542,15 +556,15 @@ h1 {
 					display: flex;
 					align-items: center;
 					flex-direction: row;
-					
+
 					margin: 5px 5px 5px 0;
 					padding: 5px;
-					
+
 					background: $color-primary;
 					border: solid 1px $gray-lighter;
 					// background: $gray-lightest;
 					border-radius: 3px;
-	
+
 					img {
 						width: 24px;
 						height: 24px;
@@ -729,10 +743,10 @@ h1 {
 					border: solid 1px $gray-lighter;
 					background-color: $color-primary;
 
-					&:hover {
+					&:hover, &:focus {
 						cursor: pointer;
 						background: $blue-lightest;
-						
+
 						// box-shadow: $shadow-small-highlight;
 					}
 
@@ -931,7 +945,6 @@ h1 {
 	right: 10px;
 	top: 75px;
 	max-height: 450px;
-	overflow: auto;
 
 	border-radius: 10px;
 	background: #fff;
@@ -955,14 +968,15 @@ h1 {
 
 	.update-content {
 		font-size: 14px;
+		overflow: auto;
+		position: relative;
 
 		.item {
 			display: flex;
 			flex-direction: column;
 			border-radius: 10px;
 
-			padding: 10px;
-			margin: 10px 0;
+			padding: 20px 10px;
 
 			.item-first {
 				display: flex;
@@ -983,8 +997,9 @@ h1 {
 				font-style: italic;
 			}
 
-			&:hover {
-				color: $blue;
+			&:hover, &:focus {
+				background: $blue-lightest;
+				border: none;
 				cursor: pointer;
 			}
 
@@ -998,6 +1013,23 @@ h1 {
 			max-height: 45px;
 			object-fit: cover;
 			margin-right: 5px;
+		}
+	}
+
+	.dismiss-update {
+		position: absolute;
+		right: 0;
+		bottom: -50px;
+		padding: 10px;
+		width: 100%;
+		box-sizing: border-box;
+		background-color: $white;
+		font-style: italic;
+		border: none;
+		border-radius: 5px;
+
+		&:focus, &:hover {
+			background-color: $blue-lighter;
 		}
 	}
 

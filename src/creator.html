@@ -28,7 +28,7 @@
 			<button type="button"
 				ng-click="modeManagerAction()">{{modeManagerActionText}}</button>
 		</mode-manager-overlay>
-		<header class="title-header">
+		<header class="title-header inert-on-dialog">
 			<img class="logo" src="assets/creator-assets/materialogo.png" alt="Materia Logo" />
 			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
 			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
@@ -52,42 +52,44 @@
 			</div>
 		</header>
 		<div id="adventure-container">
-			<div class="work-in-progress-warning">
-				Work in Progress!
-			</div>
-			<div class="zoom-buttons" zoom-buttons>
-				<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
-				<svg class="zoom-button"
-					width="40"
-					height="40"
-					ng-click="zoomTreeIn()">
-					<path d="M 18,8 L 18,18 L 8,18 L 8,22 L 18,22 L 18,32 L 22,32 L 22,22 L 32,22 L 32,18 L 22,18 L 22,8 Z"></path>
-				</svg>
-				<svg class="zoom-button"
-					width="40"
-					height="40"
-					ng-click="zoomTreeOut()">
-					<path d="M 8,18 L 8,22 L 32,22 L 32,18 Z"></path>
-				</svg>
-				<button type="button"
-					ng-click="resetZoom()">Reset</button>
-			</div>
-			<title-editor ng-show="showTitleEditor">
-				<h4>Give Your Widget a Title</h4>
-				<input type="text"
-					ng-model="title"
-					enter-submit="hideCoverAndModals()"
-					auto-select />
-				<button type="button"
-					class="important-button"
-					ng-click="hideCoverAndModals()">Done</button>
-			</title-editor>
-			<div class="inventory-items" ng-click="openItemManager()">
-				<img src="assets/creator-assets/BackPackIcon.png"/>
-				<p>{{inventoryItems.length ? 'Manage Inventory ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
+			<div class="inert-on-dialog" aria-hidden="showBackgroundCover || showInventoryBackgroundCover">
+				<div class="work-in-progress-warning">
+					Work in Progress!
+				</div>
+				<div class="zoom-buttons" zoom-buttons>
+					<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
+					<svg class="zoom-button"
+						width="40"
+						height="40"
+						ng-click="zoomTreeIn()">
+						<path d="M 18,8 L 18,18 L 8,18 L 8,22 L 18,22 L 18,32 L 22,32 L 22,22 L 32,22 L 32,18 L 22,18 L 22,8 Z"></path>
+					</svg>
+					<svg class="zoom-button"
+						width="40"
+						height="40"
+						ng-click="zoomTreeOut()">
+						<path d="M 8,18 L 8,22 L 32,22 L 32,18 Z"></path>
+					</svg>
+					<button type="button"
+						ng-click="resetZoom()">Reset</button>
+				</div>
+				<title-editor ng-show="showTitleEditor">
+					<h4>Give Your Widget a Title</h4>
+					<input type="text"
+						ng-model="title"
+						enter-submit="hideCoverAndModals()"
+						auto-select />
+					<button type="button"
+						class="important-button"
+						ng-click="hideCoverAndModals()">Done</button>
+				</title-editor>
+				<div class="inventory-items" ng-click="openItemManager()">
+					<img src="assets/creator-assets/BackPackIcon.png"/>
+					<p>{{inventoryItems.length ? 'Manage Inventory ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
+				</div>
 			</div>
 
-			<item-manager class="item-manager" ng-class="{ show: showItemManager }">
+			<item-manager class="item-manager" id="item-manager" ng-class="{ show: showItemManager }" inert>
 				<div class="item-header">
 					<div class="item-heading">
 						<h4>Manage Inventory</h4>
@@ -147,7 +149,7 @@
 							class="important-button"
 							ng-class="{'save': editingIndex == $index}"
 							ng-click="handleEditItem(item, $index, $event)">{{editingIndex == $index ? 'Save' : 'Edit'}}</button>
-							<button class="delete-button icon-cross" type="button" ng-click="removeItemFromInventoryItems($index, item)"></button>
+							<button class="delete-button icon-cross" title='Remove item from inventory' type="button" ng-click="removeItemFromInventoryItems($index, item)"></button>
 						</div>
 						<item-icon-selector class="item-selection" ng-class="{ show: showItemIconSelector && editingItemIcon == item }">
 							<div class="item-header">
@@ -593,7 +595,7 @@
 											<button type="button"
 												class="delete-button icon-cross"
 												ng-click="removeAnswerPreCheck($index, $event)"></button>
-											<button  ng-show="inventoryItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
+											<button  ng-show="inventoryItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
 												<img ng-if="!answer.hideAnswer" src="assets/creator-assets/eye.png"/>
 												<img ng-if="answer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
 												<div ng-if="showHideAnswerTooltip" class="hide-answer-tooltip"><p ng-if="!answer.hideAnswer">Answer will be visible to all players, with or without the required items</p><p ng-if="answer.hideAnswer">Answer will be hidden to players without the required items</p></div>
@@ -612,7 +614,7 @@
 													><span class="node-label">{{ integerToLetters(answer.target) }}</span>
 												</button>
 											</div>
-											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-class="{'requires-items': answer.requiredItems[0]}" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
+											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-class="{'requires-items': answer.requiredItems[0]}" ng-click="toggleRequiredItemsModal(answer)" title="Require Items" aria-label="Open Required Items Window for Answer" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
 												<div ng-class="{'unlocked': !answer.requiredItems[0], 'locked': answer.requiredItems[0]}">
 													<img src="assets/creator-assets/unlocked.png" ng-if="!answer.requiredItems[0]"/>
 													<img src="assets/creator-assets/lock.png" ng-if="answer.requiredItems[0]"/>
@@ -628,7 +630,7 @@
 											<button type="button"
 												class="delete-button icon-cross"
 												ng-click="removeAnswerPreCheck($index, $event)"></button>
-											<button ng-show="inventoryItems[0]" ng-click="answer.hideAnswer = !answer.hideAnswer" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
+											<button ng-show="inventoryItems[0]" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-click="answer.hideAnswer = !answer.hideAnswer" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
 												<img ng-if="!answer.hideAnswer" src="assets/creator-assets/eye.png"/>
 												<img ng-if="answer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
 												<div ng-if="showHideAnswerTooltip" class="hide-answer-tooltip"><p ng-if="!answer.hideAnswer">Answer will be visible to all players, with or without the required items</p><p ng-if="answer.hideAnswer">Answer will be hidden to players without the required items</p></div>
@@ -716,27 +718,28 @@
 															<span class="description">{{inventoryItems[getItemIndex(item)].description}}</span>
 														</div> -->
 													</div>
-
-													<div class="item-minimum">
-														<div class="item-quantity">
-															<label for="increase-min-count-{{item.id}}">Min Quantity</label>
-															<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+													<div class="item-options">
+														<div class="item-minimum">
+															<div class="item-quantity">
+																<label for="increase-min-count-{{item.id}}">Min Quantity</label>
+																<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+															</div>
+															<!-- <div class="item-quantity" ng-show="showAdvancedOptions">
+																<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option"  ng-change="updateMinCount(event, item)">
+																<label for="no-minimum-option-{{item.id}}">No Minimum</label>
+															</div> -->
 														</div>
-														<!-- <div class="item-quantity" ng-show="showAdvancedOptions">
-															<input ng-focus = "event = $event" id="no-minimum-option-{{item.id}}"  type="checkbox" ng-model="item.noMin" class=" no-minimum-option"  ng-change="updateMinCount(event, item)">
-															<label for="no-minimum-option-{{item.id}}">No Minimum</label>
-														</div> -->
-													</div>
-													<div class="item-options" ng-class="{'show': hoverItem}">
-														<div class="item-quantity-options">
-															<div class="item-maximum" ng-show="showAdvancedOptions">
-																<div class="item-quantity" ng-show="!item.uncappedMax">
-																	<label for="increase-max-count-{{item.id}}">Max Quantity</label>
-																	<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="0"  ng-change="updateMaxCount(event, item)"/>
-																</div>
-																<div class="item-quantity">
-																	<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
-																	<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+														<div class="item-options" ng-class="{'show': hoverItem}">
+															<div class="item-quantity-options">
+																<div class="item-maximum" ng-show="showAdvancedOptions">
+																	<div class="item-quantity" ng-show="!item.uncappedMax">
+																		<label for="increase-max-count-{{item.id}}">Max Quantity</label>
+																		<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="0"  ng-change="updateMaxCount(event, item)"/>
+																	</div>
+																	<div class="item-quantity">
+																		<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
+																		<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+																	</div>
 																</div>
 															</div>
 															<div class="quantity-explanation" ng-show="showAdvancedOptions">
@@ -749,8 +752,10 @@
 														</div>
 													</div>
 
-													<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
-												</div>
+													<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+													</div>
+
+
 											</li>
 										</ul>
 										<div class="options-bar add-item">
@@ -1041,7 +1046,7 @@
 															</div>
 														</div>
 													</div>
-													<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+													<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 												</div>
 
 											</li>
@@ -1092,7 +1097,7 @@
 										</button> -->
 									</div>
 
-									<button ng-show="inventoryItems[0]" class="require-item-btn" id="hotspot-require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = false" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false">
+									<button ng-show="inventoryItems[0]" title="Require Items" aria-label="Open Required Items Window for Answer" class="require-item-btn" id="hotspot-require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = false" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false">
 										<span class="icon-unlocked" ng-if="!answers[hotspotAnswerManager.answerIndex].requiredItems[0]"></span>
 										<span class="icon-lock" ng-if="answers[hotspotAnswerManager.answerIndex].requiredItems[0]"></span>
 										<div class="required-item-tooltip tooltip-bottom" ng-show="answers[hotspotAnswerManager.answerIndex].showTooltip">
@@ -1109,12 +1114,12 @@
 									<button type="button"
 										ng-disabled="hotspotAnswerManager.answerIndex == 0"
 										ng-click="moveAnswerBack()">Back</button>
-									<button  ng-show="inventoryItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
+									<button  ng-show="inventoryItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
 										<img ng-if="!answer.hideAnswer" src="assets/creator-assets/eye.png"/>
 										<img ng-if="answer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
 										<div ng-if="showHideAnswerTooltip" class="hide-answer-tooltip"><p ng-if="!answer.hideAnswer">Answer will be visible to all players, with or without the required items</p><p ng-if="answer.hideAnswer">Answer will be hidden to players without the required items</p></div>
 									</button>
-									<button type="button" class="delete-button icon-cross" ng-click="removeAnswerPreCheck(hotspotAnswerManager.answerIndex, $event)"></button>
+									<button type="button" class="delete-button icon-cross" title='Remove answer' ng-click="removeAnswerPreCheck(hotspotAnswerManager.answerIndex, $event)"></button>
 								</div>
 								<div class="colors-container" ng-show="colorDrawerOpen == true">
 									<button type="button"
@@ -1185,7 +1190,7 @@
 														<span>Quantity</span>
 														<input ng-focus = "event = $event" class="increase-count" type="number" min="1" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 0)"/>
 													</div>
-													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+													<button class="delete-button icon-cross" title='Remove required item from node' type="button" ng-click="removeItemFromNode(item, $index)"></button>
 												</div>
 											</div>
 											<div class="advanced-option" ng-if="showAdvancedOptions">
@@ -1231,7 +1236,7 @@
 														<span>Quantity</span>
 														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 1)"/>
 													</div>
-													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+													<button class="delete-button icon-cross" title='Remove required item from node' type="button" ng-click="removeItemFromNode(item, $index)"></button>
 												</div>
 											</div>
 
@@ -1316,7 +1321,7 @@
 											</div> -->
 										</div>
 										<div class="item-minimum">
-											<div class="item-quantity">
+											<div class="item-quantity" ng-show="!showAdvancedOptions">
 												<label for="increase-min-count-{{item.id}}">Min Quantity</label>
 												<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
 											</div>
@@ -1327,15 +1332,19 @@
 										</div>
 										<div class="item-options" ng-class="{'show': hoverItem}">
 											<div class="item-quantity-options">
+												<div class="item-quantity" ng-show="showAdvancedOptions">
+													<label for="increase-min-count-{{item.id}}">Min Quantity</label>
+													<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+												</div>
 												<div class="item-maximum" ng-show="showAdvancedOptions">
 													<div class="item-quantity" ng-show="!item.uncappedMax">
 														<label for="increase-max-count-{{item.id}}">Max Quantity</label>
 														<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="0"  ng-change="updateMaxCount(event, item)"/>
 													</div>
-													<div class="item-quantity">
-														<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
-														<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
-													</div>
+												</div>
+												<div class="item-quantity" ng-show="showAdvancedOptions">
+													<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
+													<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
 												</div>
 												<div class="quantity-explanation" ng-show="showAdvancedOptions">
 													<p ng-if="item.minCount == 0 && item.uncappedMax">Player is not required to have any amount of this item.</p>
@@ -1346,7 +1355,7 @@
 												</div>
 											</div>
 										</div>
-										<button class="delete-button icon-cross" type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+										<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
 									</div>
 								</li>
 							</ul>
@@ -1496,7 +1505,7 @@
 														<span>Quantity</span>
 														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 0)"/>
 													</div>
-													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+													<button class="delete-button icon-cross" title='Remove required item from node' type="button" ng-click="removeItemFromNode(item, $index)"></button>
 												</div>
 											</div>
 
@@ -1543,7 +1552,7 @@
 														<span>Quantity</span>
 														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 1)"/>
 													</div>
-													<button class="delete-button icon-cross" type="button" ng-click="removeItemFromNode(item, $index)"></button>
+													<button class="delete-button icon-cross" title='Remove required item from node' type="button" ng-click="removeItemFromNode(item, $index)"></button>
 												</div>
 											</div>
 
@@ -1688,7 +1697,7 @@
 						ng-click="hideCoverAndModals()">Done</button>
 				</div>
 			</div>
-			<tree-history ng-class="{ 'minimized':minimized, 'disabled': (existingNodeSelectionMode || copyNodeMode || previewNodeSelectionMode)}" ng-disabled="existingNodeSelectionMode || copyNodeMode || previewNodeSelectionMode">
+			<tree-history class="inert-on-dialog" aria-hidden="showBackgroundCover || showInventoryBackgroundCover" ng-class="{ 'minimized':minimized, 'disabled': (existingNodeSelectionMode || copyNodeMode || previewNodeSelectionMode)}" ng-disabled="existingNodeSelectionMode || copyNodeMode || previewNodeSelectionMode">
 				<div class="undo-redo-options">
 					<button ng-click="undoAction()" ng-disabled="historyPosition <= 0">Undo</button>
 					<button ng-click="redoAction()" ng-disabled="historyPosition >= historySize-1">Redo</button>
@@ -1716,7 +1725,8 @@
 				on-hover="onNodeHover(data)"
 				on-hover-out="onNodeHoverOut(data)"
 				node-click="nodeSelected(data)"
-				bg-click="bgClicked()"></tree-visualization>
+				bg-click="bgClicked()"
+				class="inert-on-dialog"></tree-visualization>
 		</div>
 
 		<!-- MAIN CREATOR SCRIPT -->

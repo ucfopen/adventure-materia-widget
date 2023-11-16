@@ -126,6 +126,16 @@ angular.module "Adventure"
 		if (item)
 			return treeSrv.getItemIndex(item.id)
 
+	$scope.$watch "showBackgroundCover", (newVal, oldVal) ->
+		if newVal == true
+			hideElements = document.getElementsByClassName("inert-on-dialog")
+			for element in hideElements
+				element.setAttribute("inert", "true")
+		else
+			hideElements = document.getElementsByClassName("inert-on-dialog")
+			for element in hideElements
+				element.removeAttribute("inert")
+
 	$scope.$watch "displayNodeCreation", (newVal, oldVal) ->
 
 		# Returning from a suspended node creation screen, don't do anything
