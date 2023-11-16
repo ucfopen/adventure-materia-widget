@@ -99,6 +99,12 @@
 						tabindex="0"></span>
 					</div>
 				</div>
+				<div class="inventory-introduction" ng-if="inventoryItems.length == 0">
+					<h3>Item Inventory</h3>
+					<span>Create items to enhance your Adventure! Items add additional depth to the player experience: reward them upon reaching certain destinations and gate certain decisions behind item possession.
+						Items can represent physical goods, currencies, or status effects like reputation or emotional states.</span>
+					<span>Begin by creating at least one item below. Afterwards, additional options will be present at each destination to manage item distribution and answer requirements.</span>
+				</div>
 				<ul class="list-items">
 					<li
 						ng-class="{'selected' : editingIndex == $index}"

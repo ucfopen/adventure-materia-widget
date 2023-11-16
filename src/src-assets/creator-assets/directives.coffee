@@ -706,7 +706,8 @@ angular.module "Adventure"
 				)
 
 			$scope.copyMode = false
-			$rootScope.$broadcast "tree.nodes.changed.complete" # inform the tree-transform directive that the tree has been re-rendered
+			$timeout ->
+				$rootScope.$broadcast "tree.nodes.changed.complete" # inform the tree-transform directive that the tree has been re-rendered
 
 		# Handle resizing of the browser window
 		window = angular.element($window)
