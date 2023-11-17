@@ -1066,17 +1066,17 @@ node-tooltips {
 	.tooltip {
 		max-width: 250px;
 		margin: 0px 0px 5px 0px;
-		padding: 5px 10px;
+		padding: 10px 15px;
 
 		border-radius: 5px;
 		background: $gray-darker;
 
 		color: $color-primary;
-		font-size: 0.7em;
+		font-size: 0.9em;
 
 		.tooltip-title {
 			display: block;
-			font-size: 0.6em;
+			font-size: 0.8em;
 
 			margin-bottom: 3px;
 		}
@@ -1099,19 +1099,19 @@ required-items-tooltip {
 	position: absolute;
 	max-width: 250px;
 	margin: 0px 0px 5px 0px;
-	padding: 5px 10px;
+	padding: 10px 15px;
 
 	border-radius: 5px;
 	background: $gray-darker;
 
 	color: $color-primary;
-	font-size: 0.7em;
+	font-size: 0.9em;
 
 	.tooltip-title {
 		display: block;
-		font-size: 0.6em;
+		font-size: 0.8em;
 
-		margin-bottom: 3px;
+		margin: 6px 0;
 	}
 
 	p {
@@ -1119,6 +1119,7 @@ required-items-tooltip {
 		flex-direction: row;
 		align-items: center;
 		grid-gap: 10px;
+		margin-top: 5px;
 
 		img {
 			width: 20px;

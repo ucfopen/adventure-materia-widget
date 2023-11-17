@@ -601,7 +601,7 @@
 											<button type="button"
 												class="delete-button icon-cross"
 												ng-click="removeAnswerPreCheck($index, $event)"></button>
-											<button  ng-show="inventoryItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
+											<button  ng-show="answer.requiredItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
 												<img ng-if="!answer.hideAnswer" src="assets/creator-assets/eye.png"/>
 												<img ng-if="answer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
 												<div ng-if="showHideAnswerTooltip" class="hide-answer-tooltip"><p ng-if="!answer.hideAnswer">Answer will be visible to all players, with or without the required items</p><p ng-if="answer.hideAnswer">Answer will be hidden to players without the required items</p></div>
