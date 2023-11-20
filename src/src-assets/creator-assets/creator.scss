@@ -1298,12 +1298,13 @@ required-items-tooltip {
 
 			.arrow-bottom {
 				position: static;
-				border-top-color: $gray-lightest;
+				// border-top-color: $gray-lightest;
+				border-top-color: $gray-lighter;
 			}
 
 			.arrow-top {
 				position: static;
-				border-bottom-color: $gray-lightest;
+				border-bottom-color:$gray-lighter;
 			}
 
 			dt {
@@ -1313,12 +1314,14 @@ required-items-tooltip {
 				grid-gap: 10px;
 				padding: 0 10px;
 				min-height: 35px;
-				background-color: $gray-lightest;
+				// background-color: $gray-lightest;
+				background: $color-primary;
 			}
 
 			.selected-item {
 				justify-content: space-between;
-				background-color: $gray-lighter;
+				// background-color: $gray-lighter;
+				background: $color-primary;
 			}
 
 			.option-contents {
@@ -1333,7 +1336,9 @@ required-items-tooltip {
 			}
 
 			dl {
-				background-color: $gray-lighter;
+				// background-color: $gray-lighter;
+				background: $color-primary;
+				border: solid 1px $gray-lightest;
 				// border: 1px solid $gray-darker;
 				margin: 0;
 				position: absolute;
@@ -1365,7 +1370,9 @@ required-items-tooltip {
 				scrollbar-color: $gray;
 
 				>:hover {
-					background-color: $gray-lighter;
+					// background-color: $gray-lighter;
+					background-color: $blue-lightest;
+					// color: #000;
 				}
 			}
 		}
