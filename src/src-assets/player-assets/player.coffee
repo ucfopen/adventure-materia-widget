@@ -142,6 +142,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		$scope.inventoryUpdate = false
 		$scope.questionItems = []
 
+		# Clear inventory updates
+		$scope.inventoryUpdateMessage = ""
+
 		# Add items to player's inventory
 		if $scope.question.options.items and $scope.question.options.items[0]
 
@@ -194,8 +197,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 								new: true
 							}
 							$scope.inventory.push(newItem)
-			# Clear inventory updates
-			$scope.inventoryUpdateMessage = ""
 
 			if ($scope.removedItems[0] || $scope.addedItems[0])
 				$scope.inventoryUpdate = true
@@ -206,12 +207,12 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 				if addedItemsExist
 					$scope.showNew = true
-					addedItemsMessage = "#{$scope.addedItems.length} new items added: #{($scope.addedItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{item.count})")).join(', ')}. "
+					addedItemsMessage = "#{$scope.addedItems.length} new items added: #{($scope.addedItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{Math.abs(item.count)})")).join(', ')}. "
 				else
 					addedItemsMessage = ""
 
 				if removedItemsExist
-					removedItemsMessage = "#{$scope.removedItems.length} items removed: #{($scope.removedItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{item.count})")).join(', ') }. "
+					removedItemsMessage = "#{$scope.removedItems.length} items removed: #{($scope.removedItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{Math.abs(item.count)})")).join(', ') }. "
 				else
 					removedItemsMessage = ""
 

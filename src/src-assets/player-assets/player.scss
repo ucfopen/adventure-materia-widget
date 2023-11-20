@@ -1011,6 +1011,10 @@ h1 {
 			&.removed-item {
 				color: $red;
 			}
+
+			&.added-item {
+				color: rgb(0, 132, 0);
+			}
 		}
 
 		img {
