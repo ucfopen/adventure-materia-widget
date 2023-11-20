@@ -904,6 +904,7 @@ angular.module "Adventure"
 					"Edit items (#{$scope.inventoryItems.length})"
 
 		$scope.newItemName = ''
+		$scope.currentItem = {}
 
 		$scope.openItemManager = () ->
 			$scope.showItemManager = true
@@ -972,6 +973,7 @@ angular.module "Adventure"
 			treeSrv.set $scope.treeData
 
 		$scope.uploadIcon = () ->
+			$scope.editingIcons = true
 			Materia.CreatorCore.showMediaImporter()
 
 		$scope.removeSelectedIcon = () ->

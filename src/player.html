@@ -21,7 +21,7 @@
 		<div id='assistive-alert' class='reader-instructions' aria-live='assertive'></div>
 
 		<div class="inventory-button-container">
-			<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn" aria-label="{{showInventory ? 'Close Inventory' : 'Open Inventory'}}" ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" ng-focus="showInventoryTooltip = true" ng-blur="showInventoryTooltip = false" class="inventory-button">
+			<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn" aria-label="{{showInventory ? 'Close Inventory' : 'Open Inventory. ' + inventory.length + ' items in inventory.' }}" ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" ng-focus="showInventoryTooltip = true" ng-blur="showInventoryTooltip = false" class="inventory-button">
 				<img src="assets/player-assets/BackPack64.png" ng-show="!showInventory"/>
 				<span ng-if="showNew" class="new-item">NEW!</span>
 			</button>
@@ -39,32 +39,32 @@
 				<i class="arrow-top"></i>
 				<div class="update-content" tabindex="-1">
 					<section ng-if="addedItems.length > 0">
-						<div class="item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0 && !itemSelection[getItemIndex(item.id)].isSilent" ng-click="toggleInventory(item)">
+						<div class="item added-item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0 && !itemSelection[getItemIndex(item.id)].isSilent" ng-click="toggleInventory(item)">
 							<div class="item-first" aria-label="Added {{item.count}} {{itemSelection[getItemIndex(item.id)].name}}">
 								<span class="item-count">+ {{item.count}} </span>
 								<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
 								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
 							</div>
-							<p class="item-update-description" aria-label="New item: {{itemSelection[getItemIndex(item.id)].description}}">
-								{{itemSelection[getItemIndex(item.id)].description}}
-							</p>
+							<div class="item-update-description">
+								Description: {{itemSelection[getItemIndex(item.id)].description}}
+							</div>
 						</div>
 					</section>
 					<section ng-if="removedItems.length > 0">
 						<div class="item removed-item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0 && !itemSelection[getItemIndex(item.id)].isSilent"" ng-click="toggleInventory(item)">
-							<div class="item-first" aria-label="Removed {{item.count}} {{itemSelection[getItemIndex(item.id)].name}}">
+							<div class="item-first" aria-label="Removed {{item.count < 0 ? item.count * -1 : item.count}} {{itemSelection[getItemIndex(item.id)].name}}">
 								<span class="item-count">- {{-1*item.count}}</span>
 								<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
 								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
 							</div>
-							<div class="item-description">
-								{{itemSelection[getItemIndex(item.id)].description}}
+							<div class="item-update-description">
+								Description: {{itemSelection[getItemIndex(item.id)].description}}
 							</div>
 						</div>
 					</section>
 				</div>
 
-				<button class="dismiss-update" ng-click="dismissUpdates()">Dismiss</button>
+				<button class="dismiss-update" ng-click="dismissUpdates()">Dismiss Updates</button>
 			</div>
 		</div>
 
