@@ -23,7 +23,7 @@ angular.module "Adventure"
 			item.nodeId = item.options.id
 			# extreme edge-case detection to ensure a mwdk mock id isn't being passed around
 			# this would generally only affect a v1 qset when viewed in the context of the mwdk
-			item.id = if typeof(item.options.id) is "string" and item.options.id.match(/^(mwdk-mock-id-[A-Za-z0-9\-]+)$/)[0] then item.options.id = 0 else item.options.id
+			if typeof(item.options.id) is "string" and item.options.id.match(/^(mwdk-mock-id-[A-Za-z0-9\-]+)$/)[0] then item.options.id = 0
 
 			delete item.assets
 
