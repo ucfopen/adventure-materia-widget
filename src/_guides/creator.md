@@ -239,19 +239,18 @@ Selecting this option will give the player the item only once upon their initial
 
 ### Adding Required Items to Answers ###
 
-Once you have created items, an option to add required items to Multiple Choice Answers, Short Answer Match Sets, or Hotspots will appear in the respective destination types, as indicated by the lock icon (1). An additional setting allows you to hide the answer if the player does not have the required item(s), indicated by the "eye" icon (2).
+Once you have created items, an option to add required items to Multiple Choice Answers, Short Answer Match Sets, or Hotspots will appear in the respective destination types, as indicated by the lock icon (1). An additional setting appears in multiple choice and hotspot answers that allows you to hide the answer if the player does not have the required item(s), indicated by the "eye" icon (2).
 
 #### Multiple Choice ####
 
 ![adventure required item mc](assets/create_widget_adventure_mc_required_items.png "adventure required item mc")
+#### Hotspot ####
+
+![adventure required item hotspot](assets/create_widget_adventure_hotspot_required_items.png "adventure required item hotspot")
 
 #### Short Answer ####
 
 ![adventure required item sa](assets/create_widget_adventure_sa_required_items.png "adventure required item sa")
-
-#### Hotspot ####
-
-![adventure required item hotspot](assets/create_widget_adventure_hotspot_required_items.png "adventure required item hotspot")
 
 ### Required Item Editor ###
 
