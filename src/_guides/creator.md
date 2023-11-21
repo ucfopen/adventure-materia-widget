@@ -175,9 +175,9 @@ If you choose to upload an image, the image uploader will be displayed, where yo
 
 ## Inventory System ##
 
-Optionally, you can choose to use the inventory system. The inventory system allows you to give the player items or remove items from the player's inventory for each destination they visit. 
+Optionally, you can choose to use the inventory system. The inventory system allows you to give the player items or remove items from the player's inventory for each destination they visit.
 
-Additionally, you can require the player to have certain items in their inventory to be able to select an answer option in Multiple Choice, Short Answer, or Hotspot. 
+Additionally, you can require the player to have certain items in their inventory to be able to select an answer option in Multiple Choice, Short Answer, or Hotspot.
 
 ### Creating Inventory Items ###
 
@@ -203,6 +203,8 @@ Clicking **Edit** will open the options for that specific item.
 2. (Optional) Add Item Description
 3. (Optional) Open the Icon Selector
 4. Save Item
+5. (Advanced) Make this a silent item. The player will not see this item in their inventory nor see it listed as a required item for an answer. An instance where this could be useful is in a choices-matter scenario. You could have an answer appear (or not appear) if the player has made a certain choice in the past.
+6. Delete Item
 
 #### Icon Selector ####
 To add icons to an item, click **Select Icon** to open the Icon Selector.
@@ -212,15 +214,15 @@ To add icons to an item, click **Select Icon** to open the Icon Selector.
 1. Click an icon to select it. Click it again to remove it.
 2. To upload your own icon, select **Upload Icon** inside the icon selector. This will display the image uploader. PNG, JPG, and SVG files are all accepted. Uploaded icons will show up at the bottom of the icon selector.
 
-Remove *custom uploaded icons* by selecting the icon in the icon selector and clicking **Remove Selected Icon**. 
+Remove *custom uploaded icons* by selecting the icon in the icon selector and clicking **Remove Selected Icon**.
 
 ![adventure item icon remove](assets/create_widget_adventure_icon_remove.png "adventure item icon remove")
 
 ### Adding Items to Destinations ###
 
-Once you have created the inventory items, an option to add items to destinations will appear in any destination besides End Point. 
+Once you have created the inventory items, an option to add items to destinations will appear in any destination besides End Point.
 
-Selecting the **Add Items** button will display the item editor for individual nodes. Inside the editor, you can choose to add or remove the items we created in the previous step from a player's inventory.
+Selecting the **Add Items** button will display the item editor for individual nodes. Inside the editor, you can choose to add items to a player's inventory or remove items from a player's inventory.
 
 ![adventure item add](assets/create_widget_adventure_add_items.png "adventure item add")
 
@@ -233,11 +235,11 @@ Selecting the **Add Items** button will display the item editor for individual n
 
 ![adventure item advanced options](assets/create_widget_adventure_item_advanced_options.png "adventure item advanced options")
 
-Selecting this option will give the player the item only once; if the player returns to this destination, they will not receive the item again.
+Selecting this option will give the player the item only once upon their initial visit to a destination; if the player returns to this destination, they will not receive the item again.
 
 ### Adding Required Items to Answers ###
 
-Once you have created items, an option to add required items to Multiple Choice Answers, Short Answer Match Sets, or Hotspots will appear in the respective destination types.
+Once you have created items, an option to add required items to Multiple Choice Answers, Short Answer Match Sets, or Hotspots will appear in the respective destination types, as indicated by the lock icon (1). An additional setting allows you to hide the answer if the player does not have the required item(s), indicated by the "eye" icon (2).
 
 #### Multiple Choice ####
 
@@ -253,21 +255,31 @@ Once you have created items, an option to add required items to Multiple Choice 
 
 ### Required Item Editor ###
 
-Although the image below was taken inside the Hotspot, the Required Item Editor appears and functions the same for each destination node type. 
+Although the image below was taken inside the Hotspot, the Required Item Editor appears and functions the same for each destination node type.
 
 ![adventure required item editor](assets/create_widget_adventure_required_item_editor.png "adventure required item editor")
 
 1. Select an item from the dropdown
 2. Make the item required for this answer to be selected
 3. Change the amount required
-4. Hide the answer if the player does not have the required items in their inventory (unchecked by default)
-5. Remove the item from required items
+4. Remove the item from required items
+5. Show advanced options (see below)
+
+#### Advanced Options
+
+![adventure required item editor advanced options](assets/create_widget_adventure_required_item_editor_advanced.png "adventure required item editor advanced options")
+
+The advanced options allow you to set the required item amount to be within a specific range.
+
+1. Set the minimum number the player can have of this item to select this answer.
+2. Set the maximum number the player can have of this item to select this answer.
+3. (Default) Set the maximum to have no cap.
 
 ### Example Tree Using Inventory System ###
 
 ![adventure tree with items](assets/create_widget_adventure_tree_with_items.png "adventure tree with items")
 
-1. Destinations that give or take items will display them in a circle surrounding the node. 
+1. Destinations that give or take items will display them in a circle surrounding the node.
 2. Items being taken by the destination will have a red circle around them. Items being given will have a green circle around them.
 3. The lock icon indicates that the answer choice requires items in order for the player to select it. Hover over the lock to see which items are required.
 4. The total number of items created will be displayed by the **Edit Inventory Items** button in parantheses.
