@@ -46,7 +46,7 @@
 								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
 							</div>
 							<div class="item-update-description">
-								Description: {{itemSelection[getItemIndex(item.id)].description}}
+								{{itemSelection[getItemIndex(item.id)].description.length > 0 ? 'Description: ' + itemSelection[getItemIndex(item.id)].description : (itemSelection[getItemIndex(item.id)].icon.alt.length > 0 ? 'Description: ' + itemSelection[getItemIndex(item.id)].icon.alt : '')}}
 							</div>
 						</div>
 					</section>
@@ -58,7 +58,7 @@
 								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
 							</div>
 							<div class="item-update-description">
-								Description: {{itemSelection[getItemIndex(item.id)].description}}
+								{{itemSelection[getItemIndex(item.id)].description.length > 0 ? 'Description: ' + itemSelection[getItemIndex(item.id)].description : (itemSelection[getItemIndex(item.id)].icon.alt.length > 0 ? 'Description: ' + itemSelection[getItemIndex(item.id)].icon.alt : '')}}
 							</div>
 						</div>
 					</section>

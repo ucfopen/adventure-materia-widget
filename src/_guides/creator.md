@@ -231,11 +231,20 @@ Selecting the **Add Items** button will display the item editor for individual n
 3. Take the item from the player. Note, however, that you can only remove an item from a player's inventory if they already have the item (i.e. you gave the player that item in a previous destination).
 4. Adjust the quantity of the item being given or taken. Only positive values greater than 0 are accepted.
 5. Remove the item
-6. Show Advanced Options. Clicking this will show the following:
+6. Show Advanced Options.
 
-![adventure item advanced options](assets/create_widget_adventure_item_advanced_options.png "adventure item advanced options")
+#### Advanced Options for Giving Items
 
-Selecting this option will give the player the item only once upon their initial visit to a destination; if the player returns to this destination, they will not receive the item again.
+![adventure item advanced options](assets/create_widget_adventure_item_advanced_options_give.png "adventure item advanced options")
+
+Selecting "Give On First Visit Only" will give the player the item only once upon their initial visit to a destination; if the player returns to this destination, they will not receive the item again.
+
+#### Advanced Options for Taking Items
+
+![adventure item advanced options](assets/create_widget_adventure_item_advanced_options_take.png "adventure item advanced options")
+
+1. Take the item only upon the player's initial visit to the destination.
+2. Take all of this type of item from the player.
 
 ### Adding Required Items to Answers ###
 

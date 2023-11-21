@@ -1038,7 +1038,8 @@ h1 {
 		border-radius: 5px;
 
 		&:focus, &:hover {
-			background-color: $blue-lighter;
+			background-color: $gray-lightest;
+			cursor: pointer;
 		}
 	}
 
