@@ -117,6 +117,29 @@
 				aria-live="assertive"
 				feedback-focus-manager>
 		</div>
+		<div class="missing-required-items"
+			ng-class="{ show: missingRequiredItems.length > 0 }"
+			ng-attr-aria-hidden="{{ !(missingRequiredItems.length > 0) }}"
+			tabindex="-1">
+			<h3>The following item(s) are required to select this answer:</h3>
+			<div class="required-items-content">
+				<ul>
+					<li ng-repeat="item in missingRequiredItems">
+						<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
+						{{ itemSelection[getItemIndex(item.id)].name }}
+						({{ item.range }})
+					</li>
+				</ul>
+			</div>
+			<input class="feedback-button trans-button"
+				type="button"
+				value="Got It"
+				ng-click="closeMissingRequiredItems()"
+				ng-attr-tabindex="{{missingRequiredItems.length > 0 ? 0 : -1}}"
+				aria-label="{{missingRequiredItemsAltText}}. Return to Widget"
+				aria-live="assertive"
+				feedback-focus-manager>
+		</div>
 		<div class="container" ng-class="{
 			'hotspot-mode' : question.type == HOTSPOT}">
 			<header class="header" ng-class="{'show-title' : !hideTitle}">

@@ -533,7 +533,7 @@
 				<h2 ng-if="displayNodeCreation == END">End Point</h2>
 				<div class="node-creation-panels">
 					<div class="panel-left" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
-					'tiny' : displayNodeCreation == HOTSPOT, 'column': showRequiredItems || showItemSelection}">
+					'tiny' : displayNodeCreation == HOTSPOT, 'column': (showRequiredItems || showItemSelection) && displayNodeCreation != HOTSPOT }">
 						<div class="question-media-box" ng-class="{
 							'align-left' : editedNode.media.align == 'left',
 							'align-right' : editedNode.media.align == 'right',
@@ -927,9 +927,11 @@
 										</g>
 									</svg>
 									<!-- Background image placed behind the hotspot's SVG canvas -->
-									<img id="hotspotImage"
-										ng-src="{{image.src}}"
-										ng-show="mediaReady" />
+									<div class="hotspot-image-container">
+										<img id="hotspotImage"
+											ng-src="{{image.src}}"
+											ng-show="mediaReady" />
+									</div>
 								</div>
 								<div class="image-options-container" ng-show="mediaReady" >
 									<!-- bottom toolbar with buttons for adding and managing hotspots -->

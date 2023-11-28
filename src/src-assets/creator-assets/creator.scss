@@ -634,19 +634,20 @@ button {
 
 
 	&.hide-answer-button {
-		height: 35px;
-		width: 35px;
-		padding: 5px 0 0 0;
+		height: 24px;
+		width: 24px;
+		padding: 4px;
 		position: relative;
 
 		img {
-			height: 25px;
-			width: 25px;
+			height: 16px;
+			width: 16px;
 		}
 
 		.hide-answer-tooltip {
 			position: absolute;
 			top: 45px;
+			left: -9px;
 			width: 100px;
 			background: $blue;
 			color: $white;
@@ -1357,11 +1358,16 @@ required-items-tooltip {
 			}
 
 			.blank-selection {
-				width: 100px;
+				width: 100%;
 				height: 2em;
 				justify-content: end;
 				background-color: $gray-lighter;
 				border-radius: 10px;
+
+				&:after {
+					content: 'No additional items.';
+					order: -1;
+				}
 			}
 
 			.options {
@@ -1384,16 +1390,22 @@ required-items-tooltip {
 		.item-details {
 			display: flex;
 			flex-direction: row;
+			flex-wrap: wrap;
 			align-items: center;
 			width: 100%;
 			gap: 10px;
 			position: relative;
 			box-sizing: border-box;
+			padding-right: 36px;
 
 			.delete-button {
+				position: absolute;
+				right: -6px;
+				top: 50%;
 				height: 24px;
 				width: 24px;
 				padding: 0;
+				margin-top: -12px;
 			}
 		}
 
@@ -1441,7 +1453,7 @@ required-items-tooltip {
 		.item-content {
 			display: flex;
 			flex-direction: column;
-			flex-grow: 2;
+			flex-grow: 1;
 			max-width: 75%;
 			justify-content: center;
 
@@ -1624,6 +1636,7 @@ required-items-tooltip {
 		align-items: end;
 		flex-direction: row;
 		justify-content: space-between;
+		margin-top: 10px;
 	}
 
 	.advanced-option {
@@ -1804,8 +1817,8 @@ item-icon-selector {
 
 	&.required-item-modal-hotspot {
 		position: absolute;
-		top: 40px;
-		left: 120px;
+		top: 28px;
+		left: 94px;
 		width: 500px;
 
 		&.show {
@@ -2492,11 +2505,12 @@ node-creation-selection-dialog {
 
 		&.tiny {
 			max-height: 2em;
+			width: 100%;
 		}
 
-		@media screen and (min-width: 1000px) {
+		@media screen and (min-width: $node-creation-panels-width) {
 			&.tiny {
-				resize: both !important;
+				resize: vertical;
 				height: 90%;
 				max-height: 100% !important;
 				width: 200px;
@@ -2585,6 +2599,10 @@ node-creation-selection-dialog {
 		&.expanded {
 			height: 100%;
 		}
+
+		&.tiny {
+			margin: 5px;
+		}
 	}
 
 	.media-box {
@@ -2665,14 +2683,14 @@ node-creation-selection-dialog {
 					grid-gap: 10px;
 
 					.hide-answer-button {
-						height: 35px;
-						width: 35px;
-						padding: 5px 0 0 0;
+						height: 24px;
+						width: 24px;
+						padding: 4px;
 						position: relative;
 
 						img {
-							height: 25px;
-							width: 25px;
+							height: 16px;
+							width: 16px;
 						}
 
 						.hide-answer-tooltip {
@@ -2797,9 +2815,10 @@ node-creation-selection-dialog {
 				}
 
 				button.delete-button {
-					height: 35px;
-					min-width: 35px;
-					max-width: 35px;
+					height: 24px;
+					min-width: 24px;
+					max-width: 24px;
+					padding: 5px;
 				}
 
 				button.answer-node-select, button.add-item {
@@ -3153,13 +3172,17 @@ node-creation-selection-dialog {
 				}
 			}
 
-			img {
-				position: relative;
-
-				z-index: $z-index-modal + 1;
-				max-width: 100%;
-				//max-height: 90%;
+			.hotspot-image-container {
+				width: 698px;
 				height: 400px;
+
+				img {
+					position: relative;
+	
+					z-index: $z-index-modal + 1;
+					max-width: 100%;
+					height: 400px;
+				}
 			}
 		}
 
@@ -3452,6 +3475,8 @@ node-creation-selection-dialog {
 			flex-direction: column;
 			align-items: start;
 			height: auto;
+			margin-top: 10px;
+			margin-bottom: 10px;
 		}
 
 		div.select-required-items {

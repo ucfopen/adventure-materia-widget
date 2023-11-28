@@ -876,7 +876,7 @@ h1 {
 	}
 }
 
-.feedback {
+.feedback, .missing-required-items {
 	position: absolute;
 	z-index: -1;
 	top: 50%;
@@ -920,12 +920,24 @@ h1 {
 		content: 'INVENTORY UPDATED';
 	}
 
+	&.missing-required-items {
+
+		h3 {
+			margin: 5px 12px;
+			font-size: 0.9em;
+		}
+	
+		&:before {
+			content: 'MISSING ITEMS';
+		}
+	}
+
 	&.show {
 		z-index: 1000;
 		opacity: 1;
 	}
 
-	.feedback-content {
+	.feedback-content, .required-items-content {
 		width: 500px;
 		height: 190px;
 
@@ -936,6 +948,29 @@ h1 {
 
 		overflow-x: hidden;
 		overflow-y: auto;
+	}
+
+	.required-items-content {
+
+		height: 140px;
+
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+
+			li {
+				display: flex;
+				font-size: 0.8em;
+				align-items: center;
+
+				img {
+					width: 48px;
+					height: auto;
+					margin-right: 12px;
+				}
+			}
+		}
 	}
 
 }

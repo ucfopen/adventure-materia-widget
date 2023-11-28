@@ -33,6 +33,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.inventory = []
 	$scope.itemSelection = []
 
+	$scope.missingRequiredItems = []
+	$scope.missingRequiredItemsAltText = ""
+
 	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
 			#Convert an old qset prior to running the widget
@@ -379,7 +382,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			if ! hasItemInInventory and item.minCount is 0
 				hasRequiredItem = true
 			if ! hasRequiredItem
-				missingItems.push(item.id)
+				missingItems.push item
 		return missingItems
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
@@ -391,11 +394,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		requiredItems = $scope.answers[index].requiredItems || $scope.answers[index].options.requiredItems
 
-		missingItems = $scope.checkInventory(requiredItems)
+		$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
 
-		if missingItems[0]
-			# string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
-			# $scope.feedback = "Answer requires the items: #{string}"
+		if $scope.missingRequiredItems[0]
+			$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
 			$scope.next = null
 			return
 
@@ -454,7 +456,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					missingItems = $scope.checkInventory(requiredItems)
 
 					if missingItems[0]
-						string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
+						# string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
+						stirng = missingItems.map((item) -> "#{item.name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
 						$scope.feedback = "Answer requires the items: #{string}"
 						$scope.next = null
 						return
@@ -493,6 +496,11 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			$scope.feedback = ""
 			if $scope.next
 				manageQuestionScreen $scope.next
+
+	$scope.closeMissingRequiredItems = () ->
+		if $scope.missingRequiredItems.length > 0
+			$scope.missingRequiredItems = []
+			$scope.missingRequiredItemsAltText = ""
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
