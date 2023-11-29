@@ -2471,6 +2471,28 @@ node-creation-selection-dialog {
 		textarea {
 			resize: none;
 		}
+
+		.panel-right {
+			display: none;
+		}
+
+		.item-selection {
+			/** Show modal on screen widths < 1000px **/
+			@media screen and (max-width: 1400px) {
+				&.item-panel {
+					display: none;
+				}
+			}
+			/** Show two panels on screen widths >= 1000px **/
+			@media screen and (min-width: 1400px) {
+				&.item-panel {
+					display: none;
+				}
+				&.item-modal.show {
+					display: block;
+				}
+			}
+		}
 	}
 
 	h2 {

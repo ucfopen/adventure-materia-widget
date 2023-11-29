@@ -240,6 +240,10 @@ h1 {
 	flex-direction: column;
 	justify-content: space-between;
 	height: 100%;
+
+	&.hotspot-mode {
+		justify-content: flex-start;
+	}
 }
 
 .question {
@@ -276,8 +280,10 @@ h1 {
 	}
 
 	&.hotspot-mode {
-		padding: 5px 30px 10px 30px;
+		margin: 0 0 10px 0;
+		padding: 0 30px;
 		max-height: 65px;
+		flex-grow: 0;
 
 		h2 {
 			max-height: 65px;
@@ -455,7 +461,6 @@ h1 {
 	box-sizing: border-box;
 
 	max-height: 250px;
-	// overflow-y: auto;
 
 	font-family: 'Lora', serif;
 
@@ -463,16 +468,12 @@ h1 {
 	box-shadow: 0px 0px 3px #888888;
 
 	&.hotspot-mode {
-		position: absolute;
-		bottom: 0px;
-	}
-
-	&.hotspot-mode {
-		max-height: 410px;
+		position: relative;
+		max-height: none;
+		margin: 0 auto;
 
 		&.no-question {
 			max-height: 440px;
-			bottom: 45px;
 
 			&.hidden-title {
 				max-height:485px;
