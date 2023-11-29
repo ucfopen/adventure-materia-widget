@@ -1455,6 +1455,7 @@ required-items-tooltip {
 			flex-direction: column;
 			flex-grow: 1;
 			max-width: 75%;
+			align-self: center;
 			justify-content: center;
 
 			.item-description {
@@ -2399,6 +2400,10 @@ node-creation-selection-dialog {
 
 		&#hotspot-require-item-btn {
 			height: auto;
+
+			.icon-lock {
+				margin-right: -4px;
+			}
 		}
 
 		div {

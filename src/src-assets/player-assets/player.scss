@@ -107,7 +107,7 @@ body {
 
 	width:62px;
 	height:62px;
-	padding: 8px;
+	padding: 4px;
 
 	// Inventory z-index is 1000
 
@@ -126,8 +126,8 @@ body {
 	}
 
 	img {
-		width: 48px;
-		height: 48px;
+		width: 46px;
+		height: 46px;
 	}
 }
 
@@ -474,6 +474,7 @@ h1 {
 
 		&.no-question {
 			max-height: 440px;
+			margin-top: 12px;
 
 			&.hidden-title {
 				max-height:485px;
@@ -541,6 +542,11 @@ h1 {
 
 			.answer-text {
 				max-width: calc(100% - 34px);
+
+				&.no-text-provided {
+					font-style: italic;
+					color: #696969;
+				}
 			}
 
 			.answer-required-items {
@@ -736,15 +742,16 @@ h1 {
 				div.item {
 					padding: 15px;
 					margin: 15px;
-					border-radius: 10px;
+					border-radius: 4px;
 					max-height: 25px;
 
 					position: relative;
 
 					display: flex;
 					flex-direction: row;
+					justify-content: flex-start;
 					align-items: center;
-					grid-gap: 10px;
+					grid-gap: 5px;
 
 					border: solid 1px $gray-lighter;
 					background-color: $color-primary;
@@ -762,6 +769,8 @@ h1 {
 					}
 
 					img {
+						position: relative;
+						left: -5px;
 						width: 35px;
 						height: 35px;
 						object-fit: cover;
@@ -781,15 +790,15 @@ h1 {
 
 					position: absolute;
 					left: 0;
-					top: 0;
+					top: -8px;
 				}
 
 				.item-count {
 					position: absolute;
-					right: -5px;
-					bottom: -5px;
-					width: 15px;
-					height: 15px;
+					right: -8px;
+					bottom: -8px;
+					width: 24px;
+					height: 24px;
 					border-radius: 50%;
 					border: 2px $blue-lighter solid;
 					text-align: center;
@@ -797,7 +806,8 @@ h1 {
 					flex-direction: column;
 					justify-content: center;
 					background-color: $white;
-					font-size: 10px;
+					font-size: 14px;
+					font-weight: bold;
 				}
 			}
 
@@ -1027,6 +1037,7 @@ h1 {
 
 			.item-count {
 				min-width: 30px;
+				font-size: 16px;
 			}
 
 			.item-name {
@@ -1072,6 +1083,8 @@ h1 {
 		font-style: italic;
 		border: none;
 		border-radius: 5px;
+
+		cursor: pointer;
 
 		&:focus, &:hover {
 			background-color: $blue-lighter;

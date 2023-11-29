@@ -45,7 +45,7 @@
 								<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
 								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
 							</div>
-							<div class="item-update-description">
+							<div class="item-update-description" ng-show="itemSelection[getItemIndex(item.id)].description.length">
 								Description: {{itemSelection[getItemIndex(item.id)].description}}
 							</div>
 						</div>
@@ -57,7 +57,7 @@
 								<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
 								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
 							</div>
-							<div class="item-update-description">
+							<div class="item-update-description" ng-show="itemSelection[getItemIndex(item.id)].description.length">
 								Description: {{itemSelection[getItemIndex(item.id)].description}}
 							</div>
 						</div>
@@ -192,7 +192,7 @@
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
 					tabindex="0">
-					<span class="answer-text" aria-label="{{answer.text}}, {{checkInventory(answer.requiredItems).length > 0 ? 'Cannot select.' : ''}}">{{answer.text}}</span>
+					<span class="answer-text" ng-class="{ 'no-text-provided' : !answer.text.length }" aria-label="{{answer.text}}, {{checkInventory(answer.requiredItems).length > 0 ? 'Cannot select.' : ''}}">{{ answer.text.length > 0 ? answer.text : 'No answer text provided' }}</span>
 					<div class="answer-required-items" ng-if="answer.requiredItems.length && hasNotSilentItem(answer.requiredItems)">
 						<span class="required-item" ng-repeat="item in answer.requiredItems" ng-show="!itemSelection[getItemIndex(item.id)].isSilent" ng-class="{'missing-item': checkInventory(answer.requiredItems).includes(item.id)}">
 							<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}"/>
@@ -238,6 +238,7 @@
 						label-manager
 						ng-click="handleAnswerSelection(answer.options.link,answer.index)"
 
+						ng-if="!(answer.hideAnswer && checkInventory(answer.requiredItems).length)"
 						ng-mouseover='onHotspotHover(answer, $event)'
 						ng-mouseout='onHotspotHoverOut($event)'
 						ng-focus='onHotspotHover(answer, $event)'
