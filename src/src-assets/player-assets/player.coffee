@@ -198,6 +198,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 							}
 							$scope.inventory.push(newItem)
 
+						$scope.inventory = $scope.inventory.filter((p_i) -> p_i.count > 0)
+
 			if ($scope.removedItems[0] || $scope.addedItems[0])
 				$scope.inventoryUpdate = true
 				document.getElementById("inventory-update").removeAttribute("inert")
