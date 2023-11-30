@@ -718,7 +718,7 @@
 														</div>
 													</div>
 													<div class="item-options-container" ng-class="{'flex-start': showAdvancedOptions, 'show': hoverItem}">
-														<div class="item-quantity">
+														<div class="item-minimum-quantity">
 															<label ng-show="!showAdvancedOptions"  for="increase-min-count-{{item.id}}">Required Quantity</label>
 															<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
 															<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
@@ -774,11 +774,11 @@
 												<label for="answer-show-advanced">Use Advanced Options</label>
 											</div>
 
-											<button class="save-button important-button"
+											<!-- <button class="save-button important-button"
 											ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 											type="button"
 											ng-click="toggleRequiredItemsModal()">Done
-											</button>
+											</button> -->
 										</div>
 										<!-- <i class="arrow-right"></i> -->
 									</div>
@@ -987,7 +987,7 @@
 												</div>
 												<div class="item-options-container" ng-class="{'show': hoverItem}">
 
-													<div class="item-quantity">
+													<div class="item-minimum-quantity">
 														<label ng-show="!showAdvancedOptions"  for="increase-min-count-{{item.id}}">Required Quantity</label>
 														<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
 														<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
@@ -1261,7 +1261,7 @@
 									</div>
 									<div class="item-options-container" ng-class="{'show': hoverItem, 'flex-start': showAdvancedOptions}">
 										<div class="item-quantity-options">
-											<div class="item-quantity">
+											<div class="item-minimum-quantity">
 												<label for="increase-min-count-{{item.id}}" ng-show="showAdvancedOptions">Min Quantity</label>
 												<label for="increase-min-count-{{item.id}}" ng-show="!showAdvancedOptions">Required Quantity</label>
 												<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
@@ -1517,11 +1517,11 @@
 									</div>
 								</div>
 
-								<button class="save-button important-button"
+								<!-- <button class="save-button important-button"
 								ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
 								type="button"
 								ng-click="toggleNodeItemsModal()">Done
-								</button>
+								</button> -->
 							</div>
 						</div>
 						<button type="button"

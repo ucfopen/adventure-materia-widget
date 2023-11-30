@@ -1216,7 +1216,7 @@ required-items-tooltip {
 			align-content:start;
 		}
 
-		.item-quantity {
+		.item-minimum-quantity, .item-quantity {
 			display: flex;
 			flex-direction: row;
 			grid-gap: 10px;
@@ -1234,6 +1234,17 @@ required-items-tooltip {
 			.ng-invalid-pattern {
 				border: $red solid 1px;
 			}
+		}
+
+		.item-quantity-options {
+			gap: 10px;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.quantity-explanation {
+			font-style: italic;
+			padding: 10px 0;
 		}
 
 		.greyed-out {
