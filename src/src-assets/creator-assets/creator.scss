@@ -62,6 +62,7 @@ $edit-popup-standard-height: 620px;
 // $edit-popup-less-height: 570px;
 
 $node-creation-panels-width: 1200px;
+$item-panel-max-width: 1400px;
 
 $z-index-hidden: -1;
 $z-index-default: 0;
@@ -666,6 +667,11 @@ button {
 	}
 }
 
+.hide-popup-btn:hover {
+	cursor: pointer;
+	color: $red;
+}
+
 .mode-header {
 	position: absolute;
 	top: 0px;
@@ -733,7 +739,7 @@ button {
 	}
 }
 
-.inventory-items {
+.open-inventory-items-btn {
 	position: absolute;
 	top: 15px;
 	right: 15px;
@@ -1126,13 +1132,128 @@ required-items-tooltip {
 	}
 }
 
-.item-selection, .item-manager {
+/** For node item editor sections only **/
+.item-selection {
+
+	.item-instructions {
+		font-size: 12px;
+		font-style: italic;
+		color: $gray-darker;
+	}
+
+	/** Show modal on screen widths < 1000px **/
+	@media screen and (max-width: $item-panel-max-width) {
+		&.item-panel {
+			display: none;
+		}
+	}
+	/** Show two panels on screen widths >= 1000px **/
+	@media screen and (min-width: $item-panel-max-width) {
+		&.item-modal {
+			display: none;
+		}
+	}
+	.basic-options {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		width: 100%;
+		align-items: center;
+	}
+
+	.advanced-option {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 15px;
+		padding: 10px 10px 10px 0;
+
+		input {
+			width: auto;
+			height: 1em;
+		}
+
+		button.hide-answer-button {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			color: $gray-darker;
+			gap: 20px;
+			padding: 20px;
+			background-color: $white;
+
+			img {
+				width: 25px;
+				height: 25px;
+			}
+
+			&:hover {
+				background-color: $gray-lighter;
+			}
+
+
+			&.hide-answer {
+				background-color: $gray-lighter;
+			}
+
+		}
+	}
+
+	.item-options-container {
+		display: flex;
+		gap: 5px;
+		flex-wrap: wrap;
+		justify-content: end;
+		flex-direction: column;
+		padding: 0 10px;
+		align-content:end;
+		min-width: 150px;
+		max-width: 150px;
+
+		&.flex-start {
+			justify-content: start;
+			align-content:start;
+		}
+
+		.item-quantity {
+			display: flex;
+			flex-direction: row;
+			grid-gap: 10px;
+			align-items: center;
+
+			input {
+				width: 70px;
+				box-sizing: border-box;
+
+				&.uncapped-max-option, &.no-minimum-option {
+					width: auto;
+				}
+			}
+
+			.ng-invalid-pattern {
+				border: $red solid 1px;
+			}
+		}
+
+		.greyed-out {
+			color: $gray-darker;
+			font-style: italic;
+		}
+	}
+}
+
+/** For both node item editors and inventory manager **/
+.item-selection, item-manager {
 	opacity: 0;
 	height: 0;
 	overflow: hidden;
 	max-height: 90%;
 	z-index: -1;
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 
 	&.show {
 		opacity: 1;
@@ -1140,28 +1261,9 @@ required-items-tooltip {
 		transition: opacity 0.3s ease;
 		padding: 5px 25px 25px 25px;
 		z-index: $z-index-modal-dialog;
-
 		box-sizing: border-box;
-
 		border-radius: 2px;
-
 		box-shadow: 0px 0px 5px #888;
-	}
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-
-	/** Show modal on screen widths < 1000px **/
-	@media screen and (max-width: 1400px) {
-		&.item-panel {
-			display: none;
-		}
-	}
-	/** Show two panels on screen widths >= 1000px **/
-	@media screen and (min-width: 1400px) {
-		&.item-modal {
-			display: none;
-		}
 	}
 
 	.item-header {
@@ -1211,14 +1313,6 @@ required-items-tooltip {
 			}
 		}
 
-		.hide-popup {
-
-			&:hover {
-				cursor: pointer;
-				color: $red;
-			}
-		}
-
 		.item-instructions {
 			margin: 0 0 10px 0;
 		}
@@ -1228,19 +1322,12 @@ required-items-tooltip {
 		}
 	}
 
-	.item-instructions {
-		font-size: 12px;
-		font-style: italic;
-		color: $gray-darker;
-	}
-
 	ul li, .options-bar {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
 		gap: 5px;
-		align-items: start;
-		flex-wrap: wrap;
+		align-items: center;
 
 		padding: 10px;
 
@@ -1253,22 +1340,10 @@ required-items-tooltip {
 		transition: background 0.5s;
 
 		&.options-bar {
-			align-items: center;
 			min-width: 425px;
 			padding-bottom: 0px;
 			margin: 0;
-		}
-
-		.icon-uploader-options {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: center;
-			gap: 20px;
-
-			> * {
-				height: 100%;
-			}
+			flex-wrap: wrap;
 		}
 
 		.selector {
@@ -1325,6 +1400,8 @@ required-items-tooltip {
 				flex-direction: row;
 				align-items: center;
 				grid-gap: 10px;
+				max-height: 30px;
+				overflow: hidden;
 			}
 
 			dt:hover {
@@ -1366,27 +1443,6 @@ required-items-tooltip {
 				>:hover {
 					background-color: $gray-lighter;
 				}
-			}
-		}
-
-		> input {
-			flex-grow: 2;
-		}
-
-		.item-details {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			width: 100%;
-			gap: 10px;
-			position: relative;
-			box-sizing: border-box;
-
-			.delete-button {
-				height: 24px;
-				min-width: 24px;
-				max-width: 24px;
-				padding: 0;
 			}
 		}
 
@@ -1438,136 +1494,12 @@ required-items-tooltip {
 			max-width: 75%;
 			justify-content: center;
 
-			.item-description {
-				color: $gray-darker;
-				overflow: auto;
-				max-height: 120px;
-				p {
-					font-style: italic;
-				}
-			}
-
-			.advanced-button {
-				color: $blue;
-				display: flex;
-				align-items: center;
-				gap: 5px;
-
-				&:hover {
-					text-decoration: underline;
-					cursor: pointer;
-				}
-
-				.arrow-bottom {
-					border-left: 7px solid transparent;
-					border-right: 7px solid transparent;
-					border-top: 7px solid $blue;
-				}
-
-				.arrow-top {
-					border-left: 7px solid transparent;
-					border-right: 7px solid transparent;
-					border-bottom: 7px solid $blue;
-				}
-			}
-
-			.silent-option {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				gap: 5px;
-				padding-top: 5px;
-
-				img {
-					height: 20px;
-					width: 20px;
-				}
-			}
-
-			textarea, input[type="text"] {
-				width: 100%;
-				max-width: 350px;
-				box-sizing: border-box;
+			&.small-name {
+				max-width: 100px;
 			}
 
 			.item-name {
 				font-weight: bold;
-			}
-		}
-
-		.item-minimum {
-			input {
-				width: 50px;
-				height: 1em;
-			}
-		}
-
-		.item-options {
-			display: flex;
-			flex-grow: 1;
-			align-items: center;
-			gap: 10px;
-			flex-wrap: wrap;
-			justify-content: end;
-
-			.item-quantity-options {
-				display: flex;
-				flex-direction: column;
-				grid-gap: 10px;
-				justify-content: end;
-
-				.item-minimum, .item-maximum {
-					display: flex;
-					flex-direction: row;
-					grid-gap: 10px;
-					align-items: center;
-					flex-wrap: wrap;
-				}
-				.quantity-explanation {
-					font-size: 12px;
-					font-style: italic;
-
-					code {
-						font-style:normal;
-						background: $gray-lighter;
-						padding: 2px 5px;
-						border: 1px solid $white;
-						border-radius: 3px;
-						display: inline-block;
-					}
-				}
-			}
-
-			.item-quantity {
-				display: flex;
-				flex-direction: row;
-				grid-gap: 10px;
-				align-items: center;
-
-				input {
-					width: 70px;
-					box-sizing: border-box;
-
-					&.uncapped-max-option, &.no-minimum-option {
-						width: auto;
-					}
-				}
-
-				.ng-invalid-pattern {
-					border: $red solid 1px;
-				}
-			}
-
-			button {
-
-				&.save {
-					background: $color-accent;
-					color: $color-primary;
-
-					&:hover {
-						background: $color-accent-highlight;
-					}
-				}
 			}
 		}
 
@@ -1584,6 +1516,12 @@ required-items-tooltip {
 
 			background: rgba(255,255,255,0.5);
 		}
+
+		.delete-button {
+			min-width: 30px;
+			max-width: 30px;
+			padding: 0;
+		}
 	}
 
 	ul.list-items {
@@ -1596,10 +1534,8 @@ required-items-tooltip {
 	}
 
 	input {
-		height: 2em;
 		font-weight: 1.2em;
 		padding: 5px 10px 5px 10px;
-
 		border: solid 1px $gray-lighter;
 		border-radius: 3px;
 	}
@@ -1613,54 +1549,9 @@ required-items-tooltip {
 		}
 	}
 
-	.advanced-option-bar {
-		display: flex;
-		align-items: end;
-		flex-direction: row;
-		justify-content: space-between;
-	}
-
-	.advanced-option {
-		display: flex;
-		align-items: center;
-		flex-direction: row;
-		justify-content: center;
-		gap: 15px;
-		padding: 0 10px;
-
-		input {
-			width: auto;
-			height: 1em;
-		}
-
-		button.hide-answer-button {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			color: $gray-darker;
-			gap: 20px;
-			padding: 20px;
-			background-color: $white;
-
-			img {
-				width: 25px;
-				height: 25px;
-			}
-
-			&:hover {
-				background-color: $gray-lighter;
-			}
-
-
-			&.hide-answer {
-				background-color: $gray-lighter;
-			}
-
-		}
-	}
 }
 
-.item-manager {
+item-manager {
 
 	&.show {
 		position: absolute;
@@ -1713,6 +1604,84 @@ required-items-tooltip {
 	.item-icon:hover {
 		cursor: pointer;
 	}
+
+	.item-options {
+		flex-direction: row;
+		flex-wrap: nowrap;
+	}
+
+	.icon-uploader-options {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		gap: 20px;
+
+		> * {
+			height: 100%;
+		}
+	}
+
+	.options-bar-add-item {
+		display: flex;
+		flex-direction: row;
+		flex-grow: 2;
+		gap: 10px;
+	}
+
+	.item-content {
+		.item-description {
+			color: $gray-darker;
+			overflow: auto;
+			max-height: 120px;
+			p {
+				font-style: italic;
+			}
+		}
+	}
+	.advanced-button {
+		color: $blue;
+		display: flex;
+		align-items: center;
+		gap: 5px;
+
+		&:hover {
+			text-decoration: underline;
+			cursor: pointer;
+		}
+
+		.arrow-bottom {
+			border-left: 7px solid transparent;
+			border-right: 7px solid transparent;
+			border-top: 7px solid $blue;
+		}
+
+		.arrow-top {
+			border-left: 7px solid transparent;
+			border-right: 7px solid transparent;
+			border-bottom: 7px solid $blue;
+		}
+	}
+
+	.silent-option {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 5px;
+		padding-top: 5px;
+
+		img {
+			height: 20px;
+			width: 20px;
+		}
+	}
+
+	textarea, input[type="text"] {
+		width: 100%;
+		max-width: 350px;
+		box-sizing: border-box;
+	}
+
 }
 
 
@@ -1832,15 +1801,12 @@ item-icon-selector {
 }
 
 .item-panel {
+	background-color: $white;
 
 	&.show {
 		height: 100% !important;
 		max-height: 100%;
 		min-width: 300px;
-	}
-
-	.item-details {
-		flex-wrap: wrap;
 	}
 
 	.item-container {
@@ -1862,7 +1828,9 @@ item-icon-selector {
 		}
 	}
 
-
+	.item-content {
+		max-width: 50%;
+	}
 
 }
 
@@ -2342,15 +2310,18 @@ node-creation-selection-dialog {
 
 		.panel-right {
 			padding: 10px;
-			max-width: 450px;
+			max-width: 550px;
+
+			@media screen and (max-width: $item-panel-max-width) {
+				& {
+					display: none;
+					padding: 0;
+				}
+			}
 		}
 	}
 
-	@media screen and (max-width: $node-creation-panels-width) {
-		.panel-right {
-			display: none;
-		}
-	}
+
 
 	@media screen and (min-width: $node-creation-panels-width) {
 		.node-creation-panels {
@@ -2788,12 +2759,6 @@ node-creation-selection-dialog {
 
 				&:hover {
 					background: $color-selection-hover;
-				}
-
-				button.delete-button {
-					height: 35px;
-					min-width: 35px;
-					max-width: 35px;
 				}
 
 				button.answer-node-select, button.add-item {
@@ -3386,13 +3351,6 @@ node-creation-selection-dialog {
 				margin: 0;
 			}
 
-			.hide-popup {
-				&:hover {
-					color: $red;
-					cursor: pointer;
-				}
-			}
-
 
 		}
 
@@ -3463,11 +3421,6 @@ node-creation-selection-dialog {
 		div.button-options {
 			margin: 5px 5px 10px 15px;
 			display: flex;
-
-			button {
-				margin-right: 4px;
-				height: 35px;
-			}
 		}
 
 		div.colors-container {
@@ -3771,14 +3724,6 @@ import-type-selection {
 
 		display: flex;
 		justify-content: space-between;
-
-		.hide-popup {
-			cursor: pointer;
-
-			&:hover {
-				color: $red;
-			}
-		}
 	}
 
 	.error-message {
