@@ -2109,6 +2109,7 @@ angular.module "Adventure"
 					hotspot.style.zIndex = 100;
 
 		$scope.toggleNodeItemsModal = () ->
+			$scope.showDropdown = false
 			# Close node items modal
 			if $scope.showItemSelection is true
 				$scope.showItemSelection = false
@@ -2149,6 +2150,7 @@ angular.module "Adventure"
 			$scope.selectedItem = $scope.availableItems[0]
 
 		$scope.toggleRequiredItemsModal = (answer = null) ->
+			$scope.showDropdown = false
 			# Same answer, close the modal
 			if $scope.currentAnswer is answer
 				$scope.currentAnswer = null

@@ -1,6 +1,6 @@
 #! /bin/bash
 # Creates JS file containing an array of icon data (icon name and url)
-# Used to bypass writing out 100 objects in the initIcons function in creator-assets/controllers.coffee 
+# Used to bypass writing out 100 objects in the initIcons function in creator-assets/controllers.coffee
 # ------------------------------------------------
 
 # Outputs list of file names into lsoutput.log
@@ -19,7 +19,7 @@ printf 'icons = [' > $output
 while read -r CURRENT_LINE
     current_line_number=$(($current_line_number + 1))
     do
-        if [[ $current_line_number -ne $last_line ]]; then 
+        if [[ $current_line_number -ne $last_line ]]; then
             if [[ $CURRENT_LINE == *".png" ]]; then
                 printf "$FMT" "$CURRENT_LINE" "assets/icons/$CURRENT_LINE" >> $output
             fi
@@ -32,3 +32,5 @@ done < lsoutput.log
 printf "]" >> $output
 
 rm lsoutput.log
+
+# Go to src/assets/icons.js and copy paste it into the initIcons function in creator-assets/controllers.coffee
