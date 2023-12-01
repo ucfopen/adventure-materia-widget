@@ -366,22 +366,36 @@ h1 {
 
 	&.right {
 		flex-direction: row;
+
+		.asset {
+			justify-content: flex-end;
+		}
 	}
 
 	&.left {
 		flex-direction: row-reverse;
+
+		.asset {
+			justify-content: flex-start;
+		}
 	}
 
 	&.top, &.bottom {
 		align-items: center;
+
+		.asset {
+			justify-content: center;
+		}
 	}
 
 	&.top {
 		flex-direction: column;
+		justify-content: flex-start;
 	}
 
 	&.bottom {
 		flex-direction: column-reverse;
+		justify-content: flex-end;
 	}
 
 	h2 {
@@ -795,11 +809,11 @@ h1 {
 
 				.item-count {
 					position: absolute;
-					right: -8px;
-					bottom: -8px;
+					right: -15px;
+					bottom: -12px;
 					width: 24px;
 					height: 24px;
-					border-radius: 50%;
+					border-radius: 3px;
 					border: 2px $blue-lighter solid;
 					text-align: center;
 					display: flex;
@@ -992,14 +1006,13 @@ h1 {
 .inventory-update {
 	z-index: -1;
 	position: absolute;
-	width: 75%;
+	width: 50%;
 	right: 10px;
 	top: 75px;
 	max-height: 450px;
 
 	border-radius: 10px;
 	background: #fff;
-	box-shadow: $shadow-small;
 
 	font-size: 24px;
 	font-weight: bold;
@@ -1027,7 +1040,7 @@ h1 {
 			flex-direction: column;
 			border-radius: 10px;
 
-			padding: 20px 10px;
+			padding: 20px;
 
 			.item-first {
 				display: flex;
@@ -1079,15 +1092,16 @@ h1 {
 		padding: 10px;
 		width: 100%;
 		box-sizing: border-box;
-		background-color: $white;
-		font-style: italic;
-		border: none;
+		color: $color-primary;
+		background-color: $color-accent;
+		font-weight: bold;
+		border: solid 1px $color-primary;
 		border-radius: 5px;
 
 		cursor: pointer;
 
 		&:focus, &:hover {
-			background-color: $blue-lighter;
+			background-color: $color-accent-highlight;
 		}
 	}
 
