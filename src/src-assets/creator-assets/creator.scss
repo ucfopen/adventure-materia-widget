@@ -350,20 +350,6 @@ header.title-header {
 	border-bottom: solid 1px $gray-lighter;
 }
 
-.work-in-progress-warning {
-	position: absolute;
-	left: 5px;
-	bottom: 5px;
-	padding: 5px 10px;
-
-	font-weight: bold;
-	color: $color-primary;
-	background-color: $red;
-
-	border: solid 1px $gray-lighter;
-	border-radius: 3px;
-}
-
 /* Tree Visualization Styles */
 
 #tree-svg {
@@ -3561,8 +3547,15 @@ node-creation-selection-dialog {
 		}
 
 		div.button-options {
-			margin: 5px 5px 10px 15px;
 			display: flex;
+			margin: 5px 5px 10px 15px;
+			gap: 5px;
+
+			button.hide-answer-button {
+				width: auto;
+				height: auto;
+				padding: 5px 10px;
+			}
 		}
 
 		div.colors-container {

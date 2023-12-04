@@ -457,10 +457,11 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
 					missingItems = $scope.checkInventory(requiredItems)
 
-					if missingItems[0]
-						# string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
-						stirng = missingItems.map((item) -> "#{item.name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
-						$scope.feedback = "Answer requires the items: #{string}"
+					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
+					$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
+
+					if $scope.missingRequiredItems[0]
+						$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
 						$scope.next = null
 						return
 
