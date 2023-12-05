@@ -70,16 +70,6 @@
 					<button type="button"
 						ng-click="resetZoom()">Reset</button>
 				</div>
-				<title-editor ng-show="showTitleEditor">
-					<h4>Give Your Widget a Title</h4>
-					<input type="text"
-						ng-model="title"
-						enter-submit="hideCoverAndModals()"
-						auto-select />
-					<button type="button"
-						class="important-button"
-						ng-click="hideCoverAndModals()">Done</button>
-				</title-editor>
 				<div class="open-inventory-items-btn" ng-click="openItemManager()">
 					<img src="assets/creator-assets/BackPackIcon.png"/>
 					<p>{{inventoryItems.length ? 'Manage Inventory ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
@@ -210,6 +200,16 @@
 				<button type="button" ng-click="loadDebugQset()">Load Qset</button>
 				<button type="button" ng-click="loadOldDebugQset()">Load OLD Qset</button>
 			</debug-qset-loader>
+			<title-editor ng-show="showTitleEditor">
+				<h4>Give Your Widget a Title</h4>
+				<input type="text"
+					ng-model="title"
+					enter-submit="hideCoverAndModals()"
+					auto-select />
+				<button type="button"
+					class="important-button"
+					ng-click="hideCoverAndModals()">Done</button>
+			</title-editor>
 			<validation-dialog ng-show="validation.show">
 				<h4>Just a sec!</h4>
 				<p class="error-count">{{validation.errors.length}} problem{{validation.errors.length > 1 ? "s" : ""}} found.</p>
