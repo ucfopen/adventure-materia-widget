@@ -1826,6 +1826,9 @@ item-icon-selector {
 }
 
 .item-modal {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 	background-color: $color-primary;
 
 	&.required-item-modal.show {
@@ -1854,6 +1857,10 @@ item-icon-selector {
 		top: 28px;
 		left: 94px;
 		width: 500px;
+
+		.list-items {
+			max-height: 40vh;
+		}
 
 		&.show {
 			height: auto;
