@@ -1240,6 +1240,14 @@ required-items-tooltip {
 			font-style: italic;
 		}
 	}
+
+	&.item-panel {
+		.advanced-option {
+			justify-content: flex-start;
+			font-size: 14px;
+			margin-top: 12px;
+		}
+	}
 }
 
 /** For both node item editors and inventory manager **/
