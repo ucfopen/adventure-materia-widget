@@ -352,7 +352,7 @@ h1 {
 		}
 	}
 
-	&.right, &.left, &.top, &.bottom {
+	&.right, &.left, &.top, &.bottom, &.image-only {
 		display: flex;
 		justify-content: space-between;
 		grid-gap: 10px;
@@ -396,6 +396,17 @@ h1 {
 	&.bottom {
 		flex-direction: column-reverse;
 		justify-content: flex-end;
+	}
+
+	&.image-only {
+		justify-content: center;
+
+		.asset {
+			justify-content: center;
+			img {
+				max-height: 350px;
+			}
+		}
 	}
 
 	h2 {
@@ -997,8 +1008,48 @@ h1 {
 			}
 		}
 	}
-
 }
+
+.tutorial {
+	position: absolute;
+	z-index: -1;
+	top: 50%;
+	left: 50%;
+	width: 600px;
+	height: 400px;
+
+	margin-left: -300px;
+	margin-top: -200px;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+
+	border: 2px solid $gray-lightest;
+	border-radius: 3px;
+	background: #fff;
+	box-shadow: $shadow-small;
+
+	opacity: 0;
+
+	&.show {
+		z-index: 1000;
+		opacity: 1;
+	}
+
+	header {
+		font-weight: bold;
+	}
+
+	.tutorial-content {
+		padding: 20px;
+
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+}
+
 .inventory-button-container {
 	position: relative;
 }
@@ -1060,6 +1111,8 @@ h1 {
 			.item-update-description {
 				padding-left: 20px;
 				font-style: italic;
+				font-weight: normal;
+				color: $black;
 			}
 
 			&:hover, &:focus {

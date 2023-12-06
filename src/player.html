@@ -97,10 +97,31 @@
 			</div>
 		</div>
 
-		<div class="backgroundcover" ng-class="{ show: feedback || inventoryUpdate }" ng-click="inventoryUpdate = false;" tabindex="-1"></div>
+		<div class="backgroundcover" ng-class="{ show: feedback || inventoryUpdate || showTutorial || missingRequiredItems.length }" ng-click="inventoryUpdate = false;" tabindex="-1"></div>
 
-
-
+		<div class="tutorial"
+			ng-class="{ show: showTutorial }"
+			ng-attr-aria-hidden="{{ !showTutorial }}"
+			tabIndex="-1">
+			<div class="tutorial-content" tabindex="-1">
+				<header>An Adventure Awaits</header>
+				<p>Navigate a series of interactions by responding to the questions or prompts provided.</p>
+				<p>Interactions may include multiple choice responses, selecting a hotspot on an image, or entering text.</p>
+				<p ng-if="qsetHasInventoryItems">Interactions may be further enhanced by items you collect upon making certain decisions. Some choices may require items to be present in your inventory.
+					View your inventory any time by clicking the backpack icon at the top-right.</p>
+				</p>
+				<p ng-if="!scoringDisabled">Your score is determined by your final destination.</p>
+			</div>
+			<input class="feedback-button trans-button"
+				type="button"
+				value="Let's Go"
+				ng-click="closeTutorial()"
+				ng-attr-tabindex="{{showTutorial}}"
+				aria-label="Return to Widget"
+				aria-live="assertive"
+				feedback-focus-manager>
+		
+		</div>
 		<div class="feedback"
 			ng-class="{ show: feedback }"
 			ng-attr-aria-hidden="{{ !(feedback.length > 0) }}"
@@ -156,6 +177,7 @@
 					'left': layout == 'left',
 					'bottom': layout == 'bottom',
 					'top': layout == 'top',
+					'image-only': layout == 'image-only'
 				}">
 				<div class="aria-live-region"
 				focus-manager

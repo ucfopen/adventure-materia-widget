@@ -27,7 +27,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.title = ""
 	$scope.qset = null
 	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
+	$scope.showTutorial = true
 	$scope.showInventoryBtn = false
+	$scope.qsetHasInventoryItems = false
 	$scope.scoringDisabled = false
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 	$scope.inventory = []
@@ -50,14 +52,16 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				if qset.options.startID isnt 0 and qset.options.startID
 					$scope.startID = qset.options.startID
 
-				manageQuestionScreen($scope.startID)
-
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
 
 				if qset.options.scoreMode and qset.options.scoreMode is "Non-Scoring"
 					$scope.scoringDisabled = true
 					if qset.options.internalScoreMessage then $scope.customInternalScoreMessage = qset.options.internalScoreMessage
+
+				$scope.qsetHasInventoryItems = _qsetHasInventoryItems $scope.qset
+
+			$scope.showTutorial = true
 
 		manualResize: true
 
@@ -500,6 +504,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			if $scope.next
 				manageQuestionScreen $scope.next
 
+	$scope.closeTutorial = () ->
+		$scope.showTutorial = false
+		manageQuestionScreen($scope.startID)
+
 	$scope.closeMissingRequiredItems = () ->
 		if $scope.missingRequiredItems.length > 0
 			$scope.missingRequiredItems = []
@@ -588,7 +596,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			return "font-size:" + $scope.questionFormat.fontSize + "px; height:" + $scope.questionFormat.height + "px;"
 		else return "font-size:" + $scope.questionFormat.fontSize + "px;"
 
-	Materia.Engine.start(materiaCallbacks)
+	_qsetHasInventoryItems = (qset) ->
+		for n in [0...$scope.qset.items.length]
+			if $scope.qset.items[n].options.items and $scope.qset.items[n].options.items[0] then return true
+		false
 
 	# Small script that inserts " target="_blank"  " into a hrefs, preventing hyperlinks from displaying within the iframe.
 	addTargetToHrefs = (string) ->
@@ -614,6 +625,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			a[j] = a[i]
 			a[i] = t
 		a
+
+	# light this candle
+	Materia.Engine.start(materiaCallbacks)
 ]
 
 
