@@ -3167,6 +3167,12 @@ angular.module "Adventure"
 							treeSrv.updateAllAnswerLinks $scope.treeData
 
 							error.correctedTarget = newTarget
+						when "unreachable_destination"
+							node = treeSrv.findNode $scope.treeData, error.node
+
+							node.hasProblem = true
+
+							error.correctedTarget = null
 
 						# For other error types, simply indicate there's a problem
 						when "blank_node", "has_no_answers", "has_no_final_score", "has_bad_html", "no_hotspot_label"

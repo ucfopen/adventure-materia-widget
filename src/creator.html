@@ -260,6 +260,9 @@
 						</svg>
 						<p ng-if="error.type == 'missing_answer_node'">An answer for <span class="bold">Destination {{integerToLetters(error.node)}}</span> pointed somewhere that didn't exist. The answer now points to Destination {{integerToLetters(error.correctedTarget)}}.</p>
 
+						<!-- Unreachable destination error -->
+						<p ng-if="error.type == 'unreachable_destination'">Destination {{integerToLetters(error.node)}} is unreachable!</p>
+
 						<!-- Blank Node Error -->
 						<svg width="35"
 							height="35"
