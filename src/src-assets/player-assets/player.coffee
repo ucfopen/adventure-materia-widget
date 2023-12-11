@@ -589,12 +589,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 	# Kinda hackish, since both autoTextScale and dynamicScale directives update the "style" attribute,
 	# need to combine updated properties from both so they don't overwrite each other.
-	# If the node isn't MC, just return fontSize, height isn't used
 	$scope.formatQuestionStyles = ->
-
-		if $scope.question.type is $scope.MC
-			return "font-size:" + $scope.questionFormat.fontSize + "px; height:" + $scope.questionFormat.height + "px;"
-		else return "font-size:" + $scope.questionFormat.fontSize + "px;"
+		return "font-size:" + $scope.questionFormat.fontSize + "px;"
 
 	_qsetHasInventoryItems = (qset) ->
 		for n in [0...$scope.qset.items.length]
@@ -659,13 +655,17 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 				text = $element.text()
 
-				if angular.element($element[0]).hasClass("right") or angular.element($element).hasClass("left")
-					scaleFactor = 25
-					scaleThreshold = 180
-
-				else if angular.element($element[0]).hasClass("top") or angular.element($element).hasClass("bottom")
-					scaleFactor = 10
+				if $scope.layout is "right" or $scope.layout is "left"
+					scaleFactor = 20
 					scaleThreshold = 140
+
+				else if $scope.layout is "top" or $scope.layout is "bottom"
+					scaleFactor = 15
+					scaleThreshold = 140
+
+				else if $scope.layout is "hotspot"
+					scaleFactor = 10
+					scaleThreshold = 100
 
 				else
 					scaleFactor = 100

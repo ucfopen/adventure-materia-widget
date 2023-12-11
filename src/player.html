@@ -5,7 +5,7 @@
 		<meta charset="utf-8" />
 
 		<!-- STYLESHEETS -->
-		<link href='//fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+		<link href='//fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700|Fugaz+One:400' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="player.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
@@ -106,9 +106,9 @@
 			<div class="tutorial-content" tabindex="-1">
 				<header>An Adventure Awaits</header>
 				<p>Navigate a series of interactions by responding to the questions or prompts provided.</p>
-				<p>Interactions may include multiple choice responses, selecting a hotspot on an image, or entering text.</p>
-				<p ng-if="qsetHasInventoryItems">Interactions may be further enhanced by items you collect upon making certain decisions. Some choices may require items to be present in your inventory.
-					View your inventory any time by clicking the backpack icon at the top-right.</p>
+				<p>Interactions may include <b>multiple choice</b> responses, selecting a <b>hotspot</b> on an image, or <b>entering text</b>.</p>
+				<p ng-if="qsetHasInventoryItems">Interactions may be further enhanced by <b>items</b> you collect upon making certain decisions. Some choices may require items to be present in your inventory.
+					View your <b>inventory</b> any time by clicking the backpack icon at the top-right.</p>
 				</p>
 				<p ng-if="!scoringDisabled">Your score is determined by your final destination.</p>
 			</div>
@@ -185,6 +185,7 @@
 				tabindex="0"
 				aria-label="Question: {{question.text}}, {{inventoryUpdateMessage}}">
 					<h2 class="text"
+					ng-class="layout"
 					ng-hide="question.text.length == 0"
 					auto-text-scale ng-bind-html="question.text" ng-if="layout != 'image-only'"></h2>
 					<span class="reader-instructions">{{inventoryUpdateMessage}}</span>

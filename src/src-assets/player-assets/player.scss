@@ -35,6 +35,9 @@ $shadow-dialog: 0px 3px 3px $gray;
 $shadow-small: 0px 0px 2px $gray;
 $shadow-small-highlight: 0px 0px 5px $gray;
 
+$font-adventure: 'Fugaz One', sans-serif;
+$font-lato: 'Lato', sans-serif;
+
 * {
 	outline: 0;
 }
@@ -247,24 +250,21 @@ h1 {
 }
 
 .question {
+	display: block;
 	position: relative;
 	padding: 15px 30px 10px 30px;
 	box-sizing: border-box;
 	margin-bottom: auto;
 
-	display: block;
 	background: #fff;
 
-	max-height: 250px;
-
-	flex-grow: 1;
 
 	.asset {
-		display: flex;
-		justify-content: right;
 		position: relative;
 		max-width: 50%;
 		max-height: 350px;
+
+		text-align: center;
 
 		img, iframe {
 			border: solid 6px $white;
@@ -273,8 +273,8 @@ h1 {
 		}
 
 		img {
-			// max-width: 100%;
-			height: 100%;
+			max-width: 90%;
+			max-height: 90%;
 			object-fit: cover;
 		}
 	}
@@ -354,13 +354,18 @@ h1 {
 
 	&.right, &.left, &.top, &.bottom, &.image-only {
 		display: flex;
+		align-items: flex-start;
 		justify-content: space-between;
 		grid-gap: 10px;
 	}
 
 	&.right, &.left {
-		h2 {
-			width: 100%;
+		.aria-live-region {
+			width: 50%;
+
+			h2 {
+				width: 100%;
+			}
 		}
 	}
 
@@ -403,9 +408,6 @@ h1 {
 
 		.asset {
 			justify-content: center;
-			img {
-				max-height: 350px;
-			}
 		}
 	}
 
@@ -413,7 +415,6 @@ h1 {
 		margin: 0px;
 
 		overflow-y: auto;
-		vertical-align: top;
 
 		font-family: 'Open Sans', sans-serif;
 		font-size:22px;
@@ -481,11 +482,12 @@ h1 {
 	position: relative;
 	z-index: 10;
 
-	margin: 15px;
+	margin: 0 15px;
 	padding: 15px;
 	box-sizing: border-box;
 
 	max-height: 250px;
+	overflow-y: auto;
 
 	font-family: 'Lora', serif;
 
@@ -496,6 +498,7 @@ h1 {
 		position: relative;
 		max-height: none;
 		margin: 0 auto;
+		overflow: hidden;
 
 		&.no-question {
 			max-height: 440px;
@@ -1039,11 +1042,16 @@ h1 {
 	}
 
 	header {
+		font-size: 24px;
+		font-family: $font-lato;
 		font-weight: bold;
+		font-style: italic;
+		text-align: center;
+		color: $color-accent;
 	}
 
 	.tutorial-content {
-		padding: 20px;
+		padding: 5px 20px;
 
 		overflow-x: hidden;
 		overflow-y: auto;

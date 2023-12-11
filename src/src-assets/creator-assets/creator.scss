@@ -75,6 +75,9 @@ $z-index-modal-svg: 75;
 $z-index-modal-dialog: 100;
 $z-index-very-important: 1000;
 
+$font-adventure: 'Fugaz One', sans-serif;
+$font-lato: 'Lato', sans-serif;
+
 html, body {
 	height: 100%;
 
@@ -277,15 +280,23 @@ mode-manager-overlay {
 }
 
 header.title-header {
-	display: block;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	width: 100%;
 	height: 46px;
-	padding-top: 14px;
+	padding: 7px 0;
 
 	background: $color-accent;
 
+	section.justify-left, section.justify-right {
+		display: flex;
+		align-items: center;
+	}
+
 	h1 {
 		display: inline-block;
+		justify-self: flex-start;
 		margin: 0px 0px 0px 15px;
 
 		font-size: 24px;
@@ -299,14 +310,15 @@ header.title-header {
 
 	img.logo {
 		display: inline-block;
-		float: left;
+		width: 53px;
+		height: auto;
 		margin-left:20px;
 	}
 
 	div.edit-title {
 		display: inline-block;
 		height: 24px;
-
+		margin-top: 3px;
 		margin-left: 10px;
 		text-decoration: underline;
 
@@ -316,8 +328,6 @@ header.title-header {
 	}
 
 	.header-options-box {
-
-		float: right;
 		margin-top: -6px;
 		margin-right: 25px;
 

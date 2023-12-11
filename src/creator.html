@@ -29,27 +29,31 @@
 				ng-click="modeManagerAction()">{{modeManagerActionText}}</button>
 		</mode-manager-overlay>
 		<header class="title-header inert-on-dialog">
-			<img class="logo" src="assets/creator-assets/materialogo.png" alt="Materia Logo" />
-			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
-			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
-			<preview-node-selector class="header-options-box">
-				<p>Start Preview On</p>
-				<button type="button"
-					class="preview-node-select"
-					ng-click="selectPreviewNode()">{{ integerToLetters(startID) }}
-				</button>
-			</preview-node-selector>
-			<div class="header-options-box">
-				<p>Hide Title When Playing Widget</p>
-				<div class="options-check-slide fancy-toggle">
-					<input type="checkbox" ng-model="hidePlayerTitle" id="options-check-slide-input"/>
-					<label for="options-check-slide-input"></label>
+			<section class="justify-left">
+				<img class="logo" src="assets/creator-assets/materia-logo.svg" alt="Materia Logo" />
+				<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
+				<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
+			</section>
+			<section class="justify-right">
+				<preview-node-selector class="header-options-box">
+					<p>Start Preview On</p>
+					<button type="button"
+						class="preview-node-select"
+						ng-click="selectPreviewNode()">{{ integerToLetters(startID) }}
+					</button>
+				</preview-node-selector>
+				<div class="header-options-box">
+					<p>Hide Title When Playing Widget</p>
+					<div class="options-check-slide fancy-toggle">
+						<input type="checkbox" ng-model="hidePlayerTitle" id="options-check-slide-input"/>
+						<label for="options-check-slide-input"></label>
+					</div>
 				</div>
-			</div>
-			<div class="header-options-box">
-				<p>Widget Scoring Mode</p>
-				<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
-			</div>
+				<div class="header-options-box">
+					<p>Widget Scoring Mode</p>
+					<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
+				</div>
+			</section>
 		</header>
 		<div id="adventure-container">
 			<div class="inert-on-dialog" aria-hidden="showBackgroundCover || showInventoryBackgroundCover">
