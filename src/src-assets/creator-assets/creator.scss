@@ -1919,6 +1919,7 @@ item-icon-selector {
 	}
 
 	.item-container {
+		flex-grow: 2;
 		flex-direction: column;
 		grid-gap: 10px;
 	}
@@ -2554,7 +2555,7 @@ node-creation-selection-dialog {
 					display: none;
 				}
 				&.item-modal.show {
-					display: block;
+					display: flex;
 				}
 			}
 		}

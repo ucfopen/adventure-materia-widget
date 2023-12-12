@@ -68,12 +68,13 @@ body {
 }
 
 .aria-live-region {
+	padding: 5px;
 	box-sizing: border-box;
-	border: 3px solid transparent;
+	border: 2px solid transparent;
+	border-radius: 5px;
 
 	&:focus {
-		border: 3px solid $blue-focus;
-		border-radius: 5px;
+		border: 2px solid $blue-lightest;
 	}
 }
 
@@ -552,7 +553,7 @@ h1 {
 			}
 
 			&:focus {
-				outline: thick solid $blue-focus;
+				outline: 2px solid $blue-focus;
 			}
 
 			&:active {
@@ -643,7 +644,7 @@ h1 {
 			width: 100px;
 
 			&:focus {
-				outline: thick solid $blue-focus;
+				outline: 2px solid $blue-focus;
 			}
 
 			&:active {
@@ -679,7 +680,7 @@ h1 {
 	cursor: pointer;
 
 	&:focus {
-		outline: thick solid $blue-focus;
+		outline: 2px solid $blue-focus;
 	}
 
 	&:active {
@@ -1243,7 +1244,7 @@ rect, ellipse, polygon {
 	}
 
 	&:focus {
-		outline: thick solid $blue-focus;
+		outline: 2px solid $blue-focus;
 	}
 
 	&:active {
@@ -1327,7 +1328,7 @@ rect, ellipse, polygon {
 			}
 
 			 &:focus {
-				 outline: thick solid $blue-focus;
+				 outline: 2px solid $blue-focus;
 			 }
 		}
 
@@ -1352,7 +1353,7 @@ rect, ellipse, polygon {
 			margin: 20px auto 0 auto;
 
 			&:focus {
-				outline: thick solid $blue-focus;
+				outline: 2px solid $blue-focus;
 			}
 		}
 
