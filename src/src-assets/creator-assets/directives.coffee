@@ -596,7 +596,8 @@ angular.module "Adventure"
 
 					label = if d.customLabel then d.customLabel else d.name
 
-					if !d.customLabel and label.length > 1 and label.length < 5 then return label.length * 14
+					if !d.customLabel and d.name is "Start" then return 36
+					else if !d.customLabel and label.length > 1 then return label.length * 14
 					else if d.customLabel then return label.length * (9 - (label.length * 0.05))
 					else return 20
 				)
