@@ -596,7 +596,7 @@ angular.module "Adventure"
 
 					label = if d.customLabel then d.customLabel else d.name
 
-					if !d.customLabel and label.length > 1 and label.length < 5 then return label.length * 12
+					if !d.customLabel and label.length > 1 and label.length < 5 then return label.length * 14
 					else if d.customLabel then return label.length * (9 - (label.length * 0.05))
 					else return 20
 				)
@@ -605,7 +605,8 @@ angular.module "Adventure"
 					unless d.name then return 0
 					label = if d.customLabel then d.customLabel else d.name
 
-					if label != "Start" then return 11 - (label.length * 3)
+					if label != "Start" and !d.customLabel then return 11 - (label.length * 3.5)
+					else if label != "Start" then return 11 - (label.length * 3)
 					else return 8
 				)
 				.attr("y", 0)
@@ -622,7 +623,8 @@ angular.module "Adventure"
 					if d.name
 						label = if d.customLabel then d.customLabel else d.name
 						
-						if label != "Start" then return 15 - (label.length * 3)
+						if label != "Start" and !d.customLabel then return 16 - (label.length * 3.5)
+						else if label != "Start" then return 16 - (label.length * 3)
 						else return 10
 					else return 0
 				)
