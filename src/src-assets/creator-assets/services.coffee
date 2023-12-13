@@ -557,6 +557,8 @@ angular.module "Adventure"
 			if tree.hasLinkToSelf then itemData.options.hasLinkToSelf = true
 			if tree.pendingTarget then itemData.options.pendingTarget = tree.pendingTarget
 
+			if tree.customLabel then itemData.options.customLabel = tree.customLabel
+
 			angular.forEach tree.answers, (answer, index) ->
 				requiredItemsData = []
 
@@ -697,6 +699,8 @@ angular.module "Adventure"
 			if item.options.hasLinkToOther then node.hasLinkToOther = true
 			if item.options.hasLinkToSelf then node.hasLinkToSelf = true
 			if item.options.pendingTarget then node.pendingTarget = item.options.pendingTarget
+
+			if item.options.customLabel then node.customLabel = item.options.customLabel
 
 			angular.forEach item.answers, (answer, index) ->
 

@@ -5,7 +5,9 @@
 		<meta charset="utf-8" />
 
 		<!-- FONTS -->
-		<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900,400italic' rel='stylesheet' type='text/css'>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Roboto+Mono&display=swap" rel="stylesheet"> 
 
 		<!-- STYLESHEETS -->
 		<link rel="stylesheet" type="text/css" href="creator.css">
@@ -523,15 +525,31 @@
 					<li ng-class="{'selected' : newNodeManager.linkMode == SELF}"  ng-click="selectLinkMode(SELF)">Loop Back to This Destination ( {{integerToLetters(editedNode.id)}} )</li>
 				</ul>
 			</new-node-manager-dialog>
+			<custom-node-label-editor ng-show="showCustomNodeLabelEditor">
+				<h4>Custom Label for This Destination</h4>
+				<p>Provide a custom label for this destination in the creator tree view. It will only be visible to you and other authors of this widget.</p>
+				<input type="text"
+					ng-model="editedNode.customLabel"
+					placeholder="Custom Label"
+					enter-submit="showCustomNodeLabelEditor = false"
+					auto-select
+					maxlength="30"/>
+				<button type="button"
+					class="important-button"
+					ng-click="showCustomNodeLabelEditor = false">Done</button>
+			</custom-node-label-editor>
 			<node-creation class="node-creation-screen"
 				ng-click="hidePopup"
 				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT, 'multi-choice': displayNodeCreation == MC}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
-				<h2 ng-if="displayNodeCreation == MC">Multiple Choice</h2>
-				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer</h2>
-				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot</h2>
-				<h2 ng-if="displayNodeCreation == NARR">Narrative</h2>
-				<h2 ng-if="displayNodeCreation == END">End Point</h2>
+				<h2>
+					<span ng-if="displayNodeCreation == MC">Multiple Choice for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == SHORTANS">Short Answer for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == NARR">Narrative for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == END">End Point for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<button class="add-custom-node-label" ng-click="showCustomNodeLabelEditor = true">Custom Label...</button>
+				</h2>
 				<div class="node-creation-panels">
 					<div class="panel-left" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
 					'tiny' : displayNodeCreation == HOTSPOT, 'column': (showRequiredItems || showItemSelection) && displayNodeCreation != HOTSPOT }">

@@ -75,7 +75,7 @@ $z-index-modal-svg: 75;
 $z-index-modal-dialog: 100;
 $z-index-very-important: 1000;
 
-$font-adventure: 'Fugaz One', sans-serif;
+$font-monospace: 'Roboto Mono', monospace;
 $font-lato: 'Lato', sans-serif;
 
 html, body {
@@ -1975,7 +1975,7 @@ item-icon-selector {
 	}
 }
 
-title-editor {
+title-editor, custom-node-label-editor {
 	position: absolute;
 	width: 500px;
 
@@ -1984,7 +1984,7 @@ title-editor {
 	margin-left: -200px;
 	padding-bottom: 25px;
 
-	z-index: $z-index-modal;
+	z-index: $z-index-modal-dialog;
 
 	background: $color-primary;
 	border-radius: 5px;
@@ -2012,6 +2012,21 @@ title-editor {
 
 		border: solid 1px $gray-lighter;
 		border-radius: 3px;
+	}
+
+}
+
+custom-node-label-editor {
+	position: absolute;
+	top: 60px;
+
+	background: $color-primary;
+	box-shadow: $shadow-small;
+
+	p {
+		padding: 10px 15px;
+
+		font-size: 0.9em;
 	}
 }
 
@@ -2562,6 +2577,8 @@ node-creation-selection-dialog {
 	}
 
 	h2 {
+		display: flex;
+		justify-content: space-between;
 		width: 100%;
 		box-sizing: border-box;
 
@@ -2573,6 +2590,12 @@ node-creation-selection-dialog {
 
 		color: $white;
 		background: $color-accent;
+
+		.add-custom-node-label {
+			background: none;
+			color: $color-primary;
+			font-size: 0.6em;
+		}
 	}
 
 	.question-box {

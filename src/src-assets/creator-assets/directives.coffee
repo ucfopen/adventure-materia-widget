@@ -594,19 +594,19 @@ angular.module "Adventure"
 				.attr("width", (d) ->
 					unless d.name then return 0
 
-					# Couldn't find a better solution to the rect width than this
-					# In the future, someone is welcome to clean this up
-					# If someone is getting to node labels with more than 3-4 characters, odds are the've got some other problems too
-					if d.name.length > 1 and d.name.length < 5 then return d.name.length * 12
-					else if d.name.length >= 5 then return d.name.length * 8
+					label = if d.customLabel then d.customLabel else d.name
+
+					if !d.customLabel and label.length > 1 and label.length < 5 then return label.length * 12
+					else if d.customLabel then return label.length * (9 - (label.length * 0.05))
 					else return 20
 				)
 				.attr("height", 19)
 				.attr("x", (d) ->
 					unless d.name then return 0
+					label = if d.customLabel then d.customLabel else d.name
 
-					if d.name.length > 1 then return 8
-					else return 11
+					if label != "Start" then return 11 - (label.length * 3)
+					else return 8
 				)
 				.attr("y", 0)
 				.attr("rx", 3)
@@ -620,16 +620,24 @@ angular.module "Adventure"
 				)
 				.attr("dx", (d) ->
 					if d.name
-						if d.name.length > 1 then return 10 # -10
-						else return 15 # -5
+						label = if d.customLabel then d.customLabel else d.name
+						
+						if label != "Start" then return 15 - (label.length * 3)
+						else return 10
 					else return 0
 				)
 
 				.attr("dy", 15) # sets Y label offset from node
-				.attr("font-family", "Lato")
-				.attr("font-size", 14)
+				.attr("font-family", (d) ->
+					if d.customLabel then return "Roboto Mono"
+					else return "Lato"
+				)
+				.attr("font-size", (d) ->
+					if d.customLabel then return 12
+					else return 14
+				)
 				.text (d) ->
-					d.name
+					if d.customLabel then d.customLabel else d.name
 
 			# Positions for item icons around each node
 			dataPos = [[34, -20], [20, -34], [0, -40], [-20, -34], [-34, -20], [-40, 0], [-34, 20]]
@@ -887,6 +895,15 @@ angular.module "Adventure"
 	link: ($scope, $element, $attrs) ->
 
 		$scope.$watch "showTitleEditor", (newVal, oldVal) ->
+			if newVal
+				$scope.showBackgroundCover = true
+]
+
+.directive "customNodeLabelEditor", [() ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "showCustomNodeLabelEditor", (newVal, oldVal) ->
 			if newVal
 				$scope.showBackgroundCover = true
 ]
