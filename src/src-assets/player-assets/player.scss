@@ -406,6 +406,10 @@ h1 {
 	&.image-only {
 		justify-content: center;
 
+		.aria-live-region:focus {
+			border: 2px solid transparent;
+		}
+
 		.asset {
 			justify-content: center;
 		}

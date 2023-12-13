@@ -183,7 +183,8 @@
 				focus-manager
 				aria-live="assertive"
 				tabindex="0"
-				aria-label="Question: {{question.text}}, {{inventoryUpdateMessage}}">
+				aria-label="Question: {{question.text}}, {{inventoryUpdateMessage}}"
+				ng-blur="dismissUpdates()">
 					<h2 class="text"
 					ng-class="layout"
 					ng-hide="question.text.length == 0"
