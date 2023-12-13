@@ -663,22 +663,9 @@ angular.module "Adventure"
 
 							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
 
-							range = i.range
-							if ! range or range is ""
-								if uncappedMax and minCount is 0
-									range = "any amount"
-								else if uncappedMax
-									range = "at least #{minCount}"
-								else if minCount is 0
-									range = "no more than #{maxCount}"
-								else if minCount is maxCount
-									range = "#{minCount}"
-								else
-									range = "#{minCount} - #{maxCount}"
-
 							formattedItem =
 								id: i.id
-								range: range
+								range: ""
 								minCount: minCount
 								maxCount: maxCount
 								uncappedMax: uncappedMax
@@ -807,22 +794,9 @@ angular.module "Adventure"
 
 							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
 
-							range = i.range
-							if ! range or range is ""
-								if uncappedMax and minCount is 0
-									range = "any amount"
-								else if uncappedMax
-									range = "at least #{minCount}"
-								else if minCount is 0
-									range = "no more than #{maxCount}"
-								else if minCount is maxCount
-									range = "#{minCount}"
-								else
-									range = "#{minCount} - #{maxCount}"
-
 							formattedItem =
 								id: i.id
-								range: range
+								range: ""
 								minCount: minCount
 								maxCount: maxCount
 								uncappedMax: uncappedMax

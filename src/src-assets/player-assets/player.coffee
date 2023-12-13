@@ -266,6 +266,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 							if item.range is ""
 								if item.uncappedMax and item.minCount is 0
 									item.range = "any amount"
+								else if item.minCount is 0 and item.maxCount is 0
+									item.range = "none"
 								else if item.uncappedMax
 									item.range = "at least #{item.minCount}"
 								else if item.minCount is 0
@@ -273,7 +275,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 								else if item.minCount is item.maxCount
 									item.range = "#{item.minCount}"
 								else
-									item.range = "#{item.minCount} - #{item.maxCount}"
+									item.range = "#{item.minCount} to #{item.maxCount}"
 
 							requiredItems.push item
 

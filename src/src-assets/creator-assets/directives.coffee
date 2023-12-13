@@ -2032,20 +2032,6 @@ angular.module "Adventure"
 
 		$scope.$watch "answers", ((newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
-				for answer in $scope.answers
-					if answer.requiredItems
-						for r in answer.requiredItems
-							do (r) ->
-								if r.uncappedMax and r.minCount is 0
-									r.range = "any amount"
-								else if r.uncappedMax
-									r.range = "at least #{r.minCount}"
-								else if r.minCount is 0
-									r.range = "no more than #{r.maxCount}"
-								else if r.minCount is r.maxCount
-									r.range = "#{r.minCount}"
-								else
-									r.range = "#{r.minCount} - #{r.maxCount}"
 				$scope.editedNode.answers = $scope.answers
 		), true
 
@@ -2120,13 +2106,14 @@ angular.module "Adventure"
 			$scope.toggleRequiredItemsModal(null)
 
 			# Show advanced options on start only if advanced options are enabled
-			for item in $scope.nodeItems
-				do (item) ->
-					if item.takeAll or item.firstVisitOnly
-						$scope.showAdvancedOptions = true
-						return
-					else
-						$scope.showAdvancedOptions = false
+			if !$scope.showAdvancedOptions
+				for item in $scope.nodeItems
+					do (item) ->
+						if item.takeAll or item.firstVisitOnly
+							$scope.showAdvancedOptions = true
+							return
+						else
+							$scope.showAdvancedOptions = false
 
 			# Remove error message
 			$scope.invalidQuantity = null
@@ -2180,11 +2167,12 @@ angular.module "Adventure"
 						item.tempMinCount = item.minCount
 						item.tempMaxCount = item.maxCount
 
-						# Show advanced options on start only if advanced options are enabled
-						if !item.uncappedMax
-							$scope.showAdvancedOptions = true
-						else
-							$scope.showAdvancedOptions = false
+						if !$scope.showAdvancedOptions
+							# Show advanced options on start only if advanced options are enabled
+							if !item.uncappedMax
+								$scope.showAdvancedOptions = true
+							else
+								$scope.showAdvancedOptions = false
 
 				# Add items not already being used to the items available for selection
 				$scope.availableItems = []
@@ -2211,13 +2199,32 @@ angular.module "Adventure"
 		# ng-pattern attribute validates quantity
 		# Display error message if quantity is invalid
 		# takesItem is true if this item is being removed from the player's inventory
-		$scope.updateMinCount = (event, item) ->
+		$scope.updateMinCount = (event, item, advanced=false) ->
 			if item.tempMinCount > -1
 				$scope.invalidQuantity = null
-				if (!item.uncappedMax and item.tempMinCount > item.tempMaxCount)
-					$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
-					if (item.tempMaxCount > -1)
-						item.minCount = item.tempMaxCount
+				if (item.tempMinCount > item.tempMaxCount)
+					if advanced
+						$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
+						$scope.showAdvancedOptions = true
+						if (item.tempMaxCount > -1)
+							item.minCount = item.tempMaxCount
+					else
+						# not in advanced mode, don't compare
+						item.minCount = item.tempMinCount
+						$scope.invalidMaxQuantity = null
+						item.uncappedMax = true
+				else if item.tempMinCount == 0 and advanced
+					# if setting minimum to 0 in advanced options, don't update max count
+					item.minCount = 0
+					$scope.invalidMaxQuantity = null
+				else if item.tempMinCount == 0 and !advanced
+					# if setting minimum to 0 in basic options, means player must have none of item
+					item.minCount = 0 
+					item.maxCount = 0
+					item.tempMaxCount = 0
+					item.uncappedMax = false
+					$scope.invalidMaxQuantity = null
+				# just update minimum
 				else
 					item.minCount = item.tempMinCount
 					$scope.invalidMaxQuantity = null
@@ -2230,6 +2237,7 @@ angular.module "Adventure"
 					$scope.invalidMaxQuantity = null
 					if (item.tempMinCount > item.tempMaxCount)
 						$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
+						$scope.showAdvancedOptions = true
 						if (item.tempMinCount > -1)
 							item.maxCount = item.tempMinCount
 					else
@@ -2249,6 +2257,9 @@ angular.module "Adventure"
 					item.count = item.tempCount * -1
 			else
 				$scope.invalidQuantity = "Invalid quantity. Quantity must be greater than 0."
+
+		$scope.toggleAdvancedOptions = ->
+			$scope.showAdvancedOptions = !$scope.showAdvancedOptions
 
 		# Adds item to node
 		$scope.addItemToNode = (item, positiveCount = true) ->
