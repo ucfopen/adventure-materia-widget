@@ -22,6 +22,8 @@ angular.module "Adventure"
 
 	customIcons = []
 
+	allNodes = new Map()
+
 	# Self explanatory getter function
 	get = ->
 		treeData
@@ -39,6 +41,16 @@ angular.module "Adventure"
 
 	incrementNodeCount = ->
 		count++
+
+	addNode = (id, node) ->
+		allNodes.set(id, node)
+
+	getNodes = ->
+		return allNodes
+
+	setNodes = (array) ->
+		for node in array
+			addNode(node.nodeId, node)
 
 	getInventoryItems = ->
 		inventoryItems
@@ -149,6 +161,70 @@ angular.module "Adventure"
 				i++
 
 		false
+
+	checkInventory = (requiredItems, inventory) ->
+		missingItems = []
+		if (! requiredItems)
+			return []
+		angular.forEach requiredItems, (item) ->
+			hasItemInInventory = false
+			playerItem = inventory.get(item.id)
+			if playerItem
+				hasItemInInventory = true
+				# Check if player has more than the min
+				if playerItem.count >= item.minCount
+					# Check if player has less than the max
+					if playerItem.count <= item.maxCount or item.uncappedMax
+						return true
+				return false
+			# Check if player doesn't have item but there is no minimum
+			if ! hasItemInInventory and item.minCount is 0
+				hasRequiredItem = true
+			if ! hasRequiredItem
+				missingItems.push(item.id)
+		return missingItems
+
+
+	# Returns all nodes that can be reached from a given node
+	findReachableDestinations = (tree, node, visitedNodes, inventory) ->
+		# If the node has already been visited some number of times, return to parent
+		# This is to prevent infinite loops
+		if visitedNodes.get(node.id) > Math.max(50, node.answerLinks.length)
+			return visitedNodes
+
+		# Increment the number of times the node has been visited
+		visitedNodes.set(node.id, (visitedNodes.get(node.id) || 0) + 1)
+
+		# If the node is an end node, return to parent
+		if node.type is "end"
+			return visitedNodes
+
+		# Add items to inventory
+		if node.items
+			for item in node.items
+				# Check if item is first visit only and player has visited this node before
+				if (visitedNodes.get(node.id) >= 1 and item.firstVisitOnly)
+					# Move to next item
+					continue
+				else
+					if item.takeAll
+						inventory.set(item.id, 0)
+					else
+						inventory.set(item.id, (inventory.get(item.id) || 0) + item.count)
+
+		# Search answers
+		if node.answers
+			for answer in node.answers
+				if checkInventory(answer.requiredItems, inventory).length > 0
+					# If the player doesn't have the required items, move onto the next answer
+					continue
+				else
+					# Find the target node
+					targetNode = findNode(tree, answer.target)
+					visitedNodes = new Map([...visitedNodes, ...findReachableDestinations(tree, targetNode, visitedNodes, inventory)])
+
+		return visitedNodes
+
 
 	# Recursive function for adding a node in between a given parent and child, essentially splitting an existing link
 	# tree: the tree structure to be iterated. Should initially reference the root node (treeData object)
@@ -589,22 +665,9 @@ angular.module "Adventure"
 
 							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
 
-							range = i.range
-							if ! range or range is ""
-								if uncappedMax and minCount is 0
-									range = "any amount"
-								else if uncappedMax
-									range = "at least #{minCount}"
-								else if minCount is 0
-									range = "no more than #{maxCount}"
-								else if minCount is maxCount
-									range = "#{minCount}"
-								else
-									range = "#{minCount} - #{maxCount}"
-
 							formattedItem =
 								id: i.id
-								range: range
+								range: ""
 								minCount: minCount
 								maxCount: maxCount
 								uncappedMax: uncappedMax
@@ -735,22 +798,9 @@ angular.module "Adventure"
 
 							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
 
-							range = i.range
-							if ! range or range is ""
-								if uncappedMax and minCount is 0
-									range = "any amount"
-								else if uncappedMax
-									range = "at least #{minCount}"
-								else if minCount is 0
-									range = "no more than #{maxCount}"
-								else if minCount is maxCount
-									range = "#{minCount}"
-								else
-									range = "#{minCount} - #{maxCount}"
-
 							formattedItem =
 								id: i.id
-								range: range
+								range: ""
 								minCount: minCount
 								maxCount: maxCount
 								uncappedMax: uncappedMax
@@ -997,6 +1047,10 @@ angular.module "Adventure"
 	validateTreeOnSave : validateTreeOnSave
 	integerToLetters : integerToLetters
 	generateAnswerHash : generateAnswerHash
+	findReachableDestinations : findReachableDestinations
+	getNodes : getNodes
+	setNodes : setNodes
+	addNode : addNode
 ]
 
 # The service in charge of managing Action History, replacing the clunky "deleteAndRestoreSrv" service

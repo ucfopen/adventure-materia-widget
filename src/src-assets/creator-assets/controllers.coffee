@@ -265,6 +265,7 @@ angular.module "Adventure"
 			$scope.$apply () ->
 				$scope.title = title
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
+				treeSrv.setNodes qset.items
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
 
@@ -292,7 +293,33 @@ angular.module "Adventure"
 				treeHistorySrv.addToHistory $scope.treeData, historyActions.EXISTING_WIDGET_INIT, "Existing Widget Initialized"
 
 	materiaCallbacks.onSaveClicked = (mode = 'save') ->
-		if mode is "publish" then validation = treeSrv.validateTreeOnSave $scope.treeData
+		if mode is "publish"
+			# Check for errors
+			validation = treeSrv.validateTreeOnSave $scope.treeData
+
+			# Check if there are any unreachable destinations if the inventory system is enabled
+			if ($scope.inventoryItems.length > 0)
+				visitedNodes = new Map()
+				inventory = new Map()
+				reachableDestinations = treeSrv.findReachableDestinations $scope.treeData, $scope.treeData, visitedNodes, inventory
+				# Get collection of all nodes in the tree
+				allNodes = treeSrv.getNodes()
+
+				if (reachableDestinations.size < allNodes.size)
+					# Get all nodes that are not in reachableDestinations
+					# create error at each node that is not in reachableDestinations
+					$scope.validation.errors = []
+					unreachableDestinations = Array.from(new Map([...allNodes.entries()].filter(([key]) => !reachableDestinations.has(key))).values());
+
+					for node in unreachableDestinations
+						$scope.validation.errors.push({
+							type: "unreachable_destination",
+							node: node.nodeId,
+							message: "Destination " + treeSrv.integerToLetters(node.nodeId) + " is unreachable!"
+						})
+						$rootScope.$broadcast "validation.error"
+					return Materia.CreatorCore.cancelSave ''
+
 		else validation = []
 
 		# Run the tree validation when save is clicked
@@ -480,6 +507,7 @@ angular.module "Adventure"
 			items: []
 
 		treeSrv.findAndAdd $scope.treeData, parent, newNode
+		treeSrv.addNode(newNode.id, newNode)
 
 		treeSrv.set $scope.treeData
 
@@ -511,6 +539,7 @@ angular.module "Adventure"
 		treeSrv.findAndAddInBetween $scope.treeData, data.source, data.target, newNode
 
 		treeSrv.incrementNodeCount()
+		treeSrv.addNode(newNode.id, newNode)
 		treeSrv.set $scope.treeData
 
 		treeSrv.updateAllAnswerLinks $scope.treeData

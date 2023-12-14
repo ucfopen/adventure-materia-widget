@@ -263,6 +263,9 @@
 						</svg>
 						<p ng-if="error.type == 'missing_answer_node'">An answer for <span class="bold">Destination {{integerToLetters(error.node)}}</span> pointed somewhere that didn't exist. The answer now points to Destination {{integerToLetters(error.correctedTarget)}}.</p>
 
+						<!-- Unreachable destination error -->
+						<p ng-if="error.type == 'unreachable_destination'">Destination {{integerToLetters(error.node)}} is unreachable!</p>
+
 						<!-- Blank Node Error -->
 						<svg width="35"
 							height="35"
@@ -738,9 +741,10 @@
 													</div>
 													<div class="item-options-container" ng-class="{'flex-start': showAdvancedOptions, 'show': hoverItem}">
 														<div class="item-minimum-quantity">
-															<label ng-show="!showAdvancedOptions"  for="increase-min-count-{{item.id}}">Required Quantity</label>
+															<label ng-show="!showAdvancedOptions"  for="increase-required-count-{{item.id}}">Required Quantity</label>
 															<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
-															<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+															<input ng-show="!showAdvancedOptions" ng-focus = "event = $event" id="increase-required-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+															<input ng-show="showAdvancedOptions" ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item, true)"/>
 														</div>
 														<div class="item-quantity-options">
 															<div class="item-maximum" ng-show="showAdvancedOptions">
@@ -750,16 +754,17 @@
 																</div>
 																<div class="item-quantity">
 																	<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
-																	<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+																	<label for="unlimited-option-{{item.id}}">Uncapped Max</label>
 																</div>
 															</div>
 														</div>
 														<div class="quantity-explanation" ng-show="showAdvancedOptions">
 															<p ng-if="item.minCount == 0 && item.uncappedMax">Player is not required to have any amount of this item.</p>
-															<p ng-if="item.minCount == 0 && !item.uncappedMax">Player will need to have <code>0</code> or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
+															<p ng-if="item.minCount == 0 && item.maxCount != 0 && !item.uncappedMax">Player will need to have none or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
 															<p ng-if="item.minCount > 0 && item.uncappedMax">Player will need to have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
 															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player will need to have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
 															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player will need to have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+															<p ng-if="item.minCount == 0 && item.maxCount == 0 && !item.uncappedMax">Player must not have this item.</p>
 														</div>
 													</div>
 													<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
@@ -789,7 +794,7 @@
 											</div>
 
 											<div class="advanced-option">
-												<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
+												<input type="checkbox" ng-model="showAdvancedOptions" ng-click="toggleAdvancedOptions()" id="answer-show-advanced"/>
 												<label for="answer-show-advanced">Use Advanced Options</label>
 											</div>
 
@@ -1009,9 +1014,10 @@
 												<div class="item-options-container" ng-class="{'show': hoverItem}">
 
 													<div class="item-minimum-quantity">
-														<label ng-show="!showAdvancedOptions"  for="increase-min-count-{{item.id}}">Required Quantity</label>
+														<label ng-show="!showAdvancedOptions"  for="increase-required-count-{{item.id}}">Required Quantity</label>
 														<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
-														<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+														<input ng-show="!showAdvancedOptions" ng-focus = "event = $event" id="increase-required-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+														<input ng-show="showAdvancedOptions" ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item, true)"/>
 													</div>
 													<div class="item-quantity-options">
 														<div class="item-maximum" ng-show="showAdvancedOptions">
@@ -1021,15 +1027,16 @@
 															</div>
 															<div class="item-quantity">
 																<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
-																<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+																<label for="unlimited-option-{{item.id}}">Uncapped Max</label>
 															</div>
 														</div>
 														<div class="quantity-explanation" ng-show="showAdvancedOptions">
 															<p ng-if="item.minCount == 0 && item.uncappedMax">Player is not required to have any amount of this item.</p>
-															<p ng-if="item.minCount == 0 && !item.uncappedMax">Player will need to have <code>0</code> or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
-															<p ng-if="item.minCount > 0 && item.uncappedMax">Player will need to have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
-															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player will need to have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
-															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player will need to have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+															<p ng-if="item.minCount == 0 && item.maxCount != 0 && !item.uncappedMax">Player must have <code>0</code> or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
+															<p ng-if="item.minCount > 0 && item.uncappedMax">Player must have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
+															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player must have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
+															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player must have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+															<p ng-if="item.minCount == 0 && item.maxCount == 0">Player must not have this item.</p>
 														</div>
 													</div>
 												</div>
@@ -1061,7 +1068,7 @@
 										</div>
 										<div class="advanced-option">
 											<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
-											<label for="answer-show-advanced">Use Advanced Options</label>
+											<label for="answer-show-advanced">Show Advanced Options</label>
 										</div>
 
 										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
@@ -1283,9 +1290,10 @@
 									<div class="item-options-container" ng-class="{'show': hoverItem, 'flex-start': showAdvancedOptions}">
 										<div class="item-quantity-options">
 											<div class="item-minimum-quantity">
-												<label for="increase-min-count-{{item.id}}" ng-show="showAdvancedOptions">Min Quantity</label>
-												<label for="increase-min-count-{{item.id}}" ng-show="!showAdvancedOptions">Required Quantity</label>
-												<input ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+												<label ng-show="!showAdvancedOptions"  for="increase-required-count-{{item.id}}">Required Quantity</label>
+												<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
+												<input ng-show="!showAdvancedOptions" ng-focus = "event = $event" id="increase-required-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+												<input ng-show="showAdvancedOptions" ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item, true)"/>
 											</div>
 											<div class="item-maximum" ng-show="showAdvancedOptions">
 												<div class="item-quantity" ng-show="!item.uncappedMax">
@@ -1295,14 +1303,15 @@
 											</div>
 											<div class="item-quantity" ng-show="showAdvancedOptions">
 												<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
-												<label for="unlimited-option-{{item.id}}">Unlimited Max</label>
+												<label for="unlimited-option-{{item.id}}">Uncapped Max</label>
 											</div>
 											<div class="quantity-explanation" ng-show="showAdvancedOptions">
 												<p ng-if="item.minCount == 0 && item.uncappedMax">Player is not required to have any amount of this item.</p>
-												<p ng-if="item.minCount == 0 && !item.uncappedMax">Player will need to have <code>0</code> or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
-												<p ng-if="item.minCount > 0 && item.uncappedMax">Player will need to have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
-												<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player will need to have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
-												<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player will need to have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+												<p ng-if="item.minCount == 0 && item.maxCount != 0 && !item.uncappedMax">Player must have <code>0</code> or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
+												<p ng-if="item.minCount > 0 && item.uncappedMax">Player must have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
+												<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player must have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
+												<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player must have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+												<p ng-if="item.minCount == 0 && item.maxCount == 0">Player must not have this item.</p>
 											</div>
 										</div>
 									</div>
@@ -1334,7 +1343,7 @@
 							</div>
 							<div class="advanced-option">
 								<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
-								<label for="show-advanced">Show Advanced Options</label>
+								<label for="show-advanced">Use Advanced Options</label>
 							</div>
 						</div>
 					</div>

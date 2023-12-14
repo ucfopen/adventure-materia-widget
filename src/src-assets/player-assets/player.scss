@@ -520,6 +520,7 @@ h1 {
 	.mc {
 		position: relative;
 		max-height: 250px;
+		height: 100%;
 
 		overflow-y: auto;
 
@@ -584,16 +585,13 @@ h1 {
 			}
 
 			.answer-required-items {
-				display: flex;
-				align-items: center;
-				flex-direction: row;
 				font-size: 0.8em;
 				margin-left: auto;
 
 				&:before {
 					margin-left: 10px;
 					padding: 5px;
-					content: "Requires: ";
+					content: "Requires items: ";
 					font-size: 0.8em;
 					font-style: italic;
 				}
@@ -602,6 +600,8 @@ h1 {
 					display: flex;
 					align-items: center;
 					flex-direction: row;
+					min-width: 75px;
+					max-width: 200px;
 
 					margin: 5px 5px 5px 0;
 					padding: 5px;
