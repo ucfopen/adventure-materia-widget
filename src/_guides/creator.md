@@ -173,6 +173,16 @@ For any destination type besides Hotspot, selecting the **Add Media** button cha
 
 If you choose to upload an image, the image uploader will be displayed, where you can upload images from your computer, or select an image you've previously uploaded to Materia. Once you've selected an image or video, you can use the **Swap with Question** button below the media to switch the arrangement of the image and question text. Narrative and End Point destinations allow you to choose between vertical as well as horizontal arrangements. Select **Change Media** to choose a different image or video.
 
+### (Advanced) Conditional Text Based on Number of Visits
+You have the option of creating different question text each time a player visits a destination. Click on the "Advanced Question Editor" at the top right of the node creation screen to open the editor.
+
+![conditional questions](assets/create_widget_adventure_conditional_questions.png "conditional questions")
+
+1. Add question text
+2. Change required number of visits
+
+It will always display the question text with the most required number of visits met. For example, if a player has visited the node 2 times, it will display the second question above. If a player has visited the node 6 times, it will display the third question above.
+
 ## Inventory System ##
 
 Optionally, you can choose to use the inventory system. The inventory system allows you to give the player items or remove items from the player's inventory for each destination they visit.
@@ -282,6 +292,13 @@ The advanced options allow you to set the required item amount to be within a sp
 1. Set the minimum number the player can have of this item to select this answer.
 2. Set the maximum number the player can have of this item to select this answer.
 3. (Default) Set the maximum to have no cap.
+
+### (Advanced) Conditional Question Text Based on Items
+Once you have created items, an option will appear in the Advanced Question Editor to require items for each question text. You can require players to have certain items in their inventory in order to see different questions by clicking on the "Edit Required Items" button. This menu will operate similarly to the required items for answers from above.
+
+![conditional questions](assets/create_widget_adventure_conditional_questions_items.png "conditional questions")
+
+It will always display the question text with the most requirements met. For example, if the first question requires the player to have a hat, but the second question requires the player to have a hat AND a vinyl, it will display the second question if the player has both.
 
 ### Example Tree Using Inventory System ###
 
