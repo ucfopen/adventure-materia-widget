@@ -35,6 +35,8 @@ $shadow-dialog: 0px 3px 3px $gray;
 $shadow-small: 0px 0px 2px $gray;
 $shadow-small-highlight: 0px 0px 5px $gray;
 
+$font-lato: 'Lato', sans-serif;
+
 * {
 	outline: 0;
 }
@@ -65,12 +67,13 @@ body {
 }
 
 .aria-live-region {
+	padding: 5px;
 	box-sizing: border-box;
-	border: 3px solid transparent;
+	border: 2px solid transparent;
+	border-radius: 5px;
 
 	&:focus {
-		border: 3px solid $blue-focus;
-		border-radius: 5px;
+		border: 2px solid $blue-lightest;
 	}
 }
 
@@ -107,7 +110,7 @@ body {
 
 	width:62px;
 	height:62px;
-	padding: 8px;
+	padding: 4px;
 
 	// Inventory z-index is 1000
 
@@ -126,8 +129,8 @@ body {
 	}
 
 	img {
-		width: 48px;
-		height: 48px;
+		width: 46px;
+		height: 46px;
 	}
 }
 
@@ -240,27 +243,28 @@ h1 {
 	flex-direction: column;
 	justify-content: space-between;
 	height: 100%;
+
+	&.hotspot-mode {
+		justify-content: flex-start;
+	}
 }
 
 .question {
+	display: block;
 	position: relative;
 	padding: 15px 30px 10px 30px;
 	box-sizing: border-box;
 	margin-bottom: auto;
 
-	display: block;
 	background: #fff;
 
-	max-height: 250px;
-
-	flex-grow: 1;
 
 	.asset {
-		display: flex;
-		justify-content: right;
 		position: relative;
 		max-width: 50%;
 		max-height: 350px;
+
+		text-align: center;
 
 		img, iframe {
 			border: solid 6px $white;
@@ -269,15 +273,19 @@ h1 {
 		}
 
 		img {
-			// max-width: 100%;
-			height: 100%;
+			width: auto;
+			height: auto;
+			max-width: 350px;
+			max-height:350px;
 			object-fit: cover;
 		}
 	}
 
 	&.hotspot-mode {
-		padding: 5px 30px 10px 30px;
+		margin: 0 0 10px 0;
+		padding: 0 30px;
 		max-height: 65px;
+		flex-grow: 0;
 
 		h2 {
 			max-height: 65px;
@@ -346,43 +354,73 @@ h1 {
 		}
 	}
 
-	&.right, &.left, &.top, &.bottom {
+	&.right, &.left, &.top, &.bottom, &.image-only {
 		display: flex;
+		align-items: flex-start;
 		justify-content: space-between;
 		grid-gap: 10px;
 	}
 
 	&.right, &.left {
-		h2 {
-			width: 100%;
+		.aria-live-region {
+			width: 50%;
+
+			h2 {
+				width: 100%;
+			}
 		}
 	}
 
 	&.right {
 		flex-direction: row;
+
+		.asset {
+			justify-content: flex-end;
+		}
 	}
 
 	&.left {
 		flex-direction: row-reverse;
+
+		.asset {
+			justify-content: flex-start;
+		}
 	}
 
 	&.top, &.bottom {
 		align-items: center;
+
+		.asset {
+			justify-content: center;
+		}
 	}
 
 	&.top {
 		flex-direction: column;
+		justify-content: flex-start;
 	}
 
 	&.bottom {
 		flex-direction: column-reverse;
+		justify-content: flex-end;
+	}
+
+	&.image-only {
+		justify-content: center;
+
+		.aria-live-region:focus {
+			border: 2px solid transparent;
+		}
+
+		.asset {
+			justify-content: center;
+		}
 	}
 
 	h2 {
 		margin: 0px;
 
 		overflow-y: auto;
-		vertical-align: top;
 
 		font-family: 'Open Sans', sans-serif;
 		font-size:22px;
@@ -450,12 +488,12 @@ h1 {
 	position: relative;
 	z-index: 10;
 
-	margin: 15px;
+	margin: 0 15px;
 	padding: 15px;
 	box-sizing: border-box;
 
 	max-height: 250px;
-	// overflow-y: auto;
+	overflow-y: auto;
 
 	font-family: 'Lora', serif;
 
@@ -463,16 +501,14 @@ h1 {
 	box-shadow: 0px 0px 3px #888888;
 
 	&.hotspot-mode {
-		position: absolute;
-		bottom: 0px;
-	}
-
-	&.hotspot-mode {
-		max-height: 410px;
+		position: relative;
+		max-height: none;
+		margin: 0 auto;
+		overflow: hidden;
 
 		&.no-question {
 			max-height: 440px;
-			bottom: 45px;
+			margin-top: 12px;
 
 			&.hidden-title {
 				max-height:485px;
@@ -523,7 +559,7 @@ h1 {
 			}
 
 			&:focus {
-				outline: thick solid $blue-focus;
+				outline: 2px solid $blue-focus;
 			}
 
 			&:active {
@@ -541,6 +577,11 @@ h1 {
 
 			.answer-text {
 				max-width: calc(100% - 34px);
+
+				&.no-text-provided {
+					font-style: italic;
+					color: #696969;
+				}
 			}
 
 			.answer-required-items {
@@ -608,7 +649,7 @@ h1 {
 			width: 100px;
 
 			&:focus {
-				outline: thick solid $blue-focus;
+				outline: 2px solid $blue-focus;
 			}
 
 			&:active {
@@ -644,7 +685,7 @@ h1 {
 	cursor: pointer;
 
 	&:focus {
-		outline: thick solid $blue-focus;
+		outline: 2px solid $blue-focus;
 	}
 
 	&:active {
@@ -735,15 +776,16 @@ h1 {
 				div.item {
 					padding: 15px;
 					margin: 15px;
-					border-radius: 10px;
+					border-radius: 4px;
 					max-height: 25px;
 
 					position: relative;
 
 					display: flex;
 					flex-direction: row;
+					justify-content: flex-start;
 					align-items: center;
-					grid-gap: 10px;
+					grid-gap: 5px;
 
 					border: solid 1px $gray-lighter;
 					background-color: $color-primary;
@@ -761,6 +803,8 @@ h1 {
 					}
 
 					img {
+						position: relative;
+						left: -5px;
 						width: 35px;
 						height: 35px;
 						object-fit: cover;
@@ -780,23 +824,24 @@ h1 {
 
 					position: absolute;
 					left: 0;
-					top: 0;
+					top: -8px;
 				}
 
 				.item-count {
 					position: absolute;
-					right: -5px;
-					bottom: -5px;
-					width: 15px;
-					height: 15px;
-					border-radius: 50%;
+					right: -15px;
+					bottom: -12px;
+					width: 24px;
+					height: 24px;
+					border-radius: 3px;
 					border: 2px $blue-lighter solid;
 					text-align: center;
 					display: flex;
 					flex-direction: column;
 					justify-content: center;
 					background-color: $white;
-					font-size: 10px;
+					font-size: 14px;
+					font-weight: bold;
 				}
 			}
 
@@ -876,7 +921,7 @@ h1 {
 	}
 }
 
-.feedback {
+.feedback, .missing-required-items {
 	position: absolute;
 	z-index: -1;
 	top: 50%;
@@ -920,12 +965,24 @@ h1 {
 		content: 'INVENTORY UPDATED';
 	}
 
+	&.missing-required-items {
+
+		h3 {
+			margin: 5px 12px;
+			font-size: 0.9em;
+		}
+	
+		&:before {
+			content: 'MISSING ITEMS';
+		}
+	}
+
 	&.show {
 		z-index: 1000;
 		opacity: 1;
 	}
 
-	.feedback-content {
+	.feedback-content, .required-items-content {
 		width: 500px;
 		height: 190px;
 
@@ -938,7 +995,75 @@ h1 {
 		overflow-y: auto;
 	}
 
+	.required-items-content {
+
+		height: 140px;
+
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+
+			li {
+				display: flex;
+				font-size: 0.8em;
+				align-items: center;
+
+				img {
+					width: 48px;
+					height: auto;
+					margin-right: 12px;
+				}
+			}
+		}
+	}
 }
+
+.tutorial {
+	position: absolute;
+	z-index: -1;
+	top: 50%;
+	left: 50%;
+	width: 600px;
+	height: 400px;
+
+	margin-left: -300px;
+	margin-top: -200px;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+
+	border: 2px solid $gray-lightest;
+	border-radius: 3px;
+	background: #fff;
+	box-shadow: $shadow-small;
+
+	opacity: 0;
+
+	&.show {
+		z-index: 1000;
+		opacity: 1;
+	}
+
+	header {
+		font-size: 24px;
+		font-family: $font-lato;
+		font-weight: bold;
+		font-style: italic;
+		text-align: center;
+		color: $color-accent;
+	}
+
+	.tutorial-content {
+		padding: 5px 20px;
+
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+}
+
 .inventory-button-container {
 	position: relative;
 }
@@ -946,14 +1071,13 @@ h1 {
 .inventory-update {
 	z-index: -1;
 	position: absolute;
-	width: 75%;
+	width: 50%;
 	right: 10px;
 	top: 75px;
 	max-height: 450px;
 
 	border-radius: 10px;
 	background: #fff;
-	box-shadow: $shadow-small;
 
 	font-size: 24px;
 	font-weight: bold;
@@ -981,7 +1105,7 @@ h1 {
 			flex-direction: column;
 			border-radius: 10px;
 
-			padding: 20px 10px;
+			padding: 20px;
 
 			.item-first {
 				display: flex;
@@ -991,6 +1115,7 @@ h1 {
 
 			.item-count {
 				min-width: 30px;
+				font-size: 16px;
 			}
 
 			.item-name {
@@ -1000,6 +1125,8 @@ h1 {
 			.item-update-description {
 				padding-left: 20px;
 				font-style: italic;
+				font-weight: normal;
+				color: $black;
 			}
 
 			&:hover, &:focus {
@@ -1032,14 +1159,16 @@ h1 {
 		padding: 10px;
 		width: 100%;
 		box-sizing: border-box;
-		background-color: $white;
-		font-style: italic;
-		border: none;
+		color: $color-primary;
+		background-color: $color-accent;
+		font-weight: bold;
+		border: solid 1px $color-primary;
 		border-radius: 5px;
 
+		cursor: pointer;
+
 		&:focus, &:hover {
-			background-color: $gray-lightest;
-			cursor: pointer;
+			background-color: $color-accent-highlight;
 		}
 	}
 
@@ -1120,7 +1249,7 @@ rect, ellipse, polygon {
 	}
 
 	&:focus {
-		outline: thick solid $blue-focus;
+		outline: 2px solid $blue-focus;
 	}
 
 	&:active {
@@ -1204,7 +1333,7 @@ rect, ellipse, polygon {
 			}
 
 			 &:focus {
-				 outline: thick solid $blue-focus;
+				 outline: 2px solid $blue-focus;
 			 }
 		}
 
@@ -1229,7 +1358,7 @@ rect, ellipse, polygon {
 			margin: 20px auto 0 auto;
 
 			&:focus {
-				outline: thick solid $blue-focus;
+				outline: 2px solid $blue-focus;
 			}
 		}
 

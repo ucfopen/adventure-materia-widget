@@ -5,7 +5,9 @@
 		<meta charset="utf-8" />
 
 		<!-- FONTS -->
-		<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900,400italic' rel='stylesheet' type='text/css'>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Roboto+Mono&display=swap" rel="stylesheet"> 
 
 		<!-- STYLESHEETS -->
 		<link rel="stylesheet" type="text/css" href="creator.css">
@@ -29,33 +31,34 @@
 				ng-click="modeManagerAction()">{{modeManagerActionText}}</button>
 		</mode-manager-overlay>
 		<header class="title-header inert-on-dialog">
-			<img class="logo" src="assets/creator-assets/materialogo.png" alt="Materia Logo" />
-			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
-			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
-			<preview-node-selector class="header-options-box">
-				<p>Start Preview On</p>
-				<button type="button"
-					class="preview-node-select"
-					ng-click="selectPreviewNode()">{{ integerToLetters(startID) }}
-				</button>
-			</preview-node-selector>
-			<div class="header-options-box">
-				<p>Hide Title When Playing Widget</p>
-				<div class="options-check-slide fancy-toggle">
-					<input type="checkbox" ng-model="hidePlayerTitle" id="options-check-slide-input"/>
-					<label for="options-check-slide-input"></label>
+			<section class="justify-left">
+				<img class="logo" src="assets/creator-assets/materia-logo.svg" alt="Materia Logo" />
+				<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
+				<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
+			</section>
+			<section class="justify-right">
+				<preview-node-selector class="header-options-box">
+					<p>Start Preview On</p>
+					<button type="button"
+						class="preview-node-select"
+						ng-click="selectPreviewNode()">{{ integerToLetters(startID) }}
+					</button>
+				</preview-node-selector>
+				<div class="header-options-box">
+					<p>Hide Title When Playing Widget</p>
+					<div class="options-check-slide fancy-toggle">
+						<input type="checkbox" ng-model="hidePlayerTitle" id="options-check-slide-input"/>
+						<label for="options-check-slide-input"></label>
+					</div>
 				</div>
-			</div>
-			<div class="header-options-box">
-				<p>Widget Scoring Mode</p>
-				<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
-			</div>
+				<div class="header-options-box">
+					<p>Widget Scoring Mode</p>
+					<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
+				</div>
+			</section>
 		</header>
 		<div id="adventure-container">
 			<div class="inert-on-dialog" aria-hidden="showBackgroundCover || showInventoryBackgroundCover">
-				<div class="work-in-progress-warning">
-					Work in Progress!
-				</div>
 				<div class="zoom-buttons" zoom-buttons>
 					<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
 					<svg class="zoom-button"
@@ -73,16 +76,6 @@
 					<button type="button"
 						ng-click="resetZoom()">Reset</button>
 				</div>
-				<title-editor ng-show="showTitleEditor">
-					<h4>Give Your Widget a Title</h4>
-					<input type="text"
-						ng-model="title"
-						enter-submit="hideCoverAndModals()"
-						auto-select />
-					<button type="button"
-						class="important-button"
-						ng-click="hideCoverAndModals()">Done</button>
-				</title-editor>
 				<div class="open-inventory-items-btn" ng-click="openItemManager()">
 					<img src="assets/creator-assets/BackPackIcon.png"/>
 					<p>{{inventoryItems.length ? 'Manage Inventory ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
@@ -213,6 +206,16 @@
 				<button type="button" ng-click="loadDebugQset()">Load Qset</button>
 				<button type="button" ng-click="loadOldDebugQset()">Load OLD Qset</button>
 			</debug-qset-loader>
+			<title-editor ng-show="showTitleEditor">
+				<h4>Give Your Widget a Title</h4>
+				<input type="text"
+					ng-model="title"
+					enter-submit="hideCoverAndModals()"
+					auto-select />
+				<button type="button"
+					class="important-button"
+					ng-click="hideCoverAndModals()">Done</button>
+			</title-editor>
 			<validation-dialog ng-show="validation.show">
 				<h4>Just a sec!</h4>
 				<p class="error-count">{{validation.errors.length}} problem{{validation.errors.length > 1 ? "s" : ""}} found.</p>
@@ -525,18 +528,34 @@
 					<li ng-class="{'selected' : newNodeManager.linkMode == SELF}"  ng-click="selectLinkMode(SELF)">Loop Back to This Destination ( {{integerToLetters(editedNode.id)}} )</li>
 				</ul>
 			</new-node-manager-dialog>
+			<custom-node-label-editor ng-show="showCustomNodeLabelEditor">
+				<h4>Custom Label for This Destination</h4>
+				<p>Provide a custom label for this destination in the creator tree view. It will only be visible to you and other authors of this widget.</p>
+				<input type="text"
+					ng-model="editedNode.customLabel"
+					placeholder="Custom Label"
+					enter-submit="showCustomNodeLabelEditor = false"
+					auto-select
+					maxlength="30"/>
+				<button type="button"
+					class="important-button"
+					ng-click="showCustomNodeLabelEditor = false">Done</button>
+			</custom-node-label-editor>
 			<node-creation class="node-creation-screen"
 				ng-click="hidePopup"
 				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT, 'multi-choice': displayNodeCreation == MC}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
-				<h2 ng-if="displayNodeCreation == MC">Multiple Choice</h2>
-				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer</h2>
-				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot</h2>
-				<h2 ng-if="displayNodeCreation == NARR">Narrative</h2>
-				<h2 ng-if="displayNodeCreation == END">End Point</h2>
+				<h2>
+					<span ng-if="displayNodeCreation == MC">Multiple Choice for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == SHORTANS">Short Answer for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == NARR">Narrative for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == END">End Point for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<button class="add-custom-node-label" ng-click="showCustomNodeLabelEditor = true">Custom Label...</button>
+				</h2>
 				<div class="node-creation-panels">
 					<div class="panel-left" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
-					'tiny' : displayNodeCreation == HOTSPOT, 'column': showRequiredItems || showItemSelection}">
+					'tiny' : displayNodeCreation == HOTSPOT, 'column': (showRequiredItems || showItemSelection) && displayNodeCreation != HOTSPOT }">
 						<div class="question-media-box" ng-class="{
 							'align-left' : editedNode.media.align == 'left',
 							'align-right' : editedNode.media.align == 'right',
@@ -604,7 +623,7 @@
 											<button type="button"
 												class="delete-button icon-cross"
 												ng-click="removeAnswerPreCheck($index, $event)"></button>
-											<button  ng-show="inventoryItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
+											<button  ng-show="answer.requiredItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
 												<img ng-if="!answer.hideAnswer" src="assets/creator-assets/eye.png"/>
 												<img ng-if="answer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
 												<div ng-if="showHideAnswerTooltip" class="hide-answer-tooltip"><p ng-if="!answer.hideAnswer">Answer will be visible to all players, with or without the required items</p><p ng-if="answer.hideAnswer">Answer will be hidden to players without the required items</p></div>
@@ -901,9 +920,11 @@
 										</g>
 									</svg>
 									<!-- Background image placed behind the hotspot's SVG canvas -->
-									<img id="hotspotImage"
-										ng-src="{{image.src}}"
-										ng-show="mediaReady" />
+									<div class="hotspot-image-container">
+										<img id="hotspotImage"
+											ng-src="{{image.src}}"
+											ng-show="mediaReady" />
+									</div>
 								</div>
 								<div class="image-options-container" ng-show="mediaReady" >
 									<!-- bottom toolbar with buttons for adding and managing hotspots -->
@@ -1070,9 +1091,9 @@
 									<button type="button"
 										ng-disabled="hotspotAnswerManager.answerIndex == 0"
 										ng-click="moveAnswerBack()">Back</button>
-									<button  ng-show="inventoryItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
-										<img ng-if="!answer.hideAnswer" src="assets/creator-assets/eye.png"/>
-										<img ng-if="answer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
+									<button ng-show="inventoryItems[0]"  ng-click="answers[hotspotAnswerManager.answerIndex].hideAnswer = !answers[hotspotAnswerManager.answerIndex].hideAnswer" aria-label="answers[hotspotAnswerManager.answerIndex].hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answers[hotspotAnswerManager.answerIndex].hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
+										<img ng-if="!answers[hotspotAnswerManager.answerIndex].hideAnswer" src="assets/creator-assets/eye.png"/>
+										<img ng-if="answers[hotspotAnswerManager.answerIndex].hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
 										<div ng-if="showHideAnswerTooltip" class="hide-answer-tooltip"><p ng-if="!answer.hideAnswer">Answer will be visible to all players, with or without the required items</p><p ng-if="answer.hideAnswer">Answer will be hidden to players without the required items</p></div>
 									</button>
 									<button type="button" class="delete-button icon-cross" title='Remove answer' ng-click="removeAnswerPreCheck(hotspotAnswerManager.answerIndex, $event)"></button>

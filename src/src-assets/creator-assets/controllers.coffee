@@ -97,6 +97,8 @@ angular.module "Adventure"
 	# Scope reference for the node currently being edited in a creation screen, updates when displayNodeCreation changes
 	$scope.editedNode = null
 
+	$scope.showCustomNodeLabelEditor = false
+
 	$scope.hoveredNode =
 		showTooltips: false
 		target: null
@@ -226,6 +228,7 @@ angular.module "Adventure"
 		$scope.showItemManager = false
 		$scope.showItemIconSelector = false
 		$scope.editingIcons = false
+		$scope.showCustomNodeLabelEditor = false
 
 		$scope.resetNewNodeManager()
 

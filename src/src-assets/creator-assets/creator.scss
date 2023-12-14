@@ -75,6 +75,9 @@ $z-index-modal-svg: 75;
 $z-index-modal-dialog: 100;
 $z-index-very-important: 1000;
 
+$font-monospace: 'Roboto Mono', monospace;
+$font-lato: 'Lato', sans-serif;
+
 html, body {
 	height: 100%;
 
@@ -277,15 +280,23 @@ mode-manager-overlay {
 }
 
 header.title-header {
-	display: block;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	width: 100%;
 	height: 46px;
-	padding-top: 14px;
+	padding: 7px 0;
 
 	background: $color-accent;
 
+	section.justify-left, section.justify-right {
+		display: flex;
+		align-items: center;
+	}
+
 	h1 {
 		display: inline-block;
+		justify-self: flex-start;
 		margin: 0px 0px 0px 15px;
 
 		font-size: 24px;
@@ -299,14 +310,15 @@ header.title-header {
 
 	img.logo {
 		display: inline-block;
-		float: left;
+		width: 53px;
+		height: auto;
 		margin-left:20px;
 	}
 
 	div.edit-title {
 		display: inline-block;
 		height: 24px;
-
+		margin-top: 3px;
 		margin-left: 10px;
 		text-decoration: underline;
 
@@ -316,8 +328,6 @@ header.title-header {
 	}
 
 	.header-options-box {
-
-		float: right;
 		margin-top: -6px;
 		margin-right: 25px;
 
@@ -348,20 +358,6 @@ header.title-header {
 	// overflow-y: auto;
 
 	border-bottom: solid 1px $gray-lighter;
-}
-
-.work-in-progress-warning {
-	position: absolute;
-	left: 5px;
-	bottom: 5px;
-	padding: 5px 10px;
-
-	font-weight: bold;
-	color: $color-primary;
-	background-color: $red;
-
-	border: solid 1px $gray-lighter;
-	border-radius: 3px;
 }
 
 /* Tree Visualization Styles */
@@ -635,19 +631,20 @@ button {
 
 
 	&.hide-answer-button {
-		height: 35px;
-		width: 35px;
-		padding: 5px 0 0 0;
+		height: 24px;
+		width: 24px;
+		padding: 4px;
 		position: relative;
 
 		img {
-			height: 25px;
-			width: 25px;
+			height: 16px;
+			width: 16px;
 		}
 
 		.hide-answer-tooltip {
 			position: absolute;
 			top: 45px;
+			left: -9px;
 			width: 100px;
 			background: $blue;
 			color: $white;
@@ -1072,17 +1069,17 @@ node-tooltips {
 	.tooltip {
 		max-width: 250px;
 		margin: 0px 0px 5px 0px;
-		padding: 5px 10px;
+		padding: 10px 15px;
 
 		border-radius: 5px;
 		background: $gray-darker;
 
 		color: $color-primary;
-		font-size: 0.7em;
+		font-size: 0.9em;
 
 		.tooltip-title {
 			display: block;
-			font-size: 0.6em;
+			font-size: 0.8em;
 
 			margin-bottom: 3px;
 		}
@@ -1105,19 +1102,19 @@ required-items-tooltip {
 	position: absolute;
 	max-width: 250px;
 	margin: 0px 0px 5px 0px;
-	padding: 5px 10px;
+	padding: 10px 15px;
 
 	border-radius: 5px;
 	background: $gray-darker;
 
 	color: $color-primary;
-	font-size: 0.7em;
+	font-size: 0.9em;
 
 	.tooltip-title {
 		display: block;
-		font-size: 0.6em;
+		font-size: 0.8em;
 
-		margin-bottom: 3px;
+		margin: 6px 0;
 	}
 
 	p {
@@ -1125,6 +1122,7 @@ required-items-tooltip {
 		flex-direction: row;
 		align-items: center;
 		grid-gap: 10px;
+		margin-top: 5px;
 
 		img {
 			width: 20px;
@@ -1250,6 +1248,14 @@ required-items-tooltip {
 		.greyed-out {
 			color: $gray-darker;
 			font-style: italic;
+		}
+	}
+
+	&.item-panel {
+		.advanced-option {
+			justify-content: flex-start;
+			font-size: 14px;
+			margin-top: 12px;
 		}
 	}
 }
@@ -1383,12 +1389,13 @@ required-items-tooltip {
 
 			.arrow-bottom {
 				position: static;
-				border-top-color: $gray-lightest;
+				// border-top-color: $gray-lightest;
+				border-top-color: $gray-lighter;
 			}
 
 			.arrow-top {
 				position: static;
-				border-bottom-color: $gray-lightest;
+				border-bottom-color:$gray-lighter;
 			}
 
 			dt {
@@ -1398,12 +1405,14 @@ required-items-tooltip {
 				grid-gap: 10px;
 				padding: 0 10px;
 				min-height: 35px;
-				background-color: $gray-lightest;
+				// background-color: $gray-lightest;
+				background: $color-primary;
 			}
 
 			.selected-item {
 				justify-content: space-between;
-				background-color: $gray-lighter;
+				// background-color: $gray-lighter;
+				background: $color-primary;
 			}
 
 			.option-contents {
@@ -1420,7 +1429,9 @@ required-items-tooltip {
 			}
 
 			dl {
-				background-color: $gray-lighter;
+				// background-color: $gray-lighter;
+				background: $color-primary;
+				border: solid 1px $gray-lightest;
 				// border: 1px solid $gray-darker;
 				margin: 0;
 				position: absolute;
@@ -1439,11 +1450,16 @@ required-items-tooltip {
 			}
 
 			.blank-selection {
-				width: 100px;
+				width: 100%;
 				height: 2em;
 				justify-content: end;
 				background-color: $gray-lighter;
 				border-radius: 10px;
+
+				&:after {
+					content: 'No additional items.';
+					order: -1;
+				}
 			}
 
 			.options {
@@ -1452,8 +1468,36 @@ required-items-tooltip {
 				scrollbar-color: $gray;
 
 				>:hover {
-					background-color: $gray-lighter;
+					// background-color: $gray-lighter;
+					background-color: $blue-lightest;
+					// color: #000;
 				}
+			}
+		}
+
+		> input {
+			flex-grow: 2;
+		}
+
+		.item-details {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items: center;
+			width: 100%;
+			gap: 10px;
+			position: relative;
+			box-sizing: border-box;
+			padding-right: 36px;
+
+			.delete-button {
+				position: absolute;
+				right: -6px;
+				top: 50%;
+				height: 24px;
+				width: 24px;
+				padding: 0;
+				margin-top: -12px;
 			}
 		}
 
@@ -1501,8 +1545,9 @@ required-items-tooltip {
 		.item-content {
 			display: flex;
 			flex-direction: column;
-			flex-grow: 2;
+			flex-grow: 1;
 			max-width: 75%;
+			align-self: center;
 			justify-content: center;
 
 			&.small-name {
@@ -1560,6 +1605,52 @@ required-items-tooltip {
 		}
 	}
 
+	.advanced-option-bar {
+		display: flex;
+		align-items: end;
+		flex-direction: row;
+		justify-content: space-between;
+		margin-top: 10px;
+	}
+
+	.advanced-option {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		justify-content: center;
+		gap: 15px;
+		padding: 0 10px;
+
+		input {
+			width: auto;
+			height: 1em;
+		}
+
+		button.hide-answer-button {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			color: $gray-darker;
+			gap: 20px;
+			padding: 20px;
+			background-color: $white;
+
+			img {
+				width: 25px;
+				height: 25px;
+			}
+
+			&:hover {
+				background-color: $gray-lighter;
+			}
+
+
+			&.hide-answer {
+				background-color: $gray-lighter;
+			}
+
+		}
+	}
 }
 
 item-manager {
@@ -1781,8 +1872,8 @@ item-icon-selector {
 
 	&.required-item-modal-hotspot {
 		position: absolute;
-		top: 40px;
-		left: 120px;
+		top: 28px;
+		left: 94px;
 		width: 500px;
 
 		.list-items {
@@ -1828,6 +1919,7 @@ item-icon-selector {
 	}
 
 	.item-container {
+		flex-grow: 2;
 		flex-direction: column;
 		grid-gap: 10px;
 	}
@@ -1883,7 +1975,7 @@ item-icon-selector {
 	}
 }
 
-title-editor {
+title-editor, custom-node-label-editor {
 	position: absolute;
 	width: 500px;
 
@@ -1892,7 +1984,7 @@ title-editor {
 	margin-left: -200px;
 	padding-bottom: 25px;
 
-	z-index: $z-index-modal;
+	z-index: $z-index-modal-dialog;
 
 	background: $color-primary;
 	border-radius: 5px;
@@ -1920,6 +2012,21 @@ title-editor {
 
 		border: solid 1px $gray-lighter;
 		border-radius: 3px;
+	}
+
+}
+
+custom-node-label-editor {
+	position: absolute;
+	top: 60px;
+
+	background: $color-primary;
+	box-shadow: $shadow-small;
+
+	p {
+		padding: 10px 15px;
+
+		font-size: 0.9em;
 	}
 }
 
@@ -2369,6 +2476,10 @@ node-creation-selection-dialog {
 
 		&#hotspot-require-item-btn {
 			height: auto;
+
+			.icon-lock {
+				margin-right: -4px;
+			}
 		}
 
 		div {
@@ -2441,9 +2552,33 @@ node-creation-selection-dialog {
 		textarea {
 			resize: none;
 		}
+
+		.panel-right {
+			display: none;
+		}
+
+		.item-selection {
+			/** Show modal on screen widths < 1000px **/
+			@media screen and (max-width: 1400px) {
+				&.item-panel {
+					display: none;
+				}
+			}
+			/** Show two panels on screen widths >= 1000px **/
+			@media screen and (min-width: 1400px) {
+				&.item-panel {
+					display: none;
+				}
+				&.item-modal.show {
+					display: flex;
+				}
+			}
+		}
 	}
 
 	h2 {
+		display: flex;
+		justify-content: space-between;
 		width: 100%;
 		box-sizing: border-box;
 
@@ -2455,6 +2590,12 @@ node-creation-selection-dialog {
 
 		color: $white;
 		background: $color-accent;
+
+		.add-custom-node-label {
+			background: none;
+			color: $color-primary;
+			font-size: 0.6em;
+		}
 	}
 
 	.question-box {
@@ -2475,11 +2616,12 @@ node-creation-selection-dialog {
 
 		&.tiny {
 			max-height: 2em;
+			width: 100%;
 		}
 
-		@media screen and (min-width: 1000px) {
+		@media screen and (min-width: $node-creation-panels-width) {
 			&.tiny {
-				resize: both !important;
+				resize: vertical;
 				height: 90%;
 				max-height: 100% !important;
 				width: 200px;
@@ -2568,6 +2710,10 @@ node-creation-selection-dialog {
 		&.expanded {
 			height: 100%;
 		}
+
+		&.tiny {
+			margin: 5px;
+		}
 	}
 
 	.media-box {
@@ -2648,14 +2794,14 @@ node-creation-selection-dialog {
 					grid-gap: 10px;
 
 					.hide-answer-button {
-						height: 35px;
-						width: 35px;
-						padding: 5px 0 0 0;
+						height: 24px;
+						width: 24px;
+						padding: 4px;
 						position: relative;
 
 						img {
-							height: 25px;
-							width: 25px;
+							height: 16px;
+							width: 16px;
 						}
 
 						.hide-answer-tooltip {
@@ -2777,6 +2923,13 @@ node-creation-selection-dialog {
 
 				&:hover {
 					background: $color-selection-hover;
+				}
+
+				button.delete-button {
+					height: 24px;
+					min-width: 24px;
+					max-width: 24px;
+					padding: 5px;
 				}
 
 				button.answer-node-select, button.add-item {
@@ -3130,13 +3283,17 @@ node-creation-selection-dialog {
 				}
 			}
 
-			img {
-				position: relative;
-
-				z-index: $z-index-modal + 1;
-				max-width: 100%;
-				//max-height: 90%;
+			.hotspot-image-container {
+				width: 698px;
 				height: 400px;
+
+				img {
+					position: relative;
+	
+					z-index: $z-index-modal + 1;
+					max-width: 100%;
+					height: 400px;
+				}
 			}
 		}
 
@@ -3422,6 +3579,8 @@ node-creation-selection-dialog {
 			flex-direction: column;
 			align-items: start;
 			height: auto;
+			margin-top: 10px;
+			margin-bottom: 10px;
 		}
 
 		div.select-required-items {
@@ -3437,8 +3596,15 @@ node-creation-selection-dialog {
 		}
 
 		div.button-options {
-			margin: 5px 5px 10px 15px;
 			display: flex;
+			margin: 5px 5px 10px 15px;
+			gap: 5px;
+
+			button.hide-answer-button {
+				width: auto;
+				height: auto;
+				padding: 5px 10px;
+			}
 		}
 
 		div.colors-container {
@@ -3634,8 +3800,6 @@ validation-dialog {
 		position: absolute;
 		bottom: 15px;
 		left: 15px;
-
-		padding: 10px 15px;
 	}
 }
 
