@@ -2202,8 +2202,8 @@ angular.module "Adventure"
 		$scope.updateMinCount = (event, item, advanced=false) ->
 			if item.tempMinCount > -1
 				$scope.invalidQuantity = null
-				if (item.tempMinCount > item.tempMaxCount)
-					if advanced
+				if (item.tempMinCount > item.tempMaxCount && !item.uncappedMax)
+					if advanced 
 						$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
 						$scope.showAdvancedOptions = true
 						if (item.tempMaxCount > -1)
