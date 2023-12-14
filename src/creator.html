@@ -543,12 +543,17 @@
 							'align-top' : editedNode.media.align == 'top',
 							'align-bottom' : editedNode.media.align == 'bottom','expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
 							'tiny' : displayNodeCreation == HOTSPOT}" >
-							<textarea class="question-box"
+							<div class="question-editor">
+								<textarea class="question-box"
 								ng-class="{
 									'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
 									'tiny' : displayNodeCreation == HOTSPOT}"
-								ng-model="question"
+								ng-model="editedNode.questions[0].text"
 								placeholder="{{questionPlaceholder}}"></textarea>
+								<button ng-click="toggleQuestionsEditor()" id="advanced-question-btn">
+									Advanced Question Editor
+								</button>
+							</div>
 							<div class="media-box"
 								ng-show="mediaReady && displayNodeCreation != HOTSPOT">
 								<div class="image-box">
@@ -748,7 +753,7 @@
 															<p ng-if="item.minCount == 0 && item.maxCount == 0 && !item.uncappedMax">Player must not have this item.</p>
 														</div>
 													</div>
-													<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+													<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromObject(item, currentAnswer)"></button>
 											</li>
 										</ul>
 										<div class="options-bar add-item">
@@ -771,7 +776,7 @@
 															</dt>
 													</div>
 												</dl>
-												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
+												<button ng-click="addRequiredItemToObject(selectedItem, currentAnswer)">Add Item</button>
 											</div>
 
 											<div class="advanced-option">
@@ -1019,7 +1024,7 @@
 														</div>
 													</div>
 												</div>
-												<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+												<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromObject(item, currentAnswer)"></button>
 											</li>
 										</ul>
 										<div class="options-bar add-item">
@@ -1042,7 +1047,7 @@
 															</dt>
 													</div>
 												</dl>
-												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
+												<button ng-click="addRequiredItemToObject(selectedItem, currentAnswer)">Add Item</button>
 											</div>
 										</div>
 										<div class="advanced-option">
@@ -1294,7 +1299,7 @@
 											</div>
 										</div>
 									</div>
-									<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+									<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromObject(item, currentAnswer)"></button>
 								</li>
 							</ul>
 							<div class="options-bar add-item">
@@ -1317,7 +1322,7 @@
 												</dt>
 										</div>
 									</dl>
-									<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
+									<button ng-click="addRequiredItemToObject(selectedItem, currentAnswer)">Add Item</button>
 								</div>
 							</div>
 							<div class="advanced-option">
@@ -1544,6 +1549,138 @@
 						</button>
 					</div>
 				</div>
+				<advanced-question-editor ng-show="showQuestions">
+					<h2 ng-if="displayNodeCreation == MC">Conditional Question</h2>
+					<h2 ng-if="displayNodeCreation == SHORTANS">Conditional Question</h2>
+					<h2 ng-if="displayNodeCreation == HOTSPOT">Conditional Question</h2>
+					<h2 ng-if="displayNodeCreation == NARR">Conditional Narrative</h2>
+					<h2 ng-if="displayNodeCreation == END">Conditional End Text</h2>
+					<p ng-class="{'hidden': inventoryItems.length > 0}"><strong>Instructions</strong>: Choose to display different text based on the number of times the player has visited this destination.</p>
+					<p ng-class="{'hidden': inventoryItems.length == 0}"><strong>Instructions</strong>: Choose to display different text based on the number of times the player has visited this destination and/or what items they have in their inventory. Note that if a player meets the requirements for more than one, then it will display the one with the most required items.</p>
+					<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
+					<ul>
+						<li ng-repeat="question in editedNode.questions">
+							<button type="button"
+								class="delete-button icon-cross"
+								ng-click="removeQuestion($index, $event)"></button>
+							<textarea class="question-textarea" ng-model="question.text" placeholder="{{questionPlaceholder}}"></textarea>
+							<div class="question-options">
+								<div class="required-number-of-visits">
+									<label for="required-number-of-visits-{{question.id}}">Required Number of Visits</label>
+									<input ng-focus = "event = $event" id="required-number-of-visits-{{question.id}}" type="number" ng-model="question.requiredVisits" min="0" value="0" ng-change="updateRequiredVisits(event, question)"/>
+								</div>
+								<button ng-show="inventoryItems[0]" class="require-item-btn" ng-class="{'requires-items': question.requiredItems[0]}" ng-click="toggleQuestionRequiredItemsModal(question)" title="Require Items" aria-label="Open Required Items Window for Question Text">
+									<div ng-class="{'unlocked': !question.requiredItems[0], 'locked': question.requiredItems[0]}">
+										<img src="assets/creator-assets/unlocked.png" ng-if="!question.requiredItems[0]"/>
+										<img src="assets/creator-assets/lock.png" ng-if="question.requiredItems[0]"/>
+										<i class="arrow-right"></i>
+									</div>
+									<span>{{question.requiredItems[0] ? 'Edit Required Items' : 'No Required Items'}}</span>
+								</button>
+							</div>
+							<!-- required items modal for questions-->
+							<div class="item-selection item-modal required-item-modal" ng-class="{ show : showQuestionRequiredItems && currentQuestion == question}"
+							ng-mousedown="modalDragStart($event)">
+								<div class="item-header">
+									<div class="item-heading">
+										<h3>Required Items for Question</h3>
+										<span class="hide-popup-btn icon-cross"
+										ng-click="toggleQuestionRequiredItemsModal(question)"
+										ng-keypress="$event.keyCode === 13 ? toggleQuestionRequiredItemsModal(question) : ''"
+										tabindex="0"></span>
+									</div>
+									<p class="item-instructions">The player must have these items in their inventory to see this question.</p>
+									<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">{{invalidQuantity}}</p>
+									<p class="item-instructions invalid-quantity-message"  ng-if="invalidMaxQuantity">{{invalidMaxQuantity}}</p>
+								</div>
+								<ul class="list-items">
+									<li
+										ng-repeat="item in currentQuestion.requiredItems"
+										ng-mouseover="hoverItem = true"
+										ng-mouseout="hoverItem = false"
+										class="question-required-item"
+										class="item-details"
+									>
+											<div class="item-icon">
+												<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+											</div>
+											<div class="item-content" ng-class="{'small-name': showAdvancedOptions}">
+												<div class="item-name">
+													<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+												</div>
+											</div>
+											<div class="item-options-container" ng-class="{'flex-start': showAdvancedOptions, 'show': hoverItem}">
+												<div class="item-minimum-quantity">
+													<label ng-show="!showAdvancedOptions"  for="increase-required-count-{{item.id}}">Required Quantity</label>
+													<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
+													<input ng-show="!showAdvancedOptions" ng-focus = "event = $event" id="increase-required-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+													<input ng-show="showAdvancedOptions" ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item, true)"/>
+												</div>
+												<div class="item-quantity-options">
+													<div class="item-maximum" ng-show="showAdvancedOptions">
+														<div class="item-quantity" ng-show="!item.uncappedMax">
+															<label for="increase-max-count-{{item.id}}">Max Quantity</label>
+															<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="0"  ng-change="updateMaxCount(event, item)"/>
+														</div>
+														<div class="item-quantity">
+															<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
+															<label for="unlimited-option-{{item.id}}">Uncapped Max</label>
+														</div>
+													</div>
+												</div>
+												<div class="quantity-explanation" ng-show="showAdvancedOptions">
+													<p ng-if="item.minCount == 0 && item.uncappedMax">Player is not required to have any amount of this item.</p>
+													<p ng-if="item.minCount == 0 && item.maxCount != 0 && !item.uncappedMax">Player will need to have none or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
+													<p ng-if="item.minCount > 0 && item.uncappedMax">Player will need to have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
+													<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player will need to have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
+													<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player will need to have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+													<p ng-if="item.minCount == 0 && item.maxCount == 0 && !item.uncappedMax">Player must not have this item.</p>
+												</div>
+											</div>
+											<button class="delete-button icon-cross" title='Remove required item from question' type="button" ng-click="removeRequiredItemFromObject(item, currentQuestion)"></button>
+									</li>
+								</ul>
+								<div class="options-bar add-item">
+									<div class="selector">
+										<dl ng-class="{'row': !availableItems[0] }">
+											<dt ng-if="!availableItems[0]" class="blank-selection">
+												<i class="arrow-top"></i>
+											</dt>
+											<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
+												<div class="option-contents">
+													<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+													{{inventoryItems[getItemIndex(selectedItem)].name}}
+												</div>
+												<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
+											</dt>
+											<div  class="options" ng-show="showDropdown">
+												<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" />
+													{{inventoryItems[getItemIndex(item)].name}}
+													</dt>
+											</div>
+										</dl>
+										<button ng-click="addRequiredItemToObject(selectedItem, currentQuestion)">Add Item</button>
+									</div>
+
+									<div class="advanced-option">
+										<input type="checkbox" ng-model="showAdvancedOptions" ng-click="toggleAdvancedOptions()" id="question-show-advanced"/>
+										<label for="question-show-advanced">Use Advanced Options</label>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+					<div class="end-buttons">
+						<button type="button"
+						class="add-question important-button"
+						ng-click="newQuestion()">Add Question</button>
+						<button class="save-button important-button"
+						type="button"
+						ng-click="toggleQuestionsEditor()">Done
+						</button>
+					</div>
+				</advanced-question-editor>
 			</node-creation>
 			<node-tooltips ng-show="hoveredNode.showTooltips">
 				<div class="tooltip"

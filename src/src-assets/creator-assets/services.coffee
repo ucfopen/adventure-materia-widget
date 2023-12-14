@@ -528,6 +528,14 @@ angular.module "Adventure"
 							answer.requiredItems.splice index, 1
 							break
 
+		if tree.questions
+			for question in tree.questions
+				if question.requiredItems
+					for item, index in question.requiredItems
+						if item.id is deletedItem.id
+							question.requiredItems.splice index, 1
+							break
+
 		if !tree.contents then return
 
 		i = 0
@@ -604,10 +612,51 @@ angular.module "Adventure"
 					items: questionItemData
 				answers: []
 
-			question =
-				text: if tree.question then tree.question else ""
+			angular.forEach tree.questions, (question, index) ->
+				requiredItemsData = []
 
-			itemData.questions.push question
+				if question.requiredItems
+					for i in question.requiredItems
+						do (i) ->
+							# Format properties for pre-existing items without said properties
+
+							if i.minCount > -1
+								minCount = i.minCount
+							else if i.tempMinCount > -1
+								minCount = i.tempMinCount
+							else if i.count
+								minCount = i.count
+							else
+								# If minCount isn't set, set it to 1
+								minCount = 1
+
+							if i.maxCount > -1
+								maxCount = i.maxCount
+							else if i.tempMaxCount > -1
+								maxCount = i.tempMaxCount
+							else if i.count
+								maxCount = i.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
+
+							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
+
+							formattedItem =
+								id: i.id
+								range: ""
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+
+							requiredItemsData.push formattedItem
+				itemQuestionData =
+					text: question.text
+					options:
+						requiredItems: requiredItemsData
+						requiredVisits: question.requiredVisits || 0
+
+				itemData.questions.push itemQuestionData
 
 			if tree.media
 				itemData.options.asset =
@@ -731,8 +780,6 @@ angular.module "Adventure"
 				type: item.options.type
 				contents: []
 
-			if item.questions[0].text then node.question = item.questions[0].text
-
 			if item.options.asset
 				if item.options.asset.type is 'image'
 					node.media =
@@ -760,6 +807,55 @@ angular.module "Adventure"
 			if item.options.hasLinkToOther then node.hasLinkToOther = true
 			if item.options.hasLinkToSelf then node.hasLinkToSelf = true
 			if item.options.pendingTarget then node.pendingTarget = item.options.pendingTarget
+
+			angular.forEach item.questions, (question, index) ->
+				unless node.questions then node.questions = []
+
+				requiredItemsData = []
+				if question.options.requiredItems
+					for i in question.options.requiredItems
+						do (i) ->
+							# Format properties for pre-existing items without said properties
+
+							if i.minCount > -1
+								minCount = i.minCount
+							else if i.tempMinCount > -1
+								minCount = i.tempMinCount
+							else if i.count
+								minCount = i.count
+							else
+								# If minCount isn't set, set it to 1
+								minCount = 1
+
+							if i.maxCount > -1
+								maxCount = i.maxCount
+							else if i.tempMaxCount > -1
+								maxCount = i.tempMaxCount
+							else if i.count
+								maxCount = i.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
+
+							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
+
+							formattedItem =
+								id: i.id
+								range: ""
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+
+
+							requiredItemsData.push formattedItem
+
+				nodeQuestion =
+					text: question.text
+					id: generateAnswerHash()
+					requiredItems: requiredItemsData
+					requiredVisits: question.options.requiredVisits
+
+				node.questions.push nodeQuestion
 
 			angular.forEach item.answers, (answer, index) ->
 

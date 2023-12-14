@@ -226,6 +226,8 @@ angular.module "Adventure"
 		$scope.showItemManager = false
 		$scope.showItemIconSelector = false
 		$scope.editingIcons = false
+		$scope.showQuestionRequiredItems = false
+		$scope.showQuestions = false
 
 		$scope.resetNewNodeManager()
 

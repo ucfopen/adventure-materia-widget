@@ -2026,9 +2026,9 @@ angular.module "Adventure"
 				$scope.questionPlaceholder = "Enter a conclusion here for this decision tree or path."
 
 		# Update the node's properties when the associated input models change
-		$scope.$watch "question", (newVal, oldVal) ->
+		$scope.$watch "questions", (newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
-				$scope.editedNode.question = newVal
+				$scope.editedNode.questions = $scope.questions
 
 		$scope.$watch "answers", ((newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
@@ -2093,6 +2093,104 @@ angular.module "Adventure"
 					items.forEach((item) -> item.style.zIndex = 100)
 				if(hotspot)
 					hotspot.style.zIndex = 100;
+
+		$scope.toggleQuestionsEditor = () ->
+			$scope.showQuestions = !$scope.showQuestions
+			if $scope.editedNode.questions.length <= 0
+				$scope.newQuestion()
+
+		$scope.toggleQuestionRequiredItemsModal = (question) ->
+			$scope.showDropdown = false
+			# Same question, close the modal
+			if $scope.currentQuestion is question
+				$scope.currentQuestion = null
+			# Different question
+			else
+				$scope.currentQuestion = question
+
+			# If current question is not null, open modal
+			if $scope.currentQuestion
+				$scope.showQuestionRequiredItems = true
+			# Else close the modal
+			else
+				$scope.showQuestionRequiredItems = false
+
+			if $scope.showQuestionRequiredItems
+				# Close node items modal
+				$scope.showItemSelection = false
+
+				# Remove error message
+				$scope.invalidQuantity = null
+				# Save the original item count in case of invalid input
+				if question.requiredItems
+					for item in question.requiredItems
+						item.tempMinCount = item.minCount
+						item.tempMaxCount = item.maxCount
+
+						if !$scope.showAdvancedOptions
+							# Show advanced options on start only if advanced options are enabled
+							if !item.uncappedMax
+								$scope.showAdvancedOptions = true
+							else
+								$scope.showAdvancedOptions = false
+
+				# Add items not already being used to the items available for selection
+				$scope.availableItems = []
+				for item in $scope.inventoryItems
+					do (item) ->
+						used = false
+						if question.requiredItems
+							for i in question.requiredItems
+								if item.id is i.id
+									used = true
+						if ! used
+							$scope.availableItems.push(item)
+
+				$scope.selectedItem = $scope.availableItems[0]
+
+		# $scope.addRequiredItemToQuestion = (item, question) ->
+		# 	newItem = {
+		# 		id: item.id
+		# 		minCount: 1
+		# 		maxCount: 1
+		# 		tempMinCount: 1
+		# 		tempMaxCount: 1
+		# 		uncappedMax: true
+		# 		range: ""
+		# 	}
+		# 	# Add item to question's required items
+		# 	question.requiredItems.push(newItem)
+		# 	# Remove item from available items
+		# 	$scope.availableItems.splice($scope.availableItems.indexOf(item), 1)
+		# 	# Reset selected item
+		# 	$scope.selectedItem = $scope.availableItems[0]
+		# 	$scope.showDropdown = false
+
+		# $scope.removeRequiredItemFromQuestion = (item, question) ->
+		# 	# Remove item from question's required items
+		# 	question.requiredItems.splice(question.requiredItems.indexOf(item), 1)
+		# 	# Add item back to available items
+		# 	item.count = 1
+		# 	for parentItem in $scope.inventoryItems
+		# 		if item.id is parentItem.id
+		# 			$scope.availableItems.push(parentItem)
+		# 	# Reset selected item
+		# 	$scope.selectedItem = $scope.availableItems[0]
+
+		$scope.newQuestion = () ->
+			# Create new question
+			newQuestion =
+				id: treeSrv.generateAnswerHash()
+				text: ""
+				requiredItems: []
+				requiredVisits: if $scope.editedNode.questions.length > 0 then $scope.editedNode.questions[$scope.editedNode.questions.length - 1].requiredVisits + 1 else 0
+
+			# Add new answer to answers array
+			$scope.editedNode.questions.push newQuestion
+
+		$scope.removeQuestion = () ->
+			# Remove question from questions array
+			$scope.editedNode.questions.splice($scope.editedNode.questions.indexOf($scope.currentQuestion), 1)
 
 		$scope.toggleNodeItemsModal = () ->
 			$scope.showDropdown = false
@@ -2203,7 +2301,7 @@ angular.module "Adventure"
 			if item.tempMinCount > -1
 				$scope.invalidQuantity = null
 				if (item.tempMinCount > item.tempMaxCount && !item.uncappedMax)
-					if advanced 
+					if advanced
 						$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
 						$scope.showAdvancedOptions = true
 						if (item.tempMaxCount > -1)
@@ -2219,7 +2317,7 @@ angular.module "Adventure"
 					$scope.invalidMaxQuantity = null
 				else if item.tempMinCount == 0 and !advanced
 					# if setting minimum to 0 in basic options, means player must have none of item
-					item.minCount = 0 
+					item.minCount = 0
 					item.maxCount = 0
 					item.tempMaxCount = 0
 					item.uncappedMax = false
@@ -2305,12 +2403,12 @@ angular.module "Adventure"
 			$scope.selectedItem = item
 			$scope.showItemManagerDialog = false
 
-		# Add a required item to answer
-		$scope.addRequiredItemToAnswer = (item, answer) ->
+		# Add a required item to object
+		$scope.addRequiredItemToObject = (item, object) ->
 			if item
-				answer.requiredItems = answer.requiredItems || []
+				object.requiredItems = object.requiredItems || []
 
-				# for i in answer.requiredItems when i.id is item.id
+				# for i in object.requiredItems when i.id is item.id
 				# 	i.count += 1
 				# 	return
 
@@ -2325,7 +2423,7 @@ angular.module "Adventure"
 					uncappedMax: true
 					range: ""
 				}
-				answer.requiredItems.push(newItem)
+				object.requiredItems.push(newItem)
 
 				# Remove item from the available items dropdown
 				index = $scope.availableItems.indexOf(item)
@@ -2335,8 +2433,8 @@ angular.module "Adventure"
 				# Hide Dropdown
 				$scope.showDropdown = false
 
-		$scope.removeRequiredItemFromAnswer = (item, answer) ->
-			answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
+		$scope.removeRequiredItemFromObject = (item, object) ->
+			object.requiredItems.splice object.requiredItems.indexOf(item), 1
 
 			# Add item to the available items dropdown
 			item.count = 1
@@ -3139,6 +3237,20 @@ angular.module "Adventure"
 						# children()[1] references the answer text input box
 						row.children()[1].focus()
 				), 100
+
+		# Listen for when a new question is added
+		$scope.$on "editedNode.questions.added", (evt) ->
+			$timeout (() ->
+				# Auto-scroll to the bottom
+				$element[0].scrollTop = $element[0].scrollHeight
+
+				# Find the answer input box and focus it
+				list = angular.element($element.children()[0]).children()
+				if list.length > 0
+					row = angular.element list[list.length - 1]
+					# children()[1] references the answer text input box
+					row.children()[1].focus()
+			), 100
 ]
 
 # The validation dialog is linked to two validation events:

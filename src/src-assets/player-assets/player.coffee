@@ -83,7 +83,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.setLightboxZoom = (val) ->
 		$scope.lightboxZoom = val
 
-	$scope.visitedNodes = []
+	$scope.visitedNodes = {}
 
 	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
@@ -103,36 +103,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		if questionId is 0
 			q_data = $scope.qset.items[0]
 
-		unless q_data.options.asset then $scope.layout = "text-only"
-		else if q_data.questions[0].text != "" then $scope.layout = q_data.options.asset.align
-		else $scope.layout = "image-only"
-
-		# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
-		# Instead, parse in advance, catch the error, and warn the user that the text was nasty
-		try
-			# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
-			presanitized = q_data.questions[0].text
-			for k, v of PRESANITIZE_CHARACTERS
-				presanitized = presanitized.replace k, v
-			$sanitize presanitized
-
-		catch error
-			q_data.questions[0].text = "*Question text removed due to malformed or dangerous HTML content*"
-
-		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
-		if presanitized.length then parsedQuestion = micromarkdown.parse(presanitized) else parsedQuestion = ""
-
-		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
-		parsedQuestion = addTargetToHrefs parsedQuestion
-
-		$scope.question =
-			text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
-			layout: $scope.layout,
-			type : q_data.options.type,
-			id : q_data.options.id
-			materiaId: q_data.id
-			options: q_data.options
-
 		# Remove new item alerts
 		for i in $scope.inventory
 			i.new = false
@@ -146,13 +116,13 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		$scope.inventoryUpdateMessage = ""
 
 		# Add items to player's inventory
-		if $scope.question.options.items and $scope.question.options.items[0]
+		if q_data.options.items and q_data.options.items[0]
 
 			$scope.showInventoryBtn = true
 
 			# Format items
-			if $scope.question.options.items
-				for q_i in $scope.question.options.items
+			if q_data.options.items
+				for q_i in q_data.options.items
 					do (q_i) ->
 						item =
 							id: q_i.id
@@ -166,7 +136,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					hasItem = false
 
 					# Check if item is first visit only and player has visited this node before
-					if ($scope.visitedNodes.some((n) => n is $scope.question.id) and q_i.firstVisitOnly)
+					if ($scope.visitedNodes[q_data.id] and q_i.firstVisitOnly)
 						# Move to next item
 					else
 						# Inventory update
@@ -219,6 +189,52 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					removedItemsMessage = ""
 
 				$scope.inventoryUpdateMessage = "Updates to inventory: " + addedItemsMessage + removedItemsMessage
+
+		# Get question based on inventory and number of visits
+		presanitized = ""
+		mostItems = 0
+		for q in q_data.questions
+			if q.options.requiredItems
+				missingItems = $scope.checkInventory(q.options.requiredItems)
+				if (missingItems.length > 0)
+					continue
+				else if (mostItems < q.options.requiredItems.length)
+					mostItems = q.options.requiredItems.length
+				else
+					continue
+			if q.options.requiredVisits != null
+				if $scope.visitedNodes[q_data.id] < q.options.requiredVisits
+					continue
+			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
+			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
+			try
+				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
+				presanitized = q.text
+				for k, v of PRESANITIZE_CHARACTERS
+					presanitized = presanitized.replace k, v
+				$sanitize presanitized
+
+			catch error
+				q.text = "*Question text removed due to malformed or dangerous HTML content*"
+
+		unless q_data.options.asset then $scope.layout = "text-only"
+		else if presanitized != "" then $scope.layout = q_data.options.asset.align
+		else $scope.layout = "image-only"
+
+
+		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
+		if presanitized.length then parsedQuestion = micromarkdown.parse(presanitized) else parsedQuestion = ""
+
+		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
+		parsedQuestion = addTargetToHrefs parsedQuestion
+
+		$scope.question =
+			text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
+			layout: $scope.layout,
+			type : q_data.options.type,
+			id : q_data.options.id
+			materiaId: q_data.id
+			options: q_data.options
 
 		$scope.answers = []
 
@@ -319,7 +335,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			else
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
 
-		$scope.visitedNodes.push(q_data.options.id)
+		$scope.visitedNodes[q_data.id] = ($scope.visitedNodes[q_data.id] || 0) + 1
 
 	$scope.dismissUpdates = () ->
 		$scope.inventoryUpdate = false
@@ -531,7 +547,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		link = null
 		if $scope.question.type is $scope.END
 			link = -1
-			Materia.Score.submitFinalScoreFromClient q_data.options.id, q_data.questions[0].text, q_data.options.finalScore
+			Materia.Score.submitFinalScoreFromClient q_data.options.id, $scope.question.text, q_data.options.finalScore
 		else
 			link = q_data.answers[0].options.link
 

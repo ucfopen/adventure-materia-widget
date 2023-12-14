@@ -1043,6 +1043,10 @@ debug-qset-loader, debug-qset-generator {
 	}
 }
 
+.invalid-quantity-message {
+	color: $red;
+}
+
 toast {
 	position: absolute;
 	z-index: $z-index-very-important;
@@ -1326,10 +1330,6 @@ required-items-tooltip {
 
 		.item-instructions {
 			margin: 0 0 10px 0;
-		}
-
-		.invalid-quantity-message {
-			color: $red;
 		}
 	}
 
@@ -1753,12 +1753,17 @@ item-icon-selector {
 }
 
 .item-modal {
-	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	background-color: $color-primary;
+	display: none;
+
+	&.show {
+		display: flex;
+	}
 
 	&.required-item-modal.show {
+		display: flex;
 		position: fixed;
 		height: 63% !important;
 		width: 56%;
@@ -2507,6 +2512,13 @@ node-creation-selection-dialog {
 			// 	}
 			// }
 		}
+	}
+
+	#advanced-question-btn {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+
 	}
 
 	#big-upload-button {
@@ -3639,6 +3651,188 @@ validation-dialog {
 	}
 }
 
+advanced-question-editor {
+	position: absolute;
+	z-index: $z-index-modal;
+	left: 5%;
+	top: 10%;
+
+	width: 90%;
+	max-width: 1280px;
+	max-height: 75%;
+	min-height: 300px;
+	border-radius: 10px;
+	background: $color-primary;
+	box-shadow: 0px 0px 10px #888888;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+
+	> p {
+		padding: 1em;
+
+		color: $gray-darker;
+		font-style: italic;
+
+		&.invalid-quantity-message {
+			padding: 0;
+		}
+
+		&.hidden {
+			padding: 0;
+			display: none;
+		}
+	}
+
+	> ul {
+		padding: 1em;
+		list-style-type: none;
+		margin: 0px;
+		padding: 0px;
+
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		grid-gap: 10px;
+
+		max-height:300px;
+		overflow-y: auto;
+
+		> li {
+			width: 99%;
+			padding: 5px;
+			box-sizing: border-box;
+			border-radius: 5px;
+			display: flex;
+			flex-direction: row;
+			gap: 10px;
+
+			textarea {
+				flex-grow: 1;
+			}
+
+			.question-options {
+				display: flex;
+				flex-direction: row;
+				text-align: center;
+				grid-gap: 10px;
+				color: $gray-darker;
+
+				.required-number-of-visits {
+					display: flex;
+					flex-direction: column;
+					width: 155px;
+					justify-content: center;
+					align-items: center;
+
+					input {
+						height: 2em;
+						width: 75px;
+					}
+				}
+
+				.require-item-btn {
+					// width: 100%;
+					height: 100%;
+					position: relative;
+					display: flex;
+					flex-direction: column-reverse;
+					justify-content: center;
+					align-items: center;
+					grid-gap: 5px;
+					border-color: $white;
+					font-size: 14px;
+					max-width: 115px;
+
+					&#hotspot-require-item-btn {
+						height: auto;
+					}
+
+					div {
+						border-radius: 5px;
+						border: 1px dashed $gray-lighter;
+						position: relative;
+						height: 50px;
+						width: 50px;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+					}
+
+					&.requires-items {
+						div {
+							background-color: $gray-lighter;
+						}
+					}
+
+					.arrow-bottom {
+						position: absolute;
+						top: -12px;
+						left: 30%;
+					}
+
+					.arrow-right {
+						position: absolute;
+						right: -17px;
+						top: 12px;
+
+						border-top: 13px solid transparent;
+						border-left: 10px solid $gray-darker;
+						border-bottom: 13px solid transparent;
+					}
+				}
+			}
+
+			input {
+				padding: 5px 10px;
+
+				border: solid 1px #cccccc;
+				border-radius: 3px;
+			}
+
+			&:hover {
+				background: $color-selection-hover;
+			}
+
+			button.question-node-select, button.add-item {
+				color: $white;
+				height: fit-content;
+			}
+
+			.question-items {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				gap: 10px;
+				box-sizing: border-box;
+
+				background: $gray-lighter;
+				border: solid 1px #cccccc;
+				border-radius: 5px;
+				padding: 10px;
+
+				p {
+					color: $gray;
+					font-size: 0.8em;
+				}
+
+				button:hover {
+					background: $red;
+					color: $white;
+				}
+			}
+		}
+	}
+
+	.end-buttons {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 1em;
+	}
+}
+
 import-type-selection {
 	position: fixed;
 	left: 50%;
@@ -3646,7 +3840,6 @@ import-type-selection {
 	z-index: $z-index-modal;
 
 	width: $misc-popup-width;
-	margin: 5px 0px 0px -300px;
 	border-radius: 10px;
 	background: $color-primary;
 
