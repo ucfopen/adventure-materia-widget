@@ -677,7 +677,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					diff = (text.length - scaleThreshold) / scaleFactor
 					$scope.questionFormat.fontSize -= diff
 
-					if $scope.questionFormat.fontSize < 12 then $scope.questionFormat.fontSize = 12
+					if $scope.questionFormat.fontSize < 14 then $scope.questionFormat.fontSize = 14
 
 				$attrs.$set "style", $scope.formatQuestionStyles()
 ]
@@ -849,7 +849,16 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 			# Focuses on the text after each answer has been given so screen reader users
 			# don't have to go back in the order of the widget
-			$element[0].focus()
+			if newVal != undefined then $element[0].focus()
+]
+
+.directive "tutorialFocusManager", [() ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		# Auto-focus feedback close button when visible
+		$scope.$watch "showTutorial", (newVal, oldVal) ->
+			if newVal then $element[0].focus()
 ]
 
 .directive "feedbackFocusManager", [() ->

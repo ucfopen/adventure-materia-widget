@@ -273,8 +273,10 @@ h1 {
 		}
 
 		img {
-			max-width: 90%;
-			max-height: 90%;
+			width: auto;
+			height: auto;
+			max-width: 350px;
+			max-height:350px;
 			object-fit: cover;
 		}
 	}

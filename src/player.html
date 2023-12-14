@@ -103,7 +103,7 @@
 			ng-class="{ show: showTutorial }"
 			ng-attr-aria-hidden="{{ !showTutorial }}"
 			tabIndex="-1">
-			<div class="tutorial-content" tabindex="-1">
+			<div id="tutorial-content" class="tutorial-content" tabindex="-1">
 				<header>An Adventure Awaits</header>
 				<p>Navigate a series of interactions by responding to the questions or prompts provided.</p>
 				<p>Interactions may include <b>multiple choice</b> responses, selecting a <b>hotspot</b> on an image, or <b>entering text</b>.</p>
@@ -117,9 +117,9 @@
 				value="Let's Go"
 				ng-click="closeTutorial()"
 				ng-attr-tabindex="{{showTutorial}}"
-				aria-label="Return to Widget"
-				aria-live="assertive"
-				feedback-focus-manager>
+				aria-label="Welcome to Adventure. Now playing: {{title}}"
+				aria-describedby="tutorial-content"
+				tutorial-focus-manager>
 		
 		</div>
 		<div class="feedback"
