@@ -623,7 +623,7 @@ angular.module "Adventure"
 				.attr("dx", (d) ->
 					if d.name
 						label = if d.customLabel then d.customLabel else d.name
-						
+
 						if label != "Start" and !d.customLabel then return 16 - (label.length * 3.5)
 						else if label != "Start" then return 16 - (label.length * 3)
 						else return 10
@@ -2223,7 +2223,7 @@ angular.module "Adventure"
 			if item.tempMinCount > -1
 				$scope.invalidQuantity = null
 				if (item.tempMinCount > item.tempMaxCount && !item.uncappedMax)
-					if advanced 
+					if advanced
 						$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
 						$scope.showAdvancedOptions = true
 						if (item.tempMaxCount > -1)
@@ -2239,7 +2239,7 @@ angular.module "Adventure"
 					$scope.invalidMaxQuantity = null
 				else if item.tempMinCount == 0 and !advanced
 					# if setting minimum to 0 in basic options, means player must have none of item
-					item.minCount = 0 
+					item.minCount = 0
 					item.maxCount = 0
 					item.tempMaxCount = 0
 					item.uncappedMax = false

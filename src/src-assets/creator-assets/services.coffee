@@ -22,8 +22,6 @@ angular.module "Adventure"
 
 	customIcons = []
 
-	allNodes = new Map()
-
 	# Self explanatory getter function
 	get = ->
 		treeData
@@ -41,16 +39,6 @@ angular.module "Adventure"
 
 	incrementNodeCount = ->
 		count++
-
-	addNode = (id, node) ->
-		allNodes.set(id, node)
-
-	getNodes = ->
-		return allNodes
-
-	setNodes = (array) ->
-		for node in array
-			addNode(node.nodeId, node)
 
 	getInventoryItems = ->
 		inventoryItems
@@ -186,18 +174,18 @@ angular.module "Adventure"
 
 
 	# Returns all nodes that can be reached from a given node
-	findReachableDestinations = (tree, node, visitedNodes, inventory) ->
+	findUnreachableDestinations = (tree, node, visitedNodes, unvisitedNodes, inventory) ->
 		# If the node has already been visited some number of times, return to parent
 		# This is to prevent infinite loops
 		if visitedNodes.get(node.id) > Math.max(50, node.answerLinks.length)
-			return visitedNodes
+			return unvisitedNodes
 
 		# Increment the number of times the node has been visited
 		visitedNodes.set(node.id, (visitedNodes.get(node.id) || 0) + 1)
 
 		# If the node is an end node, return to parent
 		if node.type is "end"
-			return visitedNodes
+			return unvisitedNodes
 
 		# Add items to inventory
 		if node.items
@@ -215,15 +203,18 @@ angular.module "Adventure"
 		# Search answers
 		if node.answers
 			for answer in node.answers
+				targetNode = findNode(tree, answer.target)
 				if checkInventory(answer.requiredItems, inventory).length > 0
-					# If the player doesn't have the required items, move onto the next answer
-					continue
+					# If the player doesn't have the required items, add it to unvisitedNodes
+					unvisitedNodes.set(targetNode.id, targetNode)
 				else
-					# Find the target node
-					targetNode = findNode(tree, answer.target)
-					visitedNodes = new Map([...visitedNodes, ...findReachableDestinations(tree, targetNode, visitedNodes, inventory)])
+					# If the player has the required items, add it to visitedNodes
+					if (unvisitedNodes.get(targetNode.id))
+						unvisitedNodes.remove(targetNode.id)
+					visitedNodes.set(targetNode.id, (visitedNodes.get(targetNode.id) || 0) + 1)
+					unvisitedNodes = new Map([...unvisitedNodes, ...findUnreachableDestinations(tree, targetNode, visitedNodes, unvisitedNodes, inventory)])
 
-		return visitedNodes
+		return unvisitedNodes
 
 
 	# Recursive function for adding a node in between a given parent and child, essentially splitting an existing link
@@ -992,19 +983,20 @@ angular.module "Adventure"
 	# Helper function that converts node IDs to their respective alphabetical counterparts
 	# e.g., 1 is "A", 2 is "B", 26 is "Z", 27 is "AA", 28 is "AB"
 	integerToLetters = (val) ->
+		copyVal = val
 
-		if val is 0 then return "Start"
+		if copyVal is 0 then return "Start"
 
 		iteration = 0
 		prefix = ""
 
-		while val > 26
+		while copyVal > 26
 			iteration++
-			val -= 26
+			copyVal -= 26
 
 		if iteration > 0 then prefix = String.fromCharCode 64 + iteration
 
-		chars = prefix + String.fromCharCode 64 + val
+		chars = prefix + String.fromCharCode 64 + copyVal
 
 		chars
 
@@ -1047,10 +1039,7 @@ angular.module "Adventure"
 	validateTreeOnSave : validateTreeOnSave
 	integerToLetters : integerToLetters
 	generateAnswerHash : generateAnswerHash
-	findReachableDestinations : findReachableDestinations
-	getNodes : getNodes
-	setNodes : setNodes
-	addNode : addNode
+	findUnreachableDestinations : findUnreachableDestinations
 ]
 
 # The service in charge of managing Action History, replacing the clunky "deleteAndRestoreSrv" service
