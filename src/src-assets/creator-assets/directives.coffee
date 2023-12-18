@@ -227,8 +227,8 @@ angular.module "Adventure"
 								requiredItems: answer.requiredItems
 								answerText: answer.text
 								hideAnswer: answer.hideAnswer
-								x: link.source.x + (link.target.x - link.source.x) * 0.25 # note that these values aren't actually used, but keeping them here for posterity
-								y: link.source.y + (link.target.y - link.source.y) * 0.25 # lock x and y values are only used for specialCase links and updated below
+								x: link.source.x
+								y: link.source.y + (link.target.y - link.source.y)/2
 								id: link.target.id
 								type: "lock"
 								sourceType: link.source.type
@@ -418,7 +418,7 @@ angular.module "Adventure"
 				.attr("class","loopback")
 				.attr("r", (d) ->
 					# Increase the radius by a certain amount if there are multiple loopbacks
-					if d.radiusOffset then 50 + d.radiusOffset * 5
+					if d.radiusOffset then 50 + d.radiusOffset * 7
 					else return 50
 				)
 				.attr("transform", (d) ->
@@ -428,10 +428,14 @@ angular.module "Adventure"
 
 					# Increase the offset based on the increased radius of the circle for multiple loopbacks
 					if d.radiusOffset
-						xOffset += d.radiusOffset * 3
-						yOffset += d.radiusOffset * 3
+						xOffset += d.radiusOffset * 5
+						yOffset += d.radiusOffset * 5
 
-					"translate(#{xOffset},#{yOffset})"
+					if d.lock and d.specialCase == "loopBack"
+						d.lock.x = xOffset + 34 + d.radiusOffset * 7
+						d.lock.y = yOffset + 34 + d.radiusOffset * 7
+
+					return "translate(#{xOffset},#{yOffset})"
 				)
 				.style("display", (d) ->
 					if d.specialCase == "loopBack" then return null
