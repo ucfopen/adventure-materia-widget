@@ -3,7 +3,7 @@
   "materia": {
     "cleanName": "adventure"
   },
-  "version": "2.3.1",
+  "version": "2.4.0",
   "dependencies": {
     "materia-widget-development-kit": "^3.0.1",
     "micromarkdown": "^0.3.0"
