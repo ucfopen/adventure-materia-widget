@@ -155,66 +155,86 @@ angular.module "Adventure"
 		if (! requiredItems)
 			return []
 		angular.forEach requiredItems, (item) ->
-			hasItemInInventory = false
-			playerItem = inventory.get(item.id)
-			if playerItem
-				hasItemInInventory = true
+			meetsMin = false
+			meetsMax = false
+			playerItemCount = inventory.get(item.id)
+			if playerItemCount
 				# Check if player has more than the min
-				if playerItem.count >= item.minCount
+				if playerItemCount >= item.minCount || item.minCount is 0
+					meetsMin = true
 					# Check if player has less than the max
-					if playerItem.count <= item.maxCount or item.uncappedMax
-						return true
-				return false
-			# Check if player doesn't have item but there is no minimum
-			if ! hasItemInInventory and item.minCount is 0
-				hasRequiredItem = true
-			if ! hasRequiredItem
+					if playerItemCount <= item.maxCount or item.uncappedMax
+						meetsMax = true
+			if !meetsMin or !meetsMax
 				missingItems.push(item.id)
 		return missingItems
 
+	# Returns all nodes that can be reached from a given node using breadth-first search
+	findUnreachableDestinations = (tree, startNode) ->
+		visitedNodes = new Map()
+		unvisitedNodes = new Map()
+		node = {
+			...startNode,
+			parent: "Start", # parent node's name
+			inventory: new Map(), # inventory up to this node
+			visitedNodes: new Map() # chain of nodes visited to get to this node
+		}
+		queue = [node]
 
-	# Returns all nodes that can be reached from a given node
-	findUnreachableDestinations = (tree, node, visitedNodes, unvisitedNodes, inventory) ->
-		# If the node has already been visited some number of times, return to parent
-		# This is to prevent infinite loops
-		if visitedNodes.get(node.id) > Math.max(50, node.answerLinks.length)
-			return unvisitedNodes
+		while queue.length > 0
+			node = queue.shift()
 
-		# Increment the number of times the node has been visited
-		visitedNodes.set(node.id, (visitedNodes.get(node.id) || 0) + 1)
+			# If the node has already been visited some number of times, skip it
+			if visitedNodes.get(node.id) && visitedNodes.get(node.id) > Math.max(50, node.answerLinks.length)
+				continue
 
-		# If the node is an end node, return to parent
-		if node.type is "end"
-			return unvisitedNodes
+			# If the node is an end node, skip it
+			if node.type is "end"
+				continue
 
-		# Add items to inventory
-		if node.items
-			for item in node.items
-				# Check if item is first visit only and player has visited this node before
-				if (visitedNodes.get(node.id) >= 1 and item.firstVisitOnly)
-					# Move to next item
-					continue
-				else
-					if item.takeAll
-						inventory.set(item.id, 0)
+			# Increment the number of times the node has been visited
+			visitedNodes.set(node.id, (visitedNodes.get(node.id) or 0) + 1)
+
+
+			# Add items to inventory
+			if node.items
+				for item in node.items
+					# Check if item is first visit only and player has visited this node before
+					if (node.visitedNodes.get(node.id) >= 1 and item.firstVisitOnly)
+						# Move to next item
+						continue
 					else
-						inventory.set(item.id, (inventory.get(item.id) || 0) + item.count)
+						if item.takeAll
+							node.inventory.set(item.id, 0)
+						else
+							node.inventory.set(item.id, (node.inventory.get(item.id) || 0) + item.count)
 
-		# Search answers
-		if node.answers
-			for answer in node.answers
-				targetNode = findNode(tree, answer.target)
-				if checkInventory(answer.requiredItems, inventory).length > 0
-					# If the player doesn't have the required items, add it to unvisitedNodes
-					unvisitedNodes.set(targetNode.id, targetNode)
-				else
-					# If the player has the required items, add it to visitedNodes
-					if (unvisitedNodes.get(targetNode.id))
-						unvisitedNodes.remove(targetNode.id)
-					visitedNodes.set(targetNode.id, (visitedNodes.get(targetNode.id) || 0) + 1)
-					unvisitedNodes = new Map([...unvisitedNodes, ...findUnreachableDestinations(tree, targetNode, visitedNodes, unvisitedNodes, inventory)])
+			node.visitedNodes.set(node.id, (node.visitedNodes.get(node.id) || 0) + 1)
 
-		return unvisitedNodes
+			if node.answers
+				for answer in node.answers
+					targetNode = findNode(tree, answer.target)
+
+					if checkInventory(answer.requiredItems, node.inventory).length > 0 && visitedNodes.get(targetNode.id) is undefined
+						# if the player doesn't have the required items and this node hasn't been visited on a different path, add it to unvisitedNodes
+						unvisitedNodes.set(targetNode.id, targetNode)
+					else
+						# if the player has the required items, add it to visitedNodes
+						if (unvisitedNodes.get(targetNode.id)) then unvisitedNodes.delete(targetNode.id)
+
+						# increment the number of times the node has been visited
+						visitedNodes.set(targetNode.id, (visitedNodes.get(targetNode.id) || 0) + 1)
+
+						# add the node to the queue with new inventory and visited node stores
+						addInventory = {
+							...targetNode,
+							parent: node.name,
+							inventory: new Map(node.inventory),
+							visitedNodes: new Map(node.visitedNodes)
+						}
+						queue.push(addInventory)
+
+		unvisitedNodes
 
 
 	# Recursive function for adding a node in between a given parent and child, essentially splitting an existing link

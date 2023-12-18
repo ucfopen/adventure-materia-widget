@@ -299,30 +299,29 @@ angular.module "Adventure"
 			validation = treeSrv.validateTreeOnSave $scope.treeData
 
 			# Check if there are any unreachable destinations if the inventory system is enabled
-			# if ($scope.inventoryItems.length > 0)
-			# 	visitedNodes = new Map()
-			# 	unvisitedNodes = new Map()
-			# 	inventory = new Map()
-			# 	unreachableDestinations = treeSrv.findUnreachableDestinations $scope.treeData, $scope.treeData, visitedNodes, unvisitedNodes, inventory
+			if ($scope.inventoryItems.length > 0)
+				visitedNodes = new Map()
+				unvisitedNodes = new Map()
+				inventory = new Map()
+				unreachableDestinations = treeSrv.findUnreachableDestinations $scope.treeData, $scope.treeData, visitedNodes, unvisitedNodes, inventory
+				if (unreachableDestinations.size > 0)
+					# Get all nodes that are not in reachableDestinations
+					# create error at each node that is not in reachableDestinations
+					$scope.validation.errors = []
+					unreachableDestinations = Array.from(unreachableDestinations.values())
 
-			# 	if (unreachableDestinations.size > 0)
-			# 		# Get all nodes that are not in reachableDestinations
-			# 		# create error at each node that is not in reachableDestinations
-			# 		$scope.validation.errors = []
-			# 		unreachableDestinations = Array.from(unreachableDestinations.values())
-
-			# 		for node in unreachableDestinations
-			# 			nodeId = if node.options then node.options.id or node.id else node.id
-			# 			if (node.parentId == -1)
-			# 				# start node id is 0
-			# 				nodeId = 0
-			# 			$scope.validation.errors.push({
-			# 				type: "unreachable_destination",
-			# 				node: nodeId,
-			# 				message: "Destination " + treeSrv.integerToLetters(nodeId) + " is unreachable!"
-			# 			})
-			# 			$rootScope.$broadcast "validation.error"
-			# 		return Materia.CreatorCore.cancelSave ''
+					for node in unreachableDestinations
+						nodeId = if node.options then node.options.id or node.id else node.id
+						if (node.parentId == -1)
+							# start node id is 0
+							nodeId = 0
+						$scope.validation.errors.push({
+							type: "unreachable_destination",
+							node: nodeId,
+							message: "Destination " + treeSrv.integerToLetters(nodeId) + " is unreachable!"
+						})
+						$rootScope.$broadcast "validation.error"
+					return Materia.CreatorCore.cancelSave ''
 
 		else validation = []
 
