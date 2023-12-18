@@ -865,7 +865,7 @@ angular.module "Adventure"
 					text: question.text
 					id: generateAnswerHash()
 					requiredItems: requiredItemsData
-					requiredVisits: if question.options then question.options.requiredVisits else -1
+					requiredVisits: if question.options then question.options.requiredVisits else 0
 
 				node.questions.push nodeQuestion
 			if item.options.customLabel then node.customLabel = item.options.customLabel

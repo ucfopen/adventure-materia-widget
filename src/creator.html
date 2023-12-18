@@ -569,9 +569,6 @@
 									'tiny' : displayNodeCreation == HOTSPOT}"
 								ng-model="editedNode.questions[0].text"
 								placeholder="{{questionPlaceholder}}"></textarea>
-								<button ng-click="toggleQuestionsEditor()" id="advanced-question-btn">
-									Advanced Question Editor
-								</button>
 							</div>
 							<div class="media-box"
 								ng-show="mediaReady && displayNodeCreation != HOTSPOT">
@@ -1559,6 +1556,10 @@
 								</button> -->
 							</div>
 						</div>
+
+						<button ng-click="toggleQuestionsEditor()" id="advanced-question-btn">
+							Advanced Question Editor
+						</button>
 						<button type="button"
 							class="item-button"
 							ng-click="toggleNodeItemsModal()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>{{nodeItems[0] ? 'Edit Items' : 'Add Items'}}</span><img src="assets/creator-assets/BackPackIconMono2.png"/>

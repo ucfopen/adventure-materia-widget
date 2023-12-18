@@ -2657,10 +2657,7 @@ node-creation-selection-dialog {
 	}
 
 	#advanced-question-btn {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-
+		margin-right: 20px;
 	}
 
 	#big-upload-button {
@@ -3301,7 +3298,7 @@ node-creation-selection-dialog {
 
 				img {
 					position: relative;
-	
+
 					z-index: $z-index-modal + 1;
 					max-width: 100%;
 					height: 400px;

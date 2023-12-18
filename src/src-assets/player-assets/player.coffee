@@ -207,9 +207,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					continue
 				else if (mostItems < q.options.requiredItems.length)
 					mostItems = q.options.requiredItems.length
-				else
-					continue
-			if q.options.requiredVisits != null
+			if q.options.requiredVisits
 				if $scope.visitedNodes[q_data.id] < q.options.requiredVisits
 					continue
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
