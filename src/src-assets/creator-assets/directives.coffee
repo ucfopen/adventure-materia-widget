@@ -1,6 +1,5 @@
-Adventure = angular.module "Adventure"
-
-Adventure.directive "toast", ['$timeout', ($timeout) ->
+angular.module "Adventure"
+.directive "toast", ['$timeout', ($timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -26,7 +25,7 @@ Adventure.directive "toast", ['$timeout', ($timeout) ->
 			$scope.toastMessage = ""
 ]
 
-Adventure.directive "modeManagerOverlay", [() ->
+.directive "modeManagerOverlay", [() ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -48,7 +47,7 @@ Adventure.directive "modeManagerOverlay", [() ->
 			$scope.modeManagerAction = null
 ]
 
-Adventure.directive "enterSubmit", ['$compile', ($compile) ->
+.directive "enterSubmit", ['$compile', ($compile) ->
 	($scope, $element, $attrs) ->
 		$element.bind "keydown keypress", (event) ->
 			if event.which is 13
@@ -58,7 +57,7 @@ Adventure.directive "enterSubmit", ['$compile', ($compile) ->
 				event.preventDefault()
 ]
 
-Adventure.directive "autoSelect", [() ->
+.directive "autoSelect", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 		$element.on "click", () ->
@@ -68,7 +67,7 @@ Adventure.directive "autoSelect", [() ->
 # The true monster directive; handles the actual tree display for the widget
 # Give up all hope, ye who enter here
 # (Seriously, sorry in advance, D3 is a clusterf*ck)
-Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$rootScope', (treeSrv, $window, $compile, $rootScope) ->
+.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$rootScope', '$timeout', (treeSrv, $window, $compile, $rootScope, $timeout) ->
 	restrict: "E",
 	scope: {
 		data: "=", # binds treeData in a way that's accessible to the directive
@@ -83,6 +82,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 		$scope.svg = null
 		$scope.copyMode = false
 		$scope.existingLinkMode = false
+		$scope.previewNodeMode = false
 
 		$scope.windowWidth = document.getElementById("adventure-container").offsetWidth - 15
 		$scope.windowHeight = document.getElementById("adventure-container").offsetHeight
@@ -107,6 +107,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 		$scope.$on "mode.existingLink.complete", (evt) ->
 			$scope.existingLinkMode = false
+			$scope.render treeSrv.get()
+
+		$scope.$on "mode.previewNodeSelectionMode", (evt) ->
+			$scope.previewNodeMode = true
+			$scope.render treeSrv.get()
+
+		$scope.$on "mode.previewNodeSelectionMode.complete", (evt) ->
+			$scope.previewNodeMode = false
 			$scope.render treeSrv.get()
 
 		$scope.render = (data) ->
@@ -211,13 +219,26 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 							links.push newLink
 
+				# Adding required items to links
+				angular.forEach links, (link, linkIndex) ->
+					angular.forEach node.answers, (answer, answerIndex) ->
+						if answer.target is link.target.id and node.id is link.source.id
+							link.lock =
+								requiredItems: answer.requiredItems
+								answerText: answer.text
+								hideAnswer: answer.hideAnswer
+								x: link.source.x
+								y: link.source.y + (link.target.y - link.source.y)/2
+								id: link.target.id
+								type: "lock"
+								sourceType: link.source.type
 
 			# We need to effectively "filter" each link and create the intermediate nodes
 			# The properties of the link and intermediate "bridge" nodes depends on what kind of link we have
 			angular.forEach links, (link, index) ->
 
 				# Don't create bridge nodes if copyMode or existingLinkMode are enabled
-				if $scope.copyMode or $scope.existingLinkMode then return
+				if $scope.copyMode or $scope.existingLinkMode or $scope.previewNodeMode then return
 
 				source = link.source
 				target = link.target
@@ -361,7 +382,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					)
 
 					# don't attempt the following calculations if in copyMode or existingLinkMode! These nodes will not exist
-					if $scope.copyMode or $scope.existingLinkMode then return
+					if $scope.copyMode or $scope.existingLinkMode or $scope.previewNodeMode then return
 
 					# Do some fancy math to find the midpoint of the curve once it's been computed
 					# This must happen AFTER the path is generated for the link
@@ -369,6 +390,11 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
 					midX = midpoint.x
 					midY = midpoint.y
+					
+					# compute the position of the lock icon along the path
+					quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
+					links[index].lock.x = quarterpoint.x
+					links[index].lock.y = quarterpoint.y
 
 					# Now find the associated bridge node using the bridgeNodeIndex flag on the given link
 					# And update its X,Y coordinates for the new midpoint location
@@ -385,16 +411,14 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						return "M" + offsetX + "," + offsetY + "L" + d.target.x + "," + d.target.y
 					)
 
-
 				# If it's just a standard link, this part is easy
 				else path.attr("d", lineData)
-
 
 			linkGroup.append("svg:circle")
 				.attr("class","loopback")
 				.attr("r", (d) ->
 					# Increase the radius by a certain amount if there are multiple loopbacks
-					if d.radiusOffset then 50 + d.radiusOffset * 5
+					if d.radiusOffset then 50 + d.radiusOffset * 7
 					else return 50
 				)
 				.attr("transform", (d) ->
@@ -404,14 +428,88 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 					# Increase the offset based on the increased radius of the circle for multiple loopbacks
 					if d.radiusOffset
-						xOffset += d.radiusOffset * 3
-						yOffset += d.radiusOffset * 3
+						xOffset += d.radiusOffset * 5
+						yOffset += d.radiusOffset * 5
 
-					"translate(#{xOffset},#{yOffset})"
+					if d.lock and d.specialCase == "loopBack"
+						d.lock.x = xOffset + 34 + d.radiusOffset * 7
+						d.lock.y = yOffset + 34 + d.radiusOffset * 7
+
+					return "translate(#{xOffset},#{yOffset})"
 				)
 				.style("display", (d) ->
 					if d.specialCase == "loopBack" then return null
 					else return "none"
+				)
+
+			# Node circle that displays the number of required items to select associated answer
+			# Positioned 1/4 of the way down the arrow
+			requiredItemsCircles = linkGroup.append("svg:circle")
+				.attr("class", (d) ->
+					if (d.lock)
+						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and (d.lock.requiredItems and d.lock.requiredItems[0]))
+							return "link-req-items show"
+					return "link-req-items hide"
+				)
+				.attr("r", "10")
+				.attr("cx", (d) ->
+					# if the lock icon is to be displayed and it's a special link, use the previously computed x value
+					# these don't appear to be accurate for standard links - so use the previous computation method instead
+					if d.lock and d.specialCase then return d.lock.x
+					else return (d.source.x + (d.source.x + d.target.x) / 2) / 2
+				)
+				.attr("cy", (d) ->
+					# if the lock icon is to be displayed and it's a special link, use the previously computed y value
+					# these don't appear to be accurate for standard links - so use the previous computation method instead
+					if d.lock and d.specialCase then return d.lock.y
+					else return (d.source.y + (d.source.y + d.target.y) / 2) / 2
+				)
+				.on("mouseover", (d, i) ->
+					$scope.onHover {data: d.lock}
+
+					d3.select(this)
+					.transition()
+					.attr("r", 20)
+				)
+				.on("mouseout", (d, i) ->
+					$scope.onHoverOut {data: d.lock}
+
+					d3.select(this)
+					.transition()
+					.attr("r", 10)
+				)
+
+			lockIcon = linkGroup.append("svg:image")
+				.attr("class", (d) ->
+					if (d.lock)
+						if ((d.lock.sourceType is "mc" or d.lock.sourceType is "shortanswer" or d.lock.sourceType is "hotspot") and (d.lock.requiredItems and d.lock.requiredItems[0]))
+							return "link-req-items show"
+					return "link-req-items hide"
+				)
+				.attr("xlink:href", "assets/creator-assets/lock.svg")
+				.attr("x", (d) ->
+					if d.lock and d.specialCase then return d.lock.x - 4
+					else return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 4
+				)
+				.attr("y", (d) ->
+					if d.lock and d.specialCase then return d.lock.y - 8
+					else return (d.source.y + (d.source.y + d.target.y) / 2) / 2 - 8
+				)
+				.attr("width", 13)
+				.attr("height", 13)
+				.on("mouseover", (d, i) ->
+					$scope.onHover {data: d.lock}
+
+					d3.select(this.parentNode).select(".link-req-items")
+					.transition()
+					.attr("r", 20)
+				)
+				.on("mouseout", (d, i) ->
+					$scope.onHoverOut {data: d.lock}
+
+					d3.select(this.parentNode).select(".link-req-items")
+					.transition()
+					.attr("r", 10)
 				)
 
 			nodeGroup = $scope.svg.selectAll("g.node")
@@ -425,6 +523,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 						return "node focused #{d.type}"
 					else if $scope.copyMode and d.type is "blank" then return "node copyMode #{d.type}"
 					else if $scope.existingLinkMode and d.ineligibleTarget then return "node ineligible #{d.type}"
+					else if d.type is "lock" then return "lock"
 					else return "node #{d.type}"
 				)
 				.on("mouseover", (d, i) ->
@@ -450,6 +549,34 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				.on("click", (d, i) ->
 					$scope.nodeClick {data: d} # when clicked, we return all of the node's data
 					d3.event.stopPropagation()
+				)
+				.on("dragover", (d, i) ->
+
+					#  Animation effects on node mouseover
+					d3.select(this).select("circle")
+					.transition()
+					.attr("r", 30)
+
+					$rootScope.nodeDrop =
+						data: d
+						screenX: d3.event.screenX
+						screenY: d3.event.screenY
+
+				)
+				.on("dragleave", (d, i) ->
+					#d3.event.preventDefault()
+					# Animation effects on node mouseout
+					d3.select(this).select("circle")
+					.transition()
+					.attr("r", 20)
+
+					# Absolutely horrendous but since
+					# dragleave triggers immediately after mouseup
+					# we must wait for ondragend to trigger on the item
+					# before we set drop target to null
+					$timeout(() ->
+						$rootScope.nodeDrop = null
+					, 2000)
 				)
 				.attr("transform", (d) ->
 					"translate(#{d.x},#{d.y})"
@@ -484,19 +611,21 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				.attr("width", (d) ->
 					unless d.name then return 0
 
-					# Couldn't find a better solution to the rect width than this
-					# In the future, someone is welcome to clean this up
-					# If someone is getting to node labels with more than 3-4 characters, odds are the've got some other problems too
-					if d.name.length > 1 and d.name.length < 5 then return d.name.length * 12
-					else if d.name.length >= 5 then return d.name.length * 8
+					label = if d.customLabel then d.customLabel else d.name
+
+					if !d.customLabel and d.name is "Start" then return 36
+					else if !d.customLabel and label.length > 1 then return label.length * 14
+					else if d.customLabel then return label.length * (9 - (label.length * 0.05))
 					else return 20
 				)
 				.attr("height", 19)
 				.attr("x", (d) ->
 					unless d.name then return 0
+					label = if d.customLabel then d.customLabel else d.name
 
-					if d.name.length > 1 then return 8
-					else return 11
+					if label != "Start" and !d.customLabel then return 11 - (label.length * 3.5)
+					else if label != "Start" then return 11 - (label.length * 3)
+					else return 8
 				)
 				.attr("y", 0)
 				.attr("rx", 3)
@@ -510,16 +639,71 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				)
 				.attr("dx", (d) ->
 					if d.name
-						if d.name.length > 1 then return 10 # -10
-						else return 15 # -5
+						label = if d.customLabel then d.customLabel else d.name
+
+						if label != "Start" and !d.customLabel then return 16 - (label.length * 3.5)
+						else if label != "Start" then return 16 - (label.length * 3)
+						else return 10
 					else return 0
 				)
 
 				.attr("dy", 15) # sets Y label offset from node
-				.attr("font-family", "Lato")
-				.attr("font-size", 14)
+				.attr("font-family", (d) ->
+					if d.customLabel then return "Roboto Mono"
+					else return "Lato"
+				)
+				.attr("font-size", (d) ->
+					if d.customLabel then return 12
+					else return 14
+				)
 				.text (d) ->
-					d.name
+					if d.customLabel then d.customLabel else d.name
+
+			# Positions for item icons around each node
+			dataPos = [[34, -20], [20, -34], [0, -40], [-20, -34], [-34, -20], [-40, 0], [-34, 20]]
+
+			# Removed the last item pos [-20, 34]: too cramped
+
+			# Display icons for each item that a node gives around each node
+			# Points were calculated using a circle of radius 30
+			nodeGroup.each((e) ->
+				g = d3.select(this)
+				numLeftoverItems = 0
+				numUsedItems = 0
+				inventoryItems = treeSrv.getInventoryItems()
+				if e.items
+					index = 0
+					for item, i in e.items
+						if index < dataPos.length - 1
+							if inventoryItems[treeSrv.getItemIndex(item.id)].icon && inventoryItems[treeSrv.getItemIndex(item.id)].icon.url
+								g.append("svg:image")
+									.attr("xlink:href", inventoryItems[treeSrv.getItemIndex(item.id)].icon.url
+									)
+									.attr("x", -10 + dataPos[index][0])
+									.attr("y", -10 + dataPos[index][1])
+									.attr("width", "20px")
+									.attr("height", "20px")
+									.attr("style", "clip-path: circle()")
+								g.append("circle")
+									.attr("cx", dataPos[index][0])
+									.attr("cy", dataPos[index][1])
+									.attr("r", "10")
+									.attr("stroke", if item.count > 0 then "green" else "red")
+									.attr("stroke-width", "1")
+									.attr("fill", "none")
+									.attr("style", "opacity: 0.2")
+								numUsedItems++
+								index++
+							else
+								numLeftoverItems++
+					# numLeftoverItems += e.items.length - index
+					if numLeftoverItems > 0
+						g.append("text")
+							.attr("class", "leftover-items")
+							.text("+#{numLeftoverItems}")
+							.attr("x", -5 + dataPos[numUsedItems][0])
+							.attr("y", dataPos[numUsedItems][1])
+			)
 
 			# The small warning graphic applied to nodes with validation problems
 			warningSymbol = nodeGroup.append("svg:g")
@@ -550,7 +734,8 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 				)
 
 			$scope.copyMode = false
-			$rootScope.$broadcast "tree.nodes.changed.complete" # inform the tree-transform directive that the tree has been re-rendered
+			$timeout ->
+				$rootScope.$broadcast "tree.nodes.changed.complete" # inform the tree-transform directive that the tree has been re-rendered
 
 		# Handle resizing of the browser window
 		window = angular.element($window)
@@ -565,7 +750,7 @@ Adventure.directive "treeVisualization", ['treeSrv', '$window', '$compile', '$ro
 
 # Directive that handles all zoom & panning transforms of the tree visualization
 # This directive is dynamically applied to the tree-svg element when it's generated by D3 and linked via the $compile function
-Adventure.directive "treeTransforms", ['treeSrv', (treeSrv) ->
+.directive "treeTransforms", ['treeSrv', (treeSrv) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -702,7 +887,7 @@ Adventure.directive "treeTransforms", ['treeSrv', (treeSrv) ->
 ]
 
 
-Adventure.directive "zoomButtons", ['$rootScope', ($rootScope) ->
+.directive "zoomButtons", ['$rootScope', ($rootScope) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -725,7 +910,7 @@ Adventure.directive "zoomButtons", ['$rootScope', ($rootScope) ->
 ]
 
 # Self explanatory directive for editing the title
-Adventure.directive "titleEditor", [() ->
+.directive "titleEditor", [() ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -734,8 +919,129 @@ Adventure.directive "titleEditor", [() ->
 				$scope.showBackgroundCover = true
 ]
 
+.directive "customNodeLabelEditor", [() ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "showCustomNodeLabelEditor", (newVal, oldVal) ->
+			if newVal
+				$scope.showBackgroundCover = true
+]
+
+# Directive for editing items
+.directive "itemManager", ['treeSrv', 'treeHistorySrv', (treeSrv, treeHistorySrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		# Watch for new or removed items from inventoryItems
+		$scope.$watch "inventoryItems.length", (newVal, oldVal) ->
+			if newVal
+				treeSrv.setInventoryItems($scope.inventoryItems)
+				$scope.editItemButtonDialog =
+					"Edit items (#{$scope.inventoryItems.length})"
+
+		$scope.newItemName = ''
+		$scope.currentItem = {}
+
+		$scope.openItemManager = () ->
+			$scope.showItemManager = true
+			document.getElementById("item-manager").removeAttribute("inert")
+			$scope.showInventoryBackgroundCover = true
+			# Collapse any open item editors
+			$scope.editingIndex = -1
+			$scope.showSilentOption = false
+
+		$scope.addNewItem = () ->
+			if $scope.newItemName.trim() != ''
+				newItem =
+					name: $scope.newItemName.trim()
+					id: treeSrv.generateItemID()
+					description: ''
+					count: 1
+					icon: {}
+					isSilent: false
+				$scope.inventoryItems.push(newItem)
+
+				$scope.newItemName = ''
+				# Collapse any open item editors
+				$scope.editingIndex = -1
+
+		$scope.removeItemFromInventoryItems = (index, item) ->
+			if item in $scope.inventoryItems
+				$scope.inventoryItems.splice index, 1
+				treeSrv.deleteItemReferencesFromAllNodes $scope.treeData, item
+
+				# Collapse any open item editors
+				$scope.editingIndex = -1
+
+		$scope.handleEditItem = (item, index, event = null) ->
+			if event then event.stopPropagation()
+			if ! ($scope.editingIndex is index)
+				# Open item editor for this item
+				$scope.editingIndex = index
+				$scope.currentItem = item
+			else
+				treeSrv.setInventoryItems($scope.inventoryItems)
+				$scope.toast "Item '#{$scope.inventoryItems[$scope.editingIndex].name}' saved!"
+				$scope.editingIndex = -1
+
+		$scope.toggleItemIconSelector = (editingItemIcon = null, index = null) ->
+			# If closing icon selector for the item user is currently editing
+			if $scope.editingItemIcon is editingItemIcon and $scope.showItemIconSelector
+				$scope.showItemIconSelector = false
+				$scope.editingItemIcon = null
+			# If opening icon selector
+			else
+				$scope.editingItemIcon = editingItemIcon
+				$scope.showItemIconSelector = true
+				# Make sure Item Editor is open too
+				$scope.editingIndex = index
+
+
+		$scope.handleIconClick = (icon) ->
+			if $scope.inventoryItems[$scope.editingIndex].icon is icon
+				# Deselect icon
+				$scope.inventoryItems[$scope.editingIndex].icon = null
+			else
+				# Select icon
+				$scope.inventoryItems[$scope.editingIndex].icon = icon
+				$scope.showItemIconSelector = false
+
+			treeSrv.set $scope.treeData
+
+		$scope.uploadIcon = () ->
+			$scope.editingIcons = true
+			Materia.CreatorCore.showMediaImporter()
+
+		$scope.removeSelectedIcon = () ->
+			# Remove icon from icon list
+			$scope.icons.splice $scope.icons.map((i) -> i.id).indexOf($scope.currentItem.icon.id), 1
+
+			# Remove icon from current item
+			$scope.inventoryItems[$scope.editingIndex].icon = null
+
+			treeSrv.set $scope.treeData
+
+		$scope.saveAndCloseInventory = () ->
+			inventory = treeSrv.getInventoryItems()
+			if inventory
+				historyActions = treeHistorySrv.getActions()
+				lastIndex = treeHistorySrv.getHistorySize() - 1
+				# Check if changes were made
+				peek = treeHistorySrv.retrieveSnapshot(lastIndex)
+				if !treeHistorySrv.compareTrees(peek.tree, $scope.treeData)
+					treeHistorySrv.addToHistory $scope.treeData, historyActions.INVENTORY_EDITED, "Inventory Items Edited"
+
+					treeSrv.set $scope.treeData
+
+					$scope.toast "Items saved!"
+
+			$scope.hideCoverAndModals()
+
+]
+
 # Directive for the small tooltips displaying the answers associated with a given node on mouseover
-Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
+.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 		$scope.$watch "hoveredNode.target", (newVal, oldVal) ->
@@ -752,14 +1058,54 @@ Adventure.directive "nodeTooltips", ['treeSrv', (treeSrv) ->
 				$scope.hoveredNode.tooltips = []
 
 				angular.forEach node.answerLinks, (answer, index) ->
-					$scope.hoveredNode.tooltips.push answer
+					tooltip = {
+						...answer
+					}
+					$scope.hoveredNode.tooltips.push tooltip
+
+				removedItems = []
+				givesItems = []
+
+				if node.items?.length > 0
+					for item in node.items
+						if item.count > 0
+							givesItems.push item
+						else if item.count < 0
+							itemNegated = {
+								...item
+								count: Math.abs(item.count)
+							}
+							removedItems.push itemNegated
+
+					tooltip = {
+						...tooltip
+						givesItems: givesItems,
+						removedItems: removedItems
+					}
+					$scope.hoveredNode.tooltips.push tooltip
 
 				$scope.hoveredNode.showTooltips = true
 ]
 
+# Directive for the small tooltips displaying the answers associated with a given node on mouseover
+.directive "requiredItemsTooltip", ['treeSrv', (treeSrv) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+		$scope.$watch "hoveredLock.target", (newVal, oldVal) ->
+			if newVal isnt null
+
+				# Update the position of the tooltip container
+				xOffset = ($scope.hoveredLock.x * $scope.treeOffset.scale) + $scope.treeOffset.x + $scope.treeOffset.scaleXOffset + (35 * $scope.treeOffset.scale)
+				yOffset = ($scope.hoveredLock.y * $scope.treeOffset.scale) + ($scope.treeOffset.y - 5) + $scope.treeOffset.scaleYOffset
+				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
+				$attrs.$set "style", styles
+
+				$scope.hoveredLock.showItems = true
+]
+
 # Directive in charge of managing the Action History, in conjunction with the treeHistorySrv service
 # for more information see the comment for treeHistorySrv in services
-Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (treeSrv, treeHistorySrv, $rootScope) ->
+.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (treeSrv, treeHistorySrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -774,7 +1120,6 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 		# if the history "cursor" is not at the top of the stack (they've clicked undo or have selected an earlier action),
 		# and a new action is performed, all actions between the cursor and the top of the stack are discarded
 		$scope.$on "tree.history.added", (evt) ->
-
 			# Have to get initial size of history stack
 			$scope.historySize = treeHistorySrv.getHistorySize()
 
@@ -806,20 +1151,21 @@ Adventure.directive "treeHistory", ['treeSrv','treeHistorySrv', '$rootScope', (t
 			$scope.rollBackToSnapshot $scope.historyPosition
 
 		$scope.rollBackToSnapshot = (index) ->
-			if $scope.existingNodeSelectionMode or $scope.copyNodeMode then return false
-
+			if $scope.existingNodeSelectionMode or $scope.copyNodeMode or $scope.previewNodeSelectionMode then return false
 			snapshot = treeHistorySrv.retrieveSnapshot index
 			tree = treeSrv.createTreeDataFromQset JSON.parse snapshot.tree
+			inventoryItems = (JSON.parse snapshot.tree).options.inventoryItems
 			$scope.treeData = tree
+			$scope.inventoryItems = inventoryItems
 			treeSrv.set tree
-			treeSrv.setNodeCount snapshot.nodeCount
+			treeSrv.setInventoryItems inventoryItems
 
 			$scope.historyPosition = index
 ]
 
 
 # Directive for the node modal dialog (edit the node, copy the node, reset the node, etc)
-Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope', '$timeout', (treeSrv, treeHistorySrv, $rootScope, $timeout) ->
+.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope', '$timeout', (treeSrv, treeHistorySrv, $rootScope, $timeout) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1185,6 +1531,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 						feedback: null
 						target: newAnswerTarget
 						linkMode: $scope.NEW
+						requiredItems: []
+						items: []
 
 					node.answers = []
 					node.answers.push newAnswer
@@ -1207,6 +1555,8 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 				angular.forEach node.answers, (answer, index) ->
 					answer.text = null
 					answer.matches = []
+					answer.caseSensitive = false
+					answer.characterSensitive = false
 
 				# Create the new node associated with the [Unmatched Response] answer
 				newDefaultId = $scope.addNode $scope.nodeTools.target, $scope.BLANK
@@ -1217,8 +1567,12 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 					feedback: null
 					target: newDefaultId
 					linkMode: $scope.NEW
+					requiredItems: []
+					items: []
 					matches: []
 					isDefault: true
+					caseSensitive: false
+					characterSensitive: false
 
 				# The new answer has to take the 0 index spot in the answers array
 				node.answers.splice 0, 0, newDefault
@@ -1241,7 +1595,7 @@ Adventure.directive "nodeToolsDialog", ['treeSrv', 'treeHistorySrv','$rootScope'
 ]
 
 # The "What kind of node do you want to create?" dialog
-Adventure.directive "nodeCreationSelectionDialog", ['treeSrv', (treeSrv) ->
+.directive "nodeCreationSelectionDialog", ['treeSrv', (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 		$scope.showDialog = false
@@ -1260,9 +1614,48 @@ Adventure.directive "nodeCreationSelectionDialog", ['treeSrv', (treeSrv) ->
 			$scope.showBackgroundCover = true
 ]
 
+# Directive for choosing node to begin preview on
+.directive "previewNodeSelector", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+		$scope.selectPreviewNode = () ->
+			# Suspend the node creation screen so the user can select a node
+			$scope.showBackgroundCover = false
+			$scope.nodeTools.show = false
+			$scope.displayNodeCreation = "suspended"
+
+			# Set the node selection mode so click events are handled differently than normal
+			$scope.previewNodeSelectionMode = true
+
+			# Notify the treeViz directive to redraw the tree in the new mode
+			$rootScope.$broadcast "mode.previewNodeSelectionMode"
+			treeSrv.set $scope.treeData
+
+			$scope.displayModeManager "Select the node the preview should start on.", "Cancel", ->
+				$scope.cancelModeManager()
+				$rootScope.$broadcast "mode.previewNodeSelectionMode.complete"
+				$scope.previewNodeSelectionMode = false
+				$scope.displayNodeCreation = "none"
+				$scope.showBackgroundCover = false
+				deregister()
+
+			deregister = $scope.$watch "previewNodeSelected", (newVal, oldVal) ->
+				if (newVal)
+					$scope.previewNodeSelectionMode = false
+					$scope.previewNodeSelected = null
+					$scope.displayNodeCreation = "none"
+					$scope.cancelModeManager()
+					$scope.resetNewNodeManager()
+
+					$scope.startID = newVal.id
+
+					deregister()
+
+]
+
 # Dialog for selecting what kind of node a given answer should target
 # e.g., "new", "existing", "self"
-Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$document', '$timeout', '$rootScope', (treeSrv, treeHistorySrv, $document, $timeout, $rootScope) ->
+.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$document', '$timeout', '$rootScope', (treeSrv, treeHistorySrv, $document, $timeout, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1533,7 +1926,7 @@ Adventure.directive "newNodeManagerDialog", ['treeSrv', 'treeHistorySrv', '$docu
 ]
 
 # Dialog for warning that, oh shit, you're going to delete some child nodes if you decide to do this
-Adventure.directive "deleteWarningDialog", ['treeSrv', (treeSrv) ->
+.directive "deleteWarningDialog", ['treeSrv', (treeSrv) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1574,9 +1967,12 @@ Adventure.directive "deleteWarningDialog", ['treeSrv', (treeSrv) ->
 # The actual node creation screen
 # Functions related to features unique to individual node types (Short answer sets, hotspots, etc) are relegated to their own directives
 # The ones here are "universal" and apply to all new nodes
-Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', '$sce', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout, $sce) ->
+.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', '$sce', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout, $sce) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
+
+		# initialize showAdvancedOptions for requiredItemsModal
+		$scope.showAdvancedOptions = false
 
 		$scope.$on "editedNode.target.changed", (evt) ->
 
@@ -1584,6 +1980,10 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
 				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
 				else $scope.question = null
+
+				# Reset size of question box
+				document.querySelector(".question-box").style.width = null;
+				document.querySelector(".question-box").style.height = null;
 
 				if $scope.editedNode.answers then $scope.answers = $scope.editedNode.answers
 				else
@@ -1608,6 +2008,12 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 						else
 							$scope.answers = []
 							$scope.newAnswer()
+
+				#
+				if $scope.editedNode.items
+					$scope.nodeItems = $scope.editedNode.items
+				else
+					$scope.nodeItems = []
 
 				if $scope.editedNode.media
 					if $scope.editedNode.media.type is "image"
@@ -1634,8 +2040,8 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				if $scope.editedNode.type is $scope.MC
 					unless $scope.editedNode.randomizeAnswers then $scope.editedNode.randomizeAnswers = false
 
-				if $scope.editedNode.type is $scope.HOTSPOT
-					unless $scope.editedNode.hotspotVisibility then $scope.editedNode.hotspotVisibility = "always"
+				# if $scope.editedNode.type is $scope.HOTSPOT
+				# 	unless $scope.editedNode.hotspotVisibility then $scope.editedNode.hotspotVisibility = $scope.ALWAYS
 
 
 				if $scope.editedNode.type is $scope.END
@@ -1656,7 +2062,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			else if $scope.editedNode.type is $scope.END
 				$scope.questionPlaceholder = "Enter a conclusion here for this decision tree or path."
 
-
 		# Update the node's properties when the associated input models change
 		$scope.$watch "question", (newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
@@ -1665,6 +2070,11 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 		$scope.$watch "answers", ((newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
 				$scope.editedNode.answers = $scope.answers
+		), true
+
+		$scope.$watch "nodeItems", ((newVal, oldVal) ->
+			if newVal isnt null and $scope.editedNode
+				$scope.editedNode.items = $scope.nodeItems
 		), true
 
 		# Since media isn't bound to a model like answers and questions, listen for update broadcasts
@@ -1696,6 +2106,282 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			$scope.inputUrl = ''
 			$scope.showImportTypeSelection = true
 
+		# Changing z-indexes of windows inside hotspot manager on click
+		$scope.bringToFront = (event) ->
+			vis = document.querySelector('.visibility-manager')
+			hotspot = document.querySelector('hotspot-answer-manager')
+			items = document.querySelectorAll('.item-selection')
+
+			if event.target.closest('.item-selection')
+				items.forEach((item) -> item.style.zIndex = 200)
+				if(vis)
+					vis.style.zIndex = 100;
+				if(hotspot)
+					hotspot.style.zIndex = 100;
+			else if event.target.closest('hotspot-answer-manager')
+				hotspot.style.zIndex = 200;
+				if(vis)
+					vis.style.zIndex = 100;
+				if(items)
+					items.forEach((item) -> item.style.zIndex = 100)
+			else if event.target.closest('.visibility-manager')
+				vis.style.zIndex = 200;
+				if(items)
+					items.forEach((item) -> item.style.zIndex = 100)
+				if(hotspot)
+					hotspot.style.zIndex = 100;
+
+		$scope.toggleNodeItemsModal = () ->
+			$scope.showDropdown = false
+			# Close node items modal
+			if $scope.showItemSelection is true
+				$scope.showItemSelection = false
+				return
+			# Open node items modal
+			$scope.showItemSelection = true
+			# Close required items modal
+			$scope.toggleRequiredItemsModal(null)
+
+			# Show advanced options on start only if advanced options are enabled
+			if !$scope.showAdvancedOptions
+				for item in $scope.nodeItems
+					do (item) ->
+						if item.takeAll or item.firstVisitOnly
+							$scope.showAdvancedOptions = true
+							return
+						else
+							$scope.showAdvancedOptions = false
+
+			# Remove error message
+			$scope.invalidQuantity = null
+
+			# Save the original item count for validation
+			if $scope.nodeItems
+				for item in $scope.nodeItems
+					item.tempCount = Math.abs(item.count)
+
+			# Add items not already being used to the items available for selection
+			$scope.availableItems = []
+			for item in $scope.inventoryItems
+				do (item) ->
+					used = false
+					for i in $scope.nodeItems
+						if item.id is i.id
+							used = true
+					if ! used
+						$scope.availableItems.push(item)
+
+			$scope.selectedItem = $scope.availableItems[0]
+
+		$scope.toggleRequiredItemsModal = (answer = null) ->
+			$scope.showDropdown = false
+			# Same answer, close the modal
+			if $scope.currentAnswer is answer
+				$scope.currentAnswer = null
+			# Different answer
+			else
+				$scope.currentAnswer = answer
+
+			# If current answer is not null, open modal
+			if $scope.currentAnswer
+				$scope.showRequiredItems = true
+			# Else close the modal
+			else
+				$scope.showRequiredItems = false
+
+			if $scope.showRequiredItems
+				# Close node items modal
+				$scope.showItemSelection = false
+
+				if document.querySelector('hotspot-answer-manager')
+					document.querySelector('hotspot-answer-manager').style.zIndex = 100;
+
+				# Remove error message
+				$scope.invalidQuantity = null
+				# Save the original item count in case of invalid input
+				if answer.requiredItems
+					for item in answer.requiredItems
+						item.tempMinCount = item.minCount
+						item.tempMaxCount = item.maxCount
+
+						if !$scope.showAdvancedOptions
+							# Show advanced options on start only if advanced options are enabled
+							if !item.uncappedMax
+								$scope.showAdvancedOptions = true
+							else
+								$scope.showAdvancedOptions = false
+
+				# Add items not already being used to the items available for selection
+				$scope.availableItems = []
+				for item in $scope.inventoryItems
+					do (item) ->
+						used = false
+						if answer.requiredItems
+							for i in answer.requiredItems
+								if item.id is i.id
+									used = true
+						if ! used
+							$scope.availableItems.push(item)
+
+				$scope.selectedItem = $scope.availableItems[0]
+
+		# Select item from available items dropdown
+		$scope.selectItem = (item) ->
+			$scope.selectedItem = item
+			$scope.showDropdown = false
+
+		$scope.toggleDropdownSelector = () ->
+			$scope.showDropdown = !$scope.showDropdown
+
+		# ng-pattern attribute validates quantity
+		# Display error message if quantity is invalid
+		# takesItem is true if this item is being removed from the player's inventory
+		$scope.updateMinCount = (event, item, advanced=false) ->
+			if item.tempMinCount > -1
+				$scope.invalidQuantity = null
+				if (item.tempMinCount > item.tempMaxCount && !item.uncappedMax)
+					if advanced
+						$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
+						$scope.showAdvancedOptions = true
+						if (item.tempMaxCount > -1)
+							item.minCount = item.tempMaxCount
+					else
+						# not in advanced mode, don't compare
+						item.minCount = item.tempMinCount
+						$scope.invalidMaxQuantity = null
+						item.uncappedMax = true
+				else if item.tempMinCount == 0 and advanced
+					# if setting minimum to 0 in advanced options, don't update max count
+					item.minCount = 0
+					$scope.invalidMaxQuantity = null
+				else if item.tempMinCount == 0 and !advanced
+					# if setting minimum to 0 in basic options, means player must have none of item
+					item.minCount = 0
+					item.maxCount = 0
+					item.tempMaxCount = 0
+					item.uncappedMax = false
+					$scope.invalidMaxQuantity = null
+				# just update minimum
+				else
+					item.minCount = item.tempMinCount
+					$scope.invalidMaxQuantity = null
+			else
+				$scope.invalidQuantity = "Invalid min quantity."
+
+		$scope.updateMaxCount = (event, item) ->
+			if !item.uncappedMax
+				if item.tempMaxCount > -1
+					$scope.invalidMaxQuantity = null
+					if (item.tempMinCount > item.tempMaxCount)
+						$scope.invalidMaxQuantity = "Invalid range. Max quantity must be greater than or equal to min quantity."
+						$scope.showAdvancedOptions = true
+						if (item.tempMinCount > -1)
+							item.maxCount = item.tempMinCount
+					else
+						item.maxCount = item.tempMaxCount
+						$scope.invalidQuantity = null
+				else
+					$scope.invalidMaxQuantity = "Invalid max quantity."
+			else
+				$scope.invalidMaxQuantity = null
+
+		$scope.updateNodeItemCount = (event, item, takesItem) ->
+			if item.tempCount
+				$scope.invalidQuantity = null
+				item.count = item.tempCount
+				if takesItem
+					# Can only be true if editing node items
+					item.count = item.tempCount * -1
+			else
+				$scope.invalidQuantity = "Invalid quantity. Quantity must be greater than 0."
+
+		$scope.toggleAdvancedOptions = ->
+			$scope.showAdvancedOptions = !$scope.showAdvancedOptions
+
+		# Adds item to node
+		$scope.addItemToNode = (item, positiveCount = true) ->
+			if item
+				# If item already exists in node, increment item count
+				for i in $scope.nodeItems
+					if item.id is i.id
+						i.count += 1
+						return
+				# Item will be given to player
+				if positiveCount
+					newItem = {
+						id: item.id
+						count: 1
+						tempCount: 1
+						firstVisitOnly: false
+						takeAll: false
+					}
+				# Item will be removed from player
+				else
+					newItem = {
+						id: item.id
+						count: -1
+						tempCount: 1
+						firstVisitOnly: false
+						takeAll: false
+					}
+				$scope.nodeItems.push(newItem)
+				# Remove item from the select dropdown
+				index = $scope.availableItems.indexOf(item)
+				$scope.availableItems.splice index, 1
+				$scope.selectedItem = $scope.availableItems[0]
+
+		# Remove item from node
+		$scope.removeItemFromNode = (item, index) ->
+			$scope.nodeItems.splice index, 1
+
+			# Add item back to available items
+			for parentItem in $scope.inventoryItems
+				if item.id is parentItem.id
+					$scope.availableItems.push(parentItem)
+
+			$scope.selectedItem = item
+			$scope.showItemManagerDialog = false
+
+		# Add a required item to answer
+		$scope.addRequiredItemToAnswer = (item, answer) ->
+			if item
+				answer.requiredItems = answer.requiredItems || []
+
+				# for i in answer.requiredItems when i.id is item.id
+				# 	i.count += 1
+				# 	return
+
+				# Required items will store the index of the item in inventoryItems and the minimum and maximum required amount
+				# Default is minimum = 1, maximum = uncapped
+				newItem = {
+					id: item.id
+					minCount: 1
+					maxCount: 1
+					tempMinCount: 1
+					tempMaxCount: 1
+					uncappedMax: true
+					range: ""
+				}
+				answer.requiredItems.push(newItem)
+
+				# Remove item from the available items dropdown
+				index = $scope.availableItems.indexOf(item)
+				$scope.availableItems.splice index, 1
+				$scope.selectedItem = $scope.availableItems[0]
+
+				# Hide Dropdown
+				$scope.showDropdown = false
+
+		$scope.removeRequiredItemFromAnswer = (item, answer) ->
+			answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
+
+			# Add item to the available items dropdown
+			item.count = 1
+			for parentItem in $scope.inventoryItems
+				if item.id is parentItem.id
+					$scope.availableItems.push(parentItem)
+			$scope.selectedItem = $scope.availableItems[0]
+
 		$scope.newAnswer = (text = null) ->
 
 			# If the editedNode has a pending target, the new answer's target will be set to it
@@ -1723,10 +2409,15 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				target: targetId
 				linkMode: linkMode
 				id: treeSrv.generateAnswerHash()
+				requiredItems: []
+				hideAnswer: false
+				# hideRequiredItems: false
 
-			# Add a matches property to the answer object if it's a short answer question.
+			# Add a matches and case sensitivity property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
 				newAnswer.matches = []
+				newAnswer.caseSensitive = false
+				newAnswer.characterSensitive = false
 			$scope.answers.push newAnswer
 
 			# Refresh all answerLinks references as some have changed
@@ -1734,7 +2425,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 			# Inform the answers-container auto-scroll-and-focus directive that a new answer is added
 			$rootScope.$broadcast "editedNode.answers.added"
-
 
 		# Check to see if removing this answer will delete any child nodes of the selected answer's node
 		# If there are child nodes present, bring up the warning dialog
@@ -1754,7 +2444,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 				$scope.deleteDialog.show = true
 			else
 				$scope.removeAnswer index, targetId
-
 
 		$scope.removeAnswer = (index, targetId) ->
 
@@ -1795,7 +2484,6 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 
 			# Refresh all answerLinks references as some have changed
 			treeSrv.updateAllAnswerLinks $scope.treeData
-
 
 		$scope.manageNewNode = ($event, target, id, mode) ->
 
@@ -1840,14 +2528,21 @@ Adventure.directive "nodeCreation", ['treeSrv','legacyQsetSrv', 'treeHistorySrv'
 			if $scope.editedNode.media.align is "left" or $scope.editedNode.media.align is "right" then $scope.editedNode.media.align = "top"
 			else $scope.editedNode.media.align = "right"
 
+
+		$scope.displayInfoDialog = (type) ->
+			switch type
+				when 'required-items' then $scope.infoMessage = "Required items for this answer to be chosen. You can create items on the widget home screen."
+			$scope.showInfoDialog = true
+
 		$scope.saveAndClose = ->
 			$scope.hideCoverAndModals()
+			$scope.showAdvancedOptions = false
 			# auto-hide set to false here because the timer in the displayNodeCreation $watch will handle it
 			$scope.toast "Destination " + $scope.editedNode.name + " saved!", false
 ]
 
 # Directive for each short answer set. Contains logic for adding and removing individual answer matches.
-Adventure.directive "shortAnswerSet", ['treeSrv', (treeSrv) ->
+.directive "shortAnswerSet", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -1865,10 +2560,34 @@ Adventure.directive "shortAnswerSet", ['treeSrv', (treeSrv) ->
 
 				while j < $scope.answers[i].matches.length
 
-					matchTo = $scope.answers[i].matches[j].toLowerCase()
+					# Remove whitespace
+					matchTo = $scope.answers[i].matches[j].trim()
+					matchTo = matchTo.split('').filter((letter) -> ! letter.match(/\W/g)).join()
 
-					if matchTo.localeCompare($scope.newMatch.toLowerCase()) is 0
-						$scope.toast "This match already exists!"
+					matchFrom = $scope.newMatch.trim()
+					matchFrom = matchFrom.split('').filter((letter) -> ! letter.match(/\W/)).join()
+
+					matchErrorMessage = "This match already exists!"
+
+					if (! $scope.answers[i].characterSensitive)
+						# If matches DO NOT have same special characters, customize toast message
+						if ! (matchTo.toLowerCase().localeCompare(matchFrom.toLowerCase()) is 0)
+							matchErrorMessage += " Make whitespace and character sensitive to add match."
+
+						matchTo = matchTo.split('').filter((letter) -> letter.match(/\w/)).join()
+
+						matchFrom = matchFrom.split('').filter((letter) -> letter.match(/\w/)).join()
+
+					if (! $scope.answers[i].caseSensitive)
+						# If matches DIFFER in case, customize toast message
+						if ! (matchTo.localeCompare(matchFrom) is 0)
+							matchErrorMessage += " Make case sensitive to add match."
+
+						matchTo = matchTo.toLowerCase()
+						matchFrom = matchFrom.toLowerCase()
+
+					if matchTo.localeCompare(matchFrom) is 0
+						$scope.toast matchErrorMessage
 						return
 
 					j++
@@ -1883,9 +2602,11 @@ Adventure.directive "shortAnswerSet", ['treeSrv', (treeSrv) ->
 		$scope.removeAnswerMatch = (matchIndex, answerIndex) ->
 
 			$scope.answers[answerIndex].matches.splice matchIndex, 1
+
+			$scope.answers[answerIndex].text = $scope.answers[answerIndex].matches.join ", "
 ]
 
-Adventure.directive "finalScoreBox", [() ->
+.directive "finalScoreBox", [() ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1894,7 +2615,7 @@ Adventure.directive "finalScoreBox", [() ->
 				$scope.editedNode.finalScore = newVal
 ]
 
-Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', '$sce', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout, $sce) ->
+.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHistorySrv', '$rootScope','$timeout', '$sce', (treeSrv, legacyQsetSrv, treeHistorySrv, $rootScope, $timeout, $sce) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -1938,7 +2659,21 @@ Adventure.directive "importTypeSelection", ['treeSrv','legacyQsetSrv', 'treeHist
 			$rootScope.$broadcast "editedNode.media.updated"
 ]
 
-Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (legacyQsetSrv, $timeout, $sce) ->
+# Directive for the info dialog
+.directive "infoDialog", [ '$rootScope','$timeout', '$sce', ($rootScope, $timeout, $sce) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "showInfoDialog", (newVal, oldVal) ->
+			if newVal
+				$scope.showBackgroundCover = true
+
+		$scope.hideInfoDialog = () ->
+			$scope.showInfo = false
+			$scope.hideCoverAndModals()
+]
+
+.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (legacyQsetSrv, $timeout, $sce) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -2094,7 +2829,6 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (lega
 					$scope.hotspotAnswerManager.answerIndex = null
 				else
 					$scope.hotspotAnswerManager.show = true
-
 					# The hotspot answer manager will appear adjacent to the cursor
 					# Pass it the cursor location, which is tweaked in the answer manager's directive before being applied
 					$scope.hotspotAnswerManager.x = evt.clientX
@@ -2102,6 +2836,9 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (lega
 
 					$scope.hotspotAnswerManager.answerIndex = index
 					$scope.hotspotAnswerManager.target = $scope.answers[index].target
+
+					$scope.hotspotAnswerManager.svgWidth = evt.currentTarget.getBoundingClientRect().width
+					$scope.hotspotAnswerManager.svgHeight = evt.currentTarget.getBoundingClientRect().height
 
 			$scope.selectedSVG.hasMoved = false # once the click event has checked on hasMoved, we can reset it
 
@@ -2113,7 +2850,7 @@ Adventure.directive "hotspotManager", ['legacyQsetSrv','$timeout', '$sce', (lega
 ]
 
 
-Adventure.directive "hotspotToolbar", [() ->
+.directive "hotspotToolbar", [() ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -2191,7 +2928,7 @@ Adventure.directive "hotspotToolbar", [() ->
 				points: $scope.polygonPoints
 ]
 
-Adventure.directive "hotspotAnswerManager", [() ->
+.directive "hotspotAnswerManager", [() ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -2221,26 +2958,65 @@ Adventure.directive "hotspotAnswerManager", [() ->
 
 				# Get bounds of the answerManager and the entire tree container to check if the manager is off-screen
 				bounds = angular.element($element)[0].getBoundingClientRect()
-				container = document.getElementById("tree-svg").getBoundingClientRect()
+				# Bounds
+				managerMaxHeight = 400
+				managerMaxWidth = 500
+				container = document.getElementById("adventure-container").getBoundingClientRect()
 
 				# Move the manager so its back into frame if it's out of bounds
-				if (yOffset + bounds.height) > container.height
-					diffY = (yOffset + bounds.height) - container.height - 5
+				if (yOffset + managerMaxHeight) > container.height
+					diffY = (yOffset + managerMaxHeight) - container.height
 					yOffset -= diffY
 
-				if (xOffset + bounds.width) > container.width
-					diffX = (xOffset + bounds.width) - container.width - 5
+				if (xOffset + managerMaxWidth) > container.width
+					diffX = (xOffset + managerMaxWidth) - container.width
 					xOffset -= diffX
 
-				# Finally, update the position of the manager so the X/Y coords properly align with the hotspot canvas
-				managerBounds = document.getElementById("hotspot-manager").getBoundingClientRect()
+				# Finally, update the positio n of the manager so the X/Y coords properly align with the hotspot canvas
+				#managerBounds = document.getElementById("hotspot-manager").getBoundingClientRect()
 
-				xOffset -= managerBounds.left
-				yOffset -= managerBounds.top
+				#xOffset -= managerBounds.left
+				#yOffset -= managerBounds.top
 
-				styles = "left: " + xOffset + "px; top: " + yOffset + "px"
+				styles = "left: " + xOffset + "px; top: " + yOffset + "px;" + "z-index: 200;"
+
+				$scope.hotspotAnswerManager.x = xOffset
+				$scope.hotspotAnswerManager.y = yOffset
+
+				document.querySelectorAll('.item-selection').forEach((modal) -> modal.style.zIndex = 100)
 
 				$attrs.$set "style", styles
+
+		$scope.dragStart = (e) ->
+			e.preventDefault()
+
+			$scope.mousePos =
+				x: e.clientX
+				y: e.clientY
+
+			document.onmouseup = $scope.closeDragListeners
+			document.onmousemove = $scope.elementDrag
+
+
+		$scope.elementDrag = (e) ->
+			e.preventDefault();
+
+			xOffset = $scope.hotspotAnswerManager.x - ($scope.mousePos.x - e.clientX)
+			yOffset = $scope.hotspotAnswerManager.y - ($scope.mousePos.y - e.clientY)
+
+			styles = "left: " + xOffset + "px; top: " + yOffset + "px;" + "z-index: 200;"
+
+			$attrs.$set "style", styles
+
+
+		$scope.closeDragListeners = (e) ->
+			e.preventDefault();
+
+			$scope.hotspotAnswerManager.x = $scope.hotspotAnswerManager.x - ($scope.mousePos.x - e.clientX)
+			$scope.hotspotAnswerManager.y = $scope.hotspotAnswerManager.y - ($scope.mousePos.y - e.clientY)
+
+			document.onmouseup = null;
+			document.onmousemove= null;
 
 		$scope.closeManager = (evt) ->
 
@@ -2290,7 +3066,7 @@ Adventure.directive "hotspotAnswerManager", [() ->
 
 # The artboard is displayed over the hotspot image and allows the user to "draw" the polygon by generating new polylines when/where a click occurs
 # When a click occurs in proximity to the original click point, the polygon is considered "closed" and the points are used to generate an actual polygon hotspot
-Adventure.directive "polygonArtboard", ['$rootScope', ($rootScope) ->
+.directive "polygonArtboard", ['$rootScope', ($rootScope) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -2378,7 +3154,7 @@ Adventure.directive "polygonArtboard", ['$rootScope', ($rootScope) ->
 ]
 
 # A rather straightforward little directive to ensure the answer container auto-scrolls to the newest row and focuses it when a new answer is added
-Adventure.directive "autoScrollAndSelect", ['$timeout', ($timeout) ->
+.directive "autoScrollAndSelect", ['$timeout', ($timeout) ->
 	restrict: "A",
 	link: ($scope,$element, $attrs) ->
 
@@ -2407,7 +3183,7 @@ Adventure.directive "autoScrollAndSelect", ['$timeout', ($timeout) ->
 # - when the widget is published and problems are detected
 # The dialog pulls the error data from the $scope.validation object, and operates on each
 # Each problem can be selected to visit the node in question (using the errorFollowUp function)
-Adventure.directive "validationDialog", ['treeSrv','$rootScope', (treeSrv, $rootScope) ->
+.directive "validationDialog", ['treeSrv','$rootScope', (treeSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 
@@ -2439,6 +3215,12 @@ Adventure.directive "validationDialog", ['treeSrv','$rootScope', (treeSrv, $root
 							treeSrv.updateAllAnswerLinks $scope.treeData
 
 							error.correctedTarget = newTarget
+						when "unreachable_destination"
+							node = treeSrv.findNode $scope.treeData, error.node
+
+							node.hasProblem = true
+
+							error.correctedTarget = null
 
 						# For other error types, simply indicate there's a problem
 						when "blank_node", "has_no_answers", "has_no_final_score", "has_bad_html", "no_hotspot_label"
@@ -2469,7 +3251,7 @@ Adventure.directive "validationDialog", ['treeSrv','$rootScope', (treeSrv, $root
 
 
 # MEANT FOR DEBUG PURPOSES ONLY
-Adventure.directive "debugQsetLoader", ['treeSrv', 'treeHistorySrv', 'legacyQsetSrv','$rootScope', (treeSrv, treeHistorySrv, legacyQsetSrv, $rootScope) ->
+.directive "debugQsetLoader", ['treeSrv', 'treeHistorySrv', 'legacyQsetSrv','$rootScope', (treeSrv, treeHistorySrv, legacyQsetSrv, $rootScope) ->
 	restrict: "E",
 	link: ($scope, $element, $attrs) ->
 

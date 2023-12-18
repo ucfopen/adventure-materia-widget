@@ -6,7 +6,7 @@
 
 		<!-- STYLESHEETS -->
 		<link href='//fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="assets/player-assets/player.css">
+		<link rel="stylesheet" type="text/css" href="player.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script src="materia.enginecore.js"></script>
@@ -16,18 +16,112 @@
 		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.8.2/angular-sanitize.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-aria/1.8.2/angular-aria.min.js"></script>
 		<script src="assets/micromarkdown.min.js"></script>
-
-		<!-- MAIN PLAYER SCRIPT -->
-		<script src="assets/player-assets/player.js"></script>
-		<script src="assets/legacyQsetSrv.js"></script>
 	</head>
-	<body id="body" ng-app="Adventure" ng-controller="AdventureController">
-		<header class="header" ng-class="{'show-title' : !hideTitle}">
-			<h1>{{title}}</h1>
-		</header>
+	<body id="body" ng-controller="AdventureController">
+		<div id='assistive-alert' class='reader-instructions' aria-live='assertive'></div>
 
-		<div class="backgroundcover" ng-class="{ show: feedback }"></div>
+		<div class="inventory-button-container">
+			<button ng-class="{'icon-cross': showInventory, 'show-inventory' : showInventory}" ng-click="toggleInventory()" ng-show="showInventoryBtn" aria-label="{{showInventory ? 'Close Inventory' : 'Open Inventory. ' + inventory.length + ' items in inventory.' }}" ng-mouseenter="showInventoryTooltip = true" ng-mouseleave="showInventoryTooltip = false" ng-focus="showInventoryTooltip = true" ng-blur="showInventoryTooltip = false" class="inventory-button">
+				<img src="assets/player-assets/BackPack64.png" ng-show="!showInventory"/>
+				<span ng-if="showNew" class="new-item">NEW!</span>
+			</button>
+			<div class="inventory-tooltip" ng-show="showInventoryTooltip" aria-hidden>
+				<p>Inventory</p>
+				<i class="arrow-right"></i>
+			</div>
+			<div class="inventory-update"
+				id="inventory-update"
+				ng-show="inventoryUpdate"
+				ng-class="{'show': inventoryUpdate}"
+				inert
+				>
 
+				<i class="arrow-top"></i>
+				<div class="update-content" tabindex="-1">
+					<section ng-if="addedItems.length > 0">
+						<div class="item added-item" ng-repeat="item in addedItems track by $index" ng-if="item.count > 0 && !itemSelection[getItemIndex(item.id)].isSilent" ng-click="toggleInventory(item)">
+							<div class="item-first" aria-label="Added {{item.count}} {{itemSelection[getItemIndex(item.id)].name}}">
+								<span class="item-count">+ {{item.count}} </span>
+								<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
+								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
+							</div>
+							<div class="item-update-description" ng-show="itemSelection[getItemIndex(item.id)].description.length">
+								Description: {{itemSelection[getItemIndex(item.id)].description}}
+							</div>
+						</div>
+					</section>
+					<section ng-if="removedItems.length > 0">
+						<div class="item removed-item" ng-repeat="item in removedItems track by $index" ng-if="item.count < 0 && !itemSelection[getItemIndex(item.id)].isSilent"" ng-click="toggleInventory(item)">
+							<div class="item-first" aria-label="Removed {{item.count < 0 ? item.count * -1 : item.count}} {{itemSelection[getItemIndex(item.id)].name}}">
+								<span class="item-count">- {{-1*item.count}}</span>
+								<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
+								<p class="item-name">{{itemSelection[getItemIndex(item.id)].name}}</p>
+							</div>
+							<div class="item-update-description" ng-show="itemSelection[getItemIndex(item.id)].description.length">
+								Description: {{itemSelection[getItemIndex(item.id)].description}}
+							</div>
+						</div>
+					</section>
+				</div>
+
+				<button class="dismiss-update" ng-click="dismissUpdates()">Dismiss Updates</button>
+			</div>
+		</div>
+
+		<div class="inventory" id="inventory" ng-class="{ show: showInventory }" inert>
+			<div class="inventory-container">
+				<h2 class="inventory-header">Inventory Items</h2>
+				<div class="inventory-content">
+					<div class="inventory-items">
+						<div class="item" aria-label="{{itemSelection[getItemIndex(item.id)].name}}, Quantity:  {{item.count}}, Description: {{itemSelection[getItemIndex(selectedItem.id)].description ? itemSelection[getItemIndex(selectedItem.id)].description : (itemSelection[getItemIndex(selectedItem.id)].icon.alt ? itemSelection[getItemIndex(selectedItem.id)].icon.alt : 'No description')}}" ng-class="{'selected' : item.id == selectedItem.id}" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0 && !itemSelection[getItemIndex(item.id)].isSilent">
+							<span ng-if="item.new" class="new-item">NEW!</span>
+							<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
+							{{itemSelection[getItemIndex(item.id)].name}}
+							<span class="item-count">{{item.count}}</span>
+						</div>
+					</div>
+					<div class="item-description" ng-show="selectedItem">
+						<div class="item-header">
+							<i class="arrow-left"></i>
+							<img ng-if="itemSelection[getItemIndex(selectedItem.id)].icon.url" ng-src="{{itemSelection[getItemIndex(selectedItem.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(selectedItem.id)].icon.url}}"/>
+							<h3>
+								{{itemSelection[getItemIndex(selectedItem.id)].name}}
+							</h3>
+						</div>
+						<h4>Description</h4>
+						<p>{{itemSelection[getItemIndex(selectedItem.id)].description ? itemSelection[getItemIndex(selectedItem.id)].description : (itemSelection[getItemIndex(selectedItem.id)].icon.alt ? itemSelection[getItemIndex(selectedItem.id)].icon.alt : 'No description')}}</p>
+						<h4>Count</h4>
+						<p>{{selectedItem.count}}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="backgroundcover" ng-class="{ show: feedback || inventoryUpdate || showTutorial || missingRequiredItems.length }" ng-click="inventoryUpdate = false;" tabindex="-1"></div>
+
+		<div class="tutorial"
+			ng-class="{ show: showTutorial }"
+			ng-attr-aria-hidden="{{ !showTutorial }}"
+			tabIndex="-1">
+			<div id="tutorial-content" class="tutorial-content" tabindex="-1">
+				<header>An Adventure Awaits</header>
+				<p>Navigate a series of interactions by responding to the questions or prompts provided.</p>
+				<p>Interactions may include <b>multiple choice</b> responses, selecting a <b>hotspot</b> on an image, or <b>entering text</b>.</p>
+				<p ng-if="qsetHasInventoryItems">Interactions may be further enhanced by <b>items</b> you collect upon making certain decisions. Some choices may require items to be present in your inventory.
+					View your <b>inventory</b> any time by clicking the backpack icon at the top-right.</p>
+				</p>
+				<p ng-if="!scoringDisabled">Your score is determined by your final destination.</p>
+			</div>
+			<input class="feedback-button trans-button"
+				type="button"
+				value="Let's Go"
+				ng-click="closeTutorial()"
+				ng-attr-tabindex="{{showTutorial}}"
+				aria-label="Welcome to Adventure. Now playing: {{title}}"
+				aria-describedby="tutorial-content"
+				tutorial-focus-manager>
+		
+		</div>
 		<div class="feedback"
 			ng-class="{ show: feedback }"
 			ng-attr-aria-hidden="{{ !(feedback.length > 0) }}"
@@ -44,99 +138,92 @@
 				aria-live="assertive"
 				feedback-focus-manager>
 		</div>
-
-		<section class="question clearfix"
-			ng-class="{
-				'hotspot-mode' : question.type == HOTSPOT,
-				'shortans-mode' : question.type == SHORTANS,
-				'transitional-mode' : question.type == NARR || question.type == END,
-				'hidden-title' : hideTitle == true,
-				'end-screen-mode' : question.type == OVER}"
-			ng-switch="layout"
-			focus-manager
-			aria-live="assertive"
-			tabindex="0">
-			<!-- just an image -->
-			<div ng-switch-when="image-only">
-				<figure class="asset image-only">
-					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
-						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
-					</div>
-				</figure>
+		<div class="missing-required-items"
+			ng-class="{ show: missingRequiredItems.length > 0 }"
+			ng-attr-aria-hidden="{{ !(missingRequiredItems.length > 0) }}"
+			tabindex="-1">
+			<h3>The following item(s) are required to select this answer:</h3>
+			<div class="required-items-content">
+				<ul>
+					<li ng-repeat="item in missingRequiredItems">
+						<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item.id)].icon.alt}}"/>
+						{{ itemSelection[getItemIndex(item.id)].name }}
+						({{ item.range }})
+					</li>
+				</ul>
 			</div>
-			<!-- just text; no image -->
-			<div ng-switch-when="text-only">
-				<h2 class="text" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
-			</div>
-			<!-- image on the right -->
-			<div ng-switch-when="right">
-				<h2 class="text left" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
-				<figure class="asset right">
-					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
-						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
-					</div>
-				</figure>
-			</div>
-			<!-- image on the left -->
-			<div ng-switch-when="left">
-				<figure class="asset left">
-					<div class="asset-container">
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
-						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
-					</div>
-				</figure>
-				<h2 class="text right" auto-text-scale dynamic-scale ng-bind-html="question.text"></h2>
-			</div>
-			<!-- image on the bottom -->
-			<div ng-switch-when="bottom">
-				<figure class="asset center">
-					<div class="asset-container" >
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
-						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
-					</div>
-				</figure>
-				<h2 class="text bottom" auto-text-scale ng-bind-html="question.text"></h2>
-			</div>
-			<!-- image on the top -->
-			<div ng-switch-when="top">
-				<h2 class="text top" auto-text-scale ng-bind-html="question.text"></h2>
-				<figure class="asset center">
-					<div class="asset-container" >
-						<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" dynamic-media-scale />
-						<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
-						<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
-					</div>
-				</figure>
-			</div>
-			<!-- hotspot mode. No image associated w/ question -->
-			<div ng-switch-when="hotspot">
-			<h2 class="text bottom"
-				ng-hide="question.text.length == 0"
-				auto-text-scale ng-bind-html="question.text"></h2>
-			</div>
-		</section>
-		<section class="answers"
+			<input class="feedback-button trans-button"
+				type="button"
+				value="Got It"
+				ng-click="closeMissingRequiredItems()"
+				ng-attr-tabindex="{{missingRequiredItems.length > 0 ? 0 : -1}}"
+				aria-label="{{missingRequiredItemsAltText}}. Return to Widget"
+				aria-live="assertive"
+				feedback-focus-manager>
+		</div>
+		<div class="container" ng-class="{
+			'hotspot-mode' : question.type == HOTSPOT}">
+			<header class="header" ng-class="{'show-title' : !hideTitle}">
+				<h1>{{title}}</h1>
+			</header>
+			<section class="question clearfix"
+				ng-class="{
+					'hotspot-mode' : question.type == HOTSPOT,
+					'shortans-mode' : question.type == SHORTANS,
+					'transitional-mode' : question.type == NARR || question.type == END,
+					'hidden-title' : hideTitle == true,
+					'end-screen-mode' : question.type == OVER,
+					'right': layout == 'right',
+					'left': layout == 'left',
+					'bottom': layout == 'bottom',
+					'top': layout == 'top',
+					'image-only': layout == 'image-only'
+				}">
+				<div class="aria-live-region"
+				focus-manager
+				aria-live="assertive"
+				tabindex="0"
+				aria-label="Question: {{question.text}}, {{inventoryUpdateMessage}}"
+				ng-blur="dismissUpdates()">
+					<h2 class="text"
+					ng-class="layout"
+					ng-hide="question.text.length == 0"
+					auto-text-scale ng-bind-html="question.text" ng-if="layout != 'image-only'"></h2>
+					<span class="reader-instructions">{{inventoryUpdateMessage}}</span>
+				</div>
+				<div class="asset" ng-if="type != HOTSPOT">
+					<img ng-if="question.options.asset.type === 'image'" ng-src="{{ question.image }}" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" />
+					<iframe class="video" ng-if="question.options.asset.type === 'video'" ng-src="{{question.video}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen dynamic-media-scale></iframe>
+					<button class="expand-btn icon-enlarge" ng-if="question.options.asset.type === 'video' || question.options.asset.type === 'image'" aria-label="Enlarge image" ng-click="setLightboxTarget(1)"></button>
+				</div>
+			</section>
+			<section class="answers"
 			ng-class="{
 				'hotspot-mode' : question.type == HOTSPOT,
 				'no-question' : question.text.length == 0,
-				'hidden-title' : hideTitle == true}"
+				'hidden-title' : hideTitle == true,
+				'transitional-mode' : question.type == NARR || question.type == END}"
 			ng-hide="question.type == OVER">
 			<div class="mc"
 				ng-show="type == MC">
 				<button
 					class="answer"
+					ng-if="!(answer.hideAnswer && checkInventory(answer.requiredItems).length)"
+					ng-class="{'nonselectable' : checkInventory(answer.requiredItems)[0]}"
 					ng-repeat="answer in answers"
 					ng-click="handleAnswerSelection(answer.link, answer.index)"
 					ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.link, answer.index) : null"
 					data-index="{{answer.index}}"
 					data-link="{{answer.link}}"
-					tabindex="0">) {{answer.text}}</button>
+					tabindex="0">
+					<span class="answer-text" ng-class="{ 'no-text-provided' : !answer.text.length }" aria-label="{{answer.text}}, {{checkInventory(answer.requiredItems).length > 0 ? 'Cannot select.' : ''}}">{{ answer.text.length > 0 ? answer.text : 'No answer text provided' }}</span>
+					<div class="answer-required-items" ng-if="answer.requiredItems.length && hasNotSilentItem(answer.requiredItems)">
+						<span class="required-item" ng-repeat="item in answer.requiredItems" ng-show="!itemSelection[getItemIndex(item.id)].isSilent" ng-class="{'missing-item': checkInventory(answer.requiredItems).includes(item.id)}">
+							<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}"/>
+							{{itemSelection[getItemIndex(item.id)].name}} <span class="item-quantity">({{item.range}})</span>
+						</span>
+					</div>
+				</button>
 			</div>
 			<div class="sa"ng-show="type == SHORTANS">
 				<input type="text"
@@ -153,7 +240,6 @@
 				<!-- label element for the hotspot label text, if it exists -->
 				<div class="hotspot-label"
 					id="hotspot-label"
-					ng-click="handleAnswerSelection(answer.link,answer.index)"
 					ng-style="{'top':hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px','opacity':hotspotLabelTarget.show? '1' : '0'}"
 					aria-hidden="true"
 					>
@@ -168,12 +254,23 @@
 					xmlns="http://www.w3.org/2000/svg"
 					xmlns:xlink="http://www.w3.org/1999/xlink"
 					xml:space="preserve">
-					<g ng-repeat="answer in answers"
+					<g
+						ng-repeat="answer in answers"
 						ng-attr-transform="matrix(1 0 0 1 {{answer.options.svg.x}} {{answer.options.svg.y}})"
 						data-label="{{answer.text}}"
 						visibility-manager
 						label-manager
 						ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+
+						ng-if="!(answer.hideAnswer && checkInventory(answer.requiredItems).length)"
+						ng-mouseover='onHotspotHover(answer, $event)'
+						ng-mouseout='onHotspotHoverOut($event)'
+						ng-focus='onHotspotHover(answer, $event)'
+						ng-blue='onHotspotHoverOut($event)'
+						ng-click="handleAnswerSelection(answer.options.link,answer.index)"
+						ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
+						tabindex="0"
+						aria-label="{{hotspotLabelTarget.ariaLabel}}"
 						>
 						<ellipse ng-if="answer.options.svg.type == 'ellipse'"
 							ng-attr-cx="0"
@@ -183,15 +280,7 @@
 							fill="{{answer.options.svg.fill}}"
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
-							fill-opacity="0.5"
-							ng-mouseover='onHotspotHover(answer, $event)'
-							ng-mouseout='onHotspotHoverOut($event)'
-							ng-focus='onHotspotHover(answer, $event)'
-							ng-blue='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
-							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
-							tabindex="0"
-							aria-label="{{answer.text}}"/>
+							fill-opacity="0.5"/>
 
 						<rect ng-if="answer.options.svg.type == 'rect'"
 							ng-attr-x="0"
@@ -201,35 +290,19 @@
 							fill="{{answer.options.svg.fill}}"
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
-							fill-opacity="0.5"
-							ng-mouseover='onHotspotHover(answer, $event)'
-							ng-mouseout='onHotspotHoverOut($event)'
-							ng-focus='onHotspotHover(answer, $event)'
-							ng-blue='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
-							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
-							tabindex="0"
-							aria-label="{{answer.text}}"/>
+							fill-opacity="0.5"/>
 
 						<polygon ng-if="answer.options.svg.type == 'polygon'"
 							ng-attr-points="{{answer.options.svg.points}}"
 							fill="{{answer.options.svg.fill}}"
 							stroke="{{answer.options.svg.fill}}"
 							stroke-width="{{answer.options.svg.stroke}}"
-							fill-opacity="0.5"
-							ng-mouseover='onHotspotHover(answer, $event)'
-							ng-mouseout='onHotspotHoverOut($event)'
-							ng-focus='onHotspotHover(answer, $event)'
-							ng-blue='onHotspotHoverOut($event)'
-							ng-click="handleAnswerSelection(answer.options.link,answer.index)"
-							ng-keyup="$event.keyCode == 13 ? handleAnswerSelection(answer.options.link,answer.index) : null"
-							tabindex="0"
-							aria-label="{{answer.text}}"/>
+							fill-opacity="0.5"/>
 					</g>
 				</svg>
 				<img ng-if="question.options.asset.type === 'image'" alt="{{question.options.asset.alt ? question.options.asset.alt : ''}}" ng-src="{{question.image}}">
 			</div>
-			<div class="trans"ng-if="type == TRANS">
+			<div class="trans" ng-if="type == TRANS">
 				<input type="button"
 					class="trans-button"
 					ng-class='{ left: question.layout == 2, right: question.layout == 3 }'
@@ -238,14 +311,18 @@
 					tabindex="0" />
 			</div>
 		</section>
+		</div>
 		<section class="lightbox" ng-class="{ 'show': lightboxTarget != -1}" ng-hide="lightboxTarget == -1">
 			<div class="lightbox-content">
-				<button class="lightbox-close" ng-click="setLightboxTarget(-1)" ng-attr-tabindex="{{lightboxTarget != -1 ? 0 : -1}}" lightbox-focus-manager aria-label="close lightbox">X</button>
+				<button class="lightbox-close icon-cross" ng-click="setLightboxTarget(-1)" ng-attr-tabindex="{{lightboxTarget != -1 ? 0 : -1}}" lightbox-focus-manager aria-label="Close image"></button>
 				<div ng-if="question.options.asset.type == 'image'" class="lightbox-image-container">
 					<img class="lightbox-image" ng-src="{{question.image}}" alt="{{question.text}}" ng-class="{'lightbox-image-zoom': lightboxZoom == 1}" ng-click="setLightboxZoom(!lightboxZoom)">
 				</div>
 				<iframe class="lightbox-video" ng-if="question.options.asset.type == 'video'" ng-src="{{question.video}}" frameborder="0" allowfullscreen></iframe>
 			</div>
 		</section>
+
+		<!-- MAIN PLAYER SCRIPT -->
+		<script src="player.js"></script>
 	</body>
 </html>

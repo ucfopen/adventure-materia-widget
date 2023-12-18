@@ -11,6 +11,7 @@ Each point on the tree, known as a *destination* or *node*, represents a screen 
 1. Title of the widget
 2. A blank destination
 3. Zoom controls
+4. Inventory items
 
 ## Details ##
 
@@ -62,17 +63,19 @@ Each destination type is identified by an icon. An example tree is shown below:
 
 The Short Answer screen is very similar to the Multiple Choice screen, with the exception of how it handles answers. Users enter a response based on the question text or image.
 
-![adventure creator shortanswer](assets/create_widget_adventure_screen_sa.png "adventure creator shortanswer")
+![adventure creator shortanswer](assets/create_widget_adventure_screen_sa_updated.png "adventure creator shortanswer")
 
 1. Question text field
 2. Add an image to accompany the question
 3. Add a new word or phrase to match
 4. Set of words or phrases that can be matched for this answer
-5. Optional feedback to accompany this set of answers
-6. The destination this answer set will point to
-7. Delete this answer set
-8. Add an additional answer set
-9. The catch-all answer set if a user's response does not match any provided answers
+5. Option to make matches case sensitive (e.g. "match" will be treated differently than "MATCH")
+6. Option to make matches special character sensitive (e.g. "$5" will be treated differently than "5")
+7. Optional feedback to accompany this set of answers
+8. The destination this answer set will point to
+9. Delete this answer set
+10. Add an additional answer set
+11. The catch-all answer set if a user's response does not match any provided answers
 
 <aside>
 	The widget will attempt to match the user's response to all possible answers provided across all answer sets. If no match is made, the <em>Unmatched Answers</em> choice is selected.
@@ -169,6 +172,125 @@ For any destination type besides Hotspot, selecting the **Add Media** button cha
 ![adventure media uploader](assets/create_widget_adventure_media_upload.png "adventure media uploader")
 
 If you choose to upload an image, the image uploader will be displayed, where you can upload images from your computer, or select an image you've previously uploaded to Materia. Once you've selected an image or video, you can use the **Swap with Question** button below the media to switch the arrangement of the image and question text. Narrative and End Point destinations allow you to choose between vertical as well as horizontal arrangements. Select **Change Media** to choose a different image or video.
+
+## Inventory System ##
+
+Optionally, you can choose to use the inventory system. The inventory system allows you to give the player items or remove items from the player's inventory for each destination they visit.
+
+Additionally, you can require the player to have certain items in their inventory to be able to select an answer option in Multiple Choice, Short Answer, or Hotspot.
+
+### Creating Inventory Items ###
+
+To use the inventory system, you must first create the items. Click **Add Inventory Items**.
+
+![adventure add inventory button](assets/create_widget_adventure_add_inventory_items.png "adventure add inventory button")
+
+This will open the Item Editor where you can begin creating items.
+
+![adventure item editor](assets/create_widget_adventure_item_editor.png "adventure item editor")
+
+1. Enter Item Name
+2. Add Item
+3. Save and Close the Item Editor.
+4. Edit Item
+5. Delete Item (This will also remove the item from all destinations it has been added to. Adding items to destinations will be explained in the next section.)
+
+Clicking **Edit** will open the options for that specific item.
+
+![adventure item editor options](assets/create_widget_adventure_item_editor_options.png "adventure item editor options")
+
+1. Edit the item name
+2. (Optional) Add Item Description
+3. (Optional) Open the Icon Selector
+4. Save Item
+5. (Advanced) Make this a silent item. The player will not see this item in their inventory nor see it listed as a required item for an answer. An instance where this could be useful is in a choices-matter scenario. You could have an answer appear (or not appear) if the player has made a certain choice in the past.
+6. Delete Item
+
+#### Icon Selector ####
+To add icons to an item, click **Select Icon** to open the Icon Selector.
+
+![adventure item icon selector](assets/create_widget_adventure_icon_selector.png "adventure item icon selector")
+
+1. Click an icon to select it. Click it again to remove it.
+2. To upload your own icon, select **Upload Icon** inside the icon selector. This will display the image uploader. PNG, JPG, and SVG files are all accepted. Uploaded icons will show up at the bottom of the icon selector.
+
+Remove *custom uploaded icons* by selecting the icon in the icon selector and clicking **Remove Selected Icon**.
+
+![adventure item icon remove](assets/create_widget_adventure_icon_remove.png "adventure item icon remove")
+
+### Adding Items to Destinations ###
+
+Once you have created the inventory items, an option to add items to destinations will appear in any destination besides End Point.
+
+Selecting the **Add Items** button will display the item editor for individual nodes. Inside the editor, you can choose to add items to a player's inventory or remove items from a player's inventory.
+
+![adventure item add](assets/create_widget_adventure_add_items.png "adventure item add")
+
+1. Select an item from the dropdown
+2. Give the item to the player
+3. Take the item from the player. Note, however, that you can only remove an item from a player's inventory if they already have the item (i.e. you gave the player that item in a previous destination).
+4. Adjust the quantity of the item being given or taken. Only positive values greater than 0 are accepted.
+5. Remove the item
+6. Show Advanced Options.
+
+#### Advanced Options for Giving Items
+
+![adventure item advanced options](assets/create_widget_adventure_item_advanced_options_give.png "adventure item advanced options")
+
+Selecting "Give On First Visit Only" will give the player the item only once upon their initial visit to a destination; if the player returns to this destination, they will not receive the item again.
+
+#### Advanced Options for Taking Items
+
+![adventure item advanced options](assets/create_widget_adventure_item_advanced_options_take.png "adventure item advanced options")
+
+1. Take the item only upon the player's initial visit to the destination.
+2. Take all of this type of item from the player.
+
+### Adding Required Items to Answers ###
+
+Once you have created items, an option to add required items to Multiple Choice Answers, Short Answer Match Sets, or Hotspots will appear in the respective destination types, as indicated by the lock icon (1). An additional setting appears in multiple choice and hotspot answers that allows you to hide the answer if the player does not have the required item(s), indicated by the "eye" icon (2).
+
+#### Multiple Choice ####
+
+![adventure required item mc](assets/create_widget_adventure_mc_required_items.png "adventure required item mc")
+#### Hotspot ####
+
+![adventure required item hotspot](assets/create_widget_adventure_hotspot_required_items.png "adventure required item hotspot")
+
+#### Short Answer ####
+
+![adventure required item sa](assets/create_widget_adventure_sa_required_items.png "adventure required item sa")
+
+### Required Item Editor ###
+
+Although the image below was taken inside the Hotspot, the Required Item Editor appears and functions the same for each destination node type.
+
+![adventure required item editor](assets/create_widget_adventure_required_item_editor.png "adventure required item editor")
+
+1. Select an item from the dropdown
+2. Make the item required for this answer to be selected
+3. Change the amount required
+4. Remove the item from required items
+5. Show advanced options (see below)
+
+#### Advanced Options
+
+![adventure required item editor advanced options](assets/create_widget_adventure_required_item_editor_advanced.png "adventure required item editor advanced options")
+
+The advanced options allow you to set the required item amount to be within a specific range.
+
+1. Set the minimum number the player can have of this item to select this answer.
+2. Set the maximum number the player can have of this item to select this answer.
+3. (Default) Set the maximum to have no cap.
+
+### Example Tree Using Inventory System ###
+
+![adventure tree with items](assets/create_widget_adventure_tree_with_items.png "adventure tree with items")
+
+1. Destinations that give or take items will display them in a circle surrounding the node.
+2. Items being taken by the destination will have a red circle around them. Items being given will have a green circle around them.
+3. The lock icon indicates that the answer choice requires items in order for the player to select it. Hover over the lock to see which items are required.
+4. The total number of items created will be displayed by the **Edit Inventory Items** button in parantheses.
 
 ## Action History ##
 

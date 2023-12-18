@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html ng-app="Adventure">
+<html>
 	<head>
 		<title>Create an Adventure Widget</title>
 		<meta charset="utf-8" />
 
 		<!-- FONTS -->
-		<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900,400italic' rel='stylesheet' type='text/css'>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Roboto+Mono&display=swap" rel="stylesheet">
 
 		<!-- STYLESHEETS -->
-		<link rel="stylesheet" type="text/css" href="assets/creator-assets/creator.css">
+		<link rel="stylesheet" type="text/css" href="creator.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script src="materia.creatorcore.js"></script>
@@ -18,10 +20,7 @@
 		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-animate.min.js'></script>
 		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-sanitize.min.js'></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
-
-		<!-- MAIN CREATOR SCRIPT -->
-		<script src="assets/creator-assets/creator.js"></script>
-		<script src="assets/legacyQsetSrv.js"></script>
+		<script src="//cdn.skypack.dev/d3-drag@3" charset="utf-8"></script>
 
 	</head>
 	<body ng-controller="AdventureCtrl" id="body">
@@ -31,51 +30,171 @@
 			<button type="button"
 				ng-click="modeManagerAction()">{{modeManagerActionText}}</button>
 		</mode-manager-overlay>
-		<header class="title-header">
-			<img class="logo" src="assets/creator-assets/materialogo.png" alt="Materia Logo" />
-			<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
-			<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
-			<div class="header-options-box">
-				<p>Hide Title When Playing Widget</p>
-				<div class="options-check-slide fancy-toggle">
-					<input type="checkbox" ng-model="hidePlayerTitle" id="options-check-slide-input"/>
-					<label for="options-check-slide-input"></label>
+		<header class="title-header inert-on-dialog">
+			<section class="justify-left">
+				<img class="logo" src="assets/creator-assets/materia-logo.svg" alt="Materia Logo" />
+				<h1 id="title" ng-click="showTitleEditor = true">{{title}}</h1>
+				<div class="edit-title" ng-click="showTitleEditor = true">Edit...</div>
+			</section>
+			<section class="justify-right">
+				<preview-node-selector class="header-options-box">
+					<p>Start Preview On</p>
+					<button type="button"
+						class="preview-node-select"
+						ng-click="selectPreviewNode()">{{ integerToLetters(startID) }}
+					</button>
+				</preview-node-selector>
+				<div class="header-options-box">
+					<p>Hide Title When Playing Widget</p>
+					<div class="options-check-slide fancy-toggle">
+						<input type="checkbox" ng-model="hidePlayerTitle" id="options-check-slide-input"/>
+						<label for="options-check-slide-input"></label>
+					</div>
 				</div>
-			</div>
-			<div class="header-options-box">
-				<p>Widget Scoring Mode</p>
-				<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
-			</div>
-			<!-- <button type="button" class="temp-qset-gen-button" ng-click="onSaveClicked('publish')">Simulate Publish</button> -->
+				<div class="header-options-box">
+					<p>Widget Scoring Mode</p>
+					<button type="button" class="header-options-button" ng-click="showScoreModeDialog = true; showBackgroundCover = true">{{scoreMode}}</button>
+				</div>
+			</section>
 		</header>
 		<div id="adventure-container">
-			<div class="zoom-buttons" zoom-buttons>
-				<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
-				<svg class="zoom-button"
-					width="40"
-					height="40"
-					ng-click="zoomTreeIn()">
-					<path d="M 18,8 L 18,18 L 8,18 L 8,22 L 18,22 L 18,32 L 22,32 L 22,22 L 32,22 L 32,18 L 22,18 L 22,8 Z"></path>
-				</svg>
-				<svg class="zoom-button"
-					width="40"
-					height="40"
-					ng-click="zoomTreeOut()">
-					<path d="M 8,18 L 8,22 L 32,22 L 32,18 Z"></path>
-				</svg>
-				<button type="button"
-					ng-click="resetZoom()">Reset</button>
+			<div class="inert-on-dialog" aria-hidden="showBackgroundCover || showInventoryBackgroundCover">
+				<div class="zoom-buttons" zoom-buttons>
+					<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
+					<svg class="zoom-button"
+						width="40"
+						height="40"
+						ng-click="zoomTreeIn()">
+						<path d="M 18,8 L 18,18 L 8,18 L 8,22 L 18,22 L 18,32 L 22,32 L 22,22 L 32,22 L 32,18 L 22,18 L 22,8 Z"></path>
+					</svg>
+					<svg class="zoom-button"
+						width="40"
+						height="40"
+						ng-click="zoomTreeOut()">
+						<path d="M 8,18 L 8,22 L 32,22 L 32,18 Z"></path>
+					</svg>
+					<button type="button"
+						ng-click="resetZoom()">Reset</button>
+				</div>
+				<div class="open-inventory-items-btn" ng-click="openItemManager()">
+					<img src="assets/creator-assets/BackPackIcon.png"/>
+					<p>{{inventoryItems.length ? 'Manage Inventory ('+inventoryItems.length+')': 'Add Inventory Items'}}</p>
+				</div>
 			</div>
-			<title-editor ng-show="showTitleEditor">
-				<h4>Give Your Widget a Title</h4>
-				<input type="text"
-					ng-model="title"
-					enter-submit="hideCoverAndModals()"
-					auto-select />
-				<button type="button"
-					class="important-button"
-					ng-click="hideCoverAndModals()">Done</button>
-			</title-editor>
+
+			<item-manager class="item-manager" id="item-manager" ng-class="{ show: showItemManager }" inert>
+				<div class="item-header">
+					<div class="item-heading">
+						<h4>Manage Inventory</h4>
+						<span class="hide-popup-btn icon-cross"
+						ng-click="saveAndCloseInventory()"
+						ng-keypress="$event.keyCode === 13 ? saveAndCloseInventory() : ''"
+						tabindex="0"></span>
+					</div>
+				</div>
+				<div class="inventory-introduction" ng-if="inventoryItems.length == 0">
+					<h3>Item Inventory</h3>
+					<span>Create items to enhance your Adventure! Items add additional depth to the player experience: reward them upon reaching certain destinations and gate certain decisions behind item possession.
+						Items can represent physical goods, currencies, or status effects like reputation or emotional states.</span>
+					<span>Begin by creating at least one item below. Afterwards, additional options will be present at each destination to manage item distribution and answer requirements.</span>
+				</div>
+				<ul class="list-items">
+					<li
+						ng-class="{'selected' : editingIndex == $index}"
+						ng-repeat="item in inventoryItems track by item.id"
+						ng-mouseover="hoverItem = true"
+						ng-mouseout="hoverItem = false"
+					>
+						<div class="item-icon"
+						ng-click="toggleItemIconSelector(item, $index)">
+							<img ng-if="item.icon.url" ng-src="{{item.icon.url}}" ng-alt="{{item.icon.alt}}"/>
+							<div ng-if="item.icon.url == undefined" class="no-icon"></div>
+							<button
+								ng-show="editingIndex == $index"
+							>Select Icon</button>
+						</div>
+						<div class="item-content">
+							<div class="item-name">
+								<span ng-show="editingIndex != $index">{{item.name}}</span>
+								<input
+									type="text"
+									ng-model="item.name"
+									ng-show="editingIndex == $index"
+									enter-submit="handleEditItem(item, $index, $event)"
+									auto-select
+								/>
+							</div>
+							<div class="item-description">
+								<span ng-show="editingIndex != $index" class="description">{{item.description}}</span>
+								<textarea
+									ng-model="item.description"
+									ng-show="editingIndex == $index"
+									placeholder="(Optional) Enter Item Description Here"
+									enter-submit="handleEditItem(item, $index, $event)"
+									auto-select></textarea>
+								<p class="advanced-button" ng-click="showSilentOption = !showSilentOption" ng-show="editingIndex == $index">Advanced <i class="arrow-bottom" ng-show="!showSilentOption"></i><i class="arrow-top" ng-show="showSilentOption"></i></p>
+								<div ng-show="showSilentOption && editingIndex == $index" class="silent-option">
+									<input type="checkbox" id="{{item.id}}-silent-item" ng-model="item.isSilent"/>
+									<label for="{{item.id}}-silent-item">Silent Item <i>(always hidden from player)</i></label>
+								</div>
+								<div ng-show="item.isSilent && editingIndex != $index"  class="silent-option">
+									<img src="assets/creator-assets/eye-blocked.png"/>
+									<p>Silent Item</p>
+								</div>
+							</div>
+						</div>
+						<button type="button"
+						class="important-button"
+						ng-class="{'save': editingIndex == $index}"
+						ng-click="handleEditItem(item, $index, $event)">{{editingIndex == $index ? 'Save' : 'Edit'}}</button>
+
+						<button class="delete-button icon-cross" title='Remove item from inventory' type="button" ng-click="removeItemFromInventoryItems($index, item)"></button>
+						<item-icon-selector class="item-selection" ng-class="{ show: showItemIconSelector && editingItemIcon == item }">
+							<div class="item-header">
+								<h4>Select or Upload an Icon</h4>
+							</div>
+							<ul class="icons-list">
+								<li ng-class="{'selectedIcon' : currentItem.icon == icon}"
+								ng-repeat="icon in icons"
+								ng-click="handleIconClick(icon)">
+									<img ng-if="icon.url" ng-src="{{icon.url}}" ng-alt="{{icon.alt}}"/>
+								</li>
+							</ul>
+							<div class="options-bar">
+								<div class="icon-uploader-options">
+									<button type="button"
+										class="important-button"
+										ng-click="uploadIcon()">Upload Icon</button>
+									<button type="button"
+									class="important-button delete-button"
+									ng-click="removeSelectedIcon()"
+									ng-if="currentItem.icon.is_custom">Remove Selected Icon</button>
+								</div>
+								<button type="button"
+									class="important-button save-button"
+									ng-click="toggleItemIconSelector()">Done</button>
+							</div>
+						</item-icon-selector>
+						<i class="arrow-left" ng-show="showItemIconSelector && editingItemIcon == item"></i>
+					</li>
+				</ul>
+				<div class="options-bar">
+					<div class="options-bar-add-item">
+						<input type="text"
+						ng-model="newItemName"
+						placeholder="Enter Item Name Here"
+						enter-submit="addNewItem()"
+						auto-select />
+						<button type="button"
+							class="important-button"
+							ng-click="addNewItem()">Add
+						</button>
+					</div>
+					<button type="button"
+						class="important-button save-button"
+						ng-click="saveAndCloseInventory()">Done</button>
+				</div>
+			</item-manager>
 			<debug-qset-generator ng-show="showQsetGenerator">
 				<h4>Generated QSet</h4>
 				<textarea ng-model="generatedQset" auto-select></textarea>
@@ -87,6 +206,16 @@
 				<button type="button" ng-click="loadDebugQset()">Load Qset</button>
 				<button type="button" ng-click="loadOldDebugQset()">Load OLD Qset</button>
 			</debug-qset-loader>
+			<title-editor ng-show="showTitleEditor">
+				<h4>Give Your Widget a Title</h4>
+				<input type="text"
+					ng-model="title"
+					enter-submit="hideCoverAndModals()"
+					auto-select />
+				<button type="button"
+					class="important-button"
+					ng-click="hideCoverAndModals()">Done</button>
+			</title-editor>
 			<validation-dialog ng-show="validation.show">
 				<h4>Just a sec!</h4>
 				<p class="error-count">{{validation.errors.length}} problem{{validation.errors.length > 1 ? "s" : ""}} found.</p>
@@ -97,7 +226,7 @@
 						<!-- Missing Answer Error -->
 						<svg width="35"
 							height="35"
-							ng-if="error.type == 'missing_answer_node'">
+							ng-if="error.type == 'missing_answer_node' || error.type == 'unreachable_destination'">
 							<circle fill="none"
 								stroke="#000000"
 								stroke-width="2"
@@ -133,6 +262,9 @@
 							<polygon points="22.8,29.1 19.7,26.1 19.2,31.5 "/>
 						</svg>
 						<p ng-if="error.type == 'missing_answer_node'">An answer for <span class="bold">Destination {{integerToLetters(error.node)}}</span> pointed somewhere that didn't exist. The answer now points to Destination {{integerToLetters(error.correctedTarget)}}.</p>
+
+						<!-- Unreachable destination error -->
+						<p ng-if="error.type == 'unreachable_destination'">Destination {{integerToLetters(error.node)}} is unreachable!</p>
 
 						<!-- Blank Node Error -->
 						<svg width="35"
@@ -396,350 +528,1067 @@
 					<li ng-class="{'selected' : newNodeManager.linkMode == SELF}"  ng-click="selectLinkMode(SELF)">Loop Back to This Destination ( {{integerToLetters(editedNode.id)}} )</li>
 				</ul>
 			</new-node-manager-dialog>
+			<custom-node-label-editor ng-show="showCustomNodeLabelEditor">
+				<h4>Custom Label for This Destination</h4>
+				<p>Provide a custom label for this destination in the creator tree view. It will only be visible to you and other authors of this widget.</p>
+				<input type="text"
+					ng-model="editedNode.customLabel"
+					placeholder="Custom Label"
+					enter-submit="showCustomNodeLabelEditor = false"
+					auto-select
+					maxlength="30"/>
+				<button type="button"
+					class="important-button"
+					ng-click="showCustomNodeLabelEditor = false">Done</button>
+			</custom-node-label-editor>
 			<node-creation class="node-creation-screen"
 				ng-click="hidePopup"
-				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT}"
+				ng-class="{'short' : displayNodeCreation == NARR || displayNodeCreation == END, 'long' : displayNodeCreation == SHORTANS || displayNodeCreation == HOTSPOT, 'hotspot' : displayNodeCreation == HOTSPOT, 'multi-choice': displayNodeCreation == MC}"
 				ng-show="displayNodeCreation != 'none' && displayNodeCreation != 'suspended'">
-				<h2 ng-if="displayNodeCreation == MC">Multiple Choice for {{editedNode.name}}</h2>
-				<h2 ng-if="displayNodeCreation == SHORTANS">Short Answer for {{editedNode.name}}</h2>
-				<h2 ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{editedNode.name}}</h2>
-				<h2 ng-if="displayNodeCreation == NARR">Narrative for {{editedNode.name}}</h2>
-				<h2 ng-if="displayNodeCreation == END">End Point for {{editedNode.name}}</h2>
-				<textarea class="question-box"
-					ng-class="{
-						'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
-						'tiny' : displayNodeCreation == HOTSPOT,
-						'align-top' : editedNode.media.align == 'top',
-						'align-bottom' : editedNode.media.align == 'bottom',
-						'shared' : (mediaReady && displayNodeCreation != HOTSPOT),
-						'align-right' : editedNode.media.align == 'left'}"
-					ng-model="question"
-					placeholder="{{questionPlaceholder}}"></textarea>
-				<div class="media-box"
-					ng-class="{
-						'align-left' : editedNode.media.align == 'left',
-						'align-right' : editedNode.media.align == 'right',
-						'align-top' : editedNode.media.align == 'top',
-						'align-bottom' : editedNode.media.align == 'bottom'}"
-					ng-show="mediaReady && displayNodeCreation != HOTSPOT">
-					<img ng-show="showImage" ng-src="{{image.src}}" />
-					<iframe ng-show="!showImage" width="100%" height="100%" ng-src="{{url}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-					<input class="image-alt-text" ng-if="editedNode.media.type == 'image'" ng-model="editedNode.media.alt" placeholder="Image alt text" />
-					<div class="media-toolbar">
-						<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
-						<button type="button" ng-show="displayNodeCreation == NARR || displayNodeCreation == END" ng-click="swapMediaOrientation()">Change Orientation: {{ (editedNode.media.align == 'top' || editedNode.media.align == 'bottom') ? "Horizontal" : "Vertical" }}</button>
-						<button type="button" ng-click="changeMedia()">Change Media</button>
-						<button type="button" class="delete-button" ng-click="removeMedia()">Remove</button>
+				<h2>
+					<span ng-if="displayNodeCreation == MC">Multiple Choice for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == SHORTANS">Short Answer for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == HOTSPOT">Hotspot for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == NARR">Narrative for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<span ng-if="displayNodeCreation == END">End Point for {{ integerToLetters(editedNode.id) }} {{ editedNode.customLabel ? ': ' + editedNode.customLabel : ''}}</span>
+					<button class="add-custom-node-label" ng-click="showCustomNodeLabelEditor = true">Custom Label...</button>
+				</h2>
+				<div class="node-creation-panels">
+					<div class="panel-left" ng-class="{'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
+					'tiny' : displayNodeCreation == HOTSPOT, 'column': (showRequiredItems || showItemSelection) && displayNodeCreation != HOTSPOT }">
+						<div class="question-media-box" ng-class="{
+							'align-left' : editedNode.media.align == 'left',
+							'align-right' : editedNode.media.align == 'right',
+							'align-top' : editedNode.media.align == 'top',
+							'align-bottom' : editedNode.media.align == 'bottom','expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
+							'tiny' : displayNodeCreation == HOTSPOT}" >
+							<textarea class="question-box"
+								ng-class="{
+									'expanded' : (displayNodeCreation == NARR || displayNodeCreation == END),
+									'tiny' : displayNodeCreation == HOTSPOT}"
+								ng-model="question"
+								placeholder="{{questionPlaceholder}}"></textarea>
+							<div class="media-box"
+								ng-show="mediaReady && displayNodeCreation != HOTSPOT">
+								<div class="image-box">
+									<img ng-show="showImage" ng-src="{{image.src}}" />
+									<input class="image-alt-text" ng-if="editedNode.media.type == 'image'" ng-model="editedNode.media.alt" placeholder="Image alt text" />
+								</div>
+								<iframe ng-show="!showImage" width="100%" height="100%" ng-src="{{url}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+								<div class="media-toolbar">
+									<button type="button" ng-click="swapMediaAndQuestion()">Swap with Question</button>
+									<button type="button" ng-show="displayNodeCreation == NARR || displayNodeCreation == END" ng-click="swapMediaOrientation()">Change Orientation: {{ (editedNode.media.align == 'top' || editedNode.media.align == 'bottom') ? "Horizontal" : "Vertical" }}</button>
+									<button type="button" ng-click="changeMedia()">Change Media</button>
+									<button type="button" class="delete-button" ng-click="removeMedia()">Remove</button>
+								</div>
+							</div>
+							<button type="button"
+								id="big-upload-button"
+								ng-if="displayNodeCreation != HOTSPOT"
+								ng-hide="mediaReady"
+								ng-click="showPopup()">
+									<span>+</span>Add Media
+							</button>
+						</div>
+						<div class="answers-container"
+							ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS"
+							auto-scroll-and-select>
+							<ul>
+								<li class="unmatched-answers-row"
+									ng-if="displayNodeCreation == SHORTANS">
+									<div class="unmatched-left-padding"></div>
+									<div class="answer-textareas">
+										<div class="unmatched-answers-box">
+											<p><span>Unmatched Answers:</span> Used if the response doesn't match any possible answers you provided.</p>
+										</div>
+										<input type="text" ng-model="answers[0].feedback" placeholder="Enter Optional Feedback" />
+									</div>
+									<div class="answer-options">
+										<div class="answer-destination">
+											<p>Destination</p>
+											<button type="button"
+												class="answer-node-select"
+												ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+												ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}
+											</button>
+										</div>
+									</div>
+
+								</li>
+								<li ng-repeat="answer in answers"
+								ng-show="displayNodeCreation == MC || displayNodeCreation == SHORTANS && $index > 0"
+								ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}">
+									<div ng-if="displayNodeCreation == MC" class="answer">
+										<div class="answer-removal-options">
+											<button type="button"
+												class="delete-button icon-cross"
+												ng-click="removeAnswerPreCheck($index, $event)"></button>
+											<button  ng-show="answer.requiredItems[0]"  ng-click="answer.hideAnswer = !answer.hideAnswer" aria-label="answer.hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answer.hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
+												<img ng-if="!answer.hideAnswer" src="assets/creator-assets/eye.png"/>
+												<img ng-if="answer.hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
+												<div ng-if="showHideAnswerTooltip" class="hide-answer-tooltip"><p ng-if="!answer.hideAnswer">Answer will be visible to all players, with or without the required items</p><p ng-if="answer.hideAnswer">Answer will be hidden to players without the required items</p></div>
+											</button>
+										</div>
+										<div class="answer-textareas">
+											<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
+											<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
+										</div>
+										<div class="answer-options">
+											<div class="answer-destination" ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">
+												<p>Destination</p>
+												<button type="button"
+													class="answer-node-select"
+													ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+													><span class="node-label">{{ integerToLetters(answer.target) }}</span>
+												</button>
+											</div>
+											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-class="{'requires-items': answer.requiredItems[0]}" ng-click="toggleRequiredItemsModal(answer)" title="Require Items" aria-label="Open Required Items Window for Answer" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
+												<div ng-class="{'unlocked': !answer.requiredItems[0], 'locked': answer.requiredItems[0]}">
+													<img src="assets/creator-assets/unlocked.png" ng-if="!answer.requiredItems[0]"/>
+													<img src="assets/creator-assets/lock.png" ng-if="answer.requiredItems[0]"/>
+													<i class="arrow-right"></i>
+												</div>
+												<span>{{answer.requiredItems[0] ? 'Edit Required Items' : 'No Required Items'}}</span>
+											</button>
+										</div>
+									</div>
+									<div ng-if="displayNodeCreation == SHORTANS" class="answer"
+										short-answer-set>
+										<div class="answer-removal-options">
+											<button type="button"
+												class="delete-button icon-cross"
+												ng-click="removeAnswerPreCheck($index, $event)"></button>
+
+										</div>
+										<div class="answer-textareas">
+											<div class="add-match-box">
+												<input type="text"
+													class="shared-row"
+													ng-model="newMatch"
+													placeholder="Add a possible answer. Matches are case insensitive by default."
+													enter-submit="addAnswerMatch($index)"></input>
+												<button type="button"
+													class="important-button add-match"
+													ng-click="addAnswerMatch($index)">Add Match</button>
+											</div>
+											<div class="possible-answers-box">
+												<p ng-hide="answer.matches.length">Possible answers will be shown here. Click an answer to remove it.</p>
+												<button type="button"
+													ng-repeat="match in answer.matches"
+													ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
+											</div>
+											<div class="match-options">
+												<input type="checkbox"
+													ng-model="answer.caseSensitive" id="caseSensitive"/>
+												<label for="caseSensitive">Make Matches Case Sensitive</label>
+												<input type="checkbox"
+													ng-model="answer.characterSensitive" id="characterSensitive"/>
+												<label for="characterSensitive">Make Matches Special Character Sensitive ('$', '#', '%', etc.)</label>
+											</div>
+											<input type="text"
+												ng-model="answer.feedback"
+												placeholder="Enter Optional Feedback" />
+										</div>
+										<div class="answer-options">
+											<div class="answer-destination" ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">
+												<p>Destination</p>
+												<button type="button"
+													class="answer-node-select"
+													ng-class="{'managed' : answer.id == newNodeManager.answerId}"
+													>{{ integerToLetters(answer.target) }}
+												</button>
+											</div>
+											<button ng-show="inventoryItems[0]" class="require-item-btn" ng-click="toggleRequiredItemsModal(answer)" ng-mouseover="answer.showTooltip = true" ng-mouseout="answer.showTooltip = false">
+												<div ng-class="{'unlocked': !answer.requiredItems[0], 'locked': answer.requiredItems[0]}">
+													<img src="assets/creator-assets/unlocked.png" ng-if="!answer.requiredItems[0]"/>
+													<img src="assets/creator-assets/lock.png" ng-if="answer.requiredItems[0]"/>
+													<i class="arrow-right"></i>
+												</div>
+												<span>{{answer.requiredItems[0] ? 'Edit Required Items' : 'No Required Items'}}</span>
+											</button>
+										</div>
+									</div>
+									<!-- required items modal for answer choices -->
+									<div class="item-selection item-modal required-item-modal" ng-class="{ show : showRequiredItems && currentAnswer == answer}"
+									ng-mousedown="modalDragStart($event)">
+										<div class="item-header">
+											<div class="item-heading">
+												<h3>Required Items for Answer</h3>
+												<span class="hide-popup-btn icon-cross"
+												ng-click="toggleRequiredItemsModal(answer)"
+												ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answer) : ''"
+												tabindex="0"></span>
+											</div>
+											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
+											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">{{invalidQuantity}}</p>
+											<p class="item-instructions invalid-quantity-message"  ng-if="invalidMaxQuantity">{{invalidMaxQuantity}}</p>
+										</div>
+										<ul class="list-items">
+											<li
+												ng-repeat="item in currentAnswer.requiredItems"
+												ng-mouseover="hoverItem = true"
+												ng-mouseout="hoverItem = false"
+												class="answer-required-item"
+												class="item-details"
+											>
+													<div class="item-icon">
+														<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+													</div>
+													<div class="item-content" ng-class="{'small-name': showAdvancedOptions}">
+														<div class="item-name">
+															<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+														</div>
+													</div>
+													<div class="item-options-container" ng-class="{'flex-start': showAdvancedOptions, 'show': hoverItem}">
+														<div class="item-minimum-quantity">
+															<label ng-show="!showAdvancedOptions"  for="increase-required-count-{{item.id}}">Required Quantity</label>
+															<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
+															<input ng-show="!showAdvancedOptions" ng-focus = "event = $event" id="increase-required-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+															<input ng-show="showAdvancedOptions" ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item, true)"/>
+														</div>
+														<div class="item-quantity-options">
+															<div class="item-maximum" ng-show="showAdvancedOptions">
+																<div class="item-quantity" ng-show="!item.uncappedMax">
+																	<label for="increase-max-count-{{item.id}}">Max Quantity</label>
+																	<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="0"  ng-change="updateMaxCount(event, item)"/>
+																</div>
+																<div class="item-quantity">
+																	<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
+																	<label for="unlimited-option-{{item.id}}">Uncapped Max</label>
+																</div>
+															</div>
+														</div>
+														<div class="quantity-explanation" ng-show="showAdvancedOptions">
+															<p ng-if="item.minCount == 0 && item.uncappedMax">Player is not required to have any amount of this item.</p>
+															<p ng-if="item.minCount == 0 && item.maxCount != 0 && !item.uncappedMax">Player will need to have none or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
+															<p ng-if="item.minCount > 0 && item.uncappedMax">Player will need to have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
+															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player will need to have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
+															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player will need to have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+															<p ng-if="item.minCount == 0 && item.maxCount == 0 && !item.uncappedMax">Player must not have this item.</p>
+														</div>
+													</div>
+													<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+											</li>
+										</ul>
+										<div class="options-bar add-item">
+											<div class="selector">
+												<dl ng-class="{'row': !availableItems[0] }">
+													<dt ng-if="!availableItems[0]" class="blank-selection">
+														<i class="arrow-top"></i>
+													</dt>
+													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
+														<div class="option-contents">
+															<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+															{{inventoryItems[getItemIndex(selectedItem)].name}}
+														</div>
+														<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
+													</dt>
+													<div  class="options" ng-show="showDropdown">
+														<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
+															<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" />
+															{{inventoryItems[getItemIndex(item)].name}}
+															</dt>
+													</div>
+												</dl>
+												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
+											</div>
+
+											<div class="advanced-option">
+												<input type="checkbox" ng-model="showAdvancedOptions" ng-click="toggleAdvancedOptions()" id="answer-show-advanced"/>
+												<label for="answer-show-advanced">Use Advanced Options</label>
+											</div>
+
+											<!-- <button class="save-button important-button"
+											ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+											type="button"
+											ng-click="toggleRequiredItemsModal()">Done
+											</button> -->
+										</div>
+										<!-- <i class="arrow-right"></i> -->
+									</div>
+
+								</li>
+							</ul>
+						</div>
+						<!-- container for all hotspot-specific elements and interactions -->
+						<!-- effectively replaces the default answers container -->
+						<hotspot-manager class="hotspot-container"
+							id="hotspot-manager"
+							ng-if="displayNodeCreation == HOTSPOT">
+							<div class="image-manager">
+								<div ng-show="!mediaReady" class="no-media">
+									<p>No Image Selected</p>
+								</div>
+								<div class="image-container" ng-show="mediaReady">
+									<!-- SVG canvas placed over the primary hotspot canvas for drawing a polygon -->
+									<svg id="polygon-svg-artboard"
+										ng-show="polygonDrawMode"
+										ng-click="recordClicks($event)"
+										ng-mousemove="updateCursorPoint($event)"
+										polygon-artboard>
+										<!-- Guide line for indicating where next section of the polyline will be drawn -->
+										<line
+											ng-if="polygonPoints"
+											ng-attr-x1="{{lastClicked.x}}"
+											ng-attr-y1="{{lastClicked.y}}"
+											ng-attr-x2="{{cursorPoint.x}}"
+											ng-attr-y2="{{cursorPoint.y}}"
+											stroke="black"
+										/>
+										<!-- Open polygon, points will be converted to final polygon on the main hotspot svg -->
+										<polyline fill="none"
+											stroke="black"
+											ng-attr-points="{{polygonPoints}}" />
+									</svg>
+									<div id="hotspot-label"
+										ng-class="{'hidden':!hotspotLabelTarget.show}"
+										ng-style="{'opacity': hotspotLabelTarget.show ? '1' : '0', 'top': hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px' }">
+											{{ hotspotLabelTarget.text }}
+									</div>
+									<!-- SVG canvas upon which all hotspots are drawn -->
+									<svg id="hotspot-canvas"
+										ng-show="mediaReady"
+										ng-click="closeManager($event)">
+										<g ng-repeat="answer in answers"
+											data-answer="answer"
+											ng-attr-transform="matrix(1 0 0 1 {{answer.svg.x}} {{answer.svg.y}})">
+											<ellipse ng-if="answer.svg.type == 'ellipse'"
+												ng-class="{'moving':selectedSVG.selected}"
+												ng-attr-cx="0"
+												ng-attr-cy="0"
+												ng-attr-rx="{{answer.svg.r + answer.svg.scaleXFactor}}"
+												ng-attr-ry="{{answer.svg.r + answer.svg.scaleYFactor}}"
+												fill="{{answer.svg.fill}}"
+												stroke="{{answer.svg.fill}}"
+												stroke-width="{{answer.svg.stroke}}"
+												fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+												ng-mouseenter="highlightSVG = true; attachLabel($index, $event)"
+												ng-mousedown="selectSVG($event)"
+												ng-mouseup="deselectSVG($event)"
+												ng-mouseleave="deselectSVG($event); highlightSVG = false; detachLabel()"
+												ng-mousemove="moveSVG($index, $event)"
+												ng-click="manageSVG($index, $event)" />
+
+											<rect ng-if="answer.svg.type == 'rect'"
+												ng-class="{'moving':selectedSVG.selected}"
+												ng-attr-x="0"
+												ng-attr-y="0"
+												ng-attr-width="{{answer.svg.width + answer.svg.scaleXFactor}}"
+												ng-attr-height="{{answer.svg.height + answer.svg.scaleYFactor}}"
+												fill="{{answer.svg.fill}}"
+												stroke="{{answer.svg.fill}}"
+												stroke-width="{{answer.svg.stroke}}"
+												fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+												ng-mouseenter="highlightSVG = true; attachLabel($index, $event)"
+												ng-mousedown="selectSVG($event)"
+												ng-mouseup="deselectSVG($event)"
+												ng-mouseleave="deselectSVG($event); highlightSVG = false; detachLabel()"
+												ng-mousemove="moveSVG($index, $event)"
+												ng-click="manageSVG($index, $event)" />
+
+											<polygon ng-if="answer.svg.type == 'polygon'"
+												ng-class="{'moving':selectedSVG.selected}"
+												ng-attr-points="{{answer.svg.points}}"
+												fill="{{answer.svg.fill}}"
+												stroke="{{answer.svg.fill}}"
+												stroke-width="{{answer.svg.stroke}}"
+												fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
+												ng-mouseenter="highlightSVG = true; attachLabel($index, $event)"
+												ng-mousedown="selectSVG($event)"
+												ng-mouseup="deselectSVG($event)"
+												ng-mouseleave="deselectSVG($event); highlightSVG = false; detachLabel()"
+												ng-mousemove="moveSVG($index, $event)"
+												ng-click="manageSVG($index, $event)" />
+
+											<!-- Icon for scaling the size of the given SVG hotspot -->
+											<g class="scale"
+												ng-if="answer.svg.type == 'rect' || answer.svg.type =='ellipse'"
+												ng-attr-transform="matrix(1 0 0 1 {{answer.svg.scaleXFactor}} {{answer.svg.scaleYFactor}})"
+												ng-mousedown="startSVGScale($event)"
+												ng-mousemove="scaleSVG($index, $event)"
+												ng-mouseup="endSVGScale($event)"
+												ng-mouseenter="hoverScale = true"
+												ng-mouseleave="hoverScale = false; endSVGScale($event)">
+												<circle ng-attr-r="{{ hoverScale ? '40' : '20' }}"
+													ng-attr-cx="{{answer.svg.scaleXOffset + 8}}"
+													ng-attr-cy="{{answer.svg.scaleYOffset + 8}}"
+													ng-class="{'hovered':hoverScale}"/>
+												<path class="scale-path"
+													d="M17.8,17.8h-7.2l2.8-2.8L10,11.6l1.7-1.7l3.3,3.3l2.8-2.8L17.8,17.8z M6.1,7.8L2.8,4.4L0,7.2L0,0l7.2,0L4.4,2.8l3.3,3.3 L6.1,7.8z"
+													ng-attr-transform="translate({{answer.svg.scaleXOffset}}, {{answer.svg.scaleYOffset}})"></path>
+											</g>
+										</g>
+									</svg>
+									<!-- Background image placed behind the hotspot's SVG canvas -->
+									<div class="hotspot-image-container">
+										<img id="hotspotImage"
+											ng-src="{{image.src}}"
+											ng-show="mediaReady" />
+									</div>
+								</div>
+								<div class="image-options-container" ng-show="mediaReady" >
+									<!-- bottom toolbar with buttons for adding and managing hotspots -->
+									<hotspot-toolbar ng-show="mediaReady">
+										<ul>
+											<li><button type="button"
+												ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
+											<li><button type="button"
+												ng-click="startSquareHotspot()">+ Square Hotspot</button></li>
+											<li><button type="button"
+												ng-click="startPolygonHotspot()">+ Polygon Hotspot</button></li>
+											<li>
+												<button type="button"
+												ng-click="visibilityManagerOpen = !visibilityManagerOpen">Edit Visibility</button>
+												<div class="visibility-manager" ng-show="visibilityManagerOpen" ng-click="bringToFront($event)">
+													<h4>For this image,</h4>
+													<ul>
+														<li ng-class="{'selected':editedNode.hotspotVisibility == ALWAYS}"
+															ng-click="editedNode.hotspotVisibility = ALWAYS; visibilityManagerOpen = false">Always show hotspots</li>
+														<li ng-class="{'selected':editedNode.hotspotVisibility == MOUSEOVER}"
+															ng-click="editedNode.hotspotVisibility = MOUSEOVER; visibilityManagerOpen = false">Reveal hotspots on mouseover</li>
+														<li ng-class="{'selected':editedNode.hotspotVisibility == NEVER}"
+															ng-click="editedNode.hotspotVisibility= NEVER; visibilityManagerOpen = false">Don't show hotspots</li>
+													</ul>
+												</div>
+												<i class="arrow-right" ng-show="visibilityManagerOpen"></i>
+											</li>
+											<li><button type="button"
+												ng-click="beginMediaImport()">Change Media</button></li>
+										</ul>
+										<textarea class="hotspot-alt-text" ng-show="mediaReady" ng-model="editedNode.media.alt" placeholder="Enter alt text for the hotspot image"></textarea>
+									</hotspot-toolbar>
+								</div>
+							</div>
+							<!-- management popup when an individual hotspot is selected -->
+							<hotspot-answer-manager
+							ng-class="{'visible' : hotspotAnswerManager.show}"
+							data-pos-x="{{hotspotAnswerManager.x}}"
+							data-pos-y="{{hotspotAnswerManager.y}}"
+							ng-click="bringToFront($event)"
+							>
+								<div class="hotspot-answer-header"
+								ng-mousedown="dragStart($event)">
+									<h4>Manage This Hotspot</h4>
+									<span class="hide-popup-btn icon-cross"
+									ng-click="hotspotAnswerManager.show = false"
+									ng-keypress="$event.keyCode === 13 ? hotspotAnswerManager.show = false : ''"
+									tabindex="0"></span>
+								</div>
+								<input type="text" id="hotspot-label-input" placeholder="Enter hotspot label here."
+									ng-model="answers[hotspotAnswerManager.answerIndex].text"/>
+								<textarea class="feedback-box"
+									placeholder="Enter optional feedback here."
+									ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
+								<div class="button-options">
+									<!-- required items modal for hotspot -->
+									<div class="item-selection item-modal required-item-modal-hotspot" ng-class="{ show : showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]}"
+									ng-click="bringToFront($event)">
+										<div class="item-header"
+										ng-mousedown="modalDragStart($event)">
+											<div class="item-heading">
+												<h3>Required Items for Hotspot</h3>
+												<span class="hide-popup-btn icon-cross"
+												ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])"
+												ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex]) : ''"
+												tabindex="0"></span>
+											</div>
+											<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
+											<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">{{invalidQuantity}}</p>
+											<p class="item-instructions invalid-quantity-message"  ng-if="invalidMaxQuantity">{{invalidMaxQuantity}}</p>
+										</div>
+										<ul class="list-items give-items">
+											<li
+												ng-repeat="item in currentAnswer.requiredItems"
+												ng-mouseover="hoverItem = true"
+												ng-mouseout="hoverItem = false"
+												class="answer-required-item"
+											>
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content" ng-class="{'small-name': showAdvancedOptions}">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+												</div>
+												<div class="item-options-container" ng-class="{'show': hoverItem}">
+
+													<div class="item-minimum-quantity">
+														<label ng-show="!showAdvancedOptions"  for="increase-required-count-{{item.id}}">Required Quantity</label>
+														<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
+														<input ng-show="!showAdvancedOptions" ng-focus = "event = $event" id="increase-required-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+														<input ng-show="showAdvancedOptions" ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item, true)"/>
+													</div>
+													<div class="item-quantity-options">
+														<div class="item-maximum" ng-show="showAdvancedOptions">
+															<div class="item-quantity" ng-show="!item.uncappedMax">
+																<label for="increase-max-count-{{item.id}}">Max Quantity</label>
+																<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="0"  ng-change="updateMaxCount(event, item)"/>
+															</div>
+															<div class="item-quantity">
+																<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
+																<label for="unlimited-option-{{item.id}}">Uncapped Max</label>
+															</div>
+														</div>
+														<div class="quantity-explanation" ng-show="showAdvancedOptions">
+															<p ng-if="item.minCount == 0 && item.uncappedMax">Player is not required to have any amount of this item.</p>
+															<p ng-if="item.minCount == 0 && item.maxCount != 0 && !item.uncappedMax">Player must have <code>0</code> or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
+															<p ng-if="item.minCount > 0 && item.uncappedMax">Player must have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
+															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player must have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
+															<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player must have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+															<p ng-if="item.minCount == 0 && item.maxCount == 0">Player must not have this item.</p>
+														</div>
+													</div>
+												</div>
+												<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+											</li>
+										</ul>
+										<div class="options-bar add-item">
+											<div class="selector">
+												<dl ng-class="{'row': !availableItems[0] }">
+													<dt ng-if="!availableItems[0]" class="blank-selection">
+														<i class="arrow-top"></i>
+													</dt>
+													<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
+														<div class="option-contents">
+															<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+															{{inventoryItems[getItemIndex(selectedItem)].name}}
+														</div>
+														<i ng-class="{'arrow-top': showDropdown, 'arrow-bottom': !showDropdown}"></i>
+													</dt>
+													<div  class="options" ng-show="showDropdown">
+														<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
+															<img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" />
+															{{inventoryItems[getItemIndex(item)].name}}
+															</dt>
+													</div>
+												</dl>
+												<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
+											</div>
+										</div>
+										<div class="advanced-option">
+											<input type="checkbox" ng-model="showAdvancedOptions" id="answer-show-advanced"/>
+											<label for="answer-show-advanced">Show Advanced Options</label>
+										</div>
+
+										<i class="arrow-left" ng-show="showRequiredItems && currentAnswer == answers[hotspotAnswerManager.answerIndex]"></i>
+									</div>
+
+									<button ng-show="inventoryItems[0]" title="Require Items" aria-label="Open Required Items Window for Answer" class="require-item-btn" id="hotspot-require-item-btn" ng-click="toggleRequiredItemsModal(answers[hotspotAnswerManager.answerIndex])" ng-mouseover="answers[hotspotAnswerManager.answerIndex].showTooltip = false" ng-mouseout="answers[hotspotAnswerManager.answerIndex].showTooltip = false">
+										<span class="icon-unlocked" ng-if="!answers[hotspotAnswerManager.answerIndex].requiredItems[0]"></span>
+										<span class="icon-lock" ng-if="answers[hotspotAnswerManager.answerIndex].requiredItems[0]"></span>
+										<div class="required-item-tooltip tooltip-bottom" ng-show="answers[hotspotAnswerManager.answerIndex].showTooltip">
+											{{answers[hotspotAnswerManager.answerIndex].requiredItems[0] ? 'Edit Required Items' : 'Add Required Items'}}
+										</div>
+										<i class="arrow-top" ng-show="answers[hotspotAnswerManager.answerIndex].showTooltip"></i>
+									</button>
+									<button type="button"
+										ng-class="{'important-button' : colorDrawerOpen}"
+										ng-click="colorDrawerOpen = !colorDrawerOpen">Color</button>
+									<button type="button"
+										ng-disabled="hotspotAnswerManager.answerIndex == answers.length - 1"
+										ng-click="moveAnswerForward()">Forward</button>
+									<button type="button"
+										ng-disabled="hotspotAnswerManager.answerIndex == 0"
+										ng-click="moveAnswerBack()">Back</button>
+									<button ng-show="inventoryItems[0]"  ng-click="answers[hotspotAnswerManager.answerIndex].hideAnswer = !answers[hotspotAnswerManager.answerIndex].hideAnswer" aria-label="answers[hotspotAnswerManager.answerIndex].hideAnswer ? 'Answer will be hidden to players without the required items' : 'Answer will be visible to all players, with or without the required items'" ng-class="{'hide-answer': answers[hotspotAnswerManager.answerIndex].hideAnswer}" class="hide-answer-button" ng-mouseover="showHideAnswerTooltip=true" ng-mouseleave="showHideAnswerTooltip=false">
+										<img ng-if="!answers[hotspotAnswerManager.answerIndex].hideAnswer" src="assets/creator-assets/eye.png"/>
+										<img ng-if="answers[hotspotAnswerManager.answerIndex].hideAnswer" src="assets/creator-assets/eye-blocked.png"/>
+										<div ng-if="showHideAnswerTooltip" class="hide-answer-tooltip"><p ng-if="!answer.hideAnswer">Answer will be visible to all players, with or without the required items</p><p ng-if="answer.hideAnswer">Answer will be hidden to players without the required items</p></div>
+									</button>
+									<button type="button" class="delete-button icon-cross" title='Remove answer' ng-click="removeAnswerPreCheck(hotspotAnswerManager.answerIndex, $event)"></button>
+								</div>
+								<div class="colors-container" ng-show="colorDrawerOpen == true">
+									<button type="button"
+										ng-repeat="color in colors"
+										class="color-selector {{color}}"
+										data-color="{{color}}"
+										ng-click="updatePolygonColor($event)"></button>
+								</div>
+								<div class="continuity-container">
+									<span>Select the destination this hotspot should lead to:</span>
+									<button type="button"
+										class="answer-node-select"
+										ng-class="{'managed' : answers[hotspotAnswerManager.answerIndex].id == newNodeManager.answerId}"
+										ng-click="manageNewNode($event, answers[hotspotAnswerManager.answerIndex].target, answers[hotspotAnswerManager.answerIndex].id, answers[hotspotAnswerManager.answerIndex].linkMode)">{{ integerToLetters(answers[hotspotAnswerManager.answerIndex].target) }}</button>
+								</div>
+							</hotspot-answer-manager>
+						</hotspot-manager>
+					</div>
+					<div class="panel-right" ng-show="showItemSelection || showRequiredItems">
+						<!-- item selection for individual nodes -->
+						<div item-selection class="item-selection item-panel" ng-class="{ show : showItemSelection }"
+						ng-click="bringToFront($event)">
+							<div class="item-header">
+								<div class="item-heading">
+									<h3>Items for {{integerToLetters(editedNode.id)}}</h3>
+									<span class="hide-popup-btn icon-cross"
+									ng-click="showItemSelection = false"
+									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
+									tabindex="0"></span>
+								</div>
+								<span class="instructions">Select an item via the drop-down, then choose whether the item will be given to the player or taken from them.</span>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">{{invalidQuantity}}</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidMaxQuantity">{{invalidMaxQuantity}}</p>
+							</div>
+							<div class="item-container">
+								<div class="give-items">
+									<div class="item-header">
+										<div class="item-heading sub-heading">
+											<div class="item-heading-icons">
+												<img id="arrow" src="assets/creator-assets/redo2.png"/>
+												<img src="assets/creator-assets/BackPackIconMono2.png"/>
+											</div>
+											<h4>Give Player Items</h4>
+										</div>
+									</div>
+									<ul class="list-items">
+										<li
+											ng-repeat="item in nodeItems"
+											ng-mouseover="hoverItem = true"
+											ng-mouseout="hoverItem = false"
+											ng-if="item.count > 0"
+										>
+											<div class="basic-options">
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+												</div>
+												<div class="item-options-container" ng-class="{'show': hoverItem}">
+
+													<div class="item-quantity">
+														<span>Quantity</span>
+														<input ng-focus = "event = $event" class="increase-count" type="number" min="1" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 0)"/>
+													</div>
+												</div>
+												<button class="delete-button icon-cross" title='Remove required item from node' type="button" ng-click="removeItemFromNode(item, $index)"></button>
+											</div>
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<input id="{{item.id}}-give-once" type="checkbox"
+												ng-model="item.firstVisitOnly"
+												value="false" />
+												<label for="{{item.id}}-give-once">Give On First Visit  Only</label>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<div class="take-items">
+									<div class="item-header">
+										<div class="item-heading sub-heading">
+											<div class="item-heading-icons">
+												<img src="assets/creator-assets/BackPackIconMono2.png"/>
+												<img id="arrow" src="assets/creator-assets/forward.png"/>
+											</div>
+											<h4>Take Player Items</h4>
+										</div>
+									</div>
+									<ul class="list-items">
+										<li
+											ng-repeat="item in nodeItems"
+											ng-mouseover="hoverItem = true"
+											ng-mouseout="hoverItem = false"
+											ng-if="item.count < 0"
+										>
+											<div class="basic-options">
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+												</div>
+												<div class="item-options-container" ng-class="{'show': hoverItem}">
+													<div class="item-quantity">
+														<span>Quantity</span>
+														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 1)"/>
+													</div>
+												</div>
+												<button class="delete-button icon-cross" title='Remove required item from node' type="button" ng-click="removeItemFromNode(item, $index)"></button>
+											</div>
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<div>
+													<input id="{{item.id}}-give-once" type="checkbox"
+													ng-model="item.firstVisitOnly"
+													value="false" />
+													<label for="{{item.id}}-give-once">Take on First Visit Only</label>
+												</div>
+												<div>
+													<input id="{{item.id}}-take-all" type="checkbox"
+													ng-model="item.takeAll"
+													value="false" />
+													<label for="{{item.id}}-take-all">Take All</label>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div class="options-bar add-item">
+								<div class="selector">
+									<dl ng-class="{'row': !availableItems[0] }">
+										<dt ng-if="!availableItems[0]" class="blank-selection">
+											<i class="arrow-top"></i>
+										</dt>
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
+											<div class="option-contents">
+												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+												{{inventoryItems[getItemIndex(selectedItem)].name}}
+											</div>
+											<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
+										</dt>
+										<div  class="options" ng-show="showDropdown">
+											<dt ng-repeat="item in availableItems" ng-click="selectItem(item)">
+												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
+												{{item.name}}
+												</dt>
+										</div>
+									</dl>
+									<button class="give-item-button" ng-click="addItemToNode(selectedItem, 1)">Give Item</button>
+									<button class="take-item-button" ng-click="addItemToNode(selectedItem, 0)">Take Item</button>
+								</div>
+								<div class="advanced-option" ng-show="nodeItems[0]">
+									<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
+									<label for="show-advanced">Show Advanced Options</label>
+								</div>
+							</div>
+						</div>
+						<!-- required items panel for answer choices -->
+						<div class="item-selection item-panel"
+						ng-click="bringToFront($event)" ng-class="{ show : showRequiredItems}">
+							<div class="item-header">
+								<div class="item-heading">
+									<h3>Required Items for Answer</h3>
+									<span class="hide-popup-btn icon-cross"
+									ng-click="toggleRequiredItemsModal()"
+									ng-keypress="$event.keyCode === 13 ? toggleRequiredItemsModal() : ''"
+									tabindex="0"></span>
+								</div>
+								<p class="item-instructions">The player must have these items in their inventory to select this answer.</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">{{invalidQuantity}}</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidMaxQuantity">{{invalidMaxQuantity}}</p>
+							</div>
+							<ul class="list-items give-items">
+								<li
+									ng-repeat="item in currentAnswer.requiredItems"
+									ng-mouseover="hoverItem = true"
+									ng-mouseout="hoverItem = false"
+									class="answer-required-item"
+								>
+									<div class="item-icon">
+										<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+									</div>
+									<div class="item-content" ng-class="{'small-name': showAdvancedOptions}">
+										<div class="item-name">
+											<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+										</div>
+									</div>
+									<div class="item-options-container" ng-class="{'show': hoverItem, 'flex-start': showAdvancedOptions}">
+										<div class="item-quantity-options">
+											<div class="item-minimum-quantity">
+												<label ng-show="!showAdvancedOptions"  for="increase-required-count-{{item.id}}">Required Quantity</label>
+												<label ng-show="showAdvancedOptions" for="increase-min-count-{{item.id}}">Min Quantity</label>
+												<input ng-show="!showAdvancedOptions" ng-focus = "event = $event" id="increase-required-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item)"/>
+												<input ng-show="showAdvancedOptions" ng-focus = "event = $event" id="increase-min-count-{{item.id}}" type="number" ng-model="item.tempMinCount"  min="0"  ng-change="updateMinCount(event, item, true)"/>
+											</div>
+											<div class="item-maximum" ng-show="showAdvancedOptions">
+												<div class="item-quantity" ng-show="!item.uncappedMax">
+													<label for="increase-max-count-{{item.id}}">Max Quantity</label>
+													<input ng-focus = "event = $event" id="increase-max-count-{{item.id}}"  type="number" ng-model="item.tempMaxCount"  min="0"  ng-change="updateMaxCount(event, item)"/>
+												</div>
+											</div>
+											<div class="item-quantity" ng-show="showAdvancedOptions">
+												<input ng-focus = "event = $event" id="unlimited-option-{{item.id}}"  type="checkbox" ng-model="item.uncappedMax" class=" uncapped-max-option"   ng-change="updateMaxCount(event, item)">
+												<label for="unlimited-option-{{item.id}}">Uncapped Max</label>
+											</div>
+											<div class="quantity-explanation" ng-show="showAdvancedOptions">
+												<p ng-if="item.minCount == 0 && item.uncappedMax">Player is not required to have any amount of this item.</p>
+												<p ng-if="item.minCount == 0 && item.maxCount != 0 && !item.uncappedMax">Player must have <code>0</code> or up to <code>{{item.tempMaxCount}}</code> of this item.</p>
+												<p ng-if="item.minCount > 0 && item.uncappedMax">Player must have a minimum of <code>{{item.tempMinCount}}</code> of this item</p>
+												<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount != item.tempMaxCount">Player must have between <code>{{item.tempMinCount}}</code> and <code>{{item.tempMaxCount}}</code> of this item.</p>
+												<p ng-if="item.minCount > 0 && !item.uncappedMax && item.tempMinCount == item.tempMaxCount">Player must have exactly <code>{{item.tempMinCount}}</code> of this item.</p>
+												<p ng-if="item.minCount == 0 && item.maxCount == 0">Player must not have this item.</p>
+											</div>
+										</div>
+									</div>
+									<button class="delete-button icon-cross" title='Remove required item from answer' type="button" ng-click="removeRequiredItemFromAnswer(item, currentAnswer)"></button>
+								</li>
+							</ul>
+							<div class="options-bar add-item">
+								<div class="selector">
+									<dl ng-class="{'row': !availableItems[0] }">
+										<dt ng-if="!availableItems[0]" class="blank-selection">
+											<i class="arrow-top"></i>
+										</dt>
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
+											<div class="option-contents">
+												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+												{{inventoryItems[getItemIndex(selectedItem)].name}}
+											</div>
+											<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
+										</dt>
+										<div  class="options" ng-show="showDropdown">
+											<dt ng-repeat="item in availableItems"  ng-click="selectItem(item)">
+												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
+												{{item.name}}
+												</dt>
+										</div>
+									</dl>
+									<button ng-click="addRequiredItemToAnswer(selectedItem, currentAnswer)">Add Item</button>
+								</div>
+							</div>
+							<div class="advanced-option">
+								<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
+								<label for="show-advanced">Use Advanced Options</label>
+							</div>
+						</div>
 					</div>
 				</div>
-				<button type="button"
-					id="big-upload-button"
-					ng-if="displayNodeCreation != HOTSPOT"
-					ng-hide="mediaReady"
-					ng-click="showPopup()">
-						<span>+</span>Add Media
-				</button>
-				<div class="answers-container"
-					ng-class="{'long' : displayNodeCreation == SHORTANS}"
-					ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS"
-					auto-scroll-and-select>
-					<ul>
-						<li class="unmatched-answers-row"
-							ng-if="displayNodeCreation == SHORTANS">
-							<div class="unmatched-answers-box">
-								<p><span>Unmatched Answers:</span> Used if the response doesn't match any possible answers you provided.</p>
-							</div>
-							<input type="text" ng-model="answers[0].feedback" placeholder="Enter Optional Feedback" />
-							<button type="button"
-								class="answer-node-select"
-								ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
-								ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
-
-						</li>
-						<li ng-if="displayNodeCreation == MC" ng-repeat="answer in answers">
-							<button type="button"
-								class="delete-button"
-								ng-click="removeAnswerPreCheck($index, $event)">X</button>
-							<input type="text" ng-model="answer.text" placeholder="Enter Answer Choice Here" />
-							<input type="text" ng-model="answer.feedback" placeholder="Enter Optional Feedback" />
-							<button type="button"
-								class="answer-node-select"
-								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
-								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
-						</li>
-
-						<li ng-if="displayNodeCreation == 	SHORTANS"
-							ng-class="{'short-answer-mode' : displayNodeCreation == SHORTANS}"
-							ng-repeat="answer in answers"
-							ng-show="$index > 0"
-							short-answer-set>
-							<button type="button"
-								class="delete-button"
-								ng-click="removeAnswerPreCheck($index, $event)"
-								ng-disabled="$index == 0">X</button>
-							<input type="text"
-								class="shared-row"
-								ng-model="newMatch"
-								placeholder="Add a possible answer. Matches are not case sensitive."
-								enter-submit="addAnswerMatch($index)"></input>
-							<button type="button"
-								class="important-button"
-								ng-click="addAnswerMatch($index)">Add Match</button>
-							<div class="possible-answers-box">
-								<p ng-hide="answer.matches.length">Possible answers will be shown here. Click an answer to remove it.</p>
-								<button type="button"
-									ng-repeat="match in answer.matches"
-									ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
-							</div>
-							<input type="text"
-								ng-model="answer.feedback"
-								placeholder="Enter Optional Feedback" />
-							<button type="button"
-								class="answer-node-select"
-								ng-class="{'managed' : answer.id == newNodeManager.answerId}"
-								ng-click="manageNewNode($event, answer.target, answer.id, answer.linkMode)">{{ integerToLetters(answer.target) }}</button>
-						</li>
-					</ul>
-				</div>
-				<!-- container for all hotspot-specific elements and interactions -->
-				<!-- effectively replaces the default answers container -->
-				<hotspot-manager class="hotspot-container"
-					id="hotspot-manager"
-					ng-if="displayNodeCreation == HOTSPOT">
-					<div class="image-container">
+				<div class="bottom-bar" ng-class="{'hotspot': displayNodeCreation == HOTSPOT}">
+					<div ng-show="displayNodeCreation == HOTSPOT" class="uploadButton">
+						<div class="uploadImageIndicator" ng-if="!mediaReady">
+							<p>
+								Add an Image to Start Editing!
+							</p>
+							<i class="arrow-bottom"></i>
+						</div>
 						<button type="button"
 						id="uploadButton"
 						class="important-button"
-						ng-show="!mediaReady"
-						ng-click="beginMediaImport()">Upload an Image</button>
-						<!-- bottom toolbar with buttons for adding and managing hotspots -->
-						<input class="hotspot-alt-text" ng-show="mediaReady" ng-model="editedNode.media.alt" placeholder="Enter alt text for the hotspot image" />
-						<hotspot-toolbar ng-show="mediaReady">
-							<ul>
-								<li><button type="button"
-									ng-click="startEllipticalHotspot()">+ Elliptical Hotspot</button></li>
-								<li><button type="button"
-									ng-click="startSquareHotspot()">+ Square Hotspot</button></li>
-								<li><button type="button"
-									ng-click="startPolygonHotspot()">+ Polygon Hotspot</button></li>
-								<li><button type="button"
-									ng-click="visibilityManagerOpen = !visibilityManagerOpen">Edit Visibility</button></li>
-								<li><button type="button"
-									ng-click="beginMediaImport()">Change Media</button></li>
-							</ul>
-						</hotspot-toolbar>
-						<div class="visibility-manager" ng-show="visibilityManagerOpen">
-							<h4>For this image,</h4>
-							<ul>
-								<li ng-class="{'selected':editedNode.hotspotVisibility == ALWAYS}"
-									ng-click="editedNode.hotspotVisibility = ALWAYS; visibilityManagerOpen = false">Always show hotspots</li>
-								<li ng-class="{'selected':editedNode.hotspotVisibility == MOUSEOVER}"
-									ng-click="editedNode.hotspotVisibility = MOUSEOVER; visibilityManagerOpen = false">Reveal hotspots on mouseover</li>
-								<li ng-class="{'selected':editedNode.hotspotVisibility == NEVER}"
-									ng-click="editedNode.hotspotVisibility= NEVER; visibilityManagerOpen = false">Don't show hotspots</li>
-							</ul>
-						</div>
-						<!-- management popup when an individual hotspot is selected -->
-						<hotspot-answer-manager
-							ng-class="{'visible' : hotspotAnswerManager.show}"
-							data-pos-x="{{hotspotAnswerManager.x}}"
-							data-pos-y="{{hotspotAnswerManager.y}}">
-							<h4>Manage This Hotspot</h4>
-							<input type="text" placeholder="Enter hotspot label here."
-								ng-model="answers[hotspotAnswerManager.answerIndex].text"/>
-							<textarea class="feedback-box"
-								placeholder="Enter optional feedback here."
-								ng-model="answers[hotspotAnswerManager.answerIndex].feedback"></textarea>
-							<div class="button-options">
-								<button type="button"
-									ng-class="{'important-button' : colorDrawerOpen}"
-									ng-click="colorDrawerOpen = !colorDrawerOpen">Color</button>
-								<button type="button"
-									ng-disabled="hotspotAnswerManager.answerIndex == answers.length - 1"
-									ng-click="moveAnswerForward()">Forward</button>
-								<button type="button"
-									ng-disabled="hotspotAnswerManager.answerIndex == 0"
-									ng-click="moveAnswerBack()">Back</button>
-								<button type="button" class="delete-button" ng-click="removeAnswerPreCheck(hotspotAnswerManager.answerIndex, $event)">Remove</button>
-							</div>
-							<div class="colors-container" ng-show="colorDrawerOpen == true">
-								<button type="button"
-									ng-repeat="color in colors"
-									class="color-selector {{color}}"
-									data-color="{{color}}"
-									ng-click="updatePolygonColor($event)"></button>
-							</div>
-							<div class="continuity-container">
-								<span>Select the destination this hotspot should lead to:</span>
-								<button type="button"
-									class="answer-node-select"
-									ng-class="{'managed' : answers[hotspotAnswerManager.answerIndex].id == newNodeManager.answerId}"
-									ng-click="manageNewNode($event, answers[hotspotAnswerManager.answerIndex].target, answers[hotspotAnswerManager.answerIndex].id, answers[hotspotAnswerManager.answerIndex].linkMode)">{{ integerToLetters(answers[hotspotAnswerManager.answerIndex].target) }}</button>
-							</div>
-
-						</hotspot-answer-manager>
-						<!-- SVG canvas placed over the primary hotspot canvas for drawing a polygon -->
-						<svg id="polygon-svg-artboard"
-							ng-show="polygonDrawMode"
-							ng-click="recordClicks($event)"
-							ng-mousemove="updateCursorPoint($event)"
-							polygon-artboard>
-							<!-- Guide line for indicating where next section of the polyline will be drawn -->
-							<line
-								ng-if="polygonPoints"
-								ng-attr-x1="{{lastClicked.x}}"
-								ng-attr-y1="{{lastClicked.y}}"
-								ng-attr-x2="{{cursorPoint.x}}"
-								ng-attr-y2="{{cursorPoint.y}}"
-								stroke="black"
-							/>
-							<!-- Open polygon, points will be converted to final polygon on the main hotspot svg -->
-							<polyline fill="none"
-								stroke="black"
-								ng-attr-points="{{polygonPoints}}" />
-						</svg>
-						<div id="hotspot-label"
-							ng-class="{'hidden':!hotspotLabelTarget.show}"
-							ng-style="{'opacity': hotspotLabelTarget.show ? '1' : '0', 'top': hotspotLabelTarget.y + 'px', 'left':hotspotLabelTarget.x + 'px' }">
-								{{ hotspotLabelTarget.text }}
-						</div>
-						<!-- SVG canvas upon which all hotspots are drawn -->
-						<svg id="hotspot-canvas"
-							ng-show="mediaReady"
-							ng-click="closeManager($event)">
-							<g ng-repeat="answer in answers"
-								data-answer="answer"
-								ng-attr-transform="matrix(1 0 0 1 {{answer.svg.x}} {{answer.svg.y}})">
-								<ellipse ng-if="answer.svg.type == 'ellipse'"
-									ng-class="{'moving':selectedSVG.selected}"
-									ng-attr-cx="0"
-									ng-attr-cy="0"
-									ng-attr-rx="{{answer.svg.r + answer.svg.scaleXFactor}}"
-									ng-attr-ry="{{answer.svg.r + answer.svg.scaleYFactor}}"
-									fill="{{answer.svg.fill}}"
-									stroke="{{answer.svg.fill}}"
-									stroke-width="{{answer.svg.stroke}}"
-									fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
-									ng-mouseenter="highlightSVG = true; attachLabel($index, $event)"
-									ng-mousedown="selectSVG($event)"
-									ng-mouseup="deselectSVG($event)"
-									ng-mouseleave="deselectSVG($event); highlightSVG = false; detachLabel()"
-									ng-mousemove="moveSVG($index, $event)"
-									ng-click="manageSVG($index, $event)" />
-
-								<rect ng-if="answer.svg.type == 'rect'"
-									ng-class="{'moving':selectedSVG.selected}"
-									ng-attr-x="0"
-									ng-attr-y="0"
-									ng-attr-width="{{answer.svg.width + answer.svg.scaleXFactor}}"
-									ng-attr-height="{{answer.svg.height + answer.svg.scaleYFactor}}"
-									fill="{{answer.svg.fill}}"
-									stroke="{{answer.svg.fill}}"
-									stroke-width="{{answer.svg.stroke}}"
-									fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
-									ng-mouseenter="highlightSVG = true; attachLabel($index, $event)"
-									ng-mousedown="selectSVG($event)"
-									ng-mouseup="deselectSVG($event)"
-									ng-mouseleave="deselectSVG($event); highlightSVG = false; detachLabel()"
-									ng-mousemove="moveSVG($index, $event)"
-									ng-click="manageSVG($index, $event)" />
-
-								<polygon ng-if="answer.svg.type == 'polygon'"
-									ng-class="{'moving':selectedSVG.selected}"
-									ng-attr-points="{{answer.svg.points}}"
-									fill="{{answer.svg.fill}}"
-									stroke="{{answer.svg.fill}}"
-									stroke-width="{{answer.svg.stroke}}"
-									fill-opacity="{{ highlightSVG ? 0.6 : 0.3 }}"
-									ng-mouseenter="highlightSVG = true; attachLabel($index, $event)"
-									ng-mousedown="selectSVG($event)"
-									ng-mouseup="deselectSVG($event)"
-									ng-mouseleave="deselectSVG($event); highlightSVG = false; detachLabel()"
-									ng-mousemove="moveSVG($index, $event)"
-									ng-click="manageSVG($index, $event)" />
-
-								<!-- Icon for scaling the size of the given SVG hotspot -->
-								<g class="scale"
-									ng-if="answer.svg.type == 'rect' || answer.svg.type =='ellipse'"
-									ng-attr-transform="matrix(1 0 0 1 {{answer.svg.scaleXFactor}} {{answer.svg.scaleYFactor}})"
-									ng-mousedown="startSVGScale($event)"
-									ng-mousemove="scaleSVG($index, $event)"
-									ng-mouseup="endSVGScale($event)"
-									ng-mouseenter="hoverScale = true"
-									ng-mouseleave="hoverScale = false; endSVGScale($event)">
-									<circle ng-attr-r="{{ hoverScale ? '40' : '20' }}"
-										ng-attr-cx="{{answer.svg.scaleXOffset + 8}}"
-										ng-attr-cy="{{answer.svg.scaleYOffset + 8}}"
-										ng-class="{'hovered':hoverScale}"/>
-									<path class="scale-path"
-										d="M17.8,17.8h-7.2l2.8-2.8L10,11.6l1.7-1.7l3.3,3.3l2.8-2.8L17.8,17.8z M6.1,7.8L2.8,4.4L0,7.2L0,0l7.2,0L4.4,2.8l3.3,3.3 L6.1,7.8z"
-										ng-attr-transform="translate({{answer.svg.scaleXOffset}}, {{answer.svg.scaleYOffset}})"></path>
-								</g>
-							</g>
-						</svg>
-						<!-- Background image placed behind the hotspot's SVG canvas -->
-						<img id="hotspotImage"
-							ng-src="{{image.src}}"
-							ng-show="mediaReady" />
+						ng-click="beginMediaImport()"
+						ng-show="!mediaReady">Upload an Image</button>
 					</div>
-				</hotspot-manager>
-				<!-- container for selecting the destination for narrative nodes -->
-				<div class="continuity-container" ng-if="displayNodeCreation == NARR">
-					<span>Select the destination to continue on:</span>
-					<button type="button"
-						class="answer-node-select"
-						ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
-						ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+					<!-- container for selecting the destination for narrative nodes -->
+					<div class="continuity-container" ng-if="displayNodeCreation == NARR">
+						<span>Select the destination to continue on:</span>
+						<button type="button"
+							class="answer-node-select"
+							ng-class="{'managed' : answers[0].id == newNodeManager.answerId}"
+							ng-click="manageNewNode($event, answers[0].target, answers[0].id, answers[0].linkMode)">{{ integerToLetters(answers[0].target) }}</button>
+					</div>
+					<!-- container for selecting the destination for end nodes -->
+					<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NORMAL">
+						<span>The user's path will conclude with this destination. Set the final score:</span>
+						<final-score-box
+							ng-form="finalScoreForm"
+							name="finalScoreForm">
+							<input type="number"
+								name="finalScoreInput"
+								class="final-score"
+								ng-class="{'invalid' : !finalScoreForm.$valid}"
+								ng-model="finalScore"
+								placeholder="100"
+								min="1"
+								max="100" />
+						</final-score-box>
+						<span>%</span>
+					</div>
+					<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NONSCORING">
+						<span>End Points do not provide scores when the widget is in Non-Scoring mode.</span>
+					</div>
+					<div class="add-answer-options" ng-if="displayNodeCreation == MC || displayNodeCreation == SHORTANS ">
+						<button class="add-answer important-button"
+							type="button"
+							ng-click="newAnswer()"
+							ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
+						<div class="random-select-container" ng-if="displayNodeCreation == MC">
+							<input type="checkbox"
+							ng-model="editedNode.randomizeAnswers"
+							value="true" /> Randomize Answers
+						</div>
+					</div>
+					<div class="items-container">
+						<!-- item selection for individual nodes -->
+						<div item-selection ng-if="showItemSelection" class="item-selection item-modal give-item-modal"
+						ng-click="bringToFront($event)"  ng-class="{ show : showItemSelection}"
+						ng-mousedown="modalDragStart($event)">
+							<div class="item-header">
+								<div class="item-heading">
+									<h3>Items for {{integerToLetters(editedNode.id)}}</h3>
+									<span class="instructions">Select an item via the drop-down, then choose whether the item will be given to the player or taken from them.</span>
+									<span class="hide-popup-btn icon-cross"
+									ng-click="toggleNodeItemsModal()"
+									ng-keypress="$event.keyCode === 13 ? showItemSelection = false : ''"
+									tabindex="0"></span>
+								</div>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidQuantity">{{invalidQuantity}}</p>
+								<p class="item-instructions invalid-quantity-message"  ng-if="invalidMaxQuantity">{{invalidMaxQuantity}}</p>
+							</div>
+							<div class="item-container">
+								<div class="give-items">
+									<div class="item-header">
+										<div class="item-heading sub-heading">
+											<div class="item-heading-icons">
+												<img id="arrow" src="assets/creator-assets/redo2.png"/>
+												<img src="assets/creator-assets/BackPackIconMono2.png"/>
+											</div>
+											<h4>Give Player Items</h4>
+										</div>
+									</div>
+									<ul class="list-items">
+										<li
+											ng-repeat="item in nodeItems"
+											ng-mouseover="hoverItem = true"
+											ng-mouseout="hoverItem = false"
+											ng-if="item.count > 0"
+										>
+											<div class="basic-options">
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+												</div>
+												<div class="item-options-container" ng-class="{'show': hoverItem}">
+
+													<div class="item-quantity">
+														<span>Quantity</span>
+														<input ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 0)"/>
+													</div>
+												</div>
+												<button class="delete-button icon-cross" title='Remove required item from node' type="button" ng-click="removeItemFromNode(item, $index)"></button>
+											</div>
+
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<input id="{{item.id}}-give-once" type="checkbox"
+												ng-model="item.firstVisitOnly"
+												value="false" />
+												<label for="{{item.id}}-give-once">Give On First Visit  Only</label>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<div class="take-items">
+									<div class="item-header">
+										<div class="item-heading sub-heading">
+											<div class="item-heading-icons">
+												<img src="assets/creator-assets/BackPackIconMono2.png"/>
+												<img id="arrow" src="assets/creator-assets/forward.png"/>
+											</div>
+											<h4>Take Player Items</h4>
+										</div>
+									</div>
+									<ul class="list-items">
+										<li
+											ng-repeat="item in nodeItems"
+											ng-mouseover="hoverItem = true"
+											ng-mouseout="hoverItem = false"
+											ng-if="item.count < 0"
+										>
+											<div class="basic-options" >
+												<div class="item-icon">
+													<img ng-if="inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" ng-alt="{{inventoryItems[getItemIndex(item)].icon.alt}}"/>
+												</div>
+												<div class="item-content">
+													<div class="item-name">
+														<span>{{inventoryItems[getItemIndex(item)].name}}</span>
+													</div>
+												</div>
+												<div class="item-options-container" ng-class="{'show': hoverItem}">
+													<div class="item-quantity">
+														<span ng-show="!item.takeAll">Quantity</span>
+														<span class="greyed-out" ng-show="item.takeAll">Deselect 'Take All' to set quantity.</span>
+														<input ng-show="!item.takeAll" ng-focus = "event = $event" class="increase-count" type="number" ng-model="item.tempCount" ng-pattern="/^[1-9]+[0-9]*$/" ng-change="updateNodeItemCount(event, item, 1)"/>
+													</div>
+												</div>
+												<button class="delete-button icon-cross" title='Remove required item from node' type="button" ng-click="removeItemFromNode(item, $index)"></button>
+											</div>
+											<div class="advanced-option" ng-if="showAdvancedOptions">
+												<div>
+													<input id="{{item.id}}-give-once" type="checkbox"
+													ng-model="item.firstVisitOnly"
+													value="false" />
+													<label for="{{item.id}}-give-once">Take on First Visit Only</label>
+												</div>
+												<div>
+													<input id="{{item.id}}-take-all" type="checkbox"
+													ng-model="item.takeAll"
+													value="false" />
+													<label for="{{item.id}}-take-all">Take All</label>
+												</div>
+											</div>
+										</li>
+									</ul>
+									<p class="item-instructions"><strong>Note: </strong>This will only take items if the player has them in their inventory.</p>
+								</div>
+							</div>
+							<div class="options-bar add-item">
+								<div class="selector">
+									<dl ng-class="{'row': !availableItems[0] }">
+										<dt ng-if="!availableItems[0]" class="blank-selection">
+											<i class="arrow-top"></i>
+										</dt>
+										<dt class="selected-item" ng-show="selectedItem" ng-model="selectedItem" ng-click="toggleDropdownSelector()">
+											<div class="option-contents">
+												<img ng-if="inventoryItems[getItemIndex(selectedItem)].icon && inventoryItems[getItemIndex(selectedItem)].icon.url" ng-src="{{inventoryItems[getItemIndex(selectedItem)].icon.url}}" class="dropdownSelector"/>
+												{{inventoryItems[getItemIndex(selectedItem)].name}}
+											</div>
+											<i ng-class="{'arrow-bottom': showDropdown, 'arrow-top': !showDropdown}"></i>
+										</dt>
+										<div  class="options" ng-show="showDropdown">
+											<dt ng-repeat="item in availableItems"
+											ng-click="selectItem(item)">
+												<img ng-if="item.icon.url"ng-src="{{item.icon.url}}" />
+												{{item.name}}
+												</dt>
+										</div>
+									</dl>
+									<button class="give-item-button" ng-click="addItemToNode(selectedItem, 1)">Give Item</button>
+									<button ng-click="addItemToNode(selectedItem, 0)">Take Item</button>
+									<div class="advanced-option" ng-show="nodeItems[0]">
+										<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
+										<label for="show-advanced">Show Advanced Options</label>
+									</div>
+								</div>
+
+								<!-- <button class="save-button important-button"
+								ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+								type="button"
+								ng-click="toggleNodeItemsModal()">Done
+								</button> -->
+							</div>
+						</div>
+						<button type="button"
+							class="item-button"
+							ng-click="toggleNodeItemsModal()" ng-show="displayNodeCreation != END && inventoryItems[0]"><span>{{nodeItems[0] ? 'Edit Items' : 'Add Items'}}</span><img src="assets/creator-assets/BackPackIconMono2.png"/>
+						</button>
+						<button class="save-button important-button"
+							ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
+							type="button"
+							ng-click="saveAndClose()">Done
+						</button>
+					</div>
 				</div>
-				<!-- container for selecting the destination for end nodes -->
-				<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NORMAL">
-					<span>The user's path will conclude with this destination. Set the final score:</span>
-					<final-score-box
-						ng-form="finalScoreForm"
-						name="finalScoreForm">
-						<input type="number"
-							name="finalScoreInput"
-							class="final-score"
-							ng-class="{'invalid' : !finalScoreForm.$valid}"
-							ng-model="finalScore"
-							placeholder="100"
-							min="0"
-							max="100" />
-					</final-score-box>
-					<span>%</span>
-				</div>
-				<div class="continuity-container" ng-if="displayNodeCreation == END && scoreMode == NONSCORING">
-					<span>End Points do not provide scores when the widget is in Non-Scoring mode.</span>
-				</div>
-				<button class="add-answer important-button"
-					type="button"
-					ng-click="newAnswer()"
-					ng-hide="displayNodeCreation == HOTSPOT || displayNodeCreation == NARR || displayNodeCreation == END">Add Answer Choice</button>
-				<div class="random-select-container" ng-if="displayNodeCreation == MC">
-				<input type="checkbox"
-					ng-model="editedNode.randomizeAnswers"
-					value="true" /> Randomize Answers
-				</div>
-				<button class="save-button important-button"
-					ng-class="{'lowered' : displayNodeCreation == HOTSPOT}"
-					type="button"
-					ng-click="saveAndClose()">Done</button>
 			</node-creation>
 			<node-tooltips ng-show="hoveredNode.showTooltips">
 				<div class="tooltip"
-					ng-repeat="tooltip in hoveredNode.tooltips">
-					<span class="tooltip-title">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
+					ng-repeat="tooltip in hoveredNode.tooltips" ng-show="tooltip.text != 'N/A' || tooltip.givesItems[0] || tooltip.removedItems[0]">
+					<span class="tooltip-title" ng-if="tooltip.text">Associated Answer from {{ integerToLetters(tooltip.parent) }}:</span>{{tooltip.text}}
+					<span class="tooltip-title" ng-if="tooltip.givesItems[0]">Gives Item(s):</span><p ng-repeat="item in tooltip.givesItems" ng-if="tooltip.givesItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /><span ng-if="!inventoryItems[getItemIndex(item)].icon.url"></span> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.count ? item.count : 1}})</p>
+					<span class="tooltip-title" ng-if="tooltip.removedItems[0]">Removes Item(s):</span><p ng-repeat="item in tooltip.removedItems" ng-if="tooltip.removedItems[0]"><img ng-if="inventoryItems[getItemIndex(item)].icon.url"ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.takeAll ? 'All' : (item.count ? item.count : -1)}})</p>
 				</div>
 			</node-tooltips>
+			<required-items-tooltip ng-show="hoveredLock.showItems">
+				<span>The answer "{{hoveredLock.answerText}}" requires item(s):</span>
+				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="inventoryItems[getItemIndex(item)].icon && inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.range ? item.range : 1}})</p>
+				<p ng-if="!hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-white.png"/></span>This answer will remain visible even if the player does not have the items.</p>
+				<p ng-if="hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-blocked-white.png"/></span>This answer will be invisible to the player if they do not have the items.</p>
+			</required-items-tooltip>
 			<import-type-selection ng-show="showImportTypeSelection">
 				<h2>
 					<span>Choose Type of Media</span>
 					<span
-						class="hide-popup"
+						class="hide-popup-btn icon-cross"
 						ng-click="showImportTypeSelection = false"
 						ng-keypress="$event.keyCode === 13 ? showImportTypeSelection = false : ''"
 						tabindex="0"
-					>X</span>
+					></span>
 				</h2>
 				<div class="import-type-selection">
 					<div>
@@ -793,7 +1642,7 @@
 						ng-click="hideCoverAndModals()">Done</button>
 				</div>
 			</div>
-			<tree-history ng-class="{ 'minimized':minimized, 'disabled': (existingNodeSelectionMode || copyNodeMode)}" ng-disabled="existingNodeSelectionMode || copyNodeMode">
+			<tree-history class="inert-on-dialog" aria-hidden="showBackgroundCover || showInventoryBackgroundCover" ng-class="{ 'minimized':minimized, 'disabled': (existingNodeSelectionMode || copyNodeMode || previewNodeSelectionMode)}" ng-disabled="existingNodeSelectionMode || copyNodeMode || previewNodeSelectionMode">
 				<div class="undo-redo-options">
 					<button ng-click="undoAction()" ng-disabled="historyPosition <= 0">Undo</button>
 					<button ng-click="redoAction()" ng-disabled="historyPosition >= historySize-1">Redo</button>
@@ -802,17 +1651,30 @@
 					<img src="assets/creator-assets/drawer-arrow.svg" />
 					Action History
 				</header>
-				<div class="action-history" ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)">
+				<div class="action-history" ng-repeat="item in treeHistoryItems | orderBy: '-timestamp'" ng-click="rollBackToSnapshot(item.index)" ng-class="{'selectedAction': historyPosition == item.index}">
 					{{item.context}}
 				</div>
 			</tree-history>
+			<div info-dialog class="info-dialog" ng-show="showInfoDialog">
+				<div>
+					<p class="info-icon">i</p>
+					<p>{{infoMessage}}</p>
+				</div>
+				<button class="icon-cross" ng-click="showInfoDialog = false"></button>
+			</div>
 			<div id="backgroundcover" ng-click="hideCoverAndModals()" ng-class="{ show: showBackgroundCover }"></div>
+			<div id="backgroundcover" ng-click="saveAndCloseInventory()" ng-class="{ show: showInventoryBackgroundCover }"></div>
+			<div id="infobackgroundcover" ng-click="showInfoDialog = false" ng-class="{ show: showInfoDialog }"></div>
 			<tree-visualization data="treeData"
 				offset="treeOffset"
 				on-hover="onNodeHover(data)"
 				on-hover-out="onNodeHoverOut(data)"
 				node-click="nodeSelected(data)"
-				bg-click="bgClicked()"></tree-visualization>
+				bg-click="bgClicked()"
+				class="inert-on-dialog"></tree-visualization>
 		</div>
+
+		<!-- MAIN CREATOR SCRIPT -->
+		<script src="creator.js"></script>
 	</body>
 </html>

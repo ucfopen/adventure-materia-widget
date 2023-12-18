@@ -1,5 +1,5 @@
-Adventure = angular.module "Adventure"
-Adventure.service "legacyQsetSrv", [() ->
+angular.module "Adventure"
+.service "legacyQsetSrv", [() ->
 
 	legacyScaleFactor = null
 	imageOffsetX = null
@@ -14,11 +14,16 @@ Adventure.service "legacyQsetSrv", [() ->
 
 		parentNodeRefs = []
 		nodeCount = 0
+		itemCount = 0
+		inventoryItems = []
 
 		angular.forEach items, (item, index) ->
 
 			item.type = "Adventure"
 			item.nodeId = item.options.id
+			# extreme edge-case detection to ensure a mwdk mock id isn't being passed around
+			# this would generally only affect a v1 qset when viewed in the context of the mwdk
+			if typeof(item.options.id) is "string" and item.options.id.match(/^(mwdk-mock-id-[A-Za-z0-9\-]+)$/)[0] then item.options.id = 0
 
 			delete item.assets
 
@@ -162,10 +167,18 @@ Adventure.service "legacyQsetSrv", [() ->
 			else if item.options.id is 0
 				item.options.parentId = -1
 
+
+		if qset.options.inventoryItems
+			inventoryItems = qset.options.inventoryItems
+		else
+			inventoryItems = []
+
 		newQset =
 			items: items
 			options:
 				nodeCount: nodeCount
+				itemCount: inventoryItems.length
+				inventoryItems: inventoryItems
 
 		return JSON.stringify newQset
 
@@ -241,3 +254,5 @@ Adventure.service "legacyQsetSrv", [() ->
 	convertOldQset : convertOldQset
 	handleLegacyScale : handleLegacyScale
 ]
+
+angular.bootstrap(document, ['Adventure'])

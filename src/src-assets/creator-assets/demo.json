@@ -1,0 +1,509 @@
+{
+    "items": [
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 0,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": "WELCOME! Today is your first day at work. May the odds be ever in your favor."
+          }
+        ],
+        "options": {
+          "id": 0,
+          "parentId": -1,
+          "type": "narrative",
+          "items": []
+        },
+        "answers": [
+          {
+            "text": null,
+            "value": 0,
+            "options": {
+              "link": 1,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          }
+        ]
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 1,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": "You are standing at the end of a road before a small brick building. There is a door in front of you. You try to open it, but it's locked."
+          }
+        ],
+        "options": {
+          "id": 1,
+          "parentId": 0,
+          "type": "mc",
+          "items": [],
+          "randomize": false
+        },
+        "answers": [
+          {
+            "text": "Look around",
+            "value": 0,
+            "options": {
+              "link": 2,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          },
+          {
+            "text": "Kick door",
+            "value": 0,
+            "options": {
+              "link": 3,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          },
+          {
+            "text": "Unlock door",
+            "value": 0,
+            "options": {
+              "link": 4,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [
+                {
+                  "id": 3,
+                  "count": 1,
+                  "tempCount": 1,
+                  "$$hashKey": "object:696"
+                }
+              ],
+              "hideAnswer": false
+            }
+          },
+          {
+            "text": "Do nothing (wait)",
+            "value": 0,
+            "options": {
+              "link": 9,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          }
+        ]
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 2,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": ""
+          }
+        ],
+        "options": {
+          "id": 2,
+          "parentId": 1,
+          "type": "mc",
+          "items": [],
+          "randomize": false
+        },
+        "answers": [
+          {
+            "text": "Look under the mat for a key. You find one, and make a mental note to talk to security later.",
+            "value": 0,
+            "options": {
+              "link": 6,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          },
+          {
+            "text": "You see a cat hop down from a tree and walk around the corner of the building. Follow the cat.",
+            "value": 0,
+            "options": {
+              "link": 7,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          }
+        ]
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 6,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": "You find your desk. On it sits a sandwich alignment chart."
+          }
+        ],
+        "options": {
+          "id": 6,
+          "parentId": 2,
+          "type": "narrative",
+          "items": []
+        },
+        "answers": [
+          {
+            "text": null,
+            "value": 0,
+            "options": {
+              "link": 11,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          }
+        ]
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 11,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": ""
+          }
+        ],
+        "options": {
+          "id": 11,
+          "parentId": 6,
+          "type": "blank",
+          "items": []
+        },
+        "answers": []
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 7,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": ""
+          }
+        ],
+        "options": {
+          "id": 7,
+          "parentId": 2,
+          "type": "narrative",
+          "items": [
+            {
+              "id": 4,
+              "count": 1,
+              "tempCount": 1,
+              "$$hashKey": "object:1817"
+            }
+          ]
+        },
+        "answers": [
+          {
+            "text": null,
+            "value": 0,
+            "options": {
+              "link": 8,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          }
+        ]
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 8,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": "VIP Meeting"
+          }
+        ],
+        "options": {
+          "id": 8,
+          "parentId": 7,
+          "type": "narrative",
+          "items": []
+        },
+        "answers": [
+          {
+            "text": null,
+            "value": 0,
+            "options": {
+              "link": 12,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          }
+        ]
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 12,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": ""
+          }
+        ],
+        "options": {
+          "id": 12,
+          "parentId": 8,
+          "type": "blank",
+          "items": []
+        },
+        "answers": []
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 3,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": ""
+          }
+        ],
+        "options": {
+          "id": 3,
+          "parentId": 1,
+          "type": "narrative",
+          "items": [
+            {
+              "id": 1,
+              "count": -10,
+              "tempCount": 10,
+              "$$hashKey": "object:1707"
+            }
+          ]
+        },
+        "answers": [
+          {
+            "text": null,
+            "value": 0,
+            "options": {
+              "link": 5,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          }
+        ]
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 5,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": ""
+          }
+        ],
+        "options": {
+          "id": 5,
+          "parentId": 3,
+          "type": "blank",
+          "items": []
+        },
+        "answers": []
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 4,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": ""
+          }
+        ],
+        "options": {
+          "id": 4,
+          "parentId": 1,
+          "type": "blank",
+          "items": []
+        },
+        "answers": []
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 9,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": "You wait."
+          }
+        ],
+        "options": {
+          "id": 9,
+          "parentId": 1,
+          "type": "narrative",
+          "items": [
+            {
+              "id": 12,
+              "count": 1,
+              "tempCount": 1,
+              "$$hashKey": "object:2323"
+            }
+          ]
+        },
+        "answers": [
+          {
+            "text": null,
+            "value": 0,
+            "options": {
+              "link": 10,
+              "linkMode": "new",
+              "feedback": null,
+              "requiredItems": [],
+              "hideAnswer": false
+            }
+          }
+        ]
+      },
+      {
+        "materiaType": "question",
+        "id": null,
+        "nodeId": 10,
+        "type": "Adventure",
+        "questions": [
+          {
+            "text": ""
+          }
+        ],
+        "options": {
+          "id": 10,
+          "parentId": 9,
+          "type": "blank",
+          "items": []
+        },
+        "answers": []
+      }
+    ],
+    "options": {
+      "nodeCount": 13,
+      "inventoryItems": [
+        {
+          "name": "Reputation",
+          "id": 1,
+          "description": "",
+          "count": 1,
+          "icon": {
+            "name": "Heart64.png",
+            "url": "assets/icons/Heart64.png",
+            "$$hashKey": "object:89"
+          },
+          "firstVisitOnly": true,
+          "$$hashKey": "object:665"
+        },
+        {
+          "name": "Keys",
+          "id": 3,
+          "description": "",
+          "count": 1,
+          "icon": {
+            "name": "Keys75.png",
+            "url": "assets/icons/Keys75.png",
+            "$$hashKey": "object:95"
+          },
+          "firstVisitOnly": true,
+          "$$hashKey": "object:666"
+        },
+        {
+          "name": "Cat",
+          "id": 4,
+          "description": "",
+          "count": 1,
+          "icon": {
+            "name": "Cat64.png",
+            "url": "assets/icons/Cat64.png",
+            "$$hashKey": "object:66"
+          },
+          "firstVisitOnly": true,
+          "$$hashKey": "object:1673"
+        },
+        {
+          "name": "Radical Sandwich Anarchist",
+          "id": 6,
+          "description": "",
+          "count": 1,
+          "icon": {
+            "name": "Pizza64.png",
+            "url": "assets/icons/Pizza64.png",
+            "$$hashKey": "object:122"
+          },
+          "firstVisitOnly": true,
+          "$$hashKey": "object:1674"
+        },
+        {
+          "name": "Pure Sandwich Elitist",
+          "id": 8,
+          "description": "",
+          "count": 1,
+          "icon": {
+            "name": "Sandwich64.png",
+            "url": "assets/icons/Sandwich64.png",
+            "$$hashKey": "object:133"
+          },
+          "firstVisitOnly": true,
+          "$$hashKey": "object:1675"
+        },
+        {
+          "name": "Neutral Sandwich Bystander",
+          "id": 10,
+          "description": "",
+          "count": 1,
+          "icon": {
+            "name": "Hotdog64.png",
+            "url": "assets/icons/Hotdog64.png",
+            "$$hashKey": "object:91"
+          },
+          "firstVisitOnly": true,
+          "$$hashKey": "object:1676"
+        },
+        {
+          "name": "Time",
+          "id": 12,
+          "description": "",
+          "count": 1,
+          "icon": {
+            "name": "Stopwatch64.png",
+            "url": "assets/icons/Stopwatch64.png",
+            "$$hashKey": "object:147"
+          },
+          "firstVisitOnly": true,
+          "$$hashKey": "object:2316"
+        }
+      ],
+      "customIcons": [],
+      "itemCount": 7,
+      "hidePlayerTitle": false,
+      "scoreMode": "Normal",
+      "internalScoreMessage": ""
+    }
+  }

@@ -1,5 +1,5 @@
-Adventure = angular.module "Adventure"
-Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv', ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
+angular.module "Adventure"
+.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv', ($rootScope, $filter, $sanitize, legacyQsetSrv) ->
 
 	# TreeData is being initialized in -two- places right now.
 	# This one may or may not be required.
@@ -18,6 +18,10 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	# Iterator that generates node IDs
 	count = 1
 
+	inventoryItems = []
+
+	customIcons = []
+
 	# Self explanatory getter function
 	get = ->
 		treeData
@@ -35,6 +39,30 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 	incrementNodeCount = ->
 		count++
+
+	getInventoryItems = ->
+		inventoryItems
+
+	setInventoryItems = (val) ->
+		inventoryItems = val
+
+	generateItemID = ->
+		if (inventoryItems[0])
+			return Math.floor(inventoryItems[inventoryItems.length - 1].id + Math.random() * 2 + 1)
+		else
+			return Math.floor(Math.random() * 2 + 1)
+
+	getItemIndex = (itemID) ->
+		for i, index in inventoryItems
+			if i.id is itemID
+				return index
+
+	# Methods for custom icons
+	getCustomIcons = ->
+		customIcons
+
+	setCustomIcons = (val) ->
+		customIcons = val
 
 	# Max depth is the maximum tree depth, used for determining height of the D3 canvas
 	getMaxDepth = ->
@@ -121,6 +149,73 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				i++
 
 		false
+
+	checkInventory = (requiredItems, inventory) ->
+		missingItems = []
+		if (! requiredItems)
+			return []
+		angular.forEach requiredItems, (item) ->
+			hasItemInInventory = false
+			playerItem = inventory.get(item.id)
+			if playerItem
+				hasItemInInventory = true
+				# Check if player has more than the min
+				if playerItem.count >= item.minCount
+					# Check if player has less than the max
+					if playerItem.count <= item.maxCount or item.uncappedMax
+						return true
+				return false
+			# Check if player doesn't have item but there is no minimum
+			if ! hasItemInInventory and item.minCount is 0
+				hasRequiredItem = true
+			if ! hasRequiredItem
+				missingItems.push(item.id)
+		return missingItems
+
+
+	# Returns all nodes that can be reached from a given node
+	findUnreachableDestinations = (tree, node, visitedNodes, unvisitedNodes, inventory) ->
+		# If the node has already been visited some number of times, return to parent
+		# This is to prevent infinite loops
+		if visitedNodes.get(node.id) > Math.max(50, node.answerLinks.length)
+			return unvisitedNodes
+
+		# Increment the number of times the node has been visited
+		visitedNodes.set(node.id, (visitedNodes.get(node.id) || 0) + 1)
+
+		# If the node is an end node, return to parent
+		if node.type is "end"
+			return unvisitedNodes
+
+		# Add items to inventory
+		if node.items
+			for item in node.items
+				# Check if item is first visit only and player has visited this node before
+				if (visitedNodes.get(node.id) >= 1 and item.firstVisitOnly)
+					# Move to next item
+					continue
+				else
+					if item.takeAll
+						inventory.set(item.id, 0)
+					else
+						inventory.set(item.id, (inventory.get(item.id) || 0) + item.count)
+
+		# Search answers
+		if node.answers
+			for answer in node.answers
+				targetNode = findNode(tree, answer.target)
+				if checkInventory(answer.requiredItems, inventory).length > 0
+					# If the player doesn't have the required items, add it to unvisitedNodes
+					unvisitedNodes.set(targetNode.id, targetNode)
+				else
+					# If the player has the required items, add it to visitedNodes
+					if (unvisitedNodes.get(targetNode.id))
+						unvisitedNodes.remove(targetNode.id)
+					visitedNodes.set(targetNode.id, (visitedNodes.get(targetNode.id) || 0) + 1)
+					unvisitedNodes = new Map([...unvisitedNodes, ...findUnreachableDestinations(tree, targetNode, visitedNodes, unvisitedNodes, inventory)])
+
+		return unvisitedNodes
+
 
 	# Recursive function for adding a node in between a given parent and child, essentially splitting an existing link
 	# tree: the tree structure to be iterated. Should initially reference the root node (treeData object)
@@ -355,8 +450,13 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 				newAnswer = {}
 				newAnswer.parent = tree.id
 
+				parentNode = findNode(tree, tree.id)
+
 				if answer.text isnt null and answer.text.length > 0 then newAnswer.text = answer.text
-				else newAnswer.text = "[No Answer Text]"
+				else if parentNode.type is "mc" or parentNode.type is "shortanswer"
+					newAnswer.text = "[No Answer Text]"
+				else
+					newAnswer.text = "N/A"
 
 				answers.push newAnswer
 
@@ -404,6 +504,36 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 
 		return
 
+	deleteItemReferencesFromAllNodes = (tree, deletedItem) ->
+		if tree.items
+			for item, index in tree.items
+				if item.id is deletedItem.id
+					tree.items.splice index, 1
+					break
+
+		if tree.answers
+			for answer in tree.answers
+				if answer.requiredItems
+					for item, index in answer.requiredItems
+						if item.id is deletedItem.id
+							answer.requiredItems.splice index, 1
+							break
+
+		if !tree.contents then return
+
+		i = 0
+
+		while i < tree.contents.length
+
+			child = tree.contents[i]
+
+			deleteItemReferencesFromAllNodes child, deletedItem
+
+			i++
+
+
+		return
+
 	# Probably deprecated??
 	findMaxDepth = (tree, depth=0) ->
 
@@ -431,11 +561,25 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			items: formatTreeDataForQset tree, []
 			options:
 				nodeCount: count
+				inventoryItems: inventoryItems
+				customIcons: customIcons
+
+		return qset
 
 
 	formatTreeDataForQset = (tree, items) ->
 
 		if !tree.children or (($filter('filter')(items, {nodeId : tree.id}, true)).length is 0)
+
+			questionItemData = []
+			if tree.items
+				for item in tree.items
+					formattedItem =
+						id: item.id
+						count: item.count or 1
+						firstVisitOnly: item.firstVisitOnly or false
+						takeAll: item.takeAll or false
+					questionItemData.push(formattedItem)
 
 			itemData =
 				materiaType: "question"
@@ -447,6 +591,8 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					id: tree.id
 					parentId: tree.parentId
 					type: tree.type
+					redirectId: tree.redirectId
+					items: questionItemData
 				answers: []
 
 			question =
@@ -478,7 +624,46 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if tree.hasLinkToSelf then itemData.options.hasLinkToSelf = true
 			if tree.pendingTarget then itemData.options.pendingTarget = tree.pendingTarget
 
+			if tree.customLabel then itemData.options.customLabel = tree.customLabel
+
 			angular.forEach tree.answers, (answer, index) ->
+				requiredItemsData = []
+
+				if answer.requiredItems
+					for i in answer.requiredItems
+						do (i) ->
+							# Format properties for pre-existing items without said properties
+
+							if i.minCount > -1
+								minCount = i.minCount
+							else if i.tempMinCount > -1
+								minCount = i.tempMinCount
+							else if i.count
+								minCount = i.count
+							else
+								# If minCount isn't set, set it to 1
+								minCount = 1
+
+							if i.maxCount > -1
+								maxCount = i.maxCount
+							else if i.tempMaxCount > -1
+								maxCount = i.tempMaxCount
+							else if i.count
+								maxCount = i.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
+
+							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
+
+							formattedItem =
+								id: i.id
+								range: ""
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+
+							requiredItemsData.push formattedItem
 
 				itemAnswerData =
 					text: answer.text
@@ -487,10 +672,15 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						link: answer.target
 						linkMode: answer.linkMode
 						feedback: answer.feedback
+						requiredItems: requiredItemsData
+						hideAnswer: answer.hideAnswer or false
+						# hideRequiredItems: answer.hideRequiredItems or false
 
 				switch tree.type
 					when "shortanswer"
 						itemAnswerData.options.matches = answer.matches
+						itemAnswerData.options.caseSensitive = answer.caseSensitive
+						itemAnswerData.options.characterSensitive = answer.characterSensitive
 						if answer.isDefault then itemAnswerData.options.isDefault = true
 
 					when "hotspot"
@@ -513,13 +703,19 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		return items
 
 	createTreeDataFromQset = (qset) ->
-
 		orphans = []
 		tree = {}
 
 		if qset.options.nodeCount then setNodeCount qset.options.nodeCount
 
+		if qset.options.inventoryItems then setInventoryItems qset.options.inventoryItems
+
+		if qset.options.icons then setIcons qset.options.icons
+
 		angular.forEach qset.items, (item, index) ->
+
+			# this is to exclusively handle how the mwdk treats the start node's id: 0 property in its qset options
+			if index == 0 and typeof(item.options.id) is "string" and item.options.id.match(/^(mwdk-mock-id-[A-Za-z0-9\-]+)$/)[0] then item.options.id = 0
 
 			node =
 				id: item.options.id
@@ -558,9 +754,50 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if item.options.hasLinkToSelf then node.hasLinkToSelf = true
 			if item.options.pendingTarget then node.pendingTarget = item.options.pendingTarget
 
+			if item.options.customLabel then node.customLabel = item.options.customLabel
+
 			angular.forEach item.answers, (answer, index) ->
 
 				unless node.answers then node.answers = []
+
+				requiredItemsData = []
+
+				if answer.options.requiredItems
+					for i in answer.options.requiredItems
+						do (i) ->
+							# Format properties for pre-existing items without said properties
+
+							if i.minCount > -1
+								minCount = i.minCount
+							else if i.tempMinCount > -1
+								minCount = i.tempMinCount
+							else if i.count
+								minCount = i.count
+							else
+								# If minCount isn't set, set it to 1
+								minCount = 1
+
+							if i.maxCount > -1
+								maxCount = i.maxCount
+							else if i.tempMaxCount > -1
+								maxCount = i.tempMaxCount
+							else if i.count
+								maxCount = i.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
+
+							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
+
+							formattedItem =
+								id: i.id
+								range: ""
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+
+
+							requiredItemsData.push formattedItem
 
 				nodeAnswer =
 					text: answer.text
@@ -569,16 +806,33 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 					linkMode: answer.options.linkMode
 					feedback: answer.options.feedback
 					id: generateAnswerHash()
+					requiredItems: requiredItemsData
+					hideAnswer: answer.options.hideAnswer or false
+					# hideRequiredItems: answer.options.hideRequiredItems or false
 
 				switch item.options.type
 					when "shortanswer"
 						nodeAnswer.matches = answer.options.matches
+						nodeAnswer.caseSensitive = answer.options.caseSensitive
+						nodeAnswer.characterSensitive = answer.options.characterSensitive
+
 						if answer.options.isDefault then nodeAnswer.isDefault = true
 
 					when "hotspot"
 						nodeAnswer.svg = answer.options.svg
 
 				node.answers.push nodeAnswer
+
+			if item.options.items
+				angular.forEach item.options.items, (inventoryItem, index) ->
+					unless node.items then node.items = []
+					nodeItem =
+						id: inventoryItem.id
+						count: inventoryItem.count or 1
+						firstVisitOnly: inventoryItem.firstVisitOnly or false
+						takeAll: inventoryItem.takeAll or false
+
+					node.items.push nodeItem
 
 			# Logic to append node to its intended position on the tree
 			if node.parentId is -1 then tree = node
@@ -600,7 +854,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 			if orphans.length and i >= orphans.length and orphans.length isnt previousCount
 				i = 0
 				previousCount = orphans.length
-
 		tree
 
 	validateTreeOnStart = (tree) ->
@@ -608,7 +861,6 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 		nodes = queueNodesForValidation tree
 		ids = []
 		errors = []
-
 		ids = createIdArray nodes
 
 		angular.forEach nodes, (node, index) ->
@@ -622,6 +874,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 						type: "missing_answer_node"
 
 					errors.push error
+				#
 
 			if node.hasLinkToOther or node.hasLinkToSelf
 
@@ -727,19 +980,20 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	# Helper function that converts node IDs to their respective alphabetical counterparts
 	# e.g., 1 is "A", 2 is "B", 26 is "Z", 27 is "AA", 28 is "AB"
 	integerToLetters = (val) ->
+		copyVal = val
 
-		if val is 0 then return "Start"
+		if copyVal is 0 then return "Start"
 
 		iteration = 0
 		prefix = ""
 
-		while val > 26
+		while copyVal > 26
 			iteration++
-			val -= 26
+			copyVal -= 26
 
 		if iteration > 0 then prefix = String.fromCharCode 64 + iteration
 
-		chars = prefix + String.fromCharCode 64 + val
+		chars = prefix + String.fromCharCode 64 + copyVal
 
 		chars
 
@@ -759,9 +1013,16 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	getNodeCount : getNodeCount
 	setNodeCount : setNodeCount
 	incrementNodeCount : incrementNodeCount
+	getInventoryItems: getInventoryItems
+	setInventoryItems: setInventoryItems
+	generateItemID : generateItemID
+	getItemIndex : getItemIndex
+	getCustomIcons: getCustomIcons
+	setCustomIcons: setCustomIcons
 	getMaxDepth : getMaxDepth
 	findAnswersWithTarget : findAnswersWithTarget
 	updateAllAnswerLinks : updateAllAnswerLinks
+	deleteItemReferencesFromAllNodes: deleteItemReferencesFromAllNodes
 	findNode : findNode
 	findAndAdd : findAndAdd
 	findAndReplace : findAndReplace
@@ -775,6 +1036,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 	validateTreeOnSave : validateTreeOnSave
 	integerToLetters : integerToLetters
 	generateAnswerHash : generateAnswerHash
+	findUnreachableDestinations : findUnreachableDestinations
 ]
 
 # The service in charge of managing Action History, replacing the clunky "deleteAndRestoreSrv" service
@@ -782,7 +1044,7 @@ Adventure.service "treeSrv", ['$rootScope','$filter','$sanitize','legacyQsetSrv'
 # action constants have no direct application currently, but are implemented for potential future features
 # various user actions result in addToHistory being called to store the tree AFTER the action has been performed, with some contextual information
 # note that the action history is not stored to the qset and is lost if the creator is reloaded or upon exit
-Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
+.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootScope) ->
 
 	HISTORY_LIMIT = 20
 
@@ -799,6 +1061,7 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		NODE_EDITED: "NODE_EDITED"
 		NODE_COPIED: "NODE_COPIED"
 		NODE_CONVERTED : "NODE_CONVERTED"
+		INVENTORY_EDITED: "INVENTORY_EDITED"
 
 	getActions = () ->
 		return actions
@@ -821,7 +1084,8 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		snapshot = createSnapshot tree, action, context
 		history.push snapshot
 
-		if history.length > HISTORY_LIMIT then history.splice 0, 1 # not using spliceHistory here to avoid broadcasting tree.history.removed
+		if history.length > HISTORY_LIMIT
+			history.splice 0, 1 # not using spliceHistory here to avoid broadcasting tree.history.removed
 		$rootScope.$broadcast "tree.history.added"
 
 	spliceHistory = (index, distance = 1) ->
@@ -835,8 +1099,9 @@ Adventure.service "treeHistorySrv", ['treeSrv', '$rootScope', (treeSrv, $rootSco
 		# SOURCE is a tree from a snapshot (string)
 		# DIFF is the raw tree to be compared (must be converted to a Qset object and stringified before comparison)
 		diff = JSON.stringify treeSrv.createQSetFromTree diff
-
 		return source == diff
+
+
 
 	getActions : getActions
 	getHistory : getHistory

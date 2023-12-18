@@ -1,13 +1,14 @@
-Adventure = angular.module('Adventure', ['ngAria', 'ngSanitize'])
+angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 ## CONTROLLER ##
-Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce) ->
+.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce, $timeout) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
 	$scope.SHORTANS = "shortanswer"
 	$scope.HOTSPOT = "hotspot"
 	$scope.TRANS = "transitional"
+	# $scope.RESTRICTED = "restricted"
 	$scope.NARR = "narrative" # May not be required
 	$scope.END = "end" # May not be required
 	$scope.OVER = "over" # the imaginary node after end nodes, representing the end of the widget
@@ -26,26 +27,41 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	$scope.title = ""
 	$scope.qset = null
 	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
+	$scope.showTutorial = true
+	$scope.showInventoryBtn = false
+	$scope.qsetHasInventoryItems = false
 	$scope.scoringDisabled = false
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
+	$scope.inventory = []
+	$scope.itemSelection = []
+
+	$scope.missingRequiredItems = []
+	$scope.missingRequiredItemsAltText = ""
 
 	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
-
 			#Convert an old qset prior to running the widget
 			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
 			$scope.$apply ->
 				$scope.title = instance.name
 				$scope.qset = qset
+				$scope.itemSelection = qset.options.inventoryItems
+				$scope.startID = qset.items[0].options.id
 
-				manageQuestionScreen(qset.items[0].options.id)
+				if qset.options.startID isnt 0 and qset.options.startID
+					$scope.startID = qset.options.startID
+
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
 
 				if qset.options.scoreMode and qset.options.scoreMode is "Non-Scoring"
 					$scope.scoringDisabled = true
 					if qset.options.internalScoreMessage then $scope.customInternalScoreMessage = qset.options.internalScoreMessage
+
+				$scope.qsetHasInventoryItems = _qsetHasInventoryItems $scope.qset
+
+			$scope.showTutorial = true
 
 		manualResize: true
 
@@ -58,11 +74,23 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	$scope.setLightboxTarget = (val) ->
 		$scope.lightboxTarget = val
+		if ($scope.lightboxTarget == -1)
+			document.getElementById("inventory").removeAttribute("inert")
+			document.querySelector(".container").removeAttribute("inert")
+			document.querySelector(".lightbox").setAttribute("inert", "true")
+			document.querySelector(".inventory-button-container").removeAttribute("inert")
+		else
+			document.getElementById("inventory").setAttribute("inert", "true")
+			document.querySelector(".container").setAttribute("inert", "true")
+			document.querySelector(".lightbox").removeAttribute("inert")
+			document.querySelector(".inventory-button-container").setAttribute("inert", "true")
 
 	$scope.lightboxZoom = 0
 
 	$scope.setLightboxZoom = (val) ->
 		$scope.lightboxZoom = val
+
+	$scope.visitedNodes = []
 
 	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
@@ -78,6 +106,9 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		for n in [0...$scope.qset.items.length]
 			if $scope.qset.items[n].options.id is questionId
 				q_data = $scope.qset.items[n]
+		# MWDK changes id of first item
+		if questionId is 0
+			q_data = $scope.qset.items[0]
 
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else if q_data.questions[0].text != "" then $scope.layout = q_data.options.asset.align
@@ -93,7 +124,6 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			$sanitize presanitized
 
 		catch error
-			console.log error
 			q_data.questions[0].text = "*Question text removed due to malformed or dangerous HTML content*"
 
 		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
@@ -110,17 +140,164 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			materiaId: q_data.id
 			options: q_data.options
 
+		# Remove new item alerts
+		for i in $scope.inventory
+			i.new = false
+
+		$scope.addedItems = []
+		$scope.removedItems = []
+		$scope.inventoryUpdate = false
+		$scope.questionItems = []
+
+		# Clear inventory updates
+		$scope.inventoryUpdateMessage = ""
+
+		# Add items to player's inventory
+		if $scope.question.options.items and $scope.question.options.items[0]
+
+			$scope.showInventoryBtn = true
+
+			# Format items
+			if $scope.question.options.items
+				for q_i in $scope.question.options.items
+					do (q_i) ->
+						item =
+							id: q_i.id
+							count: q_i.count || 1
+							takeAll: q_i.takeAll || false
+							firstVisitOnly: q_i.firstVisitOnly || false
+						$scope.questionItems.push item
+
+			for q_i in $scope.questionItems
+				do (q_i) ->
+					hasItem = false
+
+					# Check if item is first visit only and player has visited this node before
+					if ($scope.visitedNodes.some((n) => n is $scope.question.id) and q_i.firstVisitOnly)
+						# Move to next item
+					else
+						# Inventory update
+						if q_i.count < 0 or q_i.takeAll
+							# Only show removed items if player has the item in inventory
+							if $scope.inventory.some((i) => i.id is q_i.id)
+								# Can't take more than what is in player inventory
+								if Math.abs(q_i.count) > i.count or q_i.takeAll
+									q_i.count = -1 * i.count
+								if ! $scope.itemSelection[$scope.getItemIndex(q_i.id)].isSilent
+									$scope.removedItems.push(q_i)
+						else
+							if ! $scope.itemSelection[$scope.getItemIndex(q_i.id)].isSilent
+								$scope.addedItems.push(q_i)
+						# Check to see if player already has item
+						# If so, just update item count
+						for p_i, i in $scope.inventory
+							if p_i and p_i.id
+								if q_i.id is p_i.id
+									hasItem = true
+									p_i.count += q_i.count
+
+						$scope.inventory = $scope.inventory.filter((p_i) -> p_i.count > 0)
+
+						if (! hasItem)
+							newItem = {
+								...q_i
+								new: true
+							}
+							$scope.inventory.push(newItem)
+
+						$scope.inventory = $scope.inventory.filter((p_i) -> p_i.count > 0)
+
+			if ($scope.removedItems[0] || $scope.addedItems[0])
+				$scope.inventoryUpdate = true
+				document.getElementById("inventory-update").removeAttribute("inert")
+
+				addedItemsExist = $scope.addedItems[0]
+				removedItemsExist = $scope.removedItems[0]
+
+				if addedItemsExist
+					$scope.showNew = true
+					addedItemsMessage = "#{$scope.addedItems.length} new items added: #{($scope.addedItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{Math.abs(item.count)})")).join(', ')}. "
+				else
+					addedItemsMessage = ""
+
+				if removedItemsExist
+					removedItemsMessage = "#{$scope.removedItems.length} items removed: #{($scope.removedItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{Math.abs(item.count)})")).join(', ') }. "
+				else
+					removedItemsMessage = ""
+
+				$scope.inventoryUpdateMessage = "Updates to inventory: " + addedItemsMessage + removedItemsMessage
+
 		$scope.answers = []
 
 		if q_data.answers
 			for i in [0..q_data.answers.length-1]
 				continue if not q_data.answers[i]
 
+				requiredItems = []
+				# Format items
+				if q_data.answers[i].options.requiredItems
+					for r in q_data.answers[i].options.requiredItems
+						do (r) ->
+							# Format properties for pre-existing items without said properties
+							# If minCount isn't set, set it to 1
+							if r.minCount > -1
+								minCount = r.minCount
+							else if r.tempMinCount > -1
+								minCount = r.tempMinCount
+							else if r.count
+								minCount = r.count
+							else
+								minCount = 1
+
+							# If maxCount isn't set, set it to uncapped
+							if r.maxCount > -1
+								maxCount = r.maxCount
+							else if r.tempMaxCount > -1
+								maxCount = r.tempMaxCount
+							else if r.count
+								maxCount = r.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
+
+							uncappedMax = if (r.uncappedMax isnt null) then r.uncappedMax else false
+
+							item =
+								id: r.id
+								range: r.range || ""
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+
+							# Format range for pre-existing items without the range property
+							if item.range is ""
+								if item.uncappedMax and item.minCount is 0
+									item.range = "any amount"
+								else if item.minCount is 0 and item.maxCount is 0
+									item.range = "none"
+								else if item.uncappedMax
+									item.range = "at least #{item.minCount}"
+								else if item.minCount is 0
+									item.range = "no more than #{item.maxCount}"
+								else if item.minCount is item.maxCount
+									item.range = "#{item.minCount}"
+								else
+									item.range = "#{item.minCount} to #{item.maxCount}"
+
+							requiredItems.push item
+
 				answer =
 					text : q_data.answers[i].text
 					link : q_data.answers[i].options.link
 					index : i
 					options : q_data.answers[i].options
+					requiredItems: requiredItems
+					hideAnswer: q_data.answers[i].options.hideAnswer || false
+					# hideRequiredItems: q_data.answers[i].options.hideRequiredItems || false
+
+				if answer.requiredItems[0]
+					$scope.showInventoryBtn = true
+
 				$scope.answers.push answer
 
 		# shuffle answer order if asked to do so
@@ -134,7 +311,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if $scope.question.type is $scope.HOTSPOT then $scope.layout = "hotspot"
 		if $scope.question.layout isnt "text-only"
 			if $scope.question.options.asset.type is "image"
-				image_url = Materia.Engine.getImageAssetUrl q_data.options.asset.id
+				image_url = Materia.Engine.getMediaUrl q_data.options.asset.id
 				$scope.question.image = image_url
 			else
 				$scope.question.video = $sce.trustAsResourceUrl($scope.question.options.asset.url)
@@ -145,8 +322,76 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			when $scope.MC then handleMultipleChoice q_data
 			when $scope.HOTSPOT then handleHotspot q_data
 			when $scope.SHORTANS then handleShortAnswer q_data
+			# when $scope.RESTRICTED then handleRestrictedNode q_data
 			else
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
+
+		$scope.visitedNodes.push(q_data.options.id)
+
+	$scope.dismissUpdates = () ->
+		$scope.inventoryUpdate = false
+		document.getElementById("inventory-update").setAttribute("inert", true)
+		$scope.showNew = false
+
+	$scope.toggleInventory = (item = null) ->
+		$scope.showInventory = ! $scope.showInventory
+		if ! $scope.showInventory
+			document.getElementById("inventory").setAttribute("inert", "true")
+			document.querySelector(".container").removeAttribute("inert")
+			document.querySelector(".feedback").removeAttribute("inert")
+			document.querySelector(".lightbox").removeAttribute("inert")
+		else
+			document.getElementById("inventory").removeAttribute("inert")
+			document.querySelector(".container").setAttribute("inert", "true")
+			document.querySelector(".feedback").setAttribute("inert", "true")
+			document.querySelector(".lightbox").setAttribute("inert", "true")
+		$scope.inventoryUpdate = false
+		document.getElementById("inventory-update").setAttribute("inert", true)
+		if item
+			$scope.selectedItem = $scope.inventory[$scope.getItemIndex(item.id)] || null
+		$scope.showNew = false
+
+	$scope.setSelectedItem = (item) ->
+		# Display item details in right toolbar
+		$scope.selectedItem = item
+		# Remove new label from icon
+		item.new = false
+
+	$scope.getItemIndex = (itemId) ->
+		if !itemId then return false
+		for i, index in $scope.itemSelection
+			if i.id is itemId
+				return index
+
+	$scope.hasNotSilentItem = (items) ->
+		for i in items
+			if ! $scope.itemSelection[$scope.getItemIndex(i.id)].isSilent
+				return true
+		return false
+
+	# Checks to see if player inventory contains all required items
+	# Returns array of missing items
+	$scope.checkInventory = (requiredItems) ->
+		missingItems = []
+		if (! requiredItems)
+			return []
+		angular.forEach requiredItems, (item) ->
+			hasItemInInventory = false
+			hasRequiredItem = $scope.inventory.some (playerItem) ->
+				if playerItem.id is item.id
+					hasItemInInventory = true
+					# Check if player has more than the min
+					if playerItem.count >= item.minCount
+						# Check if player has less than the max
+						if playerItem.count <= item.maxCount or item.uncappedMax
+							return true
+					return false
+			# Check if player doesn't have item but there is no minimum
+			if ! hasItemInInventory and item.minCount is 0
+				hasRequiredItem = true
+			if ! hasRequiredItem
+				missingItems.push item
+		return missingItems
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
 	$scope.handleAnswerSelection = (link, index) ->
@@ -154,6 +399,15 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		if link is -1 then return _end()
 
 		$scope.selectedAnswer = $scope.q_data.answers[index].text
+
+		requiredItems = $scope.answers[index].requiredItems || $scope.answers[index].options.requiredItems
+
+		$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
+
+		if $scope.missingRequiredItems[0]
+			$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+			$scope.next = null
+			return
 
 		# Disable the hotspot label before moving on, if it's a hotspot
 		if $scope.type is $scope.HOTSPOT
@@ -173,7 +427,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 	# Do stuff when the user submits something in the SA answer box
 	$scope.handleShortAnswerInput = ->
 
-		response = $scope.response.toLowerCase()
+		response = $scope.response
 		$scope.response = ""
 
 		# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
@@ -185,8 +439,37 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			# Loop through each match to see if it matches the recorded response
 			for j in [0...$scope.q_data.answers[i].options.matches.length]
 
+
 				# TODO make matching algo more robust
-				if $scope.q_data.answers[i].options.matches[j].toLowerCase().trim() is response
+				match = $scope.q_data.answers[i].options.matches[j]
+
+				# Remove whitespace
+				match = match.trim().split('').filter((letter) -> letter.match(/\w/)).join()
+				response = response.trim().split('').filter((letter) -> letter.match(/\w/)).join()
+
+				# If matches are not character sensitive
+				if (! $scope.q_data.answers[i].options.characterSensitive)
+					# Remove any special characters
+					# Look at alphanumeric characters only
+					match = match.split('').filter((letter) -> letter.match(/\w/)).join()
+					response = response.split('').filter((letter) -> letter.match(/\w/)).join()
+
+				# If matches are not case sensitive
+				if (! $scope.q_data.answers[i].options.caseSensitive)
+					match = match.toLowerCase()
+					response = response.toLowerCase()
+
+				if match is response
+					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
+					missingItems = $scope.checkInventory(requiredItems)
+
+					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
+					$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
+
+					if $scope.missingRequiredItems[0]
+						$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+						$scope.next = null
+						return
 
 					link = ~~$scope.q_data.answers[i].options.link # is parsing required?
 
@@ -217,10 +500,20 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 				return false
 
-	$scope.closeFeedback = ->
+	$scope.closeFeedback = () ->
 		if $scope.feedback.length > 0 # prevent multiple calls to manageQuestionScreen from firing due to the scope cycle not updating fast enough
 			$scope.feedback = ""
-			manageQuestionScreen $scope.next
+			if $scope.next
+				manageQuestionScreen $scope.next
+
+	$scope.closeTutorial = () ->
+		$scope.showTutorial = false
+		manageQuestionScreen($scope.startID)
+
+	$scope.closeMissingRequiredItems = () ->
+		if $scope.missingRequiredItems.length > 0
+			$scope.missingRequiredItems = []
+			$scope.missingRequiredItemsAltText = ""
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
@@ -255,7 +548,7 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		link = null
 		if $scope.question.type is $scope.END
 			link = -1
-			Materia.Score.submitFinalScoreFromClient q_data.id, q_data.questions[0].text, q_data.options.finalScore
+			Materia.Score.submitFinalScoreFromClient q_data.options.id, q_data.questions[0].text, q_data.options.finalScore
 		else
 			link = q_data.answers[0].options.link
 
@@ -268,6 +561,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 		$scope.question.text = "[Blank destination: click Continue to end the widget preview.]"
 		$scope.link = -1
 		Materia.Score.submitFinalScoreFromClient null, "Blank Destination! Be sure to edit or remove this node before publishing.", 100
+
+	# handleRestrictedNode = () ->
+	# 	$scope.type = $scope.RESTRICTED
+	# 	$scope.layout = "text-only"
+	# 	itemArray = item.name for item in $scope.question.requiredItems
+	# 	$scope.question.text = "[Destination requires item(s): [#{itemArray.toString(', ')}]]"
+	# 	$scope.link = $scope.question.options.parentId
 
 	# Submit the user's response to the logs
 	_logProgress = ->
@@ -291,14 +591,13 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 
 	# Kinda hackish, since both autoTextScale and dynamicScale directives update the "style" attribute,
 	# need to combine updated properties from both so they don't overwrite each other.
-	# If the node isn't MC, just return fontSize, height isn't used
 	$scope.formatQuestionStyles = ->
+		return "font-size:" + $scope.questionFormat.fontSize + "px;"
 
-		if $scope.question.type is $scope.MC
-			return "font-size:" + $scope.questionFormat.fontSize + "px; height:" + $scope.questionFormat.height + "px;"
-		else return "font-size:" + $scope.questionFormat.fontSize + "px;"
-
-	Materia.Engine.start(materiaCallbacks)
+	_qsetHasInventoryItems = (qset) ->
+		for n in [0...$scope.qset.items.length]
+			if $scope.qset.items[n].options.items and $scope.qset.items[n].options.items[0] then return true
+		false
 
 	# Small script that inserts " target="_blank"  " into a hrefs, preventing hyperlinks from displaying within the iframe.
 	addTargetToHrefs = (string) ->
@@ -324,11 +623,14 @@ Adventure.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSr
 			a[j] = a[i]
 			a[i] = t
 		a
+
+	# light this candle
+	Materia.Engine.start(materiaCallbacks)
 ]
 
 
 ## DIRECTIVES ##
-Adventure.directive "ngEnter", [() ->
+.directive "ngEnter", [() ->
 	return (scope, element, attrs) ->
 		element.bind("keypress", (event) ->
 			if(event.which == 13 or event.which == 10)
@@ -340,7 +642,7 @@ Adventure.directive "ngEnter", [() ->
 ]
 
 # Font will progressively step down from 22px to 12px depending on question length after a threshold is reached
-Adventure.directive "autoTextScale", [() ->
+.directive "autoTextScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -355,13 +657,17 @@ Adventure.directive "autoTextScale", [() ->
 
 				text = $element.text()
 
-				if angular.element($element[0]).hasClass("right") or angular.element($element).hasClass("left")
-					scaleFactor = 25
-					scaleThreshold = 180
-
-				else if angular.element($element[0]).hasClass("top") or angular.element($element).hasClass("bottom")
-					scaleFactor = 10
+				if $scope.layout is "right" or $scope.layout is "left"
+					scaleFactor = 20
 					scaleThreshold = 140
+
+				else if $scope.layout is "top" or $scope.layout is "bottom"
+					scaleFactor = 15
+					scaleThreshold = 140
+
+				else if $scope.layout is "hotspot"
+					scaleFactor = 10
+					scaleThreshold = 100
 
 				else
 					scaleFactor = 100
@@ -373,7 +679,7 @@ Adventure.directive "autoTextScale", [() ->
 					diff = (text.length - scaleThreshold) / scaleFactor
 					$scope.questionFormat.fontSize -= diff
 
-					if $scope.questionFormat.fontSize < 12 then $scope.questionFormat.fontSize = 12
+					if $scope.questionFormat.fontSize < 14 then $scope.questionFormat.fontSize = 14
 
 				$attrs.$set "style", $scope.formatQuestionStyles()
 ]
@@ -381,7 +687,7 @@ Adventure.directive "autoTextScale", [() ->
 # Scales the height of the question box dynamically based on the height of the answer box
 # Ensures the negative space is effectively filled up with question text
 # Only used for MC, since MC is the only node type with variable answer container heights
-Adventure.directive "dynamicScale", [() ->
+.directive "dynamicScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -415,7 +721,7 @@ Adventure.directive "dynamicScale", [() ->
 # Images in the player are subject to a number of constraints that makes scaling them logically complicated
 # Scaling is dependent on width of accompanying text, available height (constrained by header & answer container), and horiz/vertical layout
 # Logic must be applied AFTER image has loaded in order to properly query width and height
-Adventure.directive "dynamicMediaScale", [() ->
+.directive "dynamicMediaScale", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -470,7 +776,7 @@ Adventure.directive "dynamicMediaScale", [() ->
 ]
 
 # Handles the visibility of individual hotspots
-Adventure.directive "visibilityManager", [() ->
+.directive "visibilityManager", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -493,7 +799,7 @@ Adventure.directive "visibilityManager", [() ->
 						$attrs.$set "style", style
 ]
 
-Adventure.directive "labelManager", ['$timeout', ($timeout) ->
+.directive "labelManager", ['$timeout', ($timeout) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -506,6 +812,10 @@ Adventure.directive "labelManager", ['$timeout', ($timeout) ->
 
 			if answer.text then $scope.hotspotLabelTarget.text = answer.text
 			else return false
+
+			$scope.hotspotLabelTarget.ariaLabel = answer.text + (if $scope.checkInventory(answer.requiredItems).length > 0 then ' Cannot select. ' else ' ')
+			requiredItemString = answer.requiredItems.map((item) -> $scope.itemSelection[$scope.getItemIndex(item.id)].name + ' (amount: ' + item.range + ')').join(', ')
+			$scope.hotspotLabelTarget.ariaLabel += (if (answer.requiredItems && answer.requiredItems.length > 0) then ('Required Items: ' + requiredItemString) else '')
 
 			container = document.getElementById "body"
 
@@ -533,7 +843,7 @@ Adventure.directive "labelManager", ['$timeout', ($timeout) ->
 			$scope.hotspotLabelTarget.y = null
 ]
 
-Adventure.directive "focusManager", [() ->
+.directive "focusManager", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -541,10 +851,19 @@ Adventure.directive "focusManager", [() ->
 
 			# Focuses on the text after each answer has been given so screen reader users
 			# don't have to go back in the order of the widget
-			$element[0].focus()
+			if newVal != undefined then $element[0].focus()
 ]
 
-Adventure.directive "feedbackFocusManager", [() ->
+.directive "tutorialFocusManager", [() ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		# Auto-focus feedback close button when visible
+		$scope.$watch "showTutorial", (newVal, oldVal) ->
+			if newVal then $element[0].focus()
+]
+
+.directive "feedbackFocusManager", [() ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -553,7 +872,7 @@ Adventure.directive "feedbackFocusManager", [() ->
 			if newVal and newVal.length > 0 then $element[0].focus()
 ]
 
-Adventure.directive "lightboxFocusManager", ['$timeout', ($timeout) ->
+.directive "lightboxFocusManager", ['$timeout', ($timeout) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 

@@ -23,38 +23,33 @@ copyList.push(
 		from: `${srcPath}/_guides/assets`,
 		to: `${outputPath}/guides/assets`,
 		toType: 'dir'
-	},
-	)
+	}
+)
 
 // completely replace the default entries with ours
 const entries = {
-	"assets/legacyQsetSrv.js":[
-		srcPath+"src-assets/legacyQsetSrv.coffee"
-	],
-	"assets/player-assets/player.js": [
+	"player": [
+		srcPath+"player.html",
+		srcPath+"src-assets/player-assets/player.scss",
 		srcPath+"src-assets/player-assets/app.coffee",
-		srcPath+"src-assets/player-assets/player.coffee"
+		srcPath+"src-assets/player-assets/player.coffee",
+		srcPath+"src-assets/legacyQsetSrv.coffee"
 
 	],
-	"assets/creator-assets/creator.js": [
+	"creator": [
+		srcPath+"creator.html",
+		srcPath+"src-assets/creator-assets/creator.scss",
 		srcPath+"src-assets/creator-assets/app.coffee",
 		srcPath+"src-assets/creator-assets/services.coffee",
-		srcPath+"src-assets/creator-assets/directives.coffee",
 		srcPath+"src-assets/creator-assets/controllers.coffee",
+		srcPath+"src-assets/creator-assets/directives.coffee",
+		srcPath+"src-assets/legacyQsetSrv.coffee"
 	],
-	"assets/creator-assets/creator.css": [
-		srcPath+"creator.html",
-		srcPath+"src-assets/creator-assets/creator.scss"
-	],
-	"assets/player-assets/player.css": [
-		srcPath+"player.html",
-		srcPath+"src-assets/player-assets/player.scss"
-	],
-	"guides/player.temp.html": [
-		srcPath+"_guides/player.md"
-	],
-	"guides/creator.temp.html": [
-		srcPath+"_guides/creator.md"
+	"scoreScreen": [
+		srcPath+"scoreScreen.html",
+		srcPath+"src-assets/score-assets/score.scss",
+		srcPath+"src-assets/score-assets/app.coffee",
+		srcPath+"src-assets/score-assets/score.coffee"
 	]
 }
 
@@ -83,11 +78,9 @@ const babelLoaderWithPolyfillRule = {
 const moduleRules = [
 	rules.loaderCompileCoffee,
 	babelLoaderWithPolyfillRule,
-	rules.loadAndCompileMarkdown,
 	rules.copyImages,
 	rules.loadHTMLAndReplaceMateriaScripts,
-	rules.loadAndPrefixCSS,
-	rules.loadAndPrefixSASS	
+	rules.loadAndPrefixSASS
 ]
 
 let options = {

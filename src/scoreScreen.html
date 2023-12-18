@@ -1,0 +1,93 @@
+<!--UNFINISHED-->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Adventure Score Screen</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+
+		<!-- STYLESHEETS -->
+		<link href='//fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="assets/score-assets/score.css">
+
+		<!-- REQUIRED MATERIA JAVASCRIPT -->
+		<script src="materia.scorecore.js"></script>
+
+		<!-- YOUR PREREQUISITES -->
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.8.2/angular-sanitize.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/angular-aria/1.8.2/angular-aria.min.js"></script>
+		<script src="assets/micromarkdown.min.js"></script>
+	</head>
+	<body>
+		<div class="content-frame" ng-controller="AdventureScoreCtrl">
+			<section class="inventory" ng-if="itemSelection[0]" ng-if="customTable">
+                <h1 class="inventory-header" ng-click="toggleInventoryDrawer()" ng-class="{'closed': !showInventory}">FINAL INVENTORY <i class="arrow-top"></i></h1>
+                <div class="inventory-content" ng-show="showInventory">
+                    <div class="inventory-items">
+                        <div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)">
+                            <img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
+                            {{itemSelection[getItemIndex(item)].name}} ({{item.count}})
+                        </div>
+                    </div>
+                    <div class="item-description" ng-if="selectedItem">
+                        <div class="item-header">
+                            <img ng-if="itemSelection[getItemIndex(selectedItem)].icon.url" ng-src="{{itemSelection[getItemIndex(selectedItem)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(selectedItem)].icon.alt}}"/>
+                            <h3>
+                                {{itemSelection[getItemIndex(selectedItem)].name}}
+                            </h3>
+                        </div>
+                        <h4>Description</h4>
+                        <p>{{itemSelection[getItemIndex(selectedItem)].description ? itemSelection[getItemIndex(selectedItem)].description : (itemSelection[getItemIndex(selectedItem)].icon.alt ? itemSelection[getItemIndex(selectedItem)].icon.alt : 'No description')}}</p>
+                        <h4>Count</h4>
+                        <p>{{itemSelection[getItemIndex(selectedItem)].count}}</p>
+                    </div>
+                </div>
+            </section>
+            <h1 class="responses-heading" ng-if="customTable">RESPONSES:</h1>
+            <section class="table" ng-if="customTable">
+                <div class="table-header">
+                    <div></div>
+                    <div>The Question</div>
+                    <div>Your Response</div>
+                </div>
+                <div class="table-row" ng-repeat="row in table track by $index">
+                    <div class="row-details">
+                        <div class="row-number">
+                            <p>{{$index + 1}}</p>
+                        </div>
+                        <div class="row-question">{{row.question}}</div>
+                        <div class="row-answer">
+                            <p>{{row.answer}}</p>
+                            <div class="row-feedback" ng-if="row.feedback">
+                                <p>{{row.feedback}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-items" ng-if="row.items[0]">
+                        <h4  ng-if="row.gainedItems">Items Gained</h4>
+                        <div class="row-items-gained" ng-if="row.gainedItems">
+                            <div ng-repeat="item in row.items" ng-if="item.count > 0" class="row-item">
+                                <p>+ {{item.count}}</p>
+                                <img ng-show="itemSelection[getItemIndex(item)].icon && itemSelection[getItemIndex(item)].icon.url" src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
+                                <p>{{itemSelection[getItemIndex(item)].name}}</p>
+                            </div>
+                        </div>
+                        <h4 ng-if="row.lostItems">Items Lost</h4>
+                        <div class="row-items-lost" ng-if="row.lostItems">
+                            <div ng-repeat="item in row.items" ng-if="item.count < 0" class="row-item">
+                                <p>- {{-1*item.count}}</p>
+                                <img ng-show="itemSelection[getItemIndex(item)].icon && itemSelection[getItemIndex(item)].icon.url" src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
+                                <p>{{itemSelection[getItemIndex(item)].name}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+		</div>
+
+		<!-- MAIN WIDGET SCRIPT -->
+		<script src="scoreScreen.js"></script>
+	</body>
+</html>

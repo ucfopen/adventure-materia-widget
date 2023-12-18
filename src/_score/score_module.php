@@ -80,7 +80,7 @@ class Score_Modules_Adventure extends Score_Module
 		return [
 			'data' => [
 				$this->get_ss_question($log, $q),
-				$this->get_ss_answer($log, $q),
+				$this->get_ss_answer($log, $q)
 			],
 			'data_style'    => ['question', 'response', 'answer'],
 			'score'         => $score,

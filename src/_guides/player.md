@@ -21,6 +21,18 @@ The hotspot screen is the one significant exception to the Adventure widget's la
 2. Hotspot image
 3. Example hotspot
 
+### Inventory
+Some widgets may give you items as you progress. You can view your items by clicking the backpack in the top right of the screen.
+
+![adventure player inventory button](assets/play_widget_adventure_inventory_button.png "adventure player inventory button")
+
+Your inventory will show what items you have, the quantity of those items, and their descriptions.
+
+Sometimes, multiple choice answers, hotspots, or even short answer responses require you to have certain items. Keep playing, and you might just end up finding these items!
+
+![adventure player required items example](assets/play_widget_adventure_required_items.png "adventure player required items example")
+
+
 ### Your Choices Determine Your Score ###
 
 In Choose Your Own Adventure, the score you receive is based on the final screen you encounter. Your responses to various questions determine the route you take; some widgets may be more linear than others. Additionally, you may or may not encounter screens of every type (Multiple Choice, Short Answer, Hotspot, and Narrative).
