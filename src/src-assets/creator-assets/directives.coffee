@@ -220,9 +220,9 @@ angular.module "Adventure"
 							links.push newLink
 
 				# Adding required items to links
-				angular.forEach links, (link, index) ->
-					angular.forEach node.answers, (answer, index) ->
-						if answer.target is link.target.id
+				angular.forEach links, (link, linkIndex) ->
+					angular.forEach node.answers, (answer, answerIndex) ->
+						if answer.target is link.target.id and node.id is link.source.id
 							link.lock =
 								requiredItems: answer.requiredItems
 								answerText: answer.text
@@ -390,6 +390,11 @@ angular.module "Adventure"
 					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
 					midX = midpoint.x
 					midY = midpoint.y
+					
+					# compute the position of the lock icon along the path
+					quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
+					links[index].lock.x = quarterpoint.x
+					links[index].lock.y = quarterpoint.y
 
 					# Now find the associated bridge node using the bridgeNodeIndex flag on the given link
 					# And update its X,Y coordinates for the new midpoint location
@@ -413,7 +418,7 @@ angular.module "Adventure"
 				.attr("class","loopback")
 				.attr("r", (d) ->
 					# Increase the radius by a certain amount if there are multiple loopbacks
-					if d.radiusOffset then 50 + d.radiusOffset * 5
+					if d.radiusOffset then 50 + d.radiusOffset * 7
 					else return 50
 				)
 				.attr("transform", (d) ->
@@ -423,10 +428,14 @@ angular.module "Adventure"
 
 					# Increase the offset based on the increased radius of the circle for multiple loopbacks
 					if d.radiusOffset
-						xOffset += d.radiusOffset * 3
-						yOffset += d.radiusOffset * 3
+						xOffset += d.radiusOffset * 5
+						yOffset += d.radiusOffset * 5
 
-					"translate(#{xOffset},#{yOffset})"
+					if d.lock and d.specialCase == "loopBack"
+						d.lock.x = xOffset + 34 + d.radiusOffset * 7
+						d.lock.y = yOffset + 34 + d.radiusOffset * 7
+
+					return "translate(#{xOffset},#{yOffset})"
 				)
 				.style("display", (d) ->
 					if d.specialCase == "loopBack" then return null
@@ -444,10 +453,16 @@ angular.module "Adventure"
 				)
 				.attr("r", "10")
 				.attr("cx", (d) ->
-					return (d.source.x + (d.source.x + d.target.x) / 2) / 2
+					# if the lock icon is to be displayed and it's a special link, use the previously computed x value
+					# these don't appear to be accurate for standard links - so use the previous computation method instead
+					if d.lock and d.specialCase then return d.lock.x
+					else return (d.source.x + (d.source.x + d.target.x) / 2) / 2
 				)
 				.attr("cy", (d) ->
-					return (d.source.y + (d.source.y + d.target.y) / 2) / 2
+					# if the lock icon is to be displayed and it's a special link, use the previously computed y value
+					# these don't appear to be accurate for standard links - so use the previous computation method instead
+					if d.lock and d.specialCase then return d.lock.y
+					else return (d.source.y + (d.source.y + d.target.y) / 2) / 2
 				)
 				.on("mouseover", (d, i) ->
 					$scope.onHover {data: d.lock}
@@ -473,10 +488,12 @@ angular.module "Adventure"
 				)
 				.attr("xlink:href", "assets/creator-assets/lock.svg")
 				.attr("x", (d) ->
-					return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 4
+					if d.lock and d.specialCase then return d.lock.x - 4
+					else return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 4
 				)
 				.attr("y", (d) ->
-					return (d.source.y + (d.source.y + d.target.y) / 2) / 2 - 8
+					if d.lock and d.specialCase then return d.lock.y - 8
+					else return (d.source.y + (d.source.y + d.target.y) / 2) / 2 - 8
 				)
 				.attr("width", 13)
 				.attr("height", 13)
@@ -594,19 +611,21 @@ angular.module "Adventure"
 				.attr("width", (d) ->
 					unless d.name then return 0
 
-					# Couldn't find a better solution to the rect width than this
-					# In the future, someone is welcome to clean this up
-					# If someone is getting to node labels with more than 3-4 characters, odds are the've got some other problems too
-					if d.name.length > 1 and d.name.length < 5 then return d.name.length * 12
-					else if d.name.length >= 5 then return d.name.length * 8
+					label = if d.customLabel then d.customLabel else d.name
+
+					if !d.customLabel and d.name is "Start" then return 36
+					else if !d.customLabel and label.length > 1 then return label.length * 14
+					else if d.customLabel then return label.length * (9 - (label.length * 0.05))
 					else return 20
 				)
 				.attr("height", 19)
 				.attr("x", (d) ->
 					unless d.name then return 0
+					label = if d.customLabel then d.customLabel else d.name
 
-					if d.name.length > 1 then return 8
-					else return 11
+					if label != "Start" and !d.customLabel then return 11 - (label.length * 3.5)
+					else if label != "Start" then return 11 - (label.length * 3)
+					else return 8
 				)
 				.attr("y", 0)
 				.attr("rx", 3)
@@ -620,16 +639,25 @@ angular.module "Adventure"
 				)
 				.attr("dx", (d) ->
 					if d.name
-						if d.name.length > 1 then return 10 # -10
-						else return 15 # -5
+						label = if d.customLabel then d.customLabel else d.name
+
+						if label != "Start" and !d.customLabel then return 16 - (label.length * 3.5)
+						else if label != "Start" then return 16 - (label.length * 3)
+						else return 10
 					else return 0
 				)
 
 				.attr("dy", 15) # sets Y label offset from node
-				.attr("font-family", "Lato")
-				.attr("font-size", 14)
+				.attr("font-family", (d) ->
+					if d.customLabel then return "Roboto Mono"
+					else return "Lato"
+				)
+				.attr("font-size", (d) ->
+					if d.customLabel then return 12
+					else return 14
+				)
 				.text (d) ->
-					d.name
+					if d.customLabel then d.customLabel else d.name
 
 			# Positions for item icons around each node
 			dataPos = [[34, -20], [20, -34], [0, -40], [-20, -34], [-34, -20], [-40, 0], [-34, 20]]
@@ -887,6 +915,15 @@ angular.module "Adventure"
 	link: ($scope, $element, $attrs) ->
 
 		$scope.$watch "showTitleEditor", (newVal, oldVal) ->
+			if newVal
+				$scope.showBackgroundCover = true
+]
+
+.directive "customNodeLabelEditor", [() ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+
+		$scope.$watch "showCustomNodeLabelEditor", (newVal, oldVal) ->
 			if newVal
 				$scope.showBackgroundCover = true
 ]

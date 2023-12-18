@@ -97,6 +97,8 @@ angular.module "Adventure"
 	# Scope reference for the node currently being edited in a creation screen, updates when displayNodeCreation changes
 	$scope.editedNode = null
 
+	$scope.showCustomNodeLabelEditor = false
+
 	$scope.hoveredNode =
 		showTooltips: false
 		target: null
@@ -228,6 +230,7 @@ angular.module "Adventure"
 		$scope.editingIcons = false
 		$scope.showQuestionRequiredItems = false
 		$scope.showQuestions = false
+		$scope.showCustomNodeLabelEditor = false
 
 		$scope.resetNewNodeManager()
 
@@ -264,7 +267,6 @@ angular.module "Adventure"
 			$scope.$apply () ->
 				$scope.title = title
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
-				treeSrv.setNodes qset.items
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
 
@@ -297,27 +299,30 @@ angular.module "Adventure"
 			validation = treeSrv.validateTreeOnSave $scope.treeData
 
 			# Check if there are any unreachable destinations if the inventory system is enabled
-			if ($scope.inventoryItems.length > 0)
-				visitedNodes = new Map()
-				inventory = new Map()
-				reachableDestinations = treeSrv.findReachableDestinations $scope.treeData, $scope.treeData, visitedNodes, inventory
-				# Get collection of all nodes in the tree
-				allNodes = treeSrv.getNodes()
+			# if ($scope.inventoryItems.length > 0)
+			# 	visitedNodes = new Map()
+			# 	unvisitedNodes = new Map()
+			# 	inventory = new Map()
+			# 	unreachableDestinations = treeSrv.findUnreachableDestinations $scope.treeData, $scope.treeData, visitedNodes, unvisitedNodes, inventory
 
-				if (reachableDestinations.size < allNodes.size)
-					# Get all nodes that are not in reachableDestinations
-					# create error at each node that is not in reachableDestinations
-					$scope.validation.errors = []
-					unreachableDestinations = Array.from(new Map([...allNodes.entries()].filter(([key]) => !reachableDestinations.has(key))).values());
+			# 	if (unreachableDestinations.size > 0)
+			# 		# Get all nodes that are not in reachableDestinations
+			# 		# create error at each node that is not in reachableDestinations
+			# 		$scope.validation.errors = []
+			# 		unreachableDestinations = Array.from(unreachableDestinations.values())
 
-					for node in unreachableDestinations
-						$scope.validation.errors.push({
-							type: "unreachable_destination",
-							node: node.nodeId,
-							message: "Destination " + treeSrv.integerToLetters(node.nodeId) + " is unreachable!"
-						})
-						$rootScope.$broadcast "validation.error"
-					return Materia.CreatorCore.cancelSave ''
+			# 		for node in unreachableDestinations
+			# 			nodeId = if node.options then node.options.id or node.id else node.id
+			# 			if (node.parentId == -1)
+			# 				# start node id is 0
+			# 				nodeId = 0
+			# 			$scope.validation.errors.push({
+			# 				type: "unreachable_destination",
+			# 				node: nodeId,
+			# 				message: "Destination " + treeSrv.integerToLetters(nodeId) + " is unreachable!"
+			# 			})
+			# 			$rootScope.$broadcast "validation.error"
+			# 		return Materia.CreatorCore.cancelSave ''
 
 		else validation = []
 
@@ -386,12 +391,17 @@ angular.module "Adventure"
 		if data.type is "lock"
 			$scope.hoveredLock.pendingHide = false
 			if $scope.hoveredLock.target isnt data.id
-
 				$scope.$apply () ->
 					$scope.hoveredLock.x = data.x
 					$scope.hoveredLock.y = data.y
 					$scope.hoveredLock.target = data.id
 					$scope.hoveredLock.requiredItems = data.requiredItems
+					# set required item range text
+					for item in $scope.hoveredLock.requiredItems
+						if item.uncappedMax
+							item.range = item.minCount
+						else
+							item.range = item.minCount + " to " + item.maxCount
 					$scope.hoveredLock.answerText = data.answerText
 					$scope.hoveredLock.hideAnswer = data.hideAnswer
 			return
@@ -506,7 +516,6 @@ angular.module "Adventure"
 			items: []
 
 		treeSrv.findAndAdd $scope.treeData, parent, newNode
-		treeSrv.addNode(newNode.id, newNode)
 
 		treeSrv.set $scope.treeData
 
@@ -538,7 +547,6 @@ angular.module "Adventure"
 		treeSrv.findAndAddInBetween $scope.treeData, data.source, data.target, newNode
 
 		treeSrv.incrementNodeCount()
-		treeSrv.addNode(newNode.id, newNode)
 		treeSrv.set $scope.treeData
 
 		treeSrv.updateAllAnswerLinks $scope.treeData

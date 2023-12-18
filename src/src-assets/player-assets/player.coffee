@@ -27,11 +27,16 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.title = ""
 	$scope.qset = null
 	$scope.hideTitle = true # set to true by default so header doesn't flash when widget first loads
+	$scope.showTutorial = true
 	$scope.showInventoryBtn = false
+	$scope.qsetHasInventoryItems = false
 	$scope.scoringDisabled = false
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 	$scope.inventory = []
 	$scope.itemSelection = []
+
+	$scope.missingRequiredItems = []
+	$scope.missingRequiredItemsAltText = ""
 
 	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
@@ -47,14 +52,16 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				if qset.options.startID isnt 0 and qset.options.startID
 					$scope.startID = qset.options.startID
 
-				manageQuestionScreen($scope.startID)
-
 				if qset.options.hidePlayerTitle then $scope.hideTitle = qset.options.hidePlayerTitle
 				else $scope.hideTitle = false # default is to display title
 
 				if qset.options.scoreMode and qset.options.scoreMode is "Non-Scoring"
 					$scope.scoringDisabled = true
 					if qset.options.internalScoreMessage then $scope.customInternalScoreMessage = qset.options.internalScoreMessage
+
+				$scope.qsetHasInventoryItems = _qsetHasInventoryItems $scope.qset
+
+			$scope.showTutorial = true
 
 		manualResize: true
 
@@ -399,7 +406,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			if ! hasItemInInventory and item.minCount is 0
 				hasRequiredItem = true
 			if ! hasRequiredItem
-				missingItems.push(item.id)
+				missingItems.push item
 		return missingItems
 
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
@@ -411,11 +418,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		requiredItems = $scope.answers[index].requiredItems || $scope.answers[index].options.requiredItems
 
-		missingItems = $scope.checkInventory(requiredItems)
+		$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
 
-		if missingItems[0]
-			# string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
-			# $scope.feedback = "Answer requires the items: #{string}"
+		if $scope.missingRequiredItems[0]
+			$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
 			$scope.next = null
 			return
 
@@ -473,9 +479,11 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
 					missingItems = $scope.checkInventory(requiredItems)
 
-					if missingItems[0]
-						string = missingItems.map((itemId) -> "#{$scope.itemSelection[$scope.getItemIndex(itemId)].name} (amount: #{requiredItems.find((el) -> el.id is itemId).range});")
-						$scope.feedback = "Answer requires the items: #{string}"
+					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
+					$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
+
+					if $scope.missingRequiredItems[0]
+						$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
 						$scope.next = null
 						return
 
@@ -513,6 +521,15 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			$scope.feedback = ""
 			if $scope.next
 				manageQuestionScreen $scope.next
+
+	$scope.closeTutorial = () ->
+		$scope.showTutorial = false
+		manageQuestionScreen($scope.startID)
+
+	$scope.closeMissingRequiredItems = () ->
+		if $scope.missingRequiredItems.length > 0
+			$scope.missingRequiredItems = []
+			$scope.missingRequiredItemsAltText = ""
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC
@@ -590,14 +607,13 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 	# Kinda hackish, since both autoTextScale and dynamicScale directives update the "style" attribute,
 	# need to combine updated properties from both so they don't overwrite each other.
-	# If the node isn't MC, just return fontSize, height isn't used
 	$scope.formatQuestionStyles = ->
+		return "font-size:" + $scope.questionFormat.fontSize + "px;"
 
-		if $scope.question.type is $scope.MC
-			return "font-size:" + $scope.questionFormat.fontSize + "px; height:" + $scope.questionFormat.height + "px;"
-		else return "font-size:" + $scope.questionFormat.fontSize + "px;"
-
-	Materia.Engine.start(materiaCallbacks)
+	_qsetHasInventoryItems = (qset) ->
+		for n in [0...$scope.qset.items.length]
+			if $scope.qset.items[n].options.items and $scope.qset.items[n].options.items[0] then return true
+		false
 
 	# Small script that inserts " target="_blank"  " into a hrefs, preventing hyperlinks from displaying within the iframe.
 	addTargetToHrefs = (string) ->
@@ -623,6 +639,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			a[j] = a[i]
 			a[i] = t
 		a
+
+	# light this candle
+	Materia.Engine.start(materiaCallbacks)
 ]
 
 
@@ -654,13 +673,17 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 				text = $element.text()
 
-				if angular.element($element[0]).hasClass("right") or angular.element($element).hasClass("left")
-					scaleFactor = 25
-					scaleThreshold = 180
-
-				else if angular.element($element[0]).hasClass("top") or angular.element($element).hasClass("bottom")
-					scaleFactor = 10
+				if $scope.layout is "right" or $scope.layout is "left"
+					scaleFactor = 20
 					scaleThreshold = 140
+
+				else if $scope.layout is "top" or $scope.layout is "bottom"
+					scaleFactor = 15
+					scaleThreshold = 140
+
+				else if $scope.layout is "hotspot"
+					scaleFactor = 10
+					scaleThreshold = 100
 
 				else
 					scaleFactor = 100
@@ -672,7 +695,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					diff = (text.length - scaleThreshold) / scaleFactor
 					$scope.questionFormat.fontSize -= diff
 
-					if $scope.questionFormat.fontSize < 12 then $scope.questionFormat.fontSize = 12
+					if $scope.questionFormat.fontSize < 14 then $scope.questionFormat.fontSize = 14
 
 				$attrs.$set "style", $scope.formatQuestionStyles()
 ]
@@ -844,7 +867,16 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 			# Focuses on the text after each answer has been given so screen reader users
 			# don't have to go back in the order of the widget
-			$element[0].focus()
+			if newVal != undefined then $element[0].focus()
+]
+
+.directive "tutorialFocusManager", [() ->
+	restrict: "A",
+	link: ($scope, $element, $attrs) ->
+
+		# Auto-focus feedback close button when visible
+		$scope.$watch "showTutorial", (newVal, oldVal) ->
+			if newVal then $element[0].focus()
 ]
 
 .directive "feedbackFocusManager", [() ->
