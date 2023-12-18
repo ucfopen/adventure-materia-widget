@@ -947,9 +947,6 @@ angular.module "Adventure"
 
 						errors.push error
 
-			#f node.answers and
-
-
 		return errors
 
 

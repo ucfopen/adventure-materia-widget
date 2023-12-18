@@ -220,15 +220,15 @@ angular.module "Adventure"
 							links.push newLink
 
 				# Adding required items to links
-				angular.forEach links, (link, index) ->
-					angular.forEach node.answers, (answer, index) ->
-						if answer.target is link.target.id
+				angular.forEach links, (link, linkIndex) ->
+					angular.forEach node.answers, (answer, answerIndex) ->
+						if answer.target is link.target.id and node.id is link.source.id
 							link.lock =
 								requiredItems: answer.requiredItems
 								answerText: answer.text
 								hideAnswer: answer.hideAnswer
-								x: link.source.x
-								y: link.source.y + (link.target.y - link.source.y)/2
+								x: link.source.x + (link.target.x - link.source.x) * 0.25 # note that these values aren't actually used, but keeping them here for posterity
+								y: link.source.y + (link.target.y - link.source.y) * 0.25 # lock x and y values are only used for specialCase links and updated below
 								id: link.target.id
 								type: "lock"
 								sourceType: link.source.type
@@ -390,6 +390,11 @@ angular.module "Adventure"
 					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
 					midX = midpoint.x
 					midY = midpoint.y
+					
+					# compute the position of the lock icon along the path
+					quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
+					links[index].lock.x = quarterpoint.x
+					links[index].lock.y = quarterpoint.y
 
 					# Now find the associated bridge node using the bridgeNodeIndex flag on the given link
 					# And update its X,Y coordinates for the new midpoint location
@@ -444,10 +449,16 @@ angular.module "Adventure"
 				)
 				.attr("r", "10")
 				.attr("cx", (d) ->
-					return (d.source.x + (d.source.x + d.target.x) / 2) / 2
+					# if the lock icon is to be displayed and it's a special link, use the previously computed x value
+					# these don't appear to be accurate for standard links - so use the previous computation method instead
+					if d.lock and d.specialCase then return d.lock.x
+					else return (d.source.x + (d.source.x + d.target.x) / 2) / 2
 				)
 				.attr("cy", (d) ->
-					return (d.source.y + (d.source.y + d.target.y) / 2) / 2
+					# if the lock icon is to be displayed and it's a special link, use the previously computed y value
+					# these don't appear to be accurate for standard links - so use the previous computation method instead
+					if d.lock and d.specialCase then return d.lock.y
+					else return (d.source.y + (d.source.y + d.target.y) / 2) / 2
 				)
 				.on("mouseover", (d, i) ->
 					$scope.onHover {data: d.lock}
@@ -473,10 +484,12 @@ angular.module "Adventure"
 				)
 				.attr("xlink:href", "assets/creator-assets/lock.svg")
 				.attr("x", (d) ->
-					return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 4
+					if d.lock and d.specialCase then return d.lock.x - 4
+					else return (d.source.x + (d.source.x + d.target.x) / 2) / 2 - 4
 				)
 				.attr("y", (d) ->
-					return (d.source.y + (d.source.y + d.target.y) / 2) / 2 - 8
+					if d.lock and d.specialCase then return d.lock.y - 8
+					else return (d.source.y + (d.source.y + d.target.y) / 2) / 2 - 8
 				)
 				.attr("width", 13)
 				.attr("height", 13)
