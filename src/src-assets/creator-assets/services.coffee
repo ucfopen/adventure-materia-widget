@@ -214,7 +214,6 @@ angular.module "Adventure"
 			if node.answers
 				for answer in node.answers
 					targetNode = findNode(tree, answer.target)
-
 					if checkInventory(answer.requiredItems, node.inventory).length > 0 && visitedNodes.get(targetNode.id) is undefined
 						# if the player doesn't have the required items and this node hasn't been visited on a different path, add it to unvisitedNodes
 						unvisitedNodes.set(targetNode.id, targetNode)
@@ -825,7 +824,7 @@ angular.module "Adventure"
 				unless node.questions then node.questions = []
 
 				requiredItemsData = []
-				if question.options.requiredItems
+				if question.options && question.options.requiredItems
 					for i in question.options.requiredItems
 						do (i) ->
 							# Format properties for pre-existing items without said properties
@@ -866,7 +865,7 @@ angular.module "Adventure"
 					text: question.text
 					id: generateAnswerHash()
 					requiredItems: requiredItemsData
-					requiredVisits: question.options.requiredVisits
+					requiredVisits: if question.options then question.options.requiredVisits else -1
 
 				node.questions.push nodeQuestion
 			if item.options.customLabel then node.customLabel = item.options.customLabel
