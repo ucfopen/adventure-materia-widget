@@ -389,12 +389,17 @@ angular.module "Adventure"
 		if data.type is "lock"
 			$scope.hoveredLock.pendingHide = false
 			if $scope.hoveredLock.target isnt data.id
-
 				$scope.$apply () ->
 					$scope.hoveredLock.x = data.x
 					$scope.hoveredLock.y = data.y
 					$scope.hoveredLock.target = data.id
 					$scope.hoveredLock.requiredItems = data.requiredItems
+					# set required item range text
+					for item in $scope.hoveredLock.requiredItems
+						if item.uncappedMax
+							item.range = item.minCount
+						else
+							item.range = item.minCount + " to " + item.maxCount
 					$scope.hoveredLock.answerText = data.answerText
 					$scope.hoveredLock.hideAnswer = data.hideAnswer
 			return

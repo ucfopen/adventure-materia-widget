@@ -7,7 +7,7 @@
 		<!-- FONTS -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Roboto+Mono&display=swap" rel="stylesheet"> 
+		<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Roboto+Mono&display=swap" rel="stylesheet">
 
 		<!-- STYLESHEETS -->
 		<link rel="stylesheet" type="text/css" href="creator.css">
@@ -1576,7 +1576,7 @@
 			</node-tooltips>
 			<required-items-tooltip ng-show="hoveredLock.showItems">
 				<span>The answer "{{hoveredLock.answerText}}" requires item(s):</span>
-				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="inventoryItems[getItemIndex(item)].icon && inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.range}})</p>
+				<p ng-repeat="item in hoveredLock.requiredItems"><img ng-if="inventoryItems[getItemIndex(item)].icon && inventoryItems[getItemIndex(item)].icon.url" ng-src="{{inventoryItems[getItemIndex(item)].icon.url}}" /> {{inventoryItems[getItemIndex(item)].name}} (Quantity: {{item.range ? item.range : 1}})</p>
 				<p ng-if="!hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-white.png"/></span>This answer will remain visible even if the player does not have the items.</p>
 				<p ng-if="hoveredLock.hideAnswer"><span><img src="assets/creator-assets/eye-blocked-white.png"/></span>This answer will be invisible to the player if they do not have the items.</p>
 			</required-items-tooltip>
