@@ -136,6 +136,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 							count: q_i.count || 1
 							takeAll: q_i.takeAll || false
 							firstVisitOnly: q_i.firstVisitOnly || false
+							time: Date.now()
 						$scope.questionItems.push item
 
 			for q_i in $scope.questionItems
@@ -200,16 +201,27 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		# Get question based on inventory and number of visits
 		presanitized = ""
 		mostItems = 0
+		mostRecentItem = 0
 		for q in q_data.questions
-			if q.options.requiredItems
-				missingItems = $scope.checkInventory(q.options.requiredItems)
-				if (missingItems.length > 0)
-					continue
-				else if (mostItems < q.options.requiredItems.length)
-					mostItems = q.options.requiredItems.length
 			if q.options.requiredVisits
 				if $scope.visitedNodes[q_data.id] < q.options.requiredVisits
+					# If the player hasn't visited this node enough times, skip this question
 					continue
+			if q.options.requiredItems && q.options.requiredItems[0]
+				missingItems = $scope.checkInventory(q.options.requiredItems)
+				if (missingItems.length > 0)
+					# If the player doesn't have the required items, skip this question
+					continue
+				else if (mostItems < q.options.requiredItems.length)
+					# Choose the question with the most required items
+					mostItems = q.options.requiredItems.length
+				else
+					# Choose the question with the most recent item
+					recentItem = $scope.getMostRecentItem($scope.inventory, q.options.requiredItems)
+					if (recentItem > mostRecentItem)
+						mostRecentItem = recentItem
+					else
+						continue
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 			try
@@ -341,6 +353,15 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
 
 		$scope.visitedNodes[q_data.id] = ($scope.visitedNodes[q_data.id] || 0) + 1
+
+	$scope.getMostRecentItem = (inventory, requiredItems) ->
+		mostRecentItem = 0
+		for i in inventory
+			for r in requiredItems
+				if i.id is r.id
+					if i.time > mostRecentItem
+						mostRecentItem = i.time
+		mostRecentItem
 
 	$scope.dismissUpdates = () ->
 		$scope.inventoryUpdate = false

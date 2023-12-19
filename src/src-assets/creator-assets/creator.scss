@@ -1134,136 +1134,6 @@ required-items-tooltip {
 	}
 }
 
-/** For node item editor sections only **/
-.item-selection {
-
-	.item-instructions {
-		font-size: 12px;
-		font-style: italic;
-		color: $gray-darker;
-	}
-
-	/** Show modal on screen widths < 1000px **/
-	@media screen and (max-width: $item-panel-max-width) {
-		&.item-panel {
-			display: none;
-		}
-	}
-	/** Show two panels on screen widths >= 1000px **/
-	@media screen and (min-width: $item-panel-max-width) {
-		&.item-modal {
-			display: none;
-		}
-	}
-	.basic-options {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		width: 100%;
-		align-items: center;
-	}
-
-	.advanced-option {
-		display: flex;
-		align-items: center;
-		flex-direction: row;
-		flex-wrap: wrap;
-		gap: 15px;
-		padding: 10px 10px 10px 0;
-
-		input {
-			width: auto;
-			height: 1em;
-		}
-
-		button.hide-answer-button {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			color: $gray-darker;
-			gap: 20px;
-			padding: 20px;
-			background-color: $white;
-
-			img {
-				width: 25px;
-				height: 25px;
-			}
-
-			&:hover {
-				background-color: $gray-lighter;
-			}
-
-
-			&.hide-answer {
-				background-color: $gray-lighter;
-			}
-
-		}
-	}
-
-	.item-options-container {
-		display: flex;
-		gap: 5px;
-		flex-wrap: wrap;
-		justify-content: end;
-		flex-direction: column;
-		padding: 0 10px;
-		align-content:end;
-		min-width: 150px;
-		max-width: 150px;
-
-		&.flex-start {
-			justify-content: start;
-			align-content:start;
-		}
-
-		.item-minimum-quantity, .item-quantity {
-			display: flex;
-			flex-direction: row;
-			grid-gap: 10px;
-			align-items: center;
-
-			input {
-				width: 70px;
-				box-sizing: border-box;
-
-				&.uncapped-max-option, &.no-minimum-option {
-					width: auto;
-				}
-			}
-
-			.ng-invalid-pattern {
-				border: $red solid 1px;
-			}
-		}
-
-		.item-quantity-options {
-			gap: 10px;
-			display: flex;
-			flex-direction: column;
-		}
-
-		.quantity-explanation {
-			font-style: italic;
-			padding: 10px 0;
-		}
-
-		.greyed-out {
-			color: $gray-darker;
-			font-style: italic;
-		}
-	}
-
-	&.item-panel {
-		.advanced-option {
-			justify-content: flex-start;
-			font-size: 14px;
-			margin-top: 12px;
-		}
-	}
-}
-
 /** For both node item editors and inventory manager **/
 .item-selection, item-manager {
 	opacity: 0;
@@ -1549,10 +1419,6 @@ required-items-tooltip {
 			max-width: 75%;
 			align-self: center;
 			justify-content: center;
-
-			&.small-name {
-				max-width: 100px;
-			}
 
 			.item-name {
 				font-weight: bold;
@@ -1947,6 +1813,137 @@ item-icon-selector {
 		max-width: 50%;
 	}
 
+}
+
+
+/** For node item editor sections only **/
+.item-selection {
+
+	.item-instructions {
+		font-size: 12px;
+		font-style: italic;
+		color: $gray-darker;
+	}
+
+	/** Show modal on screen widths < 1000px **/
+	@media screen and (max-width: $item-panel-max-width) {
+		&.item-panel {
+			display: none !important;
+		}
+	}
+	/** Show two panels on screen widths >= 1000px **/
+	@media screen and (min-width: $item-panel-max-width) {
+		&.item-modal:not(.question-required) {
+			display: none !important;
+		}
+	}
+	.basic-options {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		width: 100%;
+		align-items: center;
+	}
+
+	.advanced-option {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 15px;
+		padding: 10px 10px 10px 0;
+
+		input {
+			width: auto;
+			height: 1em;
+		}
+
+		button.hide-answer-button {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			color: $gray-darker;
+			gap: 20px;
+			padding: 20px;
+			background-color: $white;
+
+			img {
+				width: 25px;
+				height: 25px;
+			}
+
+			&:hover {
+				background-color: $gray-lighter;
+			}
+
+
+			&.hide-answer {
+				background-color: $gray-lighter;
+			}
+
+		}
+	}
+
+	.item-options-container {
+		display: flex;
+		gap: 5px;
+		flex-wrap: wrap;
+		justify-content: end;
+		flex-direction: column;
+		padding: 0 10px;
+		align-content:end;
+		min-width: 150px;
+		max-width: 150px;
+
+		&.flex-start {
+			justify-content: start;
+			align-content:start;
+		}
+
+		.item-minimum-quantity, .item-quantity {
+			display: flex;
+			flex-direction: row;
+			grid-gap: 10px;
+			align-items: center;
+
+			input {
+				width: 70px;
+				box-sizing: border-box;
+
+				&.uncapped-max-option, &.no-minimum-option {
+					width: auto;
+				}
+			}
+
+			.ng-invalid-pattern {
+				border: $red solid 1px;
+			}
+		}
+
+		.item-quantity-options {
+			gap: 10px;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.quantity-explanation {
+			font-style: italic;
+			padding: 10px 0;
+		}
+
+		.greyed-out {
+			color: $gray-darker;
+			font-style: italic;
+		}
+	}
+
+	&.item-panel {
+		.advanced-option {
+			justify-content: flex-start;
+			font-size: 14px;
+			margin-top: 12px;
+		}
+	}
 }
 
 /* For give-item and required-item modals and panels */
@@ -2556,28 +2553,6 @@ node-creation-selection-dialog {
 
 		textarea {
 			resize: none;
-		}
-
-		.panel-right {
-			display: none;
-		}
-
-		.item-selection {
-			/** Show modal on screen widths < 1000px **/
-			@media screen and (max-width: 1400px) {
-				&.item-panel {
-					display: none;
-				}
-			}
-			/** Show two panels on screen widths >= 1000px **/
-			@media screen and (min-width: 1400px) {
-				&.item-panel {
-					display: none;
-				}
-				&.item-modal.show {
-					display: flex;
-				}
-			}
 		}
 	}
 

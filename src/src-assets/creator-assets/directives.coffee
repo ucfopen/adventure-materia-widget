@@ -390,7 +390,7 @@ angular.module "Adventure"
 					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
 					midX = midpoint.x
 					midY = midpoint.y
-					
+
 					# compute the position of the lock icon along the path
 					quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
 					links[index].lock.x = quarterpoint.x
@@ -2184,35 +2184,6 @@ angular.module "Adventure"
 							$scope.availableItems.push(item)
 
 				$scope.selectedItem = $scope.availableItems[0]
-
-		# $scope.addRequiredItemToQuestion = (item, question) ->
-		# 	newItem = {
-		# 		id: item.id
-		# 		minCount: 1
-		# 		maxCount: 1
-		# 		tempMinCount: 1
-		# 		tempMaxCount: 1
-		# 		uncappedMax: true
-		# 		range: ""
-		# 	}
-		# 	# Add item to question's required items
-		# 	question.requiredItems.push(newItem)
-		# 	# Remove item from available items
-		# 	$scope.availableItems.splice($scope.availableItems.indexOf(item), 1)
-		# 	# Reset selected item
-		# 	$scope.selectedItem = $scope.availableItems[0]
-		# 	$scope.showDropdown = false
-
-		# $scope.removeRequiredItemFromQuestion = (item, question) ->
-		# 	# Remove item from question's required items
-		# 	question.requiredItems.splice(question.requiredItems.indexOf(item), 1)
-		# 	# Add item back to available items
-		# 	item.count = 1
-		# 	for parentItem in $scope.inventoryItems
-		# 		if item.id is parentItem.id
-		# 			$scope.availableItems.push(parentItem)
-		# 	# Reset selected item
-		# 	$scope.selectedItem = $scope.availableItems[0]
 
 		$scope.newQuestion = () ->
 			# Create new question
