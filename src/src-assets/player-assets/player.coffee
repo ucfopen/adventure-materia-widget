@@ -203,28 +203,29 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		mostItems = 0
 		mostRecentItem = 0
 		for q in q_data.questions
-			if q.options.requiredVisits
-				if $scope.visitedNodes[q_data.id] < q.options.requiredVisits
-					# If the player hasn't visited this node enough times, skip this question
-					continue
-			if q.options.requiredItems && q.options.requiredItems[0]
-				missingItems = $scope.checkInventory(q.options.requiredItems)
-				if (missingItems.length > 0)
-					# If the player doesn't have the required items, skip this question
-					continue
-				else
-					keep = false
-					recentItem = $scope.getMostRecentItem($scope.inventory, q.options.requiredItems)
-					if (recentItem >= mostRecentItem)
-						# Choose the question with the most recent item
-						mostRecentItem = recentItem
-						keep = true
-					if (mostItems < q.options.requiredItems.length)
-						# Choose the question with the most required items
-						mostItems = q.options.requiredItems.length
-						keep = true
-					if (!keep)
+			if q.options
+				if q.options.requiredVisits != undefined
+					if $scope.visitedNodes[q_data.id] < q.options.requiredVisits || (q.options.requiredVisits > 0 && $scope.visitedNodes[q_data.id] == undefined)
+						# If the player hasn't visited this node enough times, skip this question
 						continue
+				if q.options.requiredItems && q.options.requiredItems[0]
+					missingItems = $scope.checkInventory(q.options.requiredItems)
+					if (missingItems.length > 0)
+						# If the player doesn't have the required items, skip this question
+						continue
+					else
+						keep = false
+						recentItem = $scope.getMostRecentItem($scope.inventory, q.options.requiredItems)
+						if (recentItem >= mostRecentItem)
+							# Choose the question with the most recent item
+							mostRecentItem = recentItem
+							keep = true
+						if (mostItems < q.options.requiredItems.length)
+							# Choose the question with the most required items
+							mostItems = q.options.requiredItems.length
+							keep = true
+						if (!keep)
+							continue
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 			try
