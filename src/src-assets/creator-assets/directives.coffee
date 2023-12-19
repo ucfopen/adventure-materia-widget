@@ -1980,6 +1980,8 @@ angular.module "Adventure"
 				# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
 				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
 				else $scope.question = null
+				if $scope.editedNode.questions then $scope.questions = $scope.editedNode.questions
+				else $scope.questions = []
 
 				# Reset size of question box
 				document.querySelector(".question-box").style.width = null;
@@ -2193,7 +2195,7 @@ angular.module "Adventure"
 				requiredItems: []
 				requiredVisits: if $scope.editedNode.questions.length > 0 then $scope.editedNode.questions[$scope.editedNode.questions.length - 1].requiredVisits + 1 else 0
 
-			# Add new answer to answers array
+			# Add new answer to questions array
 			$scope.editedNode.questions.push newQuestion
 
 		$scope.removeQuestion = () ->
