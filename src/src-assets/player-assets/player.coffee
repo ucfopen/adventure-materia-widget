@@ -212,15 +212,18 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				if (missingItems.length > 0)
 					# If the player doesn't have the required items, skip this question
 					continue
-				else if (mostItems < q.options.requiredItems.length)
-					# Choose the question with the most required items
-					mostItems = q.options.requiredItems.length
 				else
-					# Choose the question with the most recent item
+					keep = false
 					recentItem = $scope.getMostRecentItem($scope.inventory, q.options.requiredItems)
-					if (recentItem > mostRecentItem)
+					if (recentItem >= mostRecentItem)
+						# Choose the question with the most recent item
 						mostRecentItem = recentItem
-					else
+						keep = true
+					if (mostItems < q.options.requiredItems.length)
+						# Choose the question with the most required items
+						mostItems = q.options.requiredItems.length
+						keep = true
+					if (!keep)
 						continue
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
@@ -357,6 +360,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.getMostRecentItem = (inventory, requiredItems) ->
 		mostRecentItem = 0
 		for i in inventory
+			console.log($scope.itemSelection[$scope.getItemIndex(i.id)])
+			console.log(i)
 			for r in requiredItems
 				if i.id is r.id
 					if i.time > mostRecentItem
