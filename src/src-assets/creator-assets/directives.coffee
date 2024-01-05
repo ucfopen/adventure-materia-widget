@@ -2133,15 +2133,27 @@ angular.module "Adventure"
 				if(hotspot)
 					hotspot.style.zIndex = 100;
 
+		$scope.closeModals = () ->
+			$scope.showItemSelection = false
+			$scope.showRequiredItems = false
+			$scope.showQuestionRequiredItems = false
+			$scope.showQuestions = false
+
 		$scope.toggleQuestionsEditor = () ->
-			$scope.showQuestions = !$scope.showQuestions
+			if $scope.showQuestions
+				$scope.showQuestions = false
+				return
+			# Close all modals
+			$scope.closeModals()
+			# Reopen this modal
+			$scope.showQuestions = true
 			if $scope.editedNode.questions.length <= 0
 				$scope.newQuestion()
 
 		$scope.toggleQuestionRequiredItemsModal = (question) ->
 			$scope.showDropdown = false
 			# Same question, close the modal
-			if $scope.currentQuestion is question
+			if $scope.currentQuestion is question and $scope.showQuestionRequiredItems
 				$scope.currentQuestion = null
 			# Different question
 			else
@@ -2198,9 +2210,9 @@ angular.module "Adventure"
 			# Add new answer to questions array
 			$scope.editedNode.questions.push newQuestion
 
-		$scope.removeQuestion = () ->
+		$scope.removeQuestion = (index) ->
 			# Remove question from questions array
-			$scope.editedNode.questions.splice($scope.editedNode.questions.indexOf($scope.currentQuestion), 1)
+			$scope.editedNode.questions.splice(index, 1)
 
 		$scope.toggleNodeItemsModal = () ->
 			$scope.showDropdown = false
@@ -2208,10 +2220,10 @@ angular.module "Adventure"
 			if $scope.showItemSelection is true
 				$scope.showItemSelection = false
 				return
+			# Close modals
+			$scope.closeModals()
 			# Open node items modal
 			$scope.showItemSelection = true
-			# Close required items modal
-			$scope.toggleRequiredItemsModal(null)
 
 			# Show advanced options on start only if advanced options are enabled
 			if !$scope.showAdvancedOptions
@@ -2247,7 +2259,7 @@ angular.module "Adventure"
 		$scope.toggleRequiredItemsModal = (answer = null) ->
 			$scope.showDropdown = false
 			# Same answer, close the modal
-			if $scope.currentAnswer is answer
+			if $scope.currentAnswer is answer and $scope.showRequiredItems
 				$scope.currentAnswer = null
 			# Different answer
 			else
@@ -2261,8 +2273,10 @@ angular.module "Adventure"
 				$scope.showRequiredItems = false
 
 			if $scope.showRequiredItems
-				# Close node items modal
-				$scope.showItemSelection = false
+				# Close all modals
+				$scope.closeModals()
+				# Reopen modal
+				$scope.showRequiredItems = true
 
 				if document.querySelector('hotspot-answer-manager')
 					document.querySelector('hotspot-answer-manager').style.zIndex = 100;

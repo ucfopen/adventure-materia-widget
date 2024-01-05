@@ -202,41 +202,61 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		presanitized = ""
 		mostItems = 0
 		mostRecentItem = 0
-		for q in q_data.questions
-			if q.options
-				if q.options.requiredVisits != undefined
-					if $scope.visitedNodes[q_data.id] < q.options.requiredVisits || (q.options.requiredVisits > 0 && $scope.visitedNodes[q_data.id] == undefined)
+		# Load default question
+		selected_question = q_data.questions[0]
+		# If conditional question matches, use it instead
+		if q_data.options.additionalQuestions
+			for q in q_data.options.additionalQuestions
+				if q.requiredVisits != undefined
+					if $scope.visitedNodes[q_data.id] < q.requiredVisits || (q.requiredVisits > 0 && $scope.visitedNodes[q_data.id] == undefined)
 						# If the player hasn't visited this node enough times, skip this question
 						continue
-				if q.options.requiredItems && q.options.requiredItems[0]
-					missingItems = $scope.checkInventory(q.options.requiredItems)
+				if q.requiredItems && q.requiredItems[0]
+					missingItems = $scope.checkInventory(q.requiredItems)
 					if (missingItems.length > 0)
 						# If the player doesn't have the required items, skip this question
 						continue
 					else
 						keep = false
-						recentItem = $scope.getMostRecentItem($scope.inventory, q.options.requiredItems)
+						recentItem = $scope.getMostRecentItem($scope.inventory, q.requiredItems)
 						if (recentItem >= mostRecentItem)
 							# Choose the question with the most recent item
 							mostRecentItem = recentItem
 							keep = true
-						if (mostItems < q.options.requiredItems.length)
+						if (mostItems < q.requiredItems.length)
 							# Choose the question with the most required items
-							mostItems = q.options.requiredItems.length
+							mostItems = q.requiredItems.length
 							keep = true
 						if (!keep)
 							continue
+				else if mostRecentItem > 0 || mostItems > 0
+					# If we've already chosen a more selective question, skip this one
+					continue
+				selected_question = q
+
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 			try
 				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
-				presanitized = q.text
+				presanitized = selected_question.text
 				for k, v of PRESANITIZE_CHARACTERS
 					presanitized = presanitized.replace k, v
 				$sanitize presanitized
 
 			catch error
-				q.text = "*Question text removed due to malformed or dangerous HTML content*"
+				selected_question.text = "*Question text removed due to malformed or dangerous HTML content*"
+		else
+			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
+			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
+			try
+				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
+				presanitized = selected_question.text
+				for k, v of PRESANITIZE_CHARACTERS
+					presanitized = presanitized.replace k, v
+				$sanitize presanitized
+
+			catch error
+				selected_question.text = "*Question text removed due to malformed or dangerous HTML content*"
 
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else if presanitized != "" then $scope.layout = q_data.options.asset.align
@@ -361,8 +381,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.getMostRecentItem = (inventory, requiredItems) ->
 		mostRecentItem = 0
 		for i in inventory
-			console.log($scope.itemSelection[$scope.getItemIndex(i.id)])
-			console.log(i)
 			for r in requiredItems
 				if i.id is r.id
 					if i.time > mostRecentItem

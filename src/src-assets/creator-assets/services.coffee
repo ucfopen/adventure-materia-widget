@@ -214,6 +214,7 @@ angular.module "Adventure"
 			if node.answers
 				for answer in node.answers
 					targetNode = findNode(tree, answer.target)
+
 					if checkInventory(answer.requiredItems, node.inventory).length > 0 && visitedNodes.get(targetNode.id) is undefined
 						# if the player doesn't have the required items and this node hasn't been visited on a different path, add it to unvisitedNodes
 						unvisitedNodes.set(targetNode.id, targetNode)
@@ -619,10 +620,20 @@ angular.module "Adventure"
 					parentId: tree.parentId
 					type: tree.type
 					redirectId: tree.redirectId
-					items: questionItemData
+					items: questionItemData,
+					additionalQuestions: []
 				answers: []
 
+			# Load default question
+			if tree.questions and tree.questions[0]
+				itemData.questions.push tree.questions[0]
+			else
+				itemData.questions.push
+					text: ""
+
+			# Load conditional questions
 			angular.forEach tree.questions, (question, index) ->
+				if (index < 1) then return
 				requiredItemsData = []
 
 				if question.requiredItems
@@ -662,11 +673,10 @@ angular.module "Adventure"
 							requiredItemsData.push formattedItem
 				itemQuestionData =
 					text: question.text
-					options:
-						requiredItems: requiredItemsData
-						requiredVisits: question.requiredVisits || 0
+					requiredItems: requiredItemsData
+					requiredVisits: question.requiredVisits || 0
 
-				itemData.questions.push itemQuestionData
+				itemData.options.additionalQuestions.push itemQuestionData
 
 			if tree.media
 				itemData.options.asset =
@@ -820,54 +830,61 @@ angular.module "Adventure"
 			if item.options.hasLinkToSelf then node.hasLinkToSelf = true
 			if item.options.pendingTarget then node.pendingTarget = item.options.pendingTarget
 
-			angular.forEach item.questions, (question, index) ->
-				unless node.questions then node.questions = []
+			if item.questions
+				node.questions = item.questions
+			else
+				node.questions = []
 
-				requiredItemsData = []
-				if question.options && question.options.requiredItems
-					for i in question.options.requiredItems
-						do (i) ->
-							# Format properties for pre-existing items without said properties
+			if item.options.additionalQuestions
+				angular.forEach item.options.additionalQuestions, (question, index) ->
+					unless node.questions then node.questions = []
 
-							if i.minCount > -1
-								minCount = i.minCount
-							else if i.tempMinCount > -1
-								minCount = i.tempMinCount
-							else if i.count
-								minCount = i.count
-							else
-								# If minCount isn't set, set it to 1
-								minCount = 1
+					requiredItemsData = []
+					if question.requiredItems
+						for i in question.requiredItems
+							do (i) ->
+								# Format properties for pre-existing items without said properties
 
-							if i.maxCount > -1
-								maxCount = i.maxCount
-							else if i.tempMaxCount > -1
-								maxCount = i.tempMaxCount
-							else if i.count
-								maxCount = i.count
-							else
-								# If maxCount isn't set, set it to minCount
-								maxCount = minCount
+								if i.minCount > -1
+									minCount = i.minCount
+								else if i.tempMinCount > -1
+									minCount = i.tempMinCount
+								else if i.count
+									minCount = i.count
+								else
+									# If minCount isn't set, set it to 1
+									minCount = 1
 
-							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
+								if i.maxCount > -1
+									maxCount = i.maxCount
+								else if i.tempMaxCount > -1
+									maxCount = i.tempMaxCount
+								else if i.count
+									maxCount = i.count
+								else
+									# If maxCount isn't set, set it to minCount
+									maxCount = minCount
 
-							formattedItem =
-								id: i.id
-								range: ""
-								minCount: minCount
-								maxCount: maxCount
-								uncappedMax: uncappedMax
+								uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
+
+								formattedItem =
+									id: i.id
+									range: ""
+									minCount: minCount
+									maxCount: maxCount
+									uncappedMax: uncappedMax
 
 
-							requiredItemsData.push formattedItem
+								requiredItemsData.push formattedItem
 
-				nodeQuestion =
-					text: question.text
-					id: generateAnswerHash()
-					requiredItems: requiredItemsData
-					requiredVisits: if question.options then question.options.requiredVisits else 0
+					nodeQuestion =
+						text: question.text
+						id: generateAnswerHash()
+						requiredItems: requiredItemsData
+						requiredVisits: question.requiredVisits || 0
 
-				node.questions.push nodeQuestion
+					node.questions.push nodeQuestion
+
 			if item.options.customLabel then node.customLabel = item.options.customLabel
 
 			angular.forEach item.answers, (answer, index) ->
