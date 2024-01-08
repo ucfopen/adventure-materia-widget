@@ -405,7 +405,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
 
 		if $scope.missingRequiredItems[0]
-			$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+			$scope.missingRequiredItemsAltText = $scope.missingRequiredItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
 			$scope.next = null
 			return
 

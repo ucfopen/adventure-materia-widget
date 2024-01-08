@@ -64,6 +64,7 @@ body {
 	position: absolute;
 	width: 0;
 	height: 0;
+	overflow: hidden;
 }
 
 .aria-live-region {
@@ -255,6 +256,8 @@ h1 {
 	padding: 15px 30px 10px 30px;
 	box-sizing: border-box;
 	margin-bottom: auto;
+
+	overflow-y: auto;
 
 	background: #fff;
 
@@ -493,7 +496,6 @@ h1 {
 	box-sizing: border-box;
 
 	max-height: 250px;
-	overflow-y: auto;
 
 	font-family: 'Lora', serif;
 
