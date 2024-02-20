@@ -78,22 +78,21 @@ class Score_Modules_Adventure extends Score_Module
 		$score = $this->check_answer($log);
 
 		return [
+			'id'            => $log->item_id,
 			'data' => [
 				$this->get_ss_question($log, $q),
-				$this->get_ss_answer($log, $q)
+				$this->get_ss_answer($log, $q),
 			],
-			'data_style'    => ['question', 'response', 'answer'],
+			'data_style'    => ['question', 'response'],
 			'score'         => $score,
 			'feedback'      => $this->get_feedback($log, $q->answers),
 			'type'          => $log->type,
 			'style'         => $this->get_detail_style($score),
-			'tag'           => 'div',
 			'symbol'        => '%',
 			'graphic'       => 'score',
 			'display_score' => false
 		];
 	}
-
 
 	protected function get_score_details()
 	{
@@ -116,15 +115,19 @@ class Score_Modules_Adventure extends Score_Module
 					break;
 
 				case Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT:
-					$destination_table[] = [
-						'data'          => [$log->text],
-						'data_style'    => ['node_text'],
-						'score'         => $this->check_answer($log),
+					trace($log);
+					$details[] = [
+						'id'            => $log->item_id,
+						'data' => [
+							$log->text,
+							$log->value
+						],
+						'data_style'    => ['text', 'score'],
+						'score'         => $log->value,
 						'type'          => $log->type,
-						'style'         => 'single_column',
-						'tag'           => 'p',
+						'style'         => 'final_score',
 						'symbol'        => '%',
-						'graphic'       => 'none',
+						'graphic'       => 'score',
 						'display_score' => false
 					];
 					break;
@@ -133,11 +136,6 @@ class Score_Modules_Adventure extends Score_Module
 
 		// return an array of tables
 		return [
-			[
-				'title'  => 'Where did you end up?',
-				'header' => [],
-				'table'  => $destination_table,
-			],
 			[
 				'title'  => 'Responses:',
 				'header' => ['Question Score', 'The Question', 'Your Response'],

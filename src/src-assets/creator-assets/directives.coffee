@@ -996,6 +996,7 @@ angular.module "Adventure"
 				$scope.showItemIconSelector = true
 				# Make sure Item Editor is open too
 				$scope.editingIndex = index
+				$scope.currentItem = $scope.inventoryItems[index]
 
 
 		$scope.handleIconClick = (icon) ->

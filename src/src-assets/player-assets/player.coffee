@@ -486,7 +486,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	# Do stuff when the user submits something in the SA answer box
 	$scope.handleShortAnswerInput = ->
 
-		response = $scope.response
+		response = originalResponse = $scope.response
 		$scope.response = ""
 
 		# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
@@ -497,7 +497,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 			# Loop through each match to see if it matches the recorded response
 			for j in [0...$scope.q_data.answers[i].options.matches.length]
-
 
 				# TODO make matching algo more robust
 				match = $scope.q_data.answers[i].options.matches[j]
@@ -547,7 +546,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		for answer in $scope.q_data.answers
 			if answer.options.isDefault
 
-				$scope.selectedAnswer = response
+				$scope.selectedAnswer = originalResponse
 				_logProgress() # Log the response
 
 				link = ~~answer.options.link
@@ -631,8 +630,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	# Submit the user's response to the logs
 	_logProgress = ->
 
-		if $scope.selectedAnswer isnt null # TODO is this check required??
-			Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer
+		Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer
 
 	_end = ->
 		if $scope.scoringDisabled

@@ -1,25 +1,14 @@
 angular.module('AdventureScorescreen', ['ngSanitize'])
 
-## CONTROLLER ##
+.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', '$timeout', ($scope, $sanitize, $sce, $timeout) ->
 
-## UNFINISHED ##
-.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', ($scope, $sanitize, $sce) ->
-
-	materiaCallbacks = {}
+	_getHeight = () ->
+		Math.ceil(parseFloat(window.getComputedStyle(document.querySelector('html')).height))
 
 	$scope.inventory = []
 	$scope.responses = []
 	$scope.itemSelection = []
 	$scope.customTable = false
-
-	$scope.setSelectedItem = (item) ->
-		$scope.selectedItem = item
-
-	$scope.getItemIndex = (item) ->
-		if (item)
-			for i, index in $scope.itemSelection
-				if i.id is item.id
-					return index
 
 	$scope.getQuestion = (qset, id) ->
 		for i in qset.items
@@ -27,57 +16,53 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 				return i
 		return -1
 
-	$scope.createInventoryFromResponses = (qset, responses) ->
-		inventory = []
+	$scope.getItemById = (id) ->
+		for item in $scope.inventory
+			if item.id == id then return item
+		null
 
-		for r, index in responses
-			for responseItem in $scope.getQuestion(qset, r.data[1]).options.items
-				itemPresent = false
-				for item in inventory
-					if item.id is responseItem.id
-						item.count += responseItem.count
-						itemPresent = true
-				if !itemPresent
-					inventory.push(responseItem)
-
-		return inventory
+	$scope.getItemUrl = (id) ->
+		for item in $scope.inventory
+			if item.id == id && item.icon then return item.icon.url
 
 	$scope.createTable = (qset, scoreTable) ->
 		table = []
 		for response in scoreTable
-			items = $scope.getQuestion(qset, response.data[1]).options.items
-			row =
-				question: response.data[0]
-				answer: response.data[2]
-				feedback: response.feedback
-				items: $scope.getQuestion(qset, response.data[1]).options.items
-				gainedItems: if items.some((i) => i.count > 0) then true else false
-				lostItems: if items.some((i) => i.count < 0) then true else false
-			table.push(row)
+			if response.type == 'SCORE_FINAL_FROM_CLIENT'
+				row =
+					text: response.data[0]
+					score: response.data[1]
+					type: 'end'
+				table.push row
+			else 
+				question = $scope.getQuestion qset, response.id
+				console.log(question)
+				items = question.options.items
+				row =
+					question: response.data[0]
+					answer: response.data[1]
+					type: question.options.type
+					feedback: response.feedback
+					items: question.options.items
+					gainedItems: if items.some((i) => i.count > 0) then true else false
+					lostItems: if items.some((i) => i.count < 0) then true else false
+				table.push row
 		return table
 
+	$scope.start = (instance, qset, scoreTable, isPreview, qsetVersion) ->
+		$scope.update(qset, scoreTable)
 
-	$scope.toggleInventoryDrawer = () ->
-		$scope.showInventory = !$scope.showInventory
-
-	materiaCallbacks.start = (instance, qset, scoreTable, isPreview, qsetVersion) ->
+	$scope.update = (qset, scoreTable) ->
 		$scope.$apply ->
-			# console.log(instance)
-			# console.log(qset)
-			# console.log(scoreTable)
-			# $scope.inventory = $scope.createInventoryFromResponses(qset, scoreTable)
-			# $scope.itemSelection = qset.options.inventoryItems || []
-			# $scope.table = $scope.createTable(qset, scoreTable)
-			# console.log($scope.inventory)
-			# console.log($scope.itemSelection)
-			# console.log($scope.table)
+			$scope.table = $scope.createTable(qset, scoreTable)
+			$scope.inventory = if qset.options and qset.options.inventoryItems then qset.options.inventoryItems else []
+			console.log $scope.table
+			console.log $scope.inventory
+		
+		Materia.ScoreCore.setHeight(_getHeight())
+	
+	Materia.ScoreCore.hideResultsTable()
 
-			$scope.customTable = false
-
-	# Materia.ScoreCore.hideResultsTable()
-
-	return Materia.ScoreCore.start materiaCallbacks
+	Materia.ScoreCore.start $scope
 
 ]
-
-angular.bootstrap(document, ['AdventureScorescreen'])
