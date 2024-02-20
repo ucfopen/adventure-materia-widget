@@ -458,6 +458,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		if link is -1 then return _end()
 
 		$scope.selectedAnswer = $scope.q_data.answers[index].text
+		selectedAnswerId = $scope.q_data.answers[index].id
 
 		requiredItems = $scope.answers[index].requiredItems || $scope.answers[index].options.requiredItems
 
@@ -473,9 +474,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			$scope.hotspotLabelTarget.show = false
 			$scope.hotspotLabelTarget.x = null
 			$scope.hotspotLabelTarget.y = null
-
-		# record the answer
-		_logProgress()
+			_logProgress(selectedAnswerId)
+		else
+			# record the answer
+			_logProgress()
 
 		if $scope.q_data.answers[index].options.feedback
 			$scope.feedback = $scope.q_data.answers[index].options.feedback
@@ -628,9 +630,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	# 	$scope.link = $scope.question.options.parentId
 
 	# Submit the user's response to the logs
-	_logProgress = ->
-
-		Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer
+	_logProgress = (answerId = undefined) ->
+		if answerId != undefined then Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer, answerId
+		else Materia.Score.submitQuestionForScoring $scope.question.materiaId, $scope.selectedAnswer
 
 	_end = ->
 		if $scope.scoringDisabled

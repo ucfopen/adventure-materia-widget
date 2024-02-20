@@ -82,6 +82,7 @@ class Score_Modules_Adventure extends Score_Module
 			'data' => [
 				$this->get_ss_question($log, $q),
 				$this->get_ss_answer($log, $q),
+				$log->value
 			],
 			'data_style'    => ['question', 'response'],
 			'score'         => $score,

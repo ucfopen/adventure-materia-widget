@@ -10,6 +10,10 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 	$scope.itemSelection = []
 	$scope.customTable = false
 
+	getAnswerById = (question, id) ->
+		for answer in question.answers
+			if answer.id is id then return answer
+
 	$scope.getQuestion = (qset, id) ->
 		for i in qset.items
 			if i.id is id
@@ -46,6 +50,15 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 					items: question.options.items
 					gainedItems: if items.some((i) => i.count > 0) then true else false
 					lostItems: if items.some((i) => i.count < 0) then true else false
+
+				if question.options.type is 'hotspot'
+
+					if response.data[2]
+						answer = getAnswerById(question, response.data[2])
+						if answer
+							row.svg = answer.options.svg
+							row.image = question.options.asset.url
+				
 				table.push row
 		return table
 

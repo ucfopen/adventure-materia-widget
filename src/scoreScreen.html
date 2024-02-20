@@ -48,6 +48,49 @@
 					<div class="response" ng-if="row.answer">
 						{{row.answer}}
 					</div>
+					<div class="hotspot-no-svg-content" ng-if="row.type == 'hotspot' && !row.svg">
+						<p>Historical play records don't provide enough information to display the hotspot selection associated with this answer choice.</p>
+					</div>
+					<div class="hotspot-content" ng-if="row.type == 'hotspot' && row.svg">
+						<svg
+							version="1.1"
+							xmlns:cc="http://web.resource.org/cc/"
+							xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+							xmlns:dc="http://purl.org/dc/elements/1.1/"
+							xmlns="http://www.w3.org/2000/svg"
+							xmlns:xlink="http://www.w3.org/1999/xlink"
+							xml:space="preserve">
+							<g ng-attr-transform="matrix(1 0 0 1 {{row.svg.x}} {{row.svg.y}})">
+								<ellipse ng-if="row.svg.type == 'ellipse'"
+									ng-attr-cx="0"
+									ng-attr-cy="0"
+									ng-attr-rx="{{row.svg.r + row.svg.scaleXFactor}}"
+									ng-attr-ry="{{row.svg.r + row.svg.scaleYFactor}}"
+									fill="{{row.svg.fill}}"
+									stroke="{{row.svg.fill}}"
+									stroke-width="{{row.svg.stroke}}"
+									fill-opacity="0.5"/>
+
+								<rect ng-if="row.svg.type == 'rect'"
+									ng-attr-x="0"
+									ng-attr-y="0"
+									ng-attr-width="{{row.svg.width + row.svg.scaleXFactor}}"
+									ng-attr-height="{{row.svg.height + row.svg.scaleYFactor}}"
+									fill="{{row.svg.fill}}"
+									stroke="{{row.svg.fill}}"
+									stroke-width="{{row.svg.stroke}}"
+									fill-opacity="0.5"/>
+
+								<polygon ng-if="row.svg.type == 'polygon'"
+									ng-attr-points="{{row.svg.points}}"
+									fill="{{row.svg.fill}}"
+									stroke="{{row.svg.fill}}"
+									stroke-width="{{row.svg.stroke}}"
+									fill-opacity="0.5"/>
+							</g>
+						</svg>
+						<img ng-src="{{row.image}}" />
+					</div>
 					<div class="end-row" ng-if="row.type == 'end'">
 						<p>{{ row.text }}</p>
 						<div class="end-row-score">
