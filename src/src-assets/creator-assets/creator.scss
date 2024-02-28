@@ -1182,7 +1182,7 @@ required-items-tooltip {
 			}
 
 			&.sub-heading {
-				justify-content: start;
+				justify-content: flex-start;
 
 				h4 {
 					margin: 1em 0;
@@ -1249,7 +1249,7 @@ required-items-tooltip {
 			.row {
 				display: flex;
 				flex-direction: row;
-				justify-content: end;
+				justify-content: flex-end;
 			}
 
 			img {
@@ -1322,7 +1322,7 @@ required-items-tooltip {
 			.blank-selection {
 				width: 100%;
 				height: 2em;
-				justify-content: end;
+				justify-content: flex-end;
 				background-color: $gray-lighter;
 				border-radius: 10px;
 
@@ -1478,7 +1478,7 @@ required-items-tooltip {
 
 	.advanced-option-bar {
 		display: flex;
-		align-items: end;
+		align-items: flex-end;
 		flex-direction: row;
 		justify-content: space-between;
 		margin-top: 10px;
@@ -1893,16 +1893,16 @@ item-icon-selector {
 		display: flex;
 		gap: 5px;
 		flex-wrap: wrap;
-		justify-content: end;
+		justify-content: flex-end;
 		flex-direction: column;
 		padding: 0 10px;
-		align-content:end;
+		align-content: flex-end;
 		min-width: 150px;
 		max-width: 150px;
 
 		&.flex-start {
-			justify-content: start;
-			align-content:start;
+			justify-content: flex-start;
+			align-content: flex-start;
 		}
 
 		.item-minimum-quantity, .item-quantity {
@@ -2584,8 +2584,7 @@ node-creation-selection-dialog {
 	}
 
 	.question-box {
-		width: $edit-popup-standard-question-width; // 80%
-		flex-grow: 2;
+		width: 100%;
 		max-height: 300px;
 		box-sizing: border-box;
 		height: 100%;
@@ -2658,8 +2657,8 @@ node-creation-selection-dialog {
 	.question-media-box {
 		display: flex;
 		flex-direction: row;
+		justify-content: space-between;
 		align-items: stretch;
-		// flex-grow: 1;
 
 		margin: $edit-popup-padding;
 		grid-gap: $edit-popup-padding;
@@ -2702,6 +2701,10 @@ node-creation-selection-dialog {
 
 		&.tiny {
 			margin: 5px;
+		}
+
+		.question-editor {
+			flex-grow: 2;
 		}
 	}
 
@@ -3811,10 +3814,18 @@ advanced-question-editor {
 	justify-content: space-between;
 
 	> p {
-		padding: 1em;
+		margin: 0.5em 1em;
 
 		color: $gray-darker;
-		font-style: italic;
+		font-size: 0.9em;
+
+		&:nth-child(2) {
+			margin-top: 1em;
+		}
+
+		&:nth-child(3) {
+			margin-bottom: 1em;
+		}
 
 		&.invalid-quantity-message {
 			padding: 0;
@@ -3842,7 +3853,7 @@ advanced-question-editor {
 
 		> li {
 			width: 99%;
-			padding: 5px;
+			padding: 5px 20px;
 			box-sizing: border-box;
 			border-radius: 5px;
 			display: flex;
@@ -3866,6 +3877,12 @@ advanced-question-editor {
 					width: 155px;
 					justify-content: center;
 					align-items: center;
+
+					label {
+						margin-bottom: 1em;
+						font-size: 0.8em;
+						font-weight: bold;
+					}
 
 					input {
 						height: 2em;

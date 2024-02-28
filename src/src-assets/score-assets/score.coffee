@@ -13,9 +13,49 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 	_getHeight = () ->
 		Math.ceil(parseFloat(window.getComputedStyle(document.querySelector('html')).height))
 
+	_getNodeVisitCount = (id) ->
+
+		for node in _visitedNodes
+			if node.id is id then return node.count
+		
+		return 0
+
+	_getItemInInventory = (id) ->
+		for item in _currentInventory
+			if item.id is id then return item
+
+		return null
+
 	_getAnswerById = (question, id) ->
 		for answer in question.answers
 			if answer.id is id then return answer
+
+	_manageConditionalQuestion = (question, response) ->
+		if question.options.additionalQuestions
+
+			for option in question.options.additionalQuestions
+
+				match = true
+
+				# meets required visits check?
+				if option.requiredVisits > 0
+					if _getNodeVisitCount(question.options.id) < option.requiredVisits then match = false
+
+				# does the contextual question require items?
+				if option.requiredItems.length > 0
+					
+					for item in option.requiredItems
+						inventoryItem = _getItemInInventory item.id
+						if inventoryItem != null
+							# user currently has the item by id, check if count is out of bounds
+							if inventoryItem.count < item.minCount or (inventoryItem.count > item.maxCount and item.uncappedMax is false) then match = false
+						else match = false # user does not have the required item
+
+
+				if match is true then return option.text
+		
+		return response
+
 
 	# in order to accurately simulate the items received and taken, we have to recreate item handling logic in the score screen
 	# simply using the options.items value for each question would not accurately report items taken and received
@@ -25,7 +65,8 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 		items = []
 		
 		for item in question.options.items
-			if item.firstVisitOnly and _visitedNodes.includes(question.options.id) then continue
+			# if item.firstVisitOnly and _visitedNodes.includes(question.options.id) then continue
+			if item.firstVisitOnly and _getNodeVisitCount(question.options.id) > 0 then continue
 
 			# positive delta? Add the item to the inventory, or increase the count if it's in there already
 			if item.count > 0
@@ -70,8 +111,12 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 
 						items.push itemRemoved
 
-		_visitedNodes.push question.options.id
-		if _currentInventory[0] then console.log 'the current cash count is ' + _currentInventory[0].count
+		if _getNodeVisitCount(question.options.id) > 0
+			for node in _visitedNodes
+				if node.id is question.options.id then node.count++
+		else _visitedNodes.push
+			id: question.options.id
+			count: 1
 		return items
 
 	$scope.getQuestion = (qset, id) ->
@@ -94,7 +139,7 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 		for response in scoreTable
 			if response.type == 'SCORE_FINAL_FROM_CLIENT'
 				row =
-					text: response.data[0]
+					text: response.data[0] # needs to work with conditional questions
 					score: response.data[1]
 					type: 'end'
 				table.push row
@@ -102,7 +147,7 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 				question = $scope.getQuestion qset, response.id
 				items = question.options.items
 				row =
-					question: response.data[0]
+					question: _manageConditionalQuestion question, response.data[0]
 					answer: response.data[1]
 					type: question.options.type
 					feedback: response.feedback
