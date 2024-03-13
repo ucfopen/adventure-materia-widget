@@ -390,7 +390,7 @@ angular.module "Adventure"
 					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
 					midX = midpoint.x
 					midY = midpoint.y
-					
+
 					# compute the position of the lock icon along the path
 					quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
 					links[index].lock.x = quarterpoint.x
@@ -1980,6 +1980,8 @@ angular.module "Adventure"
 				# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
 				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
 				else $scope.question = null
+				if $scope.editedNode.questions then $scope.questions = $scope.editedNode.questions
+				else $scope.questions = []
 
 				# Reset size of question box
 				document.querySelector(".question-box").style.width = null;
@@ -2063,9 +2065,9 @@ angular.module "Adventure"
 				$scope.questionPlaceholder = "Enter a conclusion here for this decision tree or path."
 
 		# Update the node's properties when the associated input models change
-		$scope.$watch "question", (newVal, oldVal) ->
+		$scope.$watch "questions", (newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
-				$scope.editedNode.question = newVal
+				$scope.editedNode.questions = $scope.questions
 
 		$scope.$watch "answers", ((newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
@@ -2131,16 +2133,97 @@ angular.module "Adventure"
 				if(hotspot)
 					hotspot.style.zIndex = 100;
 
+		$scope.closeModals = () ->
+			$scope.showItemSelection = false
+			$scope.showRequiredItems = false
+			$scope.showQuestionRequiredItems = false
+			$scope.showQuestions = false
+
+		$scope.toggleQuestionsEditor = () ->
+			if $scope.showQuestions
+				$scope.showQuestions = false
+				return
+			# Close all modals
+			$scope.closeModals()
+			# Reopen this modal
+			$scope.showQuestions = true
+			if $scope.editedNode.questions.length <= 0
+				$scope.newQuestion()
+
+		$scope.toggleQuestionRequiredItemsModal = (question) ->
+			$scope.showDropdown = false
+			# Same question, close the modal
+			if $scope.currentQuestion is question and $scope.showQuestionRequiredItems
+				$scope.currentQuestion = null
+			# Different question
+			else
+				$scope.currentQuestion = question
+
+			# If current question is not null, open modal
+			if $scope.currentQuestion
+				$scope.showQuestionRequiredItems = true
+			# Else close the modal
+			else
+				$scope.showQuestionRequiredItems = false
+
+			if $scope.showQuestionRequiredItems
+				# Close node items modal
+				$scope.showItemSelection = false
+
+				# Remove error message
+				$scope.invalidQuantity = null
+				# Save the original item count in case of invalid input
+				if question.requiredItems
+					for item in question.requiredItems
+						item.tempMinCount = item.minCount
+						item.tempMaxCount = item.maxCount
+
+						if !$scope.showAdvancedOptions
+							# Show advanced options on start only if advanced options are enabled
+							if !item.uncappedMax
+								$scope.showAdvancedOptions = true
+							else
+								$scope.showAdvancedOptions = false
+
+				# Add items not already being used to the items available for selection
+				$scope.availableItems = []
+				for item in $scope.inventoryItems
+					do (item) ->
+						used = false
+						if question.requiredItems
+							for i in question.requiredItems
+								if item.id is i.id
+									used = true
+						if ! used
+							$scope.availableItems.push(item)
+
+				$scope.selectedItem = $scope.availableItems[0]
+
+		$scope.newQuestion = () ->
+			# Create new question
+			newQuestion =
+				id: treeSrv.generateAnswerHash()
+				text: ""
+				requiredItems: []
+				requiredVisits: if $scope.editedNode.questions.length > 0 then $scope.editedNode.questions[$scope.editedNode.questions.length - 1].requiredVisits + 1 else 0
+
+			# Add new answer to questions array
+			$scope.editedNode.questions.push newQuestion
+
+		$scope.removeQuestion = (index) ->
+			# Remove question from questions array
+			$scope.editedNode.questions.splice(index, 1)
+
 		$scope.toggleNodeItemsModal = () ->
 			$scope.showDropdown = false
 			# Close node items modal
 			if $scope.showItemSelection is true
 				$scope.showItemSelection = false
 				return
+			# Close modals
+			$scope.closeModals()
 			# Open node items modal
 			$scope.showItemSelection = true
-			# Close required items modal
-			$scope.toggleRequiredItemsModal(null)
 
 			# Show advanced options on start only if advanced options are enabled
 			if !$scope.showAdvancedOptions
@@ -2176,7 +2259,7 @@ angular.module "Adventure"
 		$scope.toggleRequiredItemsModal = (answer = null) ->
 			$scope.showDropdown = false
 			# Same answer, close the modal
-			if $scope.currentAnswer is answer
+			if $scope.currentAnswer is answer and $scope.showRequiredItems
 				$scope.currentAnswer = null
 			# Different answer
 			else
@@ -2190,8 +2273,10 @@ angular.module "Adventure"
 				$scope.showRequiredItems = false
 
 			if $scope.showRequiredItems
-				# Close node items modal
-				$scope.showItemSelection = false
+				# Close all modals
+				$scope.closeModals()
+				# Reopen modal
+				$scope.showRequiredItems = true
 
 				if document.querySelector('hotspot-answer-manager')
 					document.querySelector('hotspot-answer-manager').style.zIndex = 100;
@@ -2342,12 +2427,12 @@ angular.module "Adventure"
 			$scope.selectedItem = item
 			$scope.showItemManagerDialog = false
 
-		# Add a required item to answer
-		$scope.addRequiredItemToAnswer = (item, answer) ->
+		# Add a required item to object
+		$scope.addRequiredItemToObject = (item, object) ->
 			if item
-				answer.requiredItems = answer.requiredItems || []
+				object.requiredItems = object.requiredItems || []
 
-				# for i in answer.requiredItems when i.id is item.id
+				# for i in object.requiredItems when i.id is item.id
 				# 	i.count += 1
 				# 	return
 
@@ -2362,7 +2447,7 @@ angular.module "Adventure"
 					uncappedMax: true
 					range: ""
 				}
-				answer.requiredItems.push(newItem)
+				object.requiredItems.push(newItem)
 
 				# Remove item from the available items dropdown
 				index = $scope.availableItems.indexOf(item)
@@ -2372,8 +2457,8 @@ angular.module "Adventure"
 				# Hide Dropdown
 				$scope.showDropdown = false
 
-		$scope.removeRequiredItemFromAnswer = (item, answer) ->
-			answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
+		$scope.removeRequiredItemFromObject = (item, object) ->
+			object.requiredItems.splice object.requiredItems.indexOf(item), 1
 
 			# Add item to the available items dropdown
 			item.count = 1
@@ -3176,6 +3261,20 @@ angular.module "Adventure"
 						# children()[1] references the answer text input box
 						row.children()[1].focus()
 				), 100
+
+		# Listen for when a new question is added
+		$scope.$on "editedNode.questions.added", (evt) ->
+			$timeout (() ->
+				# Auto-scroll to the bottom
+				$element[0].scrollTop = $element[0].scrollHeight
+
+				# Find the answer input box and focus it
+				list = angular.element($element.children()[0]).children()
+				if list.length > 0
+					row = angular.element list[list.length - 1]
+					# children()[1] references the answer text input box
+					row.children()[1].focus()
+			), 100
 ]
 
 # The validation dialog is linked to two validation events:
