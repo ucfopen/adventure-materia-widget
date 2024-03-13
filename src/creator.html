@@ -1577,9 +1577,12 @@
 					<h2 ng-if="displayNodeCreation == HOTSPOT">Conditional Question</h2>
 					<h2 ng-if="displayNodeCreation == NARR">Conditional Narrative</h2>
 					<h2 ng-if="displayNodeCreation == END">Conditional End Text</h2>
-					<p ng-class="{'hidden': inventoryItems.length > 0}">Choose to display different narratives based on the number of times the player has visited this destination.</p>
-					<p ng-class="{'hidden': inventoryItems.length == 0}">Choose to display different narratives based on the number of times the player has visited this destination AND/OR what items they have in their inventory. Note that if a player meets the requirements for more than one, then it will display the one with the most required items and visits.</p>
-					<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
+					<div class="question-instructions">
+						<p ng-class="{'hidden': inventoryItems.length > 0}">Choose to display different narratives based on the number of times the player has visited this destination.</p>
+						<p ng-class="{'hidden': inventoryItems.length == 0}">Choose to display different narratives based on the player's number of <strong>visits</strong> to this destination and/or what <strong>items</strong> they have in their inventory.</p>
+						<p><i>If a player meets the requirements for more than one, then it will choose the one they most recently met the requirements for.</i></p>
+						<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
+					</div>
 					<ul>
 						<li ng-repeat="question in editedNode.questions" ng-if="$index > 0">
 							<button type="button"

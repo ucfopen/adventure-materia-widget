@@ -3805,20 +3805,13 @@ advanced-question-editor {
 	flex-direction: column;
 	justify-content: space-between;
 
-	> p {
+	.question-instructions {
 		padding: 1em;
-
 		color: $gray-darker;
-		font-style: italic;
+	}
 
-		&.invalid-quantity-message {
-			padding: 0;
-		}
-
-		&.hidden {
-			padding: 0;
-			display: none;
-		}
+	.hidden {
+		display: none;
 	}
 
 	> ul {
