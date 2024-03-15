@@ -116,7 +116,6 @@ class Score_Modules_Adventure extends Score_Module
 					break;
 
 				case Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT:
-					trace($log);
 					$details[] = [
 						'id'            => $log->item_id,
 						'data' => [

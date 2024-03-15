@@ -10,6 +10,8 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 	_qsetItems = []
 	_currentInventory = []
 
+	_counter = 0
+
 	_getHeight = () ->
 		Math.ceil(parseFloat(window.getComputedStyle(document.querySelector('html')).height))
 
@@ -26,12 +28,27 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 
 		return null
 
+	# recency is determined by the order in which a node a visited
+	# unlike the player, which determines recency by time
+	_getMostRecentItem = (requiredItems) ->
+		mostRecentItem = 0
+		for i in _currentInventory
+			for r in requiredItems
+				if i.id is r.id
+					if i.recency > mostRecentItem
+						mostRecentItem = i.recency
+		mostRecentItem
+
 	_getAnswerById = (question, id) ->
 		for answer in question.answers
 			if answer.id is id then return answer
 
 	_manageConditionalQuestion = (question, response) ->
+		if !question then return response
 		if question.options.additionalQuestions
+
+			mostRecentItem = 0
+			mostItems = 0
 
 			for option in question.options.additionalQuestions
 
@@ -44,6 +61,7 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 				# does the contextual question require items?
 				if option.requiredItems.length > 0
 					
+					# ensure all required items are accounted for
 					for item in option.requiredItems
 						inventoryItem = _getItemInInventory item.id
 						if inventoryItem != null
@@ -51,7 +69,16 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 							if inventoryItem.count < item.minCount or (inventoryItem.count > item.maxCount and item.uncappedMax is false) then match = false
 						else match = false # user does not have the required item
 
+					# next, verify whether the question requires the most recently acquired item
+					itemRecency = _getMostRecentItem option.requiredItems
+					if itemRecency < mostRecentItem then match = false
+					# verify whether the question requires the most items
+					if option.requiredItems.length < mostItems then match = false
 
+				# no items required but another conditional question DID require them; therefore, it was more selective and will be chosen
+				else if mostRecentItem > 0 or mostItems > 0 then match = false
+
+				# all checks are met, this is the one
 				if match is true then return option.text
 		
 		return response
@@ -65,7 +92,6 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 		items = []
 		
 		for item in question.options.items
-			# if item.firstVisitOnly and _visitedNodes.includes(question.options.id) then continue
 			if item.firstVisitOnly and _getNodeVisitCount(question.options.id) > 0 then continue
 
 			# positive delta? Add the item to the inventory, or increase the count if it's in there already
@@ -76,11 +102,15 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 				for inventoryItem in _currentInventory
 					if inventoryItem.id is item.id
 						inventoryItem.count += item.count
+						inventoryItem.recency = _counter
 						previouslyExists = true
 						break
 				
 				# add the item to the inventory, since it wasn't there already
-				if !previouslyExists then _currentInventory.push angular.copy item
+				if !previouslyExists
+					itemCopy = angular.copy item
+					itemCopy.recency = _counter
+					_currentInventory.push angular.copy itemCopy
 
 				items.push item
 			
@@ -119,11 +149,15 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 			count: 1
 		return items
 
-	$scope.getQuestion = (qset, id) ->
+	_getQuestion = (qset, id) ->
 		for i in qset.items
-			if i.id is id
-				return i
-		return -1
+			if i.id is id then return i
+		return null
+
+	_getQuestionByNodeId = (qset, nodeId) ->
+		for i in qset.items
+			if i.options.id is parseInt(nodeId) then return i
+		return null
 
 	$scope.getItemById = (id) ->
 		for item in _qsetItems
@@ -138,13 +172,14 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 		table = []
 		for response in scoreTable
 			if response.type == 'SCORE_FINAL_FROM_CLIENT'
+				question = _getQuestionByNodeId qset, response.id
 				row =
-					text: response.data[0] # needs to work with conditional questions
+					text:  _manageConditionalQuestion question, response.data[0] # needs to work with conditional questions
 					score: response.data[1]
 					type: 'end'
 				table.push row
 			else 
-				question = $scope.getQuestion qset, response.id
+				question = _getQuestion qset, response.id
 				items = question.options.items
 				row =
 					question: _manageConditionalQuestion question, response.data[0]
@@ -163,6 +198,7 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 							row.svg = answer.options.svg
 							row.image = question.options.asset.url
 				
+				_counter++
 				table.push row
 
 		return table
