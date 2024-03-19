@@ -45,6 +45,7 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 
 	_manageConditionalQuestion = (question, response) ->
 		if !question then return response
+		selected = response
 		if question.options.additionalQuestions
 
 			mostRecentItem = 0
@@ -60,7 +61,6 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 
 				# does the contextual question require items?
 				if option.requiredItems.length > 0
-					
 					# ensure all required items are accounted for
 					for item in option.requiredItems
 						inventoryItem = _getItemInInventory item.id
@@ -72,16 +72,18 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 					# next, verify whether the question requires the most recently acquired item
 					itemRecency = _getMostRecentItem option.requiredItems
 					if itemRecency < mostRecentItem then match = false
+					else mostRecentItem = itemRecency
 					# verify whether the question requires the most items
 					if option.requiredItems.length < mostItems then match = false
+					else mostItems = option.requiredItems.length
 
 				# no items required but another conditional question DID require them; therefore, it was more selective and will be chosen
 				else if mostRecentItem > 0 or mostItems > 0 then match = false
 
 				# all checks are met, this is the one
-				if match is true then return option.text
-		
-		return response
+				if match is true then selected = option.text
+
+		return selected
 
 
 	# in order to accurately simulate the items received and taken, we have to recreate item handling logic in the score screen
