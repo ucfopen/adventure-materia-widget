@@ -25,6 +25,10 @@
 
 			<h2>Review Your Journey</h2>
 
+			<span class="older-qset-warning" ng-show="showOlderQsetWarning">
+				This play is from an earlier version of Adventure. Certain destinations you visited may not be displayed here.
+			</span>
+
 			<section class="timeline">
 				<div class="destination {{row.type}}" ng-repeat="row in table track by $index">
 					<span class="icon mc" ng-if="row.type == 'mc'">

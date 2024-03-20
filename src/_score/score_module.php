@@ -29,16 +29,33 @@ class Score_Modules_Adventure extends Score_Module
 					continue;
 				}
 
-				# make sure we have the right qset item that matches the provided log, return associated finalScore
-				if (trim($log->text) == trim($item['questions'][0]['text']))
+				# newer qsets (post- custom score screen will provide the node id as the log's item id)
+				# in older qsets, item id will always be 0 for FINAL_SCORE_FROM_CLIENT log types
+				if ($log->item_id)
 				{
-					if (isset($this->inst->qset->data['options']['scoreMode']) && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
+					if ($log->item_id == $item['options']['id'])
 					{
-						return 100;
+						if (isset($this->inst->qset->data['options']['scoreMode']) && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
+						{
+							return 100;
+						}
+						else
+						{
+							return $item['options']['finalScore'];
+						}
 					}
-					else
+				}
+				else {
+					if (trim($log->text) == trim($item['questions'][0]['text']))
 					{
-						return $item['options']['finalScore'];
+						if (isset($this->inst->qset->data['options']['scoreMode']) && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
+						{
+							return 100;
+						}
+						else
+						{
+							return $item['options']['finalScore'];
+						}
 					}
 				}
 			}
@@ -117,18 +134,19 @@ class Score_Modules_Adventure extends Score_Module
 
 				case Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT:
 					$details[] = [
-						'id'            => $log->item_id,
+						'node_id'            => $log->item_id,
 						'data' => [
 							$log->text,
-							$log->value
+							$this->check_answer($log)
 						],
 						'data_style'    => ['text', 'score'],
-						'score'         => $log->value,
+						'score'         => $this->check_answer($log),
 						'type'          => $log->type,
 						'style'         => 'final_score',
 						'symbol'        => '%',
 						'graphic'       => 'score',
-						'display_score' => false
+						'display_score' => false,
+						'older_qset'    => $log->item_id == 0 ? true : false
 					];
 					break;
 			}

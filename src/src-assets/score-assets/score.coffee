@@ -5,6 +5,7 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 	$scope.responses = []
 	$scope.itemSelection = []
 	$scope.customTable = false
+	$scope.showOlderQsetWarning = false
 
 	_visitedNodes = []
 	_qsetItems = []
@@ -174,12 +175,14 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 		table = []
 		for response in scoreTable
 			if response.type == 'SCORE_FINAL_FROM_CLIENT'
-				question = _getQuestionByNodeId qset, response.id
+				question = _getQuestionByNodeId qset, response.node_id
 				row =
 					text:  _manageConditionalQuestion question, response.data[0] # needs to work with conditional questions
 					score: response.data[1]
 					type: 'end'
 				table.push row
+
+				$scope.showOlderQsetWarning = response.older_qset
 			else 
 				question = _getQuestion qset, response.id
 				items = question.options.items
