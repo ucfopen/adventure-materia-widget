@@ -428,6 +428,11 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				return true
 		return false
 
+	$scope.presentInInventory = (id, inventory) ->
+		for item in inventory
+			if item.id == id then return true
+		return false
+
 	# Checks to see if player inventory contains all required items
 	# Returns array of missing items
 	$scope.checkInventory = (requiredItems) ->
@@ -460,12 +465,13 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		$scope.selectedAnswer = $scope.q_data.answers[index].text
 		selectedAnswerId = $scope.q_data.answers[index].id
 
-		requiredItems = $scope.answers[index].requiredItems || $scope.answers[index].options.requiredItems
+		# answers[index] will be inaccurate if answers are randomized !!!
+		requiredItems = getAnswerByIndex(index).requiredItems || []
 
 		$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
 
 		if $scope.missingRequiredItems[0]
-			$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+			$scope.missingRequiredItemsAltText = $scope.missingRequiredItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
 			$scope.next = null
 			return
 
@@ -574,6 +580,11 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		if $scope.missingRequiredItems.length > 0
 			$scope.missingRequiredItems = []
 			$scope.missingRequiredItemsAltText = ""
+
+	getAnswerByIndex = (index) ->
+		for answer in $scope.answers
+			if answer.index == index then return answer
+		return null
 
 	handleMultipleChoice = (q_data) ->
 		$scope.type = $scope.MC

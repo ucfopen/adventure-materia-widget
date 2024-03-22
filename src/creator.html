@@ -1575,7 +1575,7 @@
 					<h2 ng-if="displayNodeCreation == MC">Conditional Question Text</h2>
 					<h2 ng-if="displayNodeCreation == SHORTANS">Conditional Question</h2>
 					<h2 ng-if="displayNodeCreation == HOTSPOT">Conditional Question</h2>
-					<h2 ng-if="displayNodeCreation == NARR">Conditional Narrative</h2>
+					<h2 ng-if="displayNodeCreation == NARR">Conditional Narrative Text</h2>
 					<h2 ng-if="displayNodeCreation == END">Conditional End Text</h2>
 					<section ng-class="{'hidden': inventoryItems.length > 0}">
 						<p>Question text can be overridden based on the number of times the player has visited this destination.</p>
@@ -1700,7 +1700,7 @@
 					<div class="end-buttons">
 						<button type="button"
 						class="add-question important-button"
-						ng-click="newQuestion()">Add {{displayNodeCreation == NARR ? 'Narrative' : (displayNodeCreation == END ? 'End Text' : 'Question')}}</button>
+						ng-click="newQuestion()">Add {{displayNodeCreation == NARR ? 'Narrative Text' : (displayNodeCreation == END ? 'End Text' : 'Question Text')}}</button>
 						<button class="save-button important-button"
 						type="button"
 						ng-click="toggleQuestionsEditor()">Done
