@@ -752,7 +752,7 @@ angular.module "Adventure"
 						feedback: answer.feedback
 						requiredItems: requiredItemsData
 						hideAnswer: answer.hideAnswer or false
-						# hideRequiredItems: answer.hideRequiredItems or false
+						hideRequiredItems: answer.hideRequiredItems or false
 
 				switch tree.type
 					when "shortanswer"
@@ -939,7 +939,7 @@ angular.module "Adventure"
 					id: generateAnswerHash()
 					requiredItems: requiredItemsData
 					hideAnswer: answer.options.hideAnswer or false
-					# hideRequiredItems: answer.options.hideRequiredItems or false
+					hideRequiredItems: answer.options.hideRequiredItems or false
 
 				switch item.options.type
 					when "shortanswer"

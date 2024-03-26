@@ -343,7 +343,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					options : q_data.answers[i].options
 					requiredItems: requiredItems
 					hideAnswer: q_data.answers[i].options.hideAnswer || false
-					# hideRequiredItems: q_data.answers[i].options.hideRequiredItems || false
+					hideRequiredItems: q_data.answers[i].options.hideRequiredItems || false
 
 				if answer.requiredItems[0]
 					$scope.showInventoryBtn = true

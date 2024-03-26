@@ -2497,7 +2497,7 @@ angular.module "Adventure"
 				id: treeSrv.generateAnswerHash()
 				requiredItems: []
 				hideAnswer: false
-				# hideRequiredItems: false
+				hideRequiredItems: false # only used for MC nodes!
 
 			# Add a matches and case sensitivity property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS

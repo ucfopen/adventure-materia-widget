@@ -1489,7 +1489,7 @@ required-items-tooltip {
 		align-items: center;
 		flex-direction: row;
 		justify-content: center;
-		gap: 15px;
+		gap: 0.5em;
 		padding: 0 10px;
 
 		input {
@@ -1727,11 +1727,10 @@ item-icon-selector {
 	&.required-item-modal.show {
 		display: flex;
 		position: fixed;
-		height: 63% !important;
-		width: 56%;
-		top: 120px;
-		left: -200px;
-		right: 0;
+		top: 15%;
+		height: 75%;
+		width: 65%;
+		max-width: 850px;
 		margin: auto;
 
 		.arrow-right {
@@ -1832,14 +1831,17 @@ item-icon-selector {
 
 	/** Show modal on screen widths < 1000px **/
 	@media screen and (max-width: $item-panel-max-width) {
-		&.item-panel {
-			display: none !important;
-		}
+		// &.item-panel {
+		// 	display: none !important;
+		// }
 	}
 	/** Show two panels on screen widths >= 1000px **/
 	@media screen and (min-width: $item-panel-max-width) {
 		&.item-modal:not(.question-required) {
-			display: none !important;
+
+			// height: 100% !important;
+			// max-height: 100%;
+			// min-width: 300px;
 		}
 	}
 	.basic-options {
@@ -1855,12 +1857,22 @@ item-icon-selector {
 		align-items: center;
 		flex-direction: row;
 		flex-wrap: wrap;
-		gap: 15px;
+		gap: 0.5em;
 		padding: 10px 10px 10px 0;
 
 		input {
 			width: auto;
 			height: 1em;
+		}
+
+		.advanced-option-selection {
+			display: flex;
+			gap: 0.25em;
+			align-items: center;
+		}
+
+		label {
+			margin-right: 0.5em;
 		}
 
 		button.hide-answer-button {
@@ -2412,10 +2424,9 @@ node-creation-selection-dialog {
 	flex-direction: column;
 	justify-content: space-between;
 
-	.node-creation-panels {
+	.node-creation-content {
 		display: flex;
 		flex-direction: column;
-		flex-grow: 1;
 		max-height: 80%;
 		padding: 10px;
 		overflow: auto;
@@ -2798,6 +2809,7 @@ node-creation-selection-dialog {
 
 						.hide-answer-tooltip {
 							position: absolute;
+							z-index: $z-index-modal-dialog + 10;
 							top: 45px;
 							width: 100px;
 							background: $blue;
