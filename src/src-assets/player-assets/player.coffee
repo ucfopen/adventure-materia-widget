@@ -123,7 +123,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		$scope.inventoryUpdateMessage = ""
 
 		# Add items to player's inventory
-		if q_data.options.items and q_data.options.items[0]
+		# if q_data.options.items and q_data.options.items[0]
+		if $scope.inventory.length > 0
 
 			$scope.showInventoryBtn = true
 

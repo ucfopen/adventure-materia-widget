@@ -2427,6 +2427,7 @@ node-creation-selection-dialog {
 	.node-creation-content {
 		display: flex;
 		flex-direction: column;
+		flex-grow: 2;
 		max-height: 80%;
 		padding: 10px;
 		overflow: auto;
@@ -2451,26 +2452,26 @@ node-creation-selection-dialog {
 			}
 		}
 
-		.panel-right {
-			padding: 10px;
-			max-width: 550px;
+		// .panel-right {
+		// 	padding: 10px;
+		// 	max-width: 550px;
 
-			@media screen and (max-width: $item-panel-max-width) {
-				& {
-					display: none;
-					padding: 0;
-				}
-			}
-		}
+		// 	@media screen and (max-width: $item-panel-max-width) {
+		// 		& {
+		// 			display: none;
+		// 			padding: 0;
+		// 		}
+		// 	}
+		// }
 	}
 
 
 
-	@media screen and (min-width: $node-creation-panels-width) {
-		.node-creation-panels {
-			flex-direction: row;
-		}
-	}
+	// @media screen and (min-width: $node-creation-panels-width) {
+	// 	.node-creation-panels {
+	// 		flex-direction: row;
+	// 	}
+	// }
 
 	.answer-required-items {
 		display: flex;
@@ -2566,6 +2567,14 @@ node-creation-selection-dialog {
 
 	&.hotspot {
 		max-height: 650px;
+
+		.node-creation-content {
+			flex-direction: row;
+
+			@media screen and (max-width: $node-creation-panels-width) {
+				flex-direction: column;
+			}
+		}
 
 		textarea {
 			resize: none;

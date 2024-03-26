@@ -569,6 +569,7 @@ h1 {
 			&.nonselectable {
 				cursor: default;
 				font-style: italic;
+				color: $gray;
 
 				.missing-item {
 					color: $red-lighter;
