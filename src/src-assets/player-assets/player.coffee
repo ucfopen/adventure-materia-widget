@@ -124,9 +124,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		# Add items to player's inventory
 		# if q_data.options.items and q_data.options.items[0]
-		if $scope.inventory.length > 0
-
-			$scope.showInventoryBtn = true
+		if q_data.options.items and q_data.options.items[0]
 
 			# Format items
 			if q_data.options.items
@@ -180,6 +178,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 						$scope.inventory = $scope.inventory.filter((p_i) -> p_i.count > 0)
 
 			if ($scope.removedItems[0] || $scope.addedItems[0])
+				if !$scope.showInventoryBtn then $scope.showInventoryBtn = true
 				$scope.inventoryUpdate = true
 				document.getElementById("inventory-update").removeAttribute("inert")
 
@@ -427,11 +426,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		for i in items
 			if ! $scope.itemSelection[$scope.getItemIndex(i.id)].isSilent
 				return true
-		return false
-
-	$scope.presentInInventory = (id, inventory) ->
-		for item in inventory
-			if item.id == id then return true
 		return false
 
 	# Checks to see if player inventory contains all required items

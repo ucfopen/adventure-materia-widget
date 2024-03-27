@@ -1040,10 +1040,6 @@ debug-qset-loader, debug-qset-generator {
 	}
 }
 
-.invalid-quantity-message {
-	color: $red;
-}
-
 toast {
 	position: absolute;
 	z-index: $z-index-very-important;
@@ -1150,11 +1146,16 @@ required-items-tooltip {
 		opacity: 1;
 		overflow: visible;
 		transition: opacity 0.3s ease;
-		padding: 5px 25px 25px 25px;
+		padding: 5px 25px 20px 25px;
 		z-index: $z-index-modal-dialog;
 		box-sizing: border-box;
 		border-radius: 2px;
 		box-shadow: 0px 0px 5px #888;
+	}
+
+	.invalid-quantity-message {
+		font-weight: bold;
+		color: $red;
 	}
 
 	.item-header {
@@ -1728,10 +1729,11 @@ item-icon-selector {
 		display: flex;
 		position: fixed;
 		top: 15%;
-		height: 75%;
+		height: 65%;
 		width: 65%;
 		max-width: 850px;
 		margin: auto;
+		padding-bottom: 5px;
 
 		.arrow-right {
 			position: absolute;
@@ -1827,6 +1829,11 @@ item-icon-selector {
 		font-size: 12px;
 		font-style: italic;
 		color: $gray-darker;
+
+		&.invalid-quantity-message {
+			color: $red;
+			font-weight: bold;
+		}
 	}
 
 	/** Show modal on screen widths < 1000px **/
@@ -3851,6 +3858,8 @@ advanced-question-editor {
 
 		&.invalid-quantity-message {
 			padding: 0;
+			font-weight: bold;
+			color: $red;
 		}
 
 		&.hidden {

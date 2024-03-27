@@ -710,8 +710,7 @@
 										</div>
 									</div>
 									<!-- required items modal for answer choices -->
-									<div class="item-selection item-modal required-item-modal" ng-class="{ show : showRequiredItems && currentAnswer == answer}"
-									ng-mousedown="modalDragStart($event)">
+									<div class="item-selection item-modal required-item-modal" ng-class="{ show : showRequiredItems && currentAnswer == answer}">
 										<div class="item-header">
 											<div class="item-heading">
 												<h3>Required Items for Answer</h3>
@@ -797,7 +796,7 @@
 											<section class="advanced-option">
 												<div class="advanced-option-selection">
 													<input type="checkbox" ng-model="showAdvancedOptions" id="show-advanced"/>
-													<label for="show-advanced">Use Advanced Options</label>
+													<label for="show-advanced">Enable Advanced Options</label>
 												</div>
 												<div class="advanced-option-selection">
 													<input ng-show="displayNodeCreation == MC" type="checkbox" ng-model="answer.hideRequiredItems" id="answer-hide-required-items" />
