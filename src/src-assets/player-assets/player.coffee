@@ -265,7 +265,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 
 		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
-		if presanitized.length then parsedQuestion = micromarkdown.parse(presanitized) else parsedQuestion = ""
+		if presanitized.length then parsedQuestion = micromarkdown.parse(presanitized) else parsedQuestion = "No question text provided."
 
 		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
 		parsedQuestion = addTargetToHrefs parsedQuestion

@@ -763,6 +763,21 @@ h1 {
 			height: 100%;
 			overflow: auto;
 
+			.no-items-yet {
+				width: 90%;
+				margin: 1em 5%;
+
+				h3 {
+					text-align: center;
+					color: $gray-darker;
+				}
+
+				p {
+					text-align: center;
+					color: $gray;
+				}
+			}
+
 			.inventory-items {
 				display: flex;
 				flex-direction: row;
