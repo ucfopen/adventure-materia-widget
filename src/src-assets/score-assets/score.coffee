@@ -1,6 +1,6 @@
-angular.module('AdventureScorescreen', ['ngSanitize'])
+angular.module('Adventure', ['ngSanitize'])
 
-.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', '$timeout', ($scope, $sanitize, $sce, $timeout) ->
+.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', '$timeout', 'legacyQsetSrv', ($scope, $sanitize, $sce, $timeout, legacyQsetSrv) ->
 
 	$scope.responses = []
 	$scope.itemSelection = []
@@ -93,6 +93,8 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 	_manageItemDelta = (question) ->
 
 		items = []
+
+		if !question.options.items then return items
 		
 		for item in question.options.items
 			if item.firstVisitOnly and _getNodeVisitCount(question.options.id) > 0 then continue
@@ -185,7 +187,7 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 				$scope.showOlderQsetWarning = response.older_qset
 			else 
 				question = _getQuestion qset, response.id
-				items = question.options.items
+				items = if question.options.items then question.options.items else []
 				row =
 					question: _manageConditionalQuestion question, response.data[0]
 					answer: response.data[1]
@@ -212,6 +214,10 @@ angular.module('AdventureScorescreen', ['ngSanitize'])
 		$scope.update(qset, scoreTable)
 
 	$scope.update = (qset, scoreTable) ->
+
+		# if a legacy qset - convert it first
+		if qset.items[0].items then qset = JSON.parse legacyQsetSrv.convertOldQset qset
+		
 		$scope.$apply ->
 			$scope.table = $scope.createTable(qset, scoreTable)
 			_currentInventory = []

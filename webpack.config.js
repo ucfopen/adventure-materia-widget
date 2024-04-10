@@ -49,7 +49,8 @@ const entries = {
 		srcPath+"scoreScreen.html",
 		srcPath+"src-assets/score-assets/score.scss",
 		srcPath+"src-assets/score-assets/app.coffee",
-		srcPath+"src-assets/score-assets/score.coffee"
+		srcPath+"src-assets/score-assets/score.coffee",
+		srcPath+"src-assets/legacyQsetSrv.coffee"
 	]
 }
 

@@ -55,6 +55,15 @@ body {
 			color: $gray-darkest;
 		}
 
+		.older-qset-warning {
+			display: block;
+			width: 80%;
+			margin: 1em auto 1.5em auto;
+			text-align: center;
+			font-size: 0.9em;
+			font-style: italic;
+		}
+
 		.inventory {
 			width: 750px;
 			height: 100%;
