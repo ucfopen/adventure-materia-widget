@@ -201,9 +201,13 @@ angular.module('Adventure', ['ngSanitize'])
 
 					if response.data[2]
 						answer = _getAnswerById(question, response.data[2])
+
+						# older qsets won't contain an asset.url value
+						image = if question.options.asset.url then question.options.asset.url else Materia.ScoreCore.getMediaUrl question.options.asset.id
+
 						if answer
 							row.svg = answer.options.svg
-							row.image = question.options.asset.url
+							row.image = image
 				
 				_counter++
 				table.push row
