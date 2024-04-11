@@ -181,7 +181,7 @@ angular.module('Adventure', ['ngSanitize'])
 				row =
 					text:  _manageConditionalQuestion question, response.data[0] # needs to work with conditional questions
 					score: response.data[1]
-					type: 'end'
+					type: if response.blank_node then 'blank' else 'end'
 				table.push row
 
 				$scope.showOlderQsetWarning = response.older_qset

@@ -146,7 +146,8 @@ class Score_Modules_Adventure extends Score_Module
 						'symbol'        => '%',
 						'graphic'       => 'score',
 						'display_score' => false,
-						'older_qset'    => $log->item_id == 0 ? true : false
+						'older_qset'    => $log->item_id == 0 && $log->text != 'Blank Destination! Be sure to edit or remove this node before publishing.' ? true : false,
+						'blank_node'    => $log->item_id == 0 &&  $log->text == 'Blank Destination! Be sure to edit or remove this node before publishing.' ? true : false,
 					];
 					break;
 			}
