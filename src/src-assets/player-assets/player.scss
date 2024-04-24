@@ -602,11 +602,11 @@ h1 {
 					align-items: center;
 					flex-direction: row;
 					flex-wrap: wrap;
-					min-width: 75px;
-					max-width: 200px;
+					width: 180px;
 
 					font-style: normal;
 					font-size: 0.9em;
+					line-height: 1.5em;
 					padding: 0.25em;
 
 					img {
