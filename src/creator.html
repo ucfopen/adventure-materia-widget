@@ -1343,10 +1343,10 @@
 					<h2 ng-if="displayNodeCreation == NARR">Conditional Narrative Text</h2>
 					<h2 ng-if="displayNodeCreation == END">Conditional End Text</h2>
 					<section ng-class="{'hidden': inventoryItems.length > 0}">
-						<p>Question text can be overridden based on the number of times the player has visited this destination.</p>
+						<p>Choose to display different question text based on the number of times the player has visited this destination.</p>
 					</section>
 					<section ng-class="{'hidden': inventoryItems.length == 0}">
-						<p>Question text can be overridden based on the number of times the player has visited this destination <span class="highlight">AND/OR</span> the items they have in their inventory.</p>
+						<p>Choose to display different question text based on the player's number of <span class="highlight">visits</span> to this destination and/or what <span class="highlight">items</span> they have in their inventory.</p>
 						<p>Note that if more than one contextual question's requirements are met, the question with <span class="highlight">the most required items and visits</span> will be selected.</p>
 					</section>
 					<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
