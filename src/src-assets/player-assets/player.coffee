@@ -208,9 +208,13 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		# Track which questions have the most required items and visits, respectively
 		questionWithMostItems = null
 		questionWithMostVisits = null
+
+		# Load default question
+		selectedQuestion = q_data.questions[0]
+
 		# If conditional question matches, use it instead
-		if q_data.options.shownQuestions
-			for q in q_data.options.shownQuestions
+		if q_data.options.additionalQuestions
+			for q in q_data.options.additionalQuestions
 				keepMostVisited = false
 				keepMostItems = false
 				if q.requiredVisits != undefined
@@ -219,7 +223,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 						continue
 					# Keep the question with the most required visits
 					# We don't set questionWithMostVisits here because it also needs to have the required items
-					if mostVisited < q.requiredVisits
+					if mostVisited <= q.requiredVisits
 						mostVisited = q.requiredVisits
 						keepMostVisited = true
 				# Check if player has required items
@@ -244,8 +248,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				if keepMostItems
 					questionWithMostItems = q
 
-			# Load default question
-			selectedQuestion = q_data.questions[0]
 			# Make the decision on which question to display
 			# If both questions are not null and both have been played, just go with whichever was played last
 			if questionWithMostItems and questionWithMostVisits and $scope.shownQuestions.indexOf(questionWithMostItems) > -1 and $scope.shownQuestions.indexOf(questionWithMostVisits) > -1
