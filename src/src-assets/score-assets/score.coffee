@@ -84,6 +84,7 @@ angular.module('Adventure', ['ngSanitize'])
 				# all checks are met, this is the one
 				if match is true then selected = option.text
 
+		if selected.length then selected = micromarkdown.parse(selected) else selected = 'No question text provided.'
 		return selected
 
 
@@ -213,6 +214,10 @@ angular.module('Adventure', ['ngSanitize'])
 				table.push row
 
 		return table
+
+	# $scope.mmd_parse = (text) ->
+	# 	console.log 'haha butts'
+	# 	return micromarkdown.parse text
 
 	$scope.start = (instance, qset, scoreTable, isPreview, qsetVersion) ->
 		$scope.update(qset, scoreTable)
