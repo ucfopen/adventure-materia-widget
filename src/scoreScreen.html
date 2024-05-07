@@ -97,8 +97,7 @@
 						</svg>
 						<img ng-src="{{row.image}}" />
 					</div>
-					<div class="end-row" ng-if="row.type == 'end' || row.type =='blank'">
-						<p>{{ row.text }}</p>
+					<div class="end-row" ng-if="row.type == 'end' || row.type =='blank'" ng-bind-html="row.text">
 						<div class="end-row-score" ng-if="row.type == 'end'">
 							<p>{{ row.score }}%</p>
 						</div>

@@ -684,18 +684,18 @@
 												<ul class="match-options">
 													<li>
 														<input type="checkbox"
-															ng-model="answer.caseSensitive" id="caseSensitive"/>
-														<label for="caseSensitive">Make matches case sensitive</label>
+															ng-model="answer.caseSensitive" id="caseSensitive-{{$index}}"/>
+														<label for="caseSensitive-{{$index}}">Make matches case sensitive</label>
 													</li>
 													<li>
 														<input type="checkbox"
-															ng-model="answer.characterSensitive" id="characterSensitive"/>
-														<label for="characterSensitive">Make matches special character sensitive (<b>$</b>, <b>#</b>, <b>%</b>, etc.)</label>
+															ng-model="answer.characterSensitive" id="characterSensitive-{{$index}}"/>
+														<label for="characterSensitive-{{$index}}">Make matches special character sensitive (<b>$</b>, <b>#</b>, <b>%</b>, etc.)</label>
 													</li>
 													<li>
 														<input type="checkbox"
-															ng-model="answer.partialMatches" id="partialMatches"/>
-														<label for="partialMatches">Select if response contains a possible answer (the response <b>cat in the hat</b> will match <b>cat</b>.)</label>
+															ng-model="answer.partialMatches" id="partialMatches-{{$index}}"/>
+														<label for="partialMatches-{{$index}}">Select if response contains a possible answer (the response <b>cat in the hat</b> will match <b>cat</b>.)</label>
 													</li>
 												</ul>
 												
