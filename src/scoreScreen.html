@@ -49,8 +49,7 @@
 					<span class="icon blank" ng-if="row.type == 'blank'">
 						<img src="assets/creator-assets/blank.svg" alt="empty node icon" />
 					</span>
-					<div class="question {{row.type}}" ng-if="row.question">
-						{{row.question}}
+					<div class="question {{row.type}}" ng-if="row.question" ng-bind-html="row.question">
 					</div>
 					<div class="response" ng-if="row.answer">
 						{{row.answer}}

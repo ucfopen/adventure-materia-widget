@@ -759,6 +759,7 @@ angular.module "Adventure"
 						itemAnswerData.options.matches = answer.matches
 						itemAnswerData.options.caseSensitive = answer.caseSensitive
 						itemAnswerData.options.characterSensitive = answer.characterSensitive
+						itemAnswerData.options.partialMatches = answer.partialMatches or false
 						if answer.isDefault then itemAnswerData.options.isDefault = true
 
 					when "hotspot"
@@ -946,6 +947,7 @@ angular.module "Adventure"
 						nodeAnswer.matches = answer.options.matches
 						nodeAnswer.caseSensitive = answer.options.caseSensitive
 						nodeAnswer.characterSensitive = answer.options.characterSensitive
+						nodeAnswer.partialMatches = answer.options.partialMatches or false
 
 						if answer.options.isDefault then nodeAnswer.isDefault = true
 
