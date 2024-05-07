@@ -34,6 +34,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 	$scope.inventory = []
 	$scope.itemSelection = []
+	$scope.additionalQuestions = []
+	$scope.lastSelectedQuestion = null
 
 	$scope.missingRequiredItems = []
 	$scope.missingRequiredItemsAltText = ""
@@ -202,61 +204,94 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		presanitized = ""
 		mostItems = 0
 		mostRecentItem = 0
-		# Load default question
-		selected_question = q_data.questions[0]
+		mostVisited = 0
+		# Track which questions have the most required items and visits, respectively
+		questionWithMostItems = null
+		questionWithMostVisits = null
 		# If conditional question matches, use it instead
 		if q_data.options.additionalQuestions
 			for q in q_data.options.additionalQuestions
+				keepMostVisited = false
+				keepMostItems = false
 				if q.requiredVisits != undefined
+					# If the player hasn't visited this node enough times, skip this question
 					if $scope.visitedNodes[q_data.id] < q.requiredVisits || (q.requiredVisits > 0 && $scope.visitedNodes[q_data.id] == undefined)
-						# If the player hasn't visited this node enough times, skip this question
 						continue
+					# Keep the question with the most required visits
+					# We don't set questionWithMostVisits here because it also needs to have the required items
+					if mostVisited < q.requiredVisits
+						mostVisited = q.requiredVisits
+						keepMostVisited = true
+				# Check if player has required items
 				if q.requiredItems && q.requiredItems[0]
+					# If the player doesn't have the required items, skip this question
 					missingItems = $scope.checkInventory(q.requiredItems)
 					if (missingItems.length > 0)
-						# If the player doesn't have the required items, skip this question
 						continue
 					else
-						keep = false
 						recentItem = $scope.getMostRecentItem($scope.inventory, q.requiredItems)
+						# Keep the question with the most recent item
 						if (recentItem >= mostRecentItem)
-							# Choose the question with the most recent item
 							mostRecentItem = recentItem
-							keep = true
-						if (mostItems < q.requiredItems.length)
-							# Choose the question with the most required items
+							keepMostItems = true
+						# Keep the question with the most required items
+						else if (mostItems < q.requiredItems.length)
 							mostItems = q.requiredItems.length
-							keep = true
-						if (!keep)
-							continue
-				else if mostRecentItem > 0 || mostItems > 0
-					# If we've already chosen a more selective question, skip this one
-					continue
-				selected_question = q
+							keepMostItems = true
+				# If the question meets the visits and items requirements and has the most required items and visits, save it
+				if keepMostVisited
+					questionWithMostVisits = q
+				if keepMostItems
+					questionWithMostItems = q
+
+			# Load default question
+			selectedQuestion = q_data.questions[0]
+			# Make the decision on which question to display
+			# If both questions are not null and both have been played, just go with whichever was played last
+			console.log(questionWithMostItems, questionWithMostVisits, $scope.additionalQuestions.indexOf(questionWithMostItems), $scope.additionalQuestions.indexOf(questionWithMostVisits))
+			console.log($scope.lastSelectedQuestion)
+			if questionWithMostItems and questionWithMostVisits and $scope.additionalQuestions.indexOf(questionWithMostItems) > -1 and $scope.additionalQuestions.indexOf(questionWithMostVisits) > -1
+				if $scope.lastSelectedQuestion == questionWithMostItems
+					selectedQuestion = questionWithMostItems
+				else if $scope.lastSelectedQuestion == questionWithMostVisits
+					selectedQuestion = questionWithMostVisits
+				else
+					selectedQuestion = questionWithMostItems
+
+			# Question with most items takes precedence
+			else if questionWithMostItems and questionWithMostVisits and $scope.additionalQuestions.indexOf(questionWithMostVisits) > -1
+				selectedQuestion = questionWithMostItems
+				if $scope.additionalQuestions.indexOf(questionWithMostItems) is -1 then $scope.additionalQuestions.push questionWithMostItems
+			else if questionWithMostVisits
+				selectedQuestion = questionWithMostVisits
+				if $scope.additionalQuestions.indexOf(questionWithMostVisits) is -1 then $scope.additionalQuestions.push questionWithMostVisits
+
+
+			$scope.lastSelectedQuestion = selectedQuestion
 
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 			try
 				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
-				presanitized = selected_question.text
+				presanitized = selectedQuestion.text
 				for k, v of PRESANITIZE_CHARACTERS
 					presanitized = presanitized.replace k, v
 				$sanitize presanitized
 
 			catch error
-				selected_question.text = "*Question text removed due to malformed or dangerous HTML content*"
+				selectedQuestion.text = "*Question text removed due to malformed or dangerous HTML content*"
 		else
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 			try
 				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
-				presanitized = selected_question.text
+				presanitized = selectedQuestion.text
 				for k, v of PRESANITIZE_CHARACTERS
 					presanitized = presanitized.replace k, v
 				$sanitize presanitized
 
 			catch error
-				selected_question.text = "*Question text removed due to malformed or dangerous HTML content*"
+				selectedQuestion.text = "*Question text removed due to malformed or dangerous HTML content*"
 
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else if presanitized != "" then $scope.layout = q_data.options.asset.align
