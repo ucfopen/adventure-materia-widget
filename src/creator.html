@@ -698,7 +698,7 @@
 														<label for="partialMatches">Select if response contains a possible answer (the response <b>cat in the hat</b> will match <b>cat</b>.)</label>
 													</li>
 												</ul>
-												
+
 											</div>
 											<input type="text"
 												ng-model="answer.feedback"
@@ -1365,7 +1365,7 @@
 						<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
 					</div>
 					<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
-					<ul>
+					<ul auto-scroll-and-select-question>
 						<li ng-repeat="question in editedNode.questions" ng-if="$index > 0">
 							<button type="button"
 								class="delete-button icon-cross"
