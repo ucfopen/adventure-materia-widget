@@ -320,19 +320,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 								uncappedMax: uncappedMax
 
 							# Format range for pre-existing items without the range property
-							if item.range is ""
-								if item.uncappedMax and item.minCount is 0
-									item.range = "any amount"
-								else if item.minCount is 0 and item.maxCount is 0
-									item.range = "none"
-								else if item.uncappedMax
-									item.range = "at least #{item.minCount}"
-								else if item.minCount is 0
-									item.range = "no more than #{item.maxCount}"
-								else if item.minCount is item.maxCount
-									item.range = "#{item.minCount}"
-								else
-									item.range = "#{item.minCount} to #{item.maxCount}"
+							_assignRange item
 
 							requiredItems.push item
 
@@ -467,6 +455,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		if $scope.missingRequiredItems[0]
 			$scope.missingRequiredItemsAltText = $scope.missingRequiredItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+			# Add range value to required items
+			$scope.missingRequiredItems.map((item) -> _assignRange item)
 			$scope.next = null
 			return
 
@@ -528,6 +518,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 					if $scope.missingRequiredItems[0]
 						$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+						# Add range value to required items
+						$scope.missingRequiredItems.map((item) -> _assignRange item)
 						$scope.next = null
 						return
 
@@ -662,6 +654,20 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		for n in [0...$scope.qset.items.length]
 			if $scope.qset.items[n].options.items and $scope.qset.items[n].options.items[0] then return true
 		false
+
+	_assignRange = (item) ->
+		if item.uncappedMax and item.minCount is 0
+			item.range = "any amount"
+		else if item.minCount is 0 and item.maxCount is 0
+			item.range = "none"
+		else if item.uncappedMax
+			item.range = "at least #{item.minCount}"
+		else if item.minCount is 0
+			item.range = "no more than #{item.maxCount}"
+		else if item.minCount is item.maxCount
+			item.range = "#{item.minCount}"
+		else
+			item.range = "#{item.minCount} to #{item.maxCount}"
 
 	# Small script that inserts " target="_blank"  " into a hrefs, preventing hyperlinks from displaying within the iframe.
 	addTargetToHrefs = (string) ->
