@@ -501,7 +501,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			# Loop through each match to see if it matches the recorded response
 			for j in [0...$scope.q_data.answers[i].options.matches.length]
 
-				# TODO make matching algo more robust
 				match = $scope.q_data.answers[i].options.matches[j]
 
 				# Remove whitespace
@@ -520,7 +519,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					match = match.toLowerCase()
 					response = response.toLowerCase()
 
-				if match is response
+				if ($scope.q_data.answers[i].options.partialMatches and response.includes(match)) or match is response
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
 					missingItems = $scope.checkInventory(requiredItems)
 

@@ -1558,6 +1558,7 @@ angular.module "Adventure"
 					answer.matches = []
 					answer.caseSensitive = false
 					answer.characterSensitive = false
+					answer.partialMatches = false
 
 				# Create the new node associated with the [Unmatched Response] answer
 				newDefaultId = $scope.addNode $scope.nodeTools.target, $scope.BLANK
@@ -1574,6 +1575,7 @@ angular.module "Adventure"
 					isDefault: true
 					caseSensitive: false
 					characterSensitive: false
+					partialMatches: false
 
 				# The new answer has to take the 0 index spot in the answers array
 				node.answers.splice 0, 0, newDefault
@@ -2504,6 +2506,8 @@ angular.module "Adventure"
 				newAnswer.matches = []
 				newAnswer.caseSensitive = false
 				newAnswer.characterSensitive = false
+				newAnswer.partialMatches = false
+
 			$scope.answers.push newAnswer
 
 			# Refresh all answerLinks references as some have changed

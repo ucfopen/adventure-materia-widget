@@ -678,13 +678,27 @@
 													ng-repeat="match in answer.matches"
 													ng-click="removeAnswerMatch($index, $parent.$index)">{{match}}</button>
 											</div>
-											<div class="match-options">
-												<input type="checkbox"
-													ng-model="answer.caseSensitive" id="caseSensitive"/>
-												<label for="caseSensitive">Make Matches Case Sensitive</label>
-												<input type="checkbox"
-													ng-model="answer.characterSensitive" id="characterSensitive"/>
-												<label for="characterSensitive">Make Matches Special Character Sensitive ('$', '#', '%', etc.)</label>
+											<div class="match-options-container">
+												<h4>Matching Options</h4>
+												<p>The response entered by the user will be compared to each possible answer provided above. By default, matches are not case sensitive and whitespace is removed.</p>
+												<ul class="match-options">
+													<li>
+														<input type="checkbox"
+															ng-model="answer.caseSensitive" id="caseSensitive"/>
+														<label for="caseSensitive">Make matches case sensitive</label>
+													</li>
+													<li>
+														<input type="checkbox"
+															ng-model="answer.characterSensitive" id="characterSensitive"/>
+														<label for="characterSensitive">Make matches special character sensitive (<b>$</b>, <b>#</b>, <b>%</b>, etc.)</label>
+													</li>
+													<li>
+														<input type="checkbox"
+															ng-model="answer.partialMatches" id="partialMatches"/>
+														<label for="partialMatches">Select if response contains a possible answer (the response <b>cat in the hat</b> will match <b>cat</b>.)</label>
+													</li>
+												</ul>
+												
 											</div>
 											<input type="text"
 												ng-model="answer.feedback"
