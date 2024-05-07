@@ -34,7 +34,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 	$scope.inventory = []
 	$scope.itemSelection = []
-	$scope.additionalQuestions = []
+	$scope.shownQuestions = []
 	$scope.lastSelectedQuestion = null
 
 	$scope.missingRequiredItems = []
@@ -209,8 +209,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		questionWithMostItems = null
 		questionWithMostVisits = null
 		# If conditional question matches, use it instead
-		if q_data.options.additionalQuestions
-			for q in q_data.options.additionalQuestions
+		if q_data.options.shownQuestions
+			for q in q_data.options.shownQuestions
 				keepMostVisited = false
 				keepMostItems = false
 				if q.requiredVisits != undefined
@@ -248,9 +248,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			selectedQuestion = q_data.questions[0]
 			# Make the decision on which question to display
 			# If both questions are not null and both have been played, just go with whichever was played last
-			console.log(questionWithMostItems, questionWithMostVisits, $scope.additionalQuestions.indexOf(questionWithMostItems), $scope.additionalQuestions.indexOf(questionWithMostVisits))
-			console.log($scope.lastSelectedQuestion)
-			if questionWithMostItems and questionWithMostVisits and $scope.additionalQuestions.indexOf(questionWithMostItems) > -1 and $scope.additionalQuestions.indexOf(questionWithMostVisits) > -1
+			if questionWithMostItems and questionWithMostVisits and $scope.shownQuestions.indexOf(questionWithMostItems) > -1 and $scope.shownQuestions.indexOf(questionWithMostVisits) > -1
 				if $scope.lastSelectedQuestion == questionWithMostItems
 					selectedQuestion = questionWithMostItems
 				else if $scope.lastSelectedQuestion == questionWithMostVisits
@@ -259,12 +257,14 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					selectedQuestion = questionWithMostItems
 
 			# Question with most items takes precedence
-			else if questionWithMostItems and questionWithMostVisits and $scope.additionalQuestions.indexOf(questionWithMostVisits) > -1
+			else if questionWithMostItems and questionWithMostVisits and $scope.shownQuestions.indexOf(questionWithMostVisits) > -1
 				selectedQuestion = questionWithMostItems
-				if $scope.additionalQuestions.indexOf(questionWithMostItems) is -1 then $scope.additionalQuestions.push questionWithMostItems
+				# Add question to previously shown questions if it's not already there
+				if $scope.shownQuestions.indexOf(questionWithMostItems) is -1 then $scope.shownQuestions.push questionWithMostItems
 			else if questionWithMostVisits
 				selectedQuestion = questionWithMostVisits
-				if $scope.additionalQuestions.indexOf(questionWithMostVisits) is -1 then $scope.additionalQuestions.push questionWithMostVisits
+				# Add question to previously shown questions if it's not already there
+				if $scope.shownQuestions.indexOf(questionWithMostVisits) is -1 then $scope.shownQuestions.push questionWithMostVisits
 
 
 			$scope.lastSelectedQuestion = selectedQuestion
