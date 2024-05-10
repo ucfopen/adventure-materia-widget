@@ -2651,8 +2651,8 @@ angular.module "Adventure"
 				while j < $scope.answers[i].matches.length
 
 					# Remove whitespace
-					matchTo = matchTo.replace(/\s/g, '')
-					matchFrom = matchFrom.replace(/\s/g, '')
+					matchTo = $scope.answers[i].matches[j].replace(/\s/g, '')
+					matchFrom = $scope.newMatch.replace(/\s/g, '')
 
 					matchErrorMessage = "This match already exists!"
 
