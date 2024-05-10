@@ -2651,18 +2651,15 @@ angular.module "Adventure"
 				while j < $scope.answers[i].matches.length
 
 					# Remove whitespace
-					matchTo = $scope.answers[i].matches[j].trim()
-					matchTo = matchTo.split('').filter((letter) -> ! letter.match(/\W/g)).join()
-
-					matchFrom = $scope.newMatch.trim()
-					matchFrom = matchFrom.split('').filter((letter) -> ! letter.match(/\W/)).join()
+					matchTo = matchTo.replace(/\s/g, '')
+					matchFrom = matchFrom.replace(/\s/g, '')
 
 					matchErrorMessage = "This match already exists!"
 
 					if (! $scope.answers[i].characterSensitive)
 						# If matches DO NOT have same special characters, customize toast message
 						if ! (matchTo.toLowerCase().localeCompare(matchFrom.toLowerCase()) is 0)
-							matchErrorMessage += " Make whitespace and character sensitive to add match."
+							matchErrorMessage += " Make character sensitive to add match."
 
 						matchTo = matchTo.split('').filter((letter) -> letter.match(/\w/)).join()
 
