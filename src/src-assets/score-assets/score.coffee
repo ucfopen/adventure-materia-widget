@@ -1,6 +1,6 @@
 angular.module('Adventure', ['ngSanitize'])
 
-.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', '$timeout', 'legacyQsetSrv', ($scope, $sanitize, $sce, $timeout, legacyQsetSrv) ->
+.controller 'AdventureScoreCtrl', ['$scope','$sanitize', '$sce', '$timeout', 'inventoryService', 'legacyQsetSrv', ($scope, $sanitize, $sce, $timeout, inventoryService, legacyQsetSrv) ->
 
 	$scope.responses = []
 	$scope.itemSelection = []
@@ -20,7 +20,7 @@ angular.module('Adventure', ['ngSanitize'])
 
 		for node in _visitedNodes
 			if node.id is id then return node.count
-		
+
 		return 0
 
 	_getItemInInventory = (id) ->
@@ -96,7 +96,7 @@ angular.module('Adventure', ['ngSanitize'])
 		items = []
 
 		if !question.options.items then return items
-		
+
 		for item in question.options.items
 			if item.firstVisitOnly and _getNodeVisitCount(question.options.id) > 0 then continue
 
@@ -111,7 +111,7 @@ angular.module('Adventure', ['ngSanitize'])
 						inventoryItem.recency = _counter
 						previouslyExists = true
 						break
-				
+
 				# add the item to the inventory, since it wasn't there already
 				if !previouslyExists
 					itemCopy = angular.copy item
@@ -119,7 +119,7 @@ angular.module('Adventure', ['ngSanitize'])
 					_currentInventory.push angular.copy itemCopy
 
 				items.push item
-			
+
 			# negative delta? remove it from the inventory, if present
 			else if item.count < 0
 
@@ -132,9 +132,9 @@ angular.module('Adventure', ['ngSanitize'])
 						# instead of using item.count, the delta is whatever the current inventory value is, zeroed out
 						if item.takeAll
 							itemRemoved.count = inventoryItem.count * -1
-							
+
 							_currentInventory.splice(_currentInventory.indexOf(inventoryItem), 1)
-							
+
 						else
 							# inventoryItem will persist because the quantity removed is less than the total
 							if inventoryItem.count > item.count * -1
@@ -186,7 +186,7 @@ angular.module('Adventure', ['ngSanitize'])
 				table.push row
 
 				$scope.showOlderQsetWarning = response.older_qset
-			else 
+			else
 				question = _getQuestion qset, response.id
 				items = if question.options.items then question.options.items else []
 				row =
@@ -209,7 +209,7 @@ angular.module('Adventure', ['ngSanitize'])
 						if answer
 							row.svg = answer.options.svg
 							row.image = image
-				
+
 				_counter++
 				table.push row
 
@@ -226,14 +226,14 @@ angular.module('Adventure', ['ngSanitize'])
 
 		# if a legacy qset - convert it first
 		if qset.items[0].items then qset = JSON.parse legacyQsetSrv.convertOldQset qset
-		
+
 		$scope.$apply ->
 			$scope.table = $scope.createTable(qset, scoreTable)
 			_currentInventory = []
 			_qsetItems = if qset.options and qset.options.inventoryItems then qset.options.inventoryItems else []
-		
+
 		Materia.ScoreCore.setHeight(_getHeight())
-	
+
 	Materia.ScoreCore.hideResultsTable()
 
 	Materia.ScoreCore.start $scope

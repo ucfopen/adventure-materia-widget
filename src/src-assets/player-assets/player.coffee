@@ -1,7 +1,7 @@
 angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 ## CONTROLLER ##
-.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce, $timeout) ->
+.controller 'AdventureController', ['$scope','$rootScope', 'inventoryService', 'legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, inventoryService, legacyQsetSrv, $sanitize, $sce, $timeout) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -34,8 +34,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 	$scope.inventory = []
 	$scope.itemSelection = []
-	$scope.shownQuestions = []
-	$scope.lastSelectedQuestion = null
+	$scope.shownQuestions = {} # track which questions have been shown for each node
+	$scope.lastSelectedQuestion = {} # track the last selected question for each node
 
 	$scope.missingRequiredItems = []
 	$scope.missingRequiredItemsAltText = ""
@@ -202,87 +202,28 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		# Get question based on inventory and number of visits
 		presanitized = ""
-		mostItems = 0
-		mostRecentItem = 0
-		mostVisited = 0
-		# Track which questions have the most required items and visits, respectively
-		questionWithMostItems = null
-		questionWithMostVisits = null
 
 		# Load default question
 		selectedQuestion = q_data.questions[0]
 
 		# If conditional question matches, use it instead
 		if q_data.options.additionalQuestions
-			for q in q_data.options.additionalQuestions
-				keepMostVisited = false
-				keepMostItems = false
-				if q.requiredVisits != undefined
-					# If the player hasn't visited this node enough times, skip this question
-					if $scope.visitedNodes[q_data.id] < q.requiredVisits || (q.requiredVisits > 0 && $scope.visitedNodes[q_data.id] == undefined)
-						continue
-					# Keep the question with the most required visits
-					# We don't set questionWithMostVisits here because it also needs to have the required items
-					if mostVisited <= q.requiredVisits
-						mostVisited = q.requiredVisits
-						keepMostVisited = true
-				# Check if player has required items
-				if q.requiredItems && q.requiredItems[0]
-					# If the player doesn't have the required items, skip this question
-					missingItems = $scope.checkInventory(q.requiredItems)
-					if (missingItems.length > 0)
-						continue
-					else
-						recentItem = $scope.getMostRecentItem($scope.inventory, q.requiredItems)
-						# Keep the question with the most recent item
-						if (recentItem >= mostRecentItem)
-							mostRecentItem = recentItem
-							keepMostItems = true
-						# Keep the question with the most required items
-						else if (mostItems < q.requiredItems.length)
-							mostItems = q.requiredItems.length
-							keepMostItems = true
-				# If the question meets the visits and items requirements and has the most required items and visits, save it
-				if keepMostVisited
-					questionWithMostVisits = q
-				if keepMostItems
-					questionWithMostItems = q
+			shownQuestions = []
+			lastSelectedQuestion = null
+			if q_data.id of $scope.shownQuestions then shownQuestions = $scope.shownQuestions[q_data.id]
+			if q_data.id of $scope.lastSelectedQuestion then lastSelectedQuestion = $scope.lastSelectedQuestion[q_data.id]
 
-			# Make the decision on which question to display
-			# If both questions are not null and both have been played, just go with whichever was played last
-			if questionWithMostItems and questionWithMostVisits and $scope.shownQuestions.indexOf(questionWithMostItems) > -1 and $scope.shownQuestions.indexOf(questionWithMostVisits) > -1
-				if $scope.lastSelectedQuestion == questionWithMostItems
-					selectedQuestion = questionWithMostItems
-				else if $scope.lastSelectedQuestion == questionWithMostVisits
-					selectedQuestion = questionWithMostVisits
-				else
-					selectedQuestion = questionWithMostItems
+			selectedQuestion = inventoryService.selectQuestion(q_data, $scope.inventory, $scope.visitedNodes, shownQuestions, lastSelectedQuestion, selectedQuestion)
 
-			# Question with most items takes precedence
-			else if questionWithMostItems and questionWithMostVisits and $scope.shownQuestions.indexOf(questionWithMostVisits) > -1
-				selectedQuestion = questionWithMostItems
-				# Add question to previously shown questions if it's not already there
-				if $scope.shownQuestions.indexOf(questionWithMostItems) is -1 then $scope.shownQuestions.push questionWithMostItems
-			else if questionWithMostVisits
-				selectedQuestion = questionWithMostVisits
-				# Add question to previously shown questions if it's not already there
-				if $scope.shownQuestions.indexOf(questionWithMostVisits) is -1 then $scope.shownQuestions.push questionWithMostVisits
+		if selectedQuestion
+			# Update last selected question
+			$scope.lastSelectedQuestion[q_data.id] = selectedQuestion
 
+			# Mark the selected question as shown
+			if q_data.id of $scope.shownQuestions
+				if $scope.shownQuestions[q_data.id].indexOf(selectedQuestion) is -1 then $scope.shownQuestions[q_data.id].push selectedQuestion
+			else $scope.shownQuestions[q_data.id] = [selectedQuestion]
 
-			$scope.lastSelectedQuestion = selectedQuestion
-
-			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
-			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
-			try
-				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
-				presanitized = selectedQuestion.text
-				for k, v of PRESANITIZE_CHARACTERS
-					presanitized = presanitized.replace k, v
-				$sanitize presanitized
-
-			catch error
-				selectedQuestion.text = "*Question text removed due to malformed or dangerous HTML content*"
-		else
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 			try
@@ -403,15 +344,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		$scope.visitedNodes[q_data.id] = ($scope.visitedNodes[q_data.id] || 0) + 1
 
-	$scope.getMostRecentItem = (inventory, requiredItems) ->
-		mostRecentItem = 0
-		for i in inventory
-			for r in requiredItems
-				if i.id is r.id
-					if i.time > mostRecentItem
-						mostRecentItem = i.time
-		mostRecentItem
-
 	$scope.dismissUpdates = () ->
 		$scope.inventoryUpdate = false
 		document.getElementById("inventory-update").setAttribute("inert", true)
@@ -453,30 +385,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				return true
 		return false
 
-	# Checks to see if player inventory contains all required items
-	# Returns array of missing items
-	$scope.checkInventory = (requiredItems) ->
-		missingItems = []
-		if (! requiredItems)
-			return []
-		angular.forEach requiredItems, (item) ->
-			hasItemInInventory = false
-			hasRequiredItem = $scope.inventory.some (playerItem) ->
-				if playerItem.id is item.id
-					hasItemInInventory = true
-					# Check if player has more than the min
-					if playerItem.count >= item.minCount
-						# Check if player has less than the max
-						if playerItem.count <= item.maxCount or item.uncappedMax
-							return true
-					return false
-			# Check if player doesn't have item but there is no minimum
-			if ! hasItemInInventory and item.minCount is 0
-				hasRequiredItem = true
-			if ! hasRequiredItem
-				missingItems.push item
-		return missingItems
-
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
 	$scope.handleAnswerSelection = (link, index) ->
 		# link to -1 indicates the widget should advance to the score screen
@@ -488,7 +396,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		# answers[index] will be inaccurate if answers are randomized !!!
 		requiredItems = getAnswerByIndex(index).requiredItems || []
 
-		$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
+		$scope.missingRequiredItems = inventoryService.checkInventory(requiredItems)
 
 		if $scope.missingRequiredItems[0]
 			$scope.missingRequiredItemsAltText = $scope.missingRequiredItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
@@ -548,10 +456,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 				if ($scope.q_data.answers[i].options.partialMatches and response.includes(match)) or match is response
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
-					missingItems = $scope.checkInventory(requiredItems)
+					missingItems = inventoryService.checkInventory(requiredItems)
 
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
-					$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
+					$scope.missingRequiredItems = inventoryService.checkInventory(requiredItems)
 
 					if $scope.missingRequiredItems[0]
 						$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
@@ -920,7 +828,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			if answer.text then $scope.hotspotLabelTarget.text = answer.text
 			else return false
 
-			$scope.hotspotLabelTarget.ariaLabel = answer.text + (if $scope.checkInventory(answer.requiredItems).length > 0 then ' Cannot select. ' else ' ')
+			$scope.hotspotLabelTarget.ariaLabel = answer.text + (if inventoryService.checkInventory(answer.requiredItems).length > 0 then ' Cannot select. ' else ' ')
 			requiredItemString = answer.requiredItems.map((item) -> $scope.itemSelection[$scope.getItemIndex(item.id)].name + ' (amount: ' + item.range + ')').join(', ')
 			$scope.hotspotLabelTarget.ariaLabel += (if (answer.requiredItems && answer.requiredItems.length > 0) then ('Required Items: ' + requiredItemString) else '')
 

@@ -33,7 +33,8 @@ const entries = {
 		srcPath+"src-assets/player-assets/player.scss",
 		srcPath+"src-assets/player-assets/app.coffee",
 		srcPath+"src-assets/player-assets/player.coffee",
-		srcPath+"src-assets/legacyQsetSrv.coffee"
+		srcPath+"src-assets/services/inventoryService.coffee",
+		srcPath+"src-assets/services/legacyQsetSrv.coffee"
 
 	],
 	"creator": [
@@ -43,14 +44,15 @@ const entries = {
 		srcPath+"src-assets/creator-assets/services.coffee",
 		srcPath+"src-assets/creator-assets/controllers.coffee",
 		srcPath+"src-assets/creator-assets/directives.coffee",
-		srcPath+"src-assets/legacyQsetSrv.coffee"
+		srcPath+"src-assets/services/legacyQsetSrv.coffee"
 	],
 	"scoreScreen": [
 		srcPath+"scoreScreen.html",
 		srcPath+"src-assets/score-assets/score.scss",
 		srcPath+"src-assets/score-assets/app.coffee",
 		srcPath+"src-assets/score-assets/score.coffee",
-		srcPath+"src-assets/legacyQsetSrv.coffee"
+		srcPath+"src-assets/services/inventoryService.coffee",
+		srcPath+"src-assets/services/legacyQsetSrv.coffee"
 	]
 }
 
