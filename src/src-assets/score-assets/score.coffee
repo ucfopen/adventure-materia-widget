@@ -19,17 +19,6 @@ angular.module('Adventure', ['ngSanitize'])
 
 		return null
 
-	# recency is determined by the order in which a node a visited
-	# unlike the player, which determines recency by time
-	_getMostRecentItem = (requiredItems) ->
-		mostRecentItem = 0
-		for i in _currentInventory
-			for r in requiredItems
-				if i.id is r.id
-					if i.recency > mostRecentItem
-						mostRecentItem = i.recency
-		mostRecentItem
-
 	_getAnswerById = (question, id) ->
 		for answer in question.answers
 			if answer.id is id then return answer

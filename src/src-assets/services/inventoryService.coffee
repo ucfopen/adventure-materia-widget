@@ -35,6 +35,7 @@ angular.module("Adventure")
 		return missingItems
 
 	# Get the most recently acquired item in the player's inventory
+	# recency is determined by the order in which a node is visited
 	self.getMostRecentItem = (inventory, requiredItems) ->
 		mostRecentItem = 0
 		for i in inventory
