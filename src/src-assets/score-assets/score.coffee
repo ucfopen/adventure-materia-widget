@@ -10,8 +10,6 @@ angular.module('Adventure', ['ngSanitize'])
 	_qsetItems = []
 	_currentInventory = []
 
-	_counter = 0
-
 	_getHeight = () ->
 		Math.ceil(parseFloat(window.getComputedStyle(document.querySelector('html')).height))
 
@@ -56,14 +54,14 @@ angular.module('Adventure', ['ngSanitize'])
 				for inventoryItem in _currentInventory
 					if inventoryItem.id is item.id
 						inventoryItem.count += item.count
-						inventoryItem.recency = _counter
+						inventoryItem.recency = inventoryService.recencyCounter
 						previouslyExists = true
 						break
 
 				# add the item to the inventory, since it wasn't there already
 				if !previouslyExists
 					itemCopy = angular.copy item
-					itemCopy.recency = _counter
+					itemCopy.recency = inventoryService.recencyCounter
 					_currentInventory.push angular.copy itemCopy
 
 				items.push item
@@ -162,7 +160,7 @@ angular.module('Adventure', ['ngSanitize'])
 							row.svg = answer.options.svg
 							row.image = image
 
-				_counter++
+				inventoryService.recencyCounter++
 				table.push row
 
 		return table

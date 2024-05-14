@@ -133,8 +133,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 							count: q_i.count || 1
 							takeAll: q_i.takeAll || false
 							firstVisitOnly: q_i.firstVisitOnly || false
-							time: Date.now()
+							recency: inventoryService.recencyCounter
 						$scope.questionItems.push item
+						inventoryService.recencyCounter++
 
 			for q_i in $scope.questionItems
 				do (q_i) ->

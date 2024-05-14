@@ -9,6 +9,7 @@ angular.module("Adventure")
 	self.shownQuestions = {} # track which questions have been shown for each node
 	self.lastSelectedQuestion = {} # track the last selected question for each node
 	self.visitedNodes = {} # track which nodes have been visited and how many times
+	self.recencyCounter = 0
 
 	# Check if player has required items in their inventory
 	self.checkInventory = (inventory, requiredItems) ->
@@ -39,8 +40,8 @@ angular.module("Adventure")
 		for i in inventory
 			for r in requiredItems
 				if i.id is r.id
-					if i.time > mostRecentItem
-						mostRecentItem = i.time
+					if i.recency > mostRecentItem
+						mostRecentItem = i.recency
 		mostRecentItem
 
 	# Select the next question to display based on the player's inventory and visited nodes
@@ -134,12 +135,14 @@ angular.module("Adventure")
 		else
 			return 0
 
-	selectQuestion : self.selectQuestion
-	checkInventory : self.checkInventory
-	getMostRecentItem : self.getMostRecentItem
 	shownQuestions : self.shownQuestions
 	lastSelectedQuestion : self.lastSelectedQuestion
 	visitedNodes : self.visitedNodes
+	recencyCounter : self.recencyCounter
+
+	selectQuestion : self.selectQuestion
+	checkInventory : self.checkInventory
+	getMostRecentItem : self.getMostRecentItem
 	addNodeToVisited : self.addNodeToVisited
 	getNodeVisitedCount : self.getNodeVisitedCount
 ]
