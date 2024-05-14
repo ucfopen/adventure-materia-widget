@@ -1,8 +1,17 @@
+# Holds the conditional question logic
+# Ideally, this would hold all of the inventory logic to be shared between the player and score screen
+# Which is currently being handled by both separately
+
 angular.module("Adventure")
 .service "inventoryService", [() ->
+	self = this
+
+	self.shownQuestions = {} # track which questions have been shown for each node
+	self.lastSelectedQuestion = {} # track the last selected question for each node
+	self.visitedNodes = {} # track which nodes have been visited and how many times
 
 	# Check if player has required items in their inventory
-	checkInventory = (inventory, requiredItems) ->
+	self.checkInventory = (inventory, requiredItems) ->
 		missingItems = []
 		if (! requiredItems)
 			return []
@@ -25,7 +34,7 @@ angular.module("Adventure")
 		return missingItems
 
 	# Get the most recently acquired item in the player's inventory
-	getMostRecentItem = (inventory, requiredItems) ->
+	self.getMostRecentItem = (inventory, requiredItems) ->
 		mostRecentItem = 0
 		for i in inventory
 			for r in requiredItems
@@ -35,7 +44,13 @@ angular.module("Adventure")
 		mostRecentItem
 
 	# Select the next question to display based on the player's inventory and visited nodes
-	selectQuestion = (q_data, inventory, visitedNodes, shownQuestions, lastSelectedQuestion, defaultQuestion) ->
+	self.selectQuestion = (q_data, inventory, visitedNodes) ->
+		_shownQuestions = []
+		_lastSelectedQuestion = null
+
+		if self.shownQuestions[q_data.id]? then _shownQuestions = self.shownQuestions[q_data.id]
+		if self.lastSelectedQuestion[q_data.id]? then _lastSelectedQuestion = self.lastSelectedQuestion[q_data.id]
+
 		mostItems = 0
 		mostRecentItem = 0
 		mostVisited = 0
@@ -43,6 +58,8 @@ angular.module("Adventure")
 		questionWithMostItems = null
 		questionWithMostVisits = null
 		questionWithMostRecent = null
+
+		selectedQuestion = q_data.questions[0]
 
 		for q in q_data.options.additionalQuestions
 			keepMostVisited = false
@@ -60,12 +77,12 @@ angular.module("Adventure")
 			# Check if player has required items
 			if q.requiredItems && q.requiredItems[0]
 				# If the player doesn't have the required items, skip this question
-				missingItems = checkInventory(inventory, q.requiredItems)
+				missingItems = self.checkInventory(inventory, q.requiredItems)
 				if (missingItems.length > 0)
 					# This erases the most visited question as well
 					continue
 				else
-					recentItem = getMostRecentItem(inventory, q.requiredItems)
+					recentItem = self.getMostRecentItem(inventory, q.requiredItems)
 					# Keep the question with the most recent item
 					if (recentItem >= mostRecentItem)
 						mostRecentItem = recentItem
@@ -84,22 +101,45 @@ angular.module("Adventure")
 
 		# Make the decision on which question to display
 		# Question with most recent item takes precedence, then most items, then most visited
-		if questionWithMostRecent and shownQuestions.indexOf(questionWithMostRecent) < 0
+		if questionWithMostRecent and _shownQuestions.indexOf(questionWithMostRecent) < 0
 			selectedQuestion = questionWithMostRecent
-		else if questionWithMostItems and shownQuestions.indexOf(questionWithMostItems) < 0
+		else if questionWithMostItems and _shownQuestions.indexOf(questionWithMostItems) < 0
 			selectedQuestion = questionWithMostItems
-		else if questionWithMostVisits and shownQuestions.indexOf(questionWithMostVisits) < 0
+		else if questionWithMostVisits and _shownQuestions.indexOf(questionWithMostVisits) < 0
 			selectedQuestion = questionWithMostVisits
 		# If none of the above conditions are met, just go with the last selected question
-		else if lastSelectedQuestion
+		else if _lastSelectedQuestion
 			# Technically, the last selected question should not be null at this point if the above conditions are false
-			selectedQuestion = lastSelectedQuestion
-		else
-			selectedQuestion = defaultQuestion
+			selectedQuestion = _lastSelectedQuestion
+
+		# Update last selected question
+		self.lastSelectedQuestion[q_data.id] = selectedQuestion
+
+		# Mark the selected question as shown
+		if self.shownQuestions[q_data.id]?
+			if self.shownQuestions[q_data.id].indexOf(selectedQuestion) is -1 then self.shownQuestions[q_data.id].push selectedQuestion
+		else self.shownQuestions[q_data.id] = [selectedQuestion]
 
 		return selectedQuestion
 
-	selectQuestion : selectQuestion
-	checkInventory : checkInventory
-	getMostRecentItem : getMostRecentItem
+	self.addNodeToVisited = (node) ->
+		if self.visitedNodes[node.id]?
+			self.visitedNodes[node.id]++
+		else
+			self.visitedNodes[node.id] = 1
+
+	self.getNodeVisitedCount = (node) ->
+		if self.visitedNodes[node.id]?
+			return self.visitedNodes[node.id]
+		else
+			return 0
+
+	selectQuestion : self.selectQuestion
+	checkInventory : self.checkInventory
+	getMostRecentItem : self.getMostRecentItem
+	shownQuestions : self.shownQuestions
+	lastSelectedQuestion : self.lastSelectedQuestion
+	visitedNodes : self.visitedNodes
+	addNodeToVisited : self.addNodeToVisited
+	getNodeVisitedCount : self.getNodeVisitedCount
 ]

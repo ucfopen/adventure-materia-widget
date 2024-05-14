@@ -34,8 +34,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.customInternalScoreMessage = "" # custom "internal score screen" message, if blank then use default
 	$scope.inventory = []
 	$scope.itemSelection = []
-	$scope.shownQuestions = {} # track which questions have been shown for each node
-	$scope.lastSelectedQuestion = {} # track the last selected question for each node
 
 	$scope.missingRequiredItems = []
 	$scope.missingRequiredItemsAltText = ""
@@ -92,8 +90,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.setLightboxZoom = (val) ->
 		$scope.lightboxZoom = val
 
-	$scope.visitedNodes = {}
-
 	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
 		text: null
@@ -145,7 +141,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					hasItem = false
 
 					# Check if item is first visit only and player has visited this node before
-					if ($scope.visitedNodes[q_data.id] and q_i.firstVisitOnly)
+					if (inventoryService.getNodeVisitedCount(q_data) > 0 and q_i.firstVisitOnly)
 						# Move to next item
 					else
 						# Inventory update
@@ -208,22 +204,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		# If conditional question matches, use it instead
 		if q_data.options.additionalQuestions
-			shownQuestions = []
-			lastSelectedQuestion = null
-			if q_data.id of $scope.shownQuestions then shownQuestions = $scope.shownQuestions[q_data.id]
-			if q_data.id of $scope.lastSelectedQuestion then lastSelectedQuestion = $scope.lastSelectedQuestion[q_data.id]
-
-			selectedQuestion = inventoryService.selectQuestion(q_data, $scope.inventory, $scope.visitedNodes, shownQuestions, lastSelectedQuestion, selectedQuestion)
+			selectedQuestion = inventoryService.selectQuestion(q_data, $scope.inventory, inventoryService.visitedNodes)
 
 		if selectedQuestion
-			# Update last selected question
-			$scope.lastSelectedQuestion[q_data.id] = selectedQuestion
-
-			# Mark the selected question as shown
-			if q_data.id of $scope.shownQuestions
-				if $scope.shownQuestions[q_data.id].indexOf(selectedQuestion) is -1 then $scope.shownQuestions[q_data.id].push selectedQuestion
-			else $scope.shownQuestions[q_data.id] = [selectedQuestion]
-
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 			try
@@ -342,7 +325,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			else
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
 
-		$scope.visitedNodes[q_data.id] = ($scope.visitedNodes[q_data.id] || 0) + 1
+		inventoryService.addNodeToVisited(q_data)
 
 	$scope.dismissUpdates = () ->
 		$scope.inventoryUpdate = false
