@@ -113,8 +113,9 @@ angular.module('Adventure', ['ngSanitize'])
 				rowQuestion = response.data[0]
 				if question.options.additionalQuestions
 					rowQuestion = inventoryService.selectQuestion question, _currentInventory, inventoryService.visitedNodes
+					rowQuestion = rowQuestion.text
 				row =
-					text: rowQuestion.text
+					text: rowQuestion
 					# text:  _manageConditionalQuestion question, response.data[0] # needs to work with conditional questions
 					score: response.data[1]
 					type: if response.blank_node then 'blank' else 'end'
@@ -127,8 +128,9 @@ angular.module('Adventure', ['ngSanitize'])
 				rowQuestion = response.data[0]
 				if question.options.additionalQuestions and question.options.additionalQuestions.length > 0
 					rowQuestion = inventoryService.selectQuestion question, _currentInventory, inventoryService.visitedNodes
+					rowQuestion = rowQuestion.text
 				row =
-					question: rowQuestion.text
+					question: rowQuestion
 					# question: _manageConditionalQuestion question, response.data[0]
 					answer: response.data[1]
 					type: question.options.type
