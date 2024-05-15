@@ -380,7 +380,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		# answers[index] will be inaccurate if answers are randomized !!!
 		requiredItems = getAnswerByIndex(index).requiredItems || []
 
-		$scope.missingRequiredItems = inventoryService.checkInventory(requiredItems)
+		$scope.missingRequiredItems = inventoryService.checkInventory($scope.inventory, requiredItems)
 
 		if $scope.missingRequiredItems[0]
 			$scope.missingRequiredItemsAltText = $scope.missingRequiredItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
@@ -440,10 +440,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 				if ($scope.q_data.answers[i].options.partialMatches and response.includes(match)) or match is response
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
-					missingItems = inventoryService.checkInventory(requiredItems)
+					missingItems = inventoryService.checkInventory($scope.inventory, requiredItems)
 
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
-					$scope.missingRequiredItems = inventoryService.checkInventory(requiredItems)
+					$scope.missingRequiredItems = inventoryService.checkInventory($scope.inventory, requiredItems)
 
 					if $scope.missingRequiredItems[0]
 						$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
@@ -798,7 +798,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 						$attrs.$set "style", style
 ]
 
-.directive "labelManager", ['$timeout', ($timeout) ->
+.directive "labelManager", ['$timeout', 'inventoryService', ($timeout, inventoryService) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -812,7 +812,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			if answer.text then $scope.hotspotLabelTarget.text = answer.text
 			else return false
 
-			$scope.hotspotLabelTarget.ariaLabel = answer.text + (if inventoryService.checkInventory(answer.requiredItems).length > 0 then ' Cannot select. ' else ' ')
+			$scope.hotspotLabelTarget.ariaLabel = answer.text + (if inventoryService.checkInventory($scope.inventory, answer.requiredItems).length > 0 then ' Cannot select. ' else ' ')
 			requiredItemString = answer.requiredItems.map((item) -> $scope.itemSelection[$scope.getItemIndex(item.id)].name + ' (amount: ' + item.range + ')').join(', ')
 			$scope.hotspotLabelTarget.ariaLabel += (if (answer.requiredItems && answer.requiredItems.length > 0) then ('Required Items: ' + requiredItemString) else '')
 
