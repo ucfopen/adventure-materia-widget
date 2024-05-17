@@ -1,7 +1,7 @@
 angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 ## CONTROLLER ##
-.controller 'AdventureController', ['$scope','$rootScope','legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, legacyQsetSrv, $sanitize, $sce, $timeout) ->
+.controller 'AdventureController', ['$scope','$rootScope', 'inventoryService', 'legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, inventoryService, legacyQsetSrv, $sanitize, $sce, $timeout) ->
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -90,8 +90,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.setLightboxZoom = (val) ->
 		$scope.lightboxZoom = val
 
-	$scope.visitedNodes = {}
-
 	# Object containing properties for the hotspot label that appears on mouseover
 	$scope.hotspotLabelTarget =
 		text: null
@@ -135,15 +133,16 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 							count: q_i.count || 1
 							takeAll: q_i.takeAll || false
 							firstVisitOnly: q_i.firstVisitOnly || false
-							time: Date.now()
+							recency: inventoryService.recencyCounter
 						$scope.questionItems.push item
+						inventoryService.recencyCounter++
 
 			for q_i in $scope.questionItems
 				do (q_i) ->
 					hasItem = false
 
 					# Check if item is first visit only and player has visited this node before
-					if ($scope.visitedNodes[q_data.id] and q_i.firstVisitOnly)
+					if (inventoryService.getNodeVisitedCount(q_data) > 0 and q_i.firstVisitOnly)
 						# Move to next item
 					else
 						# Inventory update
@@ -200,63 +199,26 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		# Get question based on inventory and number of visits
 		presanitized = ""
-		mostItems = 0
-		mostRecentItem = 0
+
 		# Load default question
-		selected_question = q_data.questions[0]
+		selectedQuestion = q_data.questions[0]
+
 		# If conditional question matches, use it instead
 		if q_data.options.additionalQuestions
-			for q in q_data.options.additionalQuestions
-				if q.requiredVisits != undefined
-					if $scope.visitedNodes[q_data.id] < q.requiredVisits || (q.requiredVisits > 0 && $scope.visitedNodes[q_data.id] == undefined)
-						# If the player hasn't visited this node enough times, skip this question
-						continue
-				if q.requiredItems && q.requiredItems[0]
-					missingItems = $scope.checkInventory(q.requiredItems)
-					if (missingItems.length > 0)
-						# If the player doesn't have the required items, skip this question
-						continue
-					else
-						keep = false
-						recentItem = $scope.getMostRecentItem($scope.inventory, q.requiredItems)
-						if (recentItem >= mostRecentItem)
-							# Choose the question with the most recent item
-							mostRecentItem = recentItem
-							keep = true
-						if (mostItems < q.requiredItems.length)
-							# Choose the question with the most required items
-							mostItems = q.requiredItems.length
-							keep = true
-						if (!keep)
-							continue
-				else if mostRecentItem > 0 || mostItems > 0
-					# If we've already chosen a more selective question, skip this one
-					continue
-				selected_question = q
+			selectedQuestion = inventoryService.selectQuestion(q_data, $scope.inventory, inventoryService.visitedNodes)
 
+		if selectedQuestion
 			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
 			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
 			try
 				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
-				presanitized = selected_question.text
+				presanitized = selectedQuestion.text
 				for k, v of PRESANITIZE_CHARACTERS
 					presanitized = presanitized.replace k, v
 				$sanitize presanitized
 
 			catch error
-				selected_question.text = "*Question text removed due to malformed or dangerous HTML content*"
-		else
-			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
-			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
-			try
-				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
-				presanitized = selected_question.text
-				for k, v of PRESANITIZE_CHARACTERS
-					presanitized = presanitized.replace k, v
-				$sanitize presanitized
-
-			catch error
-				selected_question.text = "*Question text removed due to malformed or dangerous HTML content*"
+				selectedQuestion.text = "*Question text removed due to malformed or dangerous HTML content*"
 
 		unless q_data.options.asset then $scope.layout = "text-only"
 		else if presanitized != "" then $scope.layout = q_data.options.asset.align
@@ -320,19 +282,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 								uncappedMax: uncappedMax
 
 							# Format range for pre-existing items without the range property
-							if item.range is ""
-								if item.uncappedMax and item.minCount is 0
-									item.range = "any amount"
-								else if item.minCount is 0 and item.maxCount is 0
-									item.range = "none"
-								else if item.uncappedMax
-									item.range = "at least #{item.minCount}"
-								else if item.minCount is 0
-									item.range = "no more than #{item.maxCount}"
-								else if item.minCount is item.maxCount
-									item.range = "#{item.minCount}"
-								else
-									item.range = "#{item.minCount} to #{item.maxCount}"
+							_assignRange item
 
 							requiredItems.push item
 
@@ -376,16 +326,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			else
 				handleEmptyNode() # Should hopefully only happen on preview, when empty nodes are allowed
 
-		$scope.visitedNodes[q_data.id] = ($scope.visitedNodes[q_data.id] || 0) + 1
-
-	$scope.getMostRecentItem = (inventory, requiredItems) ->
-		mostRecentItem = 0
-		for i in inventory
-			for r in requiredItems
-				if i.id is r.id
-					if i.time > mostRecentItem
-						mostRecentItem = i.time
-		mostRecentItem
+		inventoryService.addNodeToVisited(q_data)
 
 	$scope.dismissUpdates = () ->
 		$scope.inventoryUpdate = false
@@ -428,30 +369,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				return true
 		return false
 
-	# Checks to see if player inventory contains all required items
-	# Returns array of missing items
-	$scope.checkInventory = (requiredItems) ->
-		missingItems = []
-		if (! requiredItems)
-			return []
-		angular.forEach requiredItems, (item) ->
-			hasItemInInventory = false
-			hasRequiredItem = $scope.inventory.some (playerItem) ->
-				if playerItem.id is item.id
-					hasItemInInventory = true
-					# Check if player has more than the min
-					if playerItem.count >= item.minCount
-						# Check if player has less than the max
-						if playerItem.count <= item.maxCount or item.uncappedMax
-							return true
-					return false
-			# Check if player doesn't have item but there is no minimum
-			if ! hasItemInInventory and item.minCount is 0
-				hasRequiredItem = true
-			if ! hasRequiredItem
-				missingItems.push item
-		return missingItems
-
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
 	$scope.handleAnswerSelection = (link, index) ->
 		# link to -1 indicates the widget should advance to the score screen
@@ -463,10 +380,12 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		# answers[index] will be inaccurate if answers are randomized !!!
 		requiredItems = getAnswerByIndex(index).requiredItems || []
 
-		$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
+		$scope.missingRequiredItems = inventoryService.checkInventory($scope.inventory, requiredItems)
 
 		if $scope.missingRequiredItems[0]
 			$scope.missingRequiredItemsAltText = $scope.missingRequiredItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+			# Add range value to required items
+			$scope.missingRequiredItems.map((item) -> _assignRange item)
 			$scope.next = null
 			return
 
@@ -521,13 +440,15 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 				if ($scope.q_data.answers[i].options.partialMatches and response.includes(match)) or match is response
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
-					missingItems = $scope.checkInventory(requiredItems)
+					missingItems = inventoryService.checkInventory($scope.inventory, requiredItems)
 
 					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
-					$scope.missingRequiredItems = $scope.checkInventory(requiredItems)
+					$scope.missingRequiredItems = inventoryService.checkInventory($scope.inventory, requiredItems)
 
 					if $scope.missingRequiredItems[0]
 						$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+						# Add range value to required items
+						$scope.missingRequiredItems.map((item) -> _assignRange item)
 						$scope.next = null
 						return
 
@@ -662,6 +583,20 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		for n in [0...$scope.qset.items.length]
 			if $scope.qset.items[n].options.items and $scope.qset.items[n].options.items[0] then return true
 		false
+
+	_assignRange = (item) ->
+		if item.uncappedMax and item.minCount is 0
+			item.range = "any amount"
+		else if item.minCount is 0 and item.maxCount is 0
+			item.range = "none"
+		else if item.uncappedMax
+			item.range = "at least #{item.minCount}"
+		else if item.minCount is 0
+			item.range = "no more than #{item.maxCount}"
+		else if item.minCount is item.maxCount
+			item.range = "#{item.minCount}"
+		else
+			item.range = "#{item.minCount} to #{item.maxCount}"
 
 	# Small script that inserts " target="_blank"  " into a hrefs, preventing hyperlinks from displaying within the iframe.
 	addTargetToHrefs = (string) ->
@@ -863,7 +798,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 						$attrs.$set "style", style
 ]
 
-.directive "labelManager", ['$timeout', ($timeout) ->
+.directive "labelManager", ['$timeout', 'inventoryService', ($timeout, inventoryService) ->
 	restrict: "A",
 	link: ($scope, $element, $attrs) ->
 
@@ -877,7 +812,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			if answer.text then $scope.hotspotLabelTarget.text = answer.text
 			else return false
 
-			$scope.hotspotLabelTarget.ariaLabel = answer.text + (if $scope.checkInventory(answer.requiredItems).length > 0 then ' Cannot select. ' else ' ')
+			$scope.hotspotLabelTarget.ariaLabel = answer.text + (if inventoryService.checkInventory($scope.inventory, answer.requiredItems).length > 0 then ' Cannot select. ' else ' ')
 			requiredItemString = answer.requiredItems.map((item) -> $scope.itemSelection[$scope.getItemIndex(item.id)].name + ' (amount: ' + item.range + ')').join(', ')
 			$scope.hotspotLabelTarget.ariaLabel += (if (answer.requiredItems && answer.requiredItems.length > 0) then ('Required Items: ' + requiredItemString) else '')
 

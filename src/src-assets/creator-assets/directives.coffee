@@ -2213,6 +2213,9 @@ angular.module "Adventure"
 			# Add new answer to questions array
 			$scope.editedNode.questions.push newQuestion
 
+			# Inform the auto-scroll-and-focus directive that a new question is added
+			$rootScope.$broadcast "editedNode.questions.added"
+
 		$scope.removeQuestion = (index) ->
 			# Remove question from questions array
 			$scope.editedNode.questions.splice(index, 1)
@@ -3263,12 +3266,18 @@ angular.module "Adventure"
 						# children()[1] references the answer text input box
 						row.children()[1].focus()
 				), 100
+]
+
+.directive "autoScrollAndSelectQuestion", ['$timeout', ($timeout) ->
+	restrict: "A",
+	link: ($scope,$element, $attrs) ->
 
 		# Listen for when a new question is added
 		$scope.$on "editedNode.questions.added", (evt) ->
 			$timeout (() ->
 				# Auto-scroll to the bottom
 				$element[0].scrollTop = $element[0].scrollHeight
+
 
 				# Find the answer input box and focus it
 				list = angular.element($element.children()[0]).children()

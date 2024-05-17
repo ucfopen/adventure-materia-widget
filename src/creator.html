@@ -698,7 +698,7 @@
 														<label for="partialMatches-{{$index}}">Select if response contains a possible answer (the response <b>cat in the hat</b> will match <b>cat</b>.)</label>
 													</li>
 												</ul>
-												
+
 											</div>
 											<input type="text"
 												ng-model="answer.feedback"
@@ -1356,15 +1356,16 @@
 					<h2 ng-if="displayNodeCreation == HOTSPOT">Conditional Question</h2>
 					<h2 ng-if="displayNodeCreation == NARR">Conditional Narrative Text</h2>
 					<h2 ng-if="displayNodeCreation == END">Conditional End Text</h2>
-					<section ng-class="{'hidden': inventoryItems.length > 0}">
-						<p>Choose to display different question text based on the number of times the player has visited this destination.</p>
-					</section>
-					<section ng-class="{'hidden': inventoryItems.length == 0}">
-						<p>Choose to display different question text based on the player's number of <span class="highlight">visits</span> to this destination and/or what <span class="highlight">items</span> they have in their inventory.</p>
-						<p>Note that if more than one contextual question's requirements are met, the question with <span class="highlight">the most required items and visits</span> will be selected.</p>
-					</section>
+					<div class="question-instructions">
+						<p ng-class="{'hidden': inventoryItems.length > 0}">Choose to display different narratives based on the number of times the player has visited this destination.</p>
+						<p ng-class="{'hidden': inventoryItems.length == 0}">Choose to display different narratives based on the player's number of <strong>visits</strong> to this destination and/or what <strong>items</strong> they have in their inventory.</p>
+						<p id="question-instructions-subtext">
+							<span><strong>How the widget chooses which one to display:</strong></span> If a player meets the requirements for more than one question, then it will choose the one that has not been shown yet. And if there is more than one question that hasn't been shown yet, it will choose the one with the most required items and visits.
+						</p>
+						<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
+					</div>
 					<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
-					<ul>
+					<ul auto-scroll-and-select-question>
 						<li ng-repeat="question in editedNode.questions" ng-if="$index > 0">
 							<button type="button"
 								class="delete-button icon-cross"
