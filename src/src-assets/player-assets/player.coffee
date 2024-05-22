@@ -411,6 +411,12 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		response = originalResponse = $scope.response
 		$scope.response = ""
 
+		console.log $scope.response
+		console.log originalResponse
+
+		matches = []
+		selectedMatch = null
+
 		# Outer loop - loop through every answer set (index 0 is always [All Other Answers] )
 		for i in [0...$scope.q_data.answers.length]
 
@@ -438,32 +444,39 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					match = match.toLowerCase()
 					response = response.toLowerCase()
 
-				if ($scope.q_data.answers[i].options.partialMatches and response.includes(match)) or match is response
-					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
-					missingItems = inventoryService.checkInventory($scope.inventory, requiredItems)
+				if ($scope.q_data.answers[i].options.partialMatches and response.includes(match)) or match is response then matches.push { text: match, index: i, requiresExact: !$scope.q_data.answers[i].options.partialMatches }
 
-					requiredItems = $scope.q_data.answers[i].options.requiredItems || $scope.q_data.answers[i].requiredItems
-					$scope.missingRequiredItems = inventoryService.checkInventory($scope.inventory, requiredItems)
+		# determine the selected match via most significant match criteria (if multiple matches were identified)
+		if matches.length > 1 then selectedMatch = _mostSignificantMatch response, matches
+		else if matches.length is 1 then selectedMatch = matches[0]
 
-					if $scope.missingRequiredItems[0]
-						$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
-						# Add range value to required items
-						$scope.missingRequiredItems.map((item) -> _assignRange item)
-						$scope.next = null
-						return
+		if selectedMatch
+			matchIndex = selectedMatch.index
+			requiredItems = $scope.q_data.answers[matchIndex].options.requiredItems || $scope.q_data.answers[matchIndex].requiredItems
+			missingItems = inventoryService.checkInventory($scope.inventory, requiredItems)
 
-					link = ~~$scope.q_data.answers[i].options.link # is parsing required?
+			requiredItems = $scope.q_data.answers[matchIndex].options.requiredItems || $scope.q_data.answers[matchIndex].requiredItems
+			$scope.missingRequiredItems = inventoryService.checkInventory($scope.inventory, requiredItems)
 
-					$scope.selectedAnswer = $scope.q_data.answers[i].options.matches[j]
-					_logProgress()
+			if $scope.missingRequiredItems[0]
+				$scope.missingRequiredItemsAltText = missingItems.map((item) -> "#{$scope.itemSelection[$scope.getItemIndex(item.id)].name} (amount: #{requiredItems.find((el) -> el.id is item.id).range});")
+				# Add range value to required items
+				$scope.missingRequiredItems.map((item) -> _assignRange item)
+				$scope.next = null
+				return
 
-					if $scope.q_data.answers[i].options and $scope.q_data.answers[i].options.feedback
-						$scope.feedback = $scope.q_data.answers[i].options.feedback
-						$scope.next = link
-					else
-						manageQuestionScreen link
+			link = ~~$scope.q_data.answers[matchIndex].options.link # is parsing required?
 
-					return true
+			$scope.selectedAnswer = originalResponse
+			_logProgress()
+
+			if $scope.q_data.answers[matchIndex].options and $scope.q_data.answers[matchIndex].options.feedback
+				$scope.feedback = $scope.q_data.answers[matchIndex].options.feedback
+				$scope.next = link
+			else
+				manageQuestionScreen link
+
+			return true
 
 		# Fallback in case the user response doesn't match anything. Have to match the link associated with [All Other Answers]
 		for answer in $scope.q_data.answers
@@ -554,6 +567,17 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	# 	itemArray = item.name for item in $scope.question.requiredItems
 	# 	$scope.question.text = "[Destination requires item(s): [#{itemArray.toString(', ')}]]"
 	# 	$scope.link = $scope.question.options.parentId
+
+	_mostSignificantMatch = (response, matches) ->
+		mostSignificantMatch = { text: '' }
+		for option in matches
+			# exact match against an answer that requires exact matches takes top priority
+			if option.requiresExact then return mostSignificantMatch = option
+			# exact match against an answer that allows partial matches
+			else if option.text == response then return mostSignificantMatch = option
+			# fuzzy match of highest complexity (longest string length)
+			else if option.text.length > mostSignificantMatch.text.length then mostSignificantMatch = option
+		return mostSignificantMatch
 
 	# Submit the user's response to the logs
 	_logProgress = (answerId = undefined) ->
