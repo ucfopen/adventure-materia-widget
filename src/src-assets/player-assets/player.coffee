@@ -411,9 +411,6 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		response = originalResponse = $scope.response
 		$scope.response = ""
 
-		console.log $scope.response
-		console.log originalResponse
-
 		matches = []
 		selectedMatch = null
 
