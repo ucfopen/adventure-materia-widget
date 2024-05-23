@@ -369,6 +369,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				return true
 		return false
 
+	$scope.checkInventory = (items) ->
+		return inventoryService.checkInventory $scope.inventory, items
+
 	# Handles selection of MC answer choices and transitional buttons (narrative and end screen)
 	$scope.handleAnswerSelection = (link, index) ->
 		# link to -1 indicates the widget should advance to the score screen
