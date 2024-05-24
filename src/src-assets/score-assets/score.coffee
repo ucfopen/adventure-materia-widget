@@ -33,7 +33,7 @@ angular.module('Adventure', ['ngSanitize'])
 		if !question.options.items then return items
 
 		for item in question.options.items
-			if item.firstVisitOnly and inventoryService.getNodeVisitedCount() > 0 then continue
+			if item.firstVisitOnly and inventoryService.getNodeVisitedCount(question) > 0 then continue
 
 			# positive delta? Add the item to the inventory, or increase the count if it's in there already
 			if item.count > 0

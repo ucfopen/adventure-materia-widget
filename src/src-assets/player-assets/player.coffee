@@ -108,6 +108,51 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		if questionId is 0
 			q_data = $scope.qset.items[0]
 
+		# ****************************** condition question selection, question parsing and sanitizing ****************************
+
+		# Get question based on inventory and number of visits
+		presanitized = ""
+
+		# Load default question
+		selectedQuestion = q_data.questions[0]
+
+		# If conditional question matches, use it instead
+		if q_data.options.additionalQuestions
+			selectedQuestion = inventoryService.selectQuestion(q_data, $scope.inventory, inventoryService.visitedNodes)
+
+		if selectedQuestion
+			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
+			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
+			try
+				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
+				presanitized = selectedQuestion.text
+				for k, v of PRESANITIZE_CHARACTERS
+					presanitized = presanitized.replace k, v
+				$sanitize presanitized
+
+			catch error
+				selectedQuestion.text = "*Question text removed due to malformed or dangerous HTML content*"
+
+		unless q_data.options.asset then $scope.layout = "text-only"
+		else if presanitized != "" then $scope.layout = q_data.options.asset.align
+		else $scope.layout = "image-only"
+
+		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
+		if presanitized.length then parsedQuestion = micromarkdown.parse(presanitized) else parsedQuestion = "No question text provided."
+
+		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
+		parsedQuestion = addTargetToHrefs parsedQuestion
+
+		$scope.question =
+			text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
+			layout: $scope.layout,
+			type : q_data.options.type,
+			id : q_data.options.id
+			materiaId: q_data.id
+			options: q_data.options
+
+		# ******************************************* inventory item management **************************************
+
 		# Remove new item alerts
 		for i in $scope.inventory
 			i.new = false
@@ -197,47 +242,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 				$scope.inventoryUpdateMessage = "Updates to inventory: " + addedItemsMessage + removedItemsMessage
 
-		# Get question based on inventory and number of visits
-		presanitized = ""
-
-		# Load default question
-		selectedQuestion = q_data.questions[0]
-
-		# If conditional question matches, use it instead
-		if q_data.options.additionalQuestions
-			selectedQuestion = inventoryService.selectQuestion(q_data, $scope.inventory, inventoryService.visitedNodes)
-
-		if selectedQuestion
-			# If the question text contains a string that doesn't pass angular's $sanitize check, it'll fail to display anything
-			# Instead, parse in advance, catch the error, and warn the user that the text was nasty
-			try
-				# Run question text thru pre-sanitize routine because $sanitize is fickle about certain characters like >, <
-				presanitized = selectedQuestion.text
-				for k, v of PRESANITIZE_CHARACTERS
-					presanitized = presanitized.replace k, v
-				$sanitize presanitized
-
-			catch error
-				selectedQuestion.text = "*Question text removed due to malformed or dangerous HTML content*"
-
-		unless q_data.options.asset then $scope.layout = "text-only"
-		else if presanitized != "" then $scope.layout = q_data.options.asset.align
-		else $scope.layout = "image-only"
-
-
-		# Note: Micromarkdown is still adding a mystery newline or carriage return character to the beginning of most parsed strings (but not generated tags??)
-		if presanitized.length then parsedQuestion = micromarkdown.parse(presanitized) else parsedQuestion = "No question text provided."
-
-		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
-		parsedQuestion = addTargetToHrefs parsedQuestion
-
-		$scope.question =
-			text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
-			layout: $scope.layout,
-			type : q_data.options.type,
-			id : q_data.options.id
-			materiaId: q_data.id
-			options: q_data.options
+		# *************************************** answer generation ******************************************
 
 		$scope.answers = []
 
@@ -305,6 +310,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		$scope.q_data = q_data
 
+		# ************************************ layout formatting ********************************
+
 		# TODO Add back in with Layout support
 		# check if question has an associated asset (for now, just an image)
 		# if $scope.question.type is $scope.HOTSPOT then $scope.question.layout = LAYOUT_VERT_TEXT
@@ -315,6 +322,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				$scope.question.image = image_url
 			else
 				$scope.question.video = $sce.trustAsResourceUrl($scope.question.options.asset.url)
+
+		# ************************************ node type specific follow-ups ****************************
 
 		switch q_data.options.type
 			when $scope.OVER then _end() # Creator doesn't pass a value like this back yet / technically this shouldn't be called - the end call is made is _handleAnswerSelection
