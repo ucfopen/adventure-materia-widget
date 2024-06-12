@@ -111,14 +111,16 @@ angular.module('Adventure', ['ngSanitize'])
 			if response.type == 'SCORE_FINAL_FROM_CLIENT'
 				question = _getQuestionByNodeId qset, response.node_id
 				rowQuestion = response.data[0]
-				if question.options.additionalQuestions
+
+				if question.options.additionalQuestions and question.options.additionalQuestions.length > 0
 					rowQuestion = inventoryService.selectQuestion question, _currentInventory, inventoryService.visitedNodes
 					rowQuestion = rowQuestion.text
+
 				row =
 					text: rowQuestion
-					# text:  _manageConditionalQuestion question, response.data[0] # needs to work with conditional questions
 					score: response.data[1]
 					type: if response.blank_node then 'blank' else 'end'
+
 				table.push row
 
 				$scope.showOlderQsetWarning = response.older_qset
@@ -126,12 +128,13 @@ angular.module('Adventure', ['ngSanitize'])
 				question = _getQuestion qset, response.id
 				items = if question.options.items then question.options.items else []
 				rowQuestion = response.data[0]
+
 				if question.options.additionalQuestions and question.options.additionalQuestions.length > 0
 					rowQuestion = inventoryService.selectQuestion question, _currentInventory, inventoryService.visitedNodes
 					rowQuestion = rowQuestion.text
+
 				row =
 					question: rowQuestion
-					# question: _manageConditionalQuestion question, response.data[0]
 					answer: response.data[1]
 					type: question.options.type
 					feedback: response.feedback

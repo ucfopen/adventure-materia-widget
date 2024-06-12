@@ -1360,7 +1360,7 @@
 						<p ng-class="{'hidden': inventoryItems.length > 0}">Choose to display different narratives based on the number of times the player has visited this destination.</p>
 						<p ng-class="{'hidden': inventoryItems.length == 0}">Choose to display different narratives based on the player's number of <strong>visits</strong> to this destination and/or what <strong>items</strong> they have in their inventory.</p>
 						<p id="question-instructions-subtext">
-							<span><strong>How the widget chooses which one to display:</strong></span> If a player meets the requirements for more than one question, then it will choose the one that has not been shown yet. And if there is more than one question that hasn't been shown yet, it will choose the one with the most required items and visits.
+							<span><strong>How the widget chooses which option to display:</strong></span> If a player meets the requirements for more than one option, the option that has not yet been displayed will be chosen. If more than one option meeting the criteria hasn't been displayed yet, the option with the most required items and visits will be selected.
 						</p>
 						<p class="invalid-quantity-message">{{invalidRequiredVisits}}</p>
 					</div>
