@@ -436,6 +436,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			for j in [0...$scope.q_data.answers[i].options.matches.length]
 
 				match = $scope.q_data.answers[i].options.matches[j]
+				response = originalResponse
 
 				# Remove whitespace
 				match = match.trim().split('').filter((letter) -> letter.match(/\w/)).join()
