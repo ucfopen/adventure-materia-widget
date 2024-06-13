@@ -439,8 +439,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				response = originalResponse
 
 				# Remove whitespace
-				match = match.trim().split('').filter((letter) -> letter.match(/\w/)).join()
-				response = response.trim().split('').filter((letter) -> letter.match(/\w/)).join()
+				match = match.replace(/\s/g, '')
+				response = response.replace(/\s/g, '')
 
 				# If matches are not character sensitive
 				if (! $scope.q_data.answers[i].options.characterSensitive)
