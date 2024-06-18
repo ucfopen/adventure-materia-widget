@@ -117,6 +117,22 @@ angular.module "Adventure"
 			$scope.previewNodeMode = false
 			$scope.render treeSrv.get()
 
+		
+		# helper function to determine the closest pixel distance between one node and the set of all other nodes in the tree
+		# used with bridge nodes (in-between nodes) to determine whether the "add an in-between node" option is too close to another one
+		_getDistanceToClosestAdjacentNode = (nodes, target) ->
+			closestNode = null
+			closestDistance = Infinity
+
+			for node in nodes
+				if node != target
+					distance = Math.sqrt(Math.pow(node.x - target.x, 2) + Math.pow(node.y - target.y, 2))
+					if distance < closestDistance
+						closestNode = node
+						closestDistance = distance
+
+			closestDistance
+
 		$scope.render = (data) ->
 
 			unless data? then return false
@@ -242,6 +258,9 @@ angular.module "Adventure"
 
 				source = link.source
 				target = link.target
+
+				# don't create bridge nodes if either the source or target is blank
+				if source.type is "blank" or target.type is "blank" then return
 
 				# Disable bridge nodes on loopbacks
 				if link.specialCase is "loopBack" then return
@@ -390,7 +409,7 @@ angular.module "Adventure"
 					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
 					midX = midpoint.x
 					midY = midpoint.y
-
+					
 					# compute the position of the lock icon along the path
 					quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
 					links[index].lock.x = quarterpoint.x
@@ -399,9 +418,22 @@ angular.module "Adventure"
 					# Now find the associated bridge node using the bridgeNodeIndex flag on the given link
 					# And update its X,Y coordinates for the new midpoint location
 					nodeIndex = links[index].bridgeNodeIndex
+
 					nodes[nodeIndex].x = midX
 					nodes[nodeIndex].y = midY
 
+					# compute distance to the closest node
+					distance = _getDistanceToClosestAdjacentNode nodes, nodes[nodeIndex]
+
+					# if the distance is too close, nudge the bridge node along the link path
+					while distance < 36
+						midpointOffset = pathNode.getPointAtLength((pathNode.getTotalLength()/2) + distance * 2)
+
+						nodes[nodeIndex].x = midpointOffset.x
+						nodes[nodeIndex].y = midpointOffset.y
+						
+						# re-compute distance in case nudging the bridge node moved it too close to a different node
+						distance = _getDistanceToClosestAdjacentNode nodes, nodes[nodeIndex]
 
 				else if links[index].specialCase and links[index].specialCase is "loopBack"
 
@@ -531,9 +563,15 @@ angular.module "Adventure"
 					$scope.onHover {data: d}
 
 					#  Animation effects on node mouseover
-					d3.select(this).select("circle")
-					.transition()
-					.attr("r", 30)
+					# expansion radius dependent on node type (bridge or regular node)
+					if d.type is 'bridge'
+						d3.select(this).select("circle")
+						.transition()
+						.attr("r", 16)
+					else
+						d3.select(this).select("circle")
+						.transition()
+						.attr("r", 30)
 				)
 				.on("mouseout", (d, i) ->
 
@@ -541,10 +579,15 @@ angular.module "Adventure"
 
 					$scope.onHoverOut {data: d}
 
-					# Animation effects on node mouseout
-					d3.select(this).select("circle")
-					.transition()
-					.attr("r", 20)
+					#  Animation effects on node mouseover
+					if d.type is 'bridge'
+						d3.select(this).select("circle")
+						.transition()
+						.attr("r", 3)
+					else
+						d3.select(this).select("circle")
+						.transition()
+						.attr("r", 20)
 				)
 				.on("click", (d, i) ->
 					$scope.nodeClick {data: d} # when clicked, we return all of the node's data
@@ -585,9 +628,13 @@ angular.module "Adventure"
 			nodeGroup.append("svg:circle")
 				.attr("class", "node-dot")
 				.attr("r", (d) ->
-					return 20 # sets size of node bubbles
+					# sets initial node radius. normal nodes are 20px; bridge nodes are 3
+					if d.type is 'bridge' then return 3
+					else return 20
 				)
-				.attr("filter", "url(#dropshadow)")
+				.attr("filter", (d) ->
+					if d.type isnt 'bridge' then return "url(#dropshadow)"
+				)
 
 			# Icons displayed inside the node circles
 			nodeGroup.append("svg:image")
@@ -728,7 +775,7 @@ angular.module "Adventure"
 
 			# The "+" symbol displayed on bridge nodes (the pseudo-nodes between nodes you can click to add an in-between node)
 			nodeGroup.append("path")
-				.attr("d", "M -3,12 L -3,3 L -12,3 L -12,-3 L -3,-3 L -3,-12 L 3,-12 L 3,-3 L 12,-3 L 12,3 L 3,3 L 3,12 Z")
+				.attr("d", "M -0.5,3 L -0.5,0.5 L -3,0.5 L -3,-0.5 L -0.5,-0.5 L -0.5,-3 L 0.5,-3 L 0.5,-0.5 L 3,-0.5 L 3,0.5 L 0.5,0.5 L 0.5,3 Z")
 				.attr("visibility", (d) ->
 					if d.type isnt "bridge" then return "hidden"
 				)

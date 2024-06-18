@@ -510,29 +510,26 @@ g.node {
 
 g.bridge {
 
-	opacity: 0;
-
 	cursor: pointer;
 
 	-webkit-transition: opacity 0.5s;
 	transition: opacity 0.5s;
 
-	circle {
-
-		// -webkit-transition: opacity 0.5s;
-		// transition: opacity 0.5s;
+	circle.node-dot {
+		fill: $gray;
 	}
 
 	path {
-		// opacity: 0;
+		opacity: 0;
 		fill: $white;
+
+		transition: opacity 0.5s;
 	}
 
 	&:hover {
-		// circle {
-		// 	opacity: 0.8;
-		// }
-		opacity: 0.8;
+		path {
+			opacity: 1;
+		}
 	}
 }
 
