@@ -409,15 +409,21 @@ angular.module "Adventure"
 					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
 					midX = midpoint.x
 					midY = midpoint.y
+
+					if links[index].lock
+						# compute the position of the lock icon along the path
+						quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
+						links[index].lock.x = quarterpoint.x
+						links[index].lock.y = quarterpoint.y
 					
-					# compute the position of the lock icon along the path
-					quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
-					links[index].lock.x = quarterpoint.x
-					links[index].lock.y = quarterpoint.y
+					# don't perform any midpoint computations if the bridgeNodeIndex isn't present in the link: links with a blank source or target no longer include them
+					unless links[index].bridgeNodeIndex then return
 
 					# Now find the associated bridge node using the bridgeNodeIndex flag on the given link
 					# And update its X,Y coordinates for the new midpoint location
 					nodeIndex = links[index].bridgeNodeIndex
+
+					console.log links[index]
 
 					nodes[nodeIndex].x = midX
 					nodes[nodeIndex].y = midY
