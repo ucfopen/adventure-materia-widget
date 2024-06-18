@@ -423,8 +423,6 @@ angular.module "Adventure"
 					# And update its X,Y coordinates for the new midpoint location
 					nodeIndex = links[index].bridgeNodeIndex
 
-					console.log links[index]
-
 					nodes[nodeIndex].x = midX
 					nodes[nodeIndex].y = midY
 

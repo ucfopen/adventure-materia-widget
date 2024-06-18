@@ -3237,9 +3237,12 @@ node-creation-selection-dialog {
 		}
 
 		button {
+			color: $white;
+			background: $color-accent;
+
 			&.managed {
 				color: $white;
-				background: $color-accent;
+				background: $color-accent-highlight;
 			}
 		}
 	}
