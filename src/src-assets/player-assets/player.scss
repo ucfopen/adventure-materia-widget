@@ -530,10 +530,10 @@ h1 {
 			display: flex;
 			align-items: center;
 			flex-direction: row;
-			flex-wrap: wrap;
+			flex-wrap: nowrap;
 			width: 100%;
 			margin-bottom:10px;
-			// padding-left: 20px;
+			padding-right: 0.5em;
 
 			color:#000000;
 
@@ -571,6 +571,7 @@ h1 {
 			&.nonselectable {
 				cursor: default;
 				font-style: italic;
+				color: $gray;
 
 				.missing-item {
 					color: $red-lighter;
@@ -578,8 +579,6 @@ h1 {
 			}
 
 			.answer-text {
-				max-width: calc(100% - 34px);
-
 				&.no-text-provided {
 					font-style: italic;
 					color: #696969;
@@ -587,31 +586,30 @@ h1 {
 			}
 
 			.answer-required-items {
+				min-width: 120px;
 				font-size: 0.8em;
 				margin-left: auto;
+				padding-left: 0.5em;
 
 				&:before {
-					margin-left: 10px;
-					padding: 5px;
-					content: "Requires items: ";
+					padding: 0 0 0.25em 0;
+					content: "Requires items:";
 					font-size: 0.8em;
-					font-style: italic;
+					font-style: normal;
+					color: $gray;
 				}
 
 				.required-item {
 					display: flex;
 					align-items: center;
 					flex-direction: row;
-					min-width: 75px;
-					max-width: 200px;
+					flex-wrap: wrap;
+					width: 180px;
 
-					margin: 5px 5px 5px 0;
-					padding: 5px;
-
-					background: $color-primary;
-					border: solid 1px $gray-lighter;
-					// background: $gray-lightest;
-					border-radius: 3px;
+					font-style: normal;
+					font-size: 0.9em;
+					line-height: 1.5em;
+					padding: 0.25em;
 
 					img {
 						width: 24px;
@@ -766,6 +764,21 @@ h1 {
 			align-items: stretch;
 			height: 100%;
 			overflow: auto;
+
+			.no-items-yet {
+				width: 90%;
+				margin: 1em 5%;
+
+				h3 {
+					text-align: center;
+					color: $gray-darker;
+				}
+
+				p {
+					text-align: center;
+					color: $gray;
+				}
+			}
 
 			.inventory-items {
 				display: flex;

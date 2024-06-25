@@ -72,6 +72,10 @@
 			<div class="inventory-container">
 				<h2 class="inventory-header">Inventory Items</h2>
 				<div class="inventory-content">
+					<div class="no-items-yet" ng-if="inventory.length == 0">
+						<h3>You don't have any items yet.</h3>
+						<p>Once you receive an item, it'll appear here.</p>
+					</div>
 					<div class="inventory-items">
 						<div class="item" aria-label="{{itemSelection[getItemIndex(item.id)].name}}, Quantity:  {{item.count}}, Description: {{itemSelection[getItemIndex(selectedItem.id)].description ? itemSelection[getItemIndex(selectedItem.id)].description : (itemSelection[getItemIndex(selectedItem.id)].icon.alt ? itemSelection[getItemIndex(selectedItem.id)].icon.alt : 'No description')}}" ng-class="{'selected' : item.id == selectedItem.id}" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)" ng-if="item.count > 0 && !itemSelection[getItemIndex(item.id)].isSilent">
 							<span ng-if="item.new" class="new-item">NEW!</span>
@@ -120,7 +124,6 @@
 				aria-label="Welcome to Adventure. Now playing: {{title}}"
 				aria-describedby="tutorial-content"
 				tutorial-focus-manager>
-		
 		</div>
 		<div class="feedback"
 			ng-class="{ show: feedback }"
@@ -217,8 +220,8 @@
 					data-link="{{answer.link}}"
 					tabindex="0">
 					<span class="answer-text" ng-class="{ 'no-text-provided' : !answer.text.length }" aria-label="{{answer.text}}, {{checkInventory(answer.requiredItems).length > 0 ? 'Cannot select.' : ''}}">{{ answer.text.length > 0 ? answer.text : 'No answer text provided' }}</span>
-					<div class="answer-required-items" ng-if="answer.requiredItems.length && hasNotSilentItem(answer.requiredItems)">
-						<span class="required-item" ng-repeat="item in answer.requiredItems" ng-show="!itemSelection[getItemIndex(item.id)].isSilent" ng-class="{'missing-item': checkInventory(answer.requiredItems).includes(item.id)}">
+					<div class="answer-required-items" ng-if="answer.requiredItems.length && hasNotSilentItem(answer.requiredItems) && !answer.hideRequiredItems">
+						<span class="required-item" ng-repeat="item in answer.requiredItems" ng-show="!itemSelection[getItemIndex(item.id)].isSilent" ng-class="{'missing-item': checkInventory([item]).length > 0}">
 							<img ng-if="itemSelection[getItemIndex(item.id)].icon.url" ng-src="{{itemSelection[getItemIndex(item.id)].icon.url}}"/>
 							{{itemSelection[getItemIndex(item.id)].name}} <span class="item-quantity">({{item.range}})</span>
 						</span>

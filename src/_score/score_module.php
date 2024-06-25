@@ -29,16 +29,33 @@ class Score_Modules_Adventure extends Score_Module
 					continue;
 				}
 
-				# make sure we have the right qset item that matches the provided log, return associated finalScore
-				if (trim($log->text) == trim($item['questions'][0]['text']))
+				# newer qsets (post- custom score screen will provide the node id as the log's item id)
+				# in older qsets, item id will always be 0 for FINAL_SCORE_FROM_CLIENT log types
+				if ($log->item_id)
 				{
-					if (isset($this->inst->qset->data['options']['scoreMode']) && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
+					if ($log->item_id == $item['options']['id'])
 					{
-						return 100;
+						if (isset($this->inst->qset->data['options']['scoreMode']) && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
+						{
+							return 100;
+						}
+						else
+						{
+							return $item['options']['finalScore'];
+						}
 					}
-					else
+				}
+				else {
+					if (trim($log->text) == trim($item['questions'][0]['text']))
 					{
-						return $item['options']['finalScore'];
+						if (isset($this->inst->qset->data['options']['scoreMode']) && $this->inst->qset->data['options']['scoreMode'] == 'Non-Scoring')
+						{
+							return 100;
+						}
+						else
+						{
+							return $item['options']['finalScore'];
+						}
 					}
 				}
 			}
@@ -78,22 +95,22 @@ class Score_Modules_Adventure extends Score_Module
 		$score = $this->check_answer($log);
 
 		return [
+			'id'            => $log->item_id,
 			'data' => [
 				$this->get_ss_question($log, $q),
-				$this->get_ss_answer($log, $q)
+				$this->get_ss_answer($log, $q),
+				$log->value
 			],
-			'data_style'    => ['question', 'response', 'answer'],
+			'data_style'    => ['question', 'response'],
 			'score'         => $score,
 			'feedback'      => $this->get_feedback($log, $q->answers),
 			'type'          => $log->type,
 			'style'         => $this->get_detail_style($score),
-			'tag'           => 'div',
 			'symbol'        => '%',
 			'graphic'       => 'score',
 			'display_score' => false
 		];
 	}
-
 
 	protected function get_score_details()
 	{
@@ -116,16 +133,21 @@ class Score_Modules_Adventure extends Score_Module
 					break;
 
 				case Session_Log::TYPE_FINAL_SCORE_FROM_CLIENT:
-					$destination_table[] = [
-						'data'          => [$log->text],
-						'data_style'    => ['node_text'],
+					$details[] = [
+						'node_id'            => $log->item_id,
+						'data' => [
+							$log->text,
+							$this->check_answer($log)
+						],
+						'data_style'    => ['text', 'score'],
 						'score'         => $this->check_answer($log),
 						'type'          => $log->type,
-						'style'         => 'single_column',
-						'tag'           => 'p',
+						'style'         => 'final_score',
 						'symbol'        => '%',
-						'graphic'       => 'none',
-						'display_score' => false
+						'graphic'       => 'score',
+						'display_score' => false,
+						'older_qset'    => $log->item_id == 0 && $log->text != 'Blank Destination! Be sure to edit or remove this node before publishing.' ? true : false,
+						'blank_node'    => $log->item_id == 0 &&  $log->text == 'Blank Destination! Be sure to edit or remove this node before publishing.' ? true : false,
 					];
 					break;
 			}
@@ -133,11 +155,6 @@ class Score_Modules_Adventure extends Score_Module
 
 		// return an array of tables
 		return [
-			[
-				'title'  => 'Where did you end up?',
-				'header' => [],
-				'table'  => $destination_table,
-			],
 			[
 				'title'  => 'Responses:',
 				'header' => ['Question Score', 'The Question', 'Your Response'],

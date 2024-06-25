@@ -228,6 +228,8 @@ angular.module "Adventure"
 		$scope.showItemManager = false
 		$scope.showItemIconSelector = false
 		$scope.editingIcons = false
+		$scope.showQuestionRequiredItems = false
+		$scope.showQuestions = false
 		$scope.showCustomNodeLabelEditor = false
 
 		$scope.resetNewNodeManager()
@@ -296,13 +298,12 @@ angular.module "Adventure"
 			# Check for errors
 			validation = treeSrv.validateTreeOnSave $scope.treeData
 
-			# Check if there are any unreachable destinations if the inventory system is enabled
+			# # Check if there are any unreachable destinations if the inventory system is enabled
 			# if ($scope.inventoryItems.length > 0)
 			# 	visitedNodes = new Map()
 			# 	unvisitedNodes = new Map()
 			# 	inventory = new Map()
 			# 	unreachableDestinations = treeSrv.findUnreachableDestinations $scope.treeData, $scope.treeData, visitedNodes, unvisitedNodes, inventory
-
 			# 	if (unreachableDestinations.size > 0)
 			# 		# Get all nodes that are not in reachableDestinations
 			# 		# create error at each node that is not in reachableDestinations

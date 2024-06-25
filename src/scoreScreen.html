@@ -9,7 +9,7 @@
 
 		<!-- STYLESHEETS -->
 		<link href='//fonts.googleapis.com/css?family=Lora:400,700|Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="assets/score-assets/score.css">
+		<link rel="stylesheet" type="text/css" href="scoreScreen.css">
 
 		<!-- REQUIRED MATERIA JAVASCRIPT -->
 		<script src="materia.scorecore.js"></script>
@@ -21,70 +21,108 @@
 		<script src="assets/micromarkdown.min.js"></script>
 	</head>
 	<body>
-		<div class="content-frame" ng-controller="AdventureScoreCtrl">
-			<section class="inventory" ng-if="itemSelection[0]" ng-if="customTable">
-                <h1 class="inventory-header" ng-click="toggleInventoryDrawer()" ng-class="{'closed': !showInventory}">FINAL INVENTORY <i class="arrow-top"></i></h1>
-                <div class="inventory-content" ng-show="showInventory">
-                    <div class="inventory-items">
-                        <div class="item" ng-repeat="item in inventory track by $index" ng-click="setSelectedItem(item)">
-                            <img ng-if="itemSelection[getItemIndex(item)].icon.url" ng-src="{{itemSelection[getItemIndex(item)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(item)].icon.alt}}"/>
-                            {{itemSelection[getItemIndex(item)].name}} ({{item.count}})
-                        </div>
-                    </div>
-                    <div class="item-description" ng-if="selectedItem">
-                        <div class="item-header">
-                            <img ng-if="itemSelection[getItemIndex(selectedItem)].icon.url" ng-src="{{itemSelection[getItemIndex(selectedItem)].icon.url}}" ng-alt="{{itemSelection[getItemIndex(selectedItem)].icon.alt}}"/>
-                            <h3>
-                                {{itemSelection[getItemIndex(selectedItem)].name}}
-                            </h3>
-                        </div>
-                        <h4>Description</h4>
-                        <p>{{itemSelection[getItemIndex(selectedItem)].description ? itemSelection[getItemIndex(selectedItem)].description : (itemSelection[getItemIndex(selectedItem)].icon.alt ? itemSelection[getItemIndex(selectedItem)].icon.alt : 'No description')}}</p>
-                        <h4>Count</h4>
-                        <p>{{itemSelection[getItemIndex(selectedItem)].count}}</p>
-                    </div>
-                </div>
-            </section>
-            <h1 class="responses-heading" ng-if="customTable">RESPONSES:</h1>
-            <section class="table" ng-if="customTable">
-                <div class="table-header">
-                    <div></div>
-                    <div>The Question</div>
-                    <div>Your Response</div>
-                </div>
-                <div class="table-row" ng-repeat="row in table track by $index">
-                    <div class="row-details">
-                        <div class="row-number">
-                            <p>{{$index + 1}}</p>
-                        </div>
-                        <div class="row-question">{{row.question}}</div>
-                        <div class="row-answer">
-                            <p>{{row.answer}}</p>
-                            <div class="row-feedback" ng-if="row.feedback">
-                                <p>{{row.feedback}}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row-items" ng-if="row.items[0]">
-                        <h4  ng-if="row.gainedItems">Items Gained</h4>
-                        <div class="row-items-gained" ng-if="row.gainedItems">
-                            <div ng-repeat="item in row.items" ng-if="item.count > 0" class="row-item">
-                                <p>+ {{item.count}}</p>
-                                <img ng-show="itemSelection[getItemIndex(item)].icon && itemSelection[getItemIndex(item)].icon.url" src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
-                                <p>{{itemSelection[getItemIndex(item)].name}}</p>
-                            </div>
-                        </div>
-                        <h4 ng-if="row.lostItems">Items Lost</h4>
-                        <div class="row-items-lost" ng-if="row.lostItems">
-                            <div ng-repeat="item in row.items" ng-if="item.count < 0" class="row-item">
-                                <p>- {{-1*item.count}}</p>
-                                <img ng-show="itemSelection[getItemIndex(item)].icon && itemSelection[getItemIndex(item)].icon.url" src="{{itemSelection[getItemIndex(item)].icon.url}}"/>
-                                <p>{{itemSelection[getItemIndex(item)].name}}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+		<div id="score-content" class="content-frame" ng-controller="AdventureScoreCtrl">
+
+			<h2>Review Your Journey</h2>
+
+			<span class="older-qset-warning" ng-show="showOlderQsetWarning">
+				This play is from an earlier version of Adventure. Certain destinations you visited may not be displayed here.
+			</span>
+
+			<section class="timeline">
+				<div class="destination {{row.type}}" ng-repeat="row in table track by $index">
+					<span class="icon mc" ng-if="row.type == 'mc'">
+						<img src="assets/creator-assets/mc.svg" alt="multiple choice icon" />
+					</span>
+					<span class="icon sa" ng-if="row.type == 'shortanswer'">
+						<img src="assets/creator-assets/sa.svg" alt="short answer icon" />
+					</span>
+					<span class="icon hotspot" ng-if="row.type == 'hotspot'">
+						<img src="assets/creator-assets/hs.svg" alt="hotspot icon" />
+					</span>
+					<span class="icon narr" ng-if="row.type == 'narrative'">
+						<img src="assets/creator-assets/narr.svg" alt="narrative icon" />
+					</span>
+					<span class="icon end" ng-if="row.type == 'end'">
+						<img src="assets/creator-assets/end.svg" alt="end point icon" />
+					</span>
+					<span class="icon blank" ng-if="row.type == 'blank'">
+						<img src="assets/creator-assets/blank.svg" alt="empty node icon" />
+					</span>
+					<div class="question {{row.type}}" ng-if="row.question" ng-bind-html="row.question">
+					</div>
+					<div class="response" ng-if="row.answer">
+						{{row.answer}}
+					</div>
+					<div class="hotspot-no-svg-content" ng-if="row.type == 'hotspot' && !row.svg">
+						<p>Historical play records don't provide enough information to display the hotspot selection associated with this answer choice.</p>
+					</div>
+					<div class="hotspot-content" ng-if="row.type == 'hotspot' && row.svg">
+						<svg
+							version="1.1"
+							xmlns:cc="http://web.resource.org/cc/"
+							xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+							xmlns:dc="http://purl.org/dc/elements/1.1/"
+							xmlns="http://www.w3.org/2000/svg"
+							xmlns:xlink="http://www.w3.org/1999/xlink"
+							xml:space="preserve">
+							<g ng-attr-transform="matrix(1 0 0 1 {{row.svg.x}} {{row.svg.y}})">
+								<ellipse ng-if="row.svg.type == 'ellipse'"
+									ng-attr-cx="0"
+									ng-attr-cy="0"
+									ng-attr-rx="{{row.svg.r + row.svg.scaleXFactor}}"
+									ng-attr-ry="{{row.svg.r + row.svg.scaleYFactor}}"
+									fill="{{row.svg.fill}}"
+									stroke="{{row.svg.fill}}"
+									stroke-width="{{row.svg.stroke}}"
+									fill-opacity="0.5"/>
+
+								<rect ng-if="row.svg.type == 'rect'"
+									ng-attr-x="0"
+									ng-attr-y="0"
+									ng-attr-width="{{row.svg.width + row.svg.scaleXFactor}}"
+									ng-attr-height="{{row.svg.height + row.svg.scaleYFactor}}"
+									fill="{{row.svg.fill}}"
+									stroke="{{row.svg.fill}}"
+									stroke-width="{{row.svg.stroke}}"
+									fill-opacity="0.5"/>
+
+								<polygon ng-if="row.svg.type == 'polygon'"
+									ng-attr-points="{{row.svg.points}}"
+									fill="{{row.svg.fill}}"
+									stroke="{{row.svg.fill}}"
+									stroke-width="{{row.svg.stroke}}"
+									fill-opacity="0.5"/>
+							</g>
+						</svg>
+						<img ng-src="{{row.image}}" />
+					</div>
+					<div class="end-row" ng-if="row.type == 'end' || row.type =='blank'">
+						<p ng-bind-html="row.text"></p>
+						<div class="end-row-score" ng-if="row.type == 'end'">
+							<p>{{ row.score }}%</p>
+						</div>
+					</div>
+					<div class="items" ng-if="row.items.length">
+						<div
+							class="item"
+							ng-class="{'item-received' : item.count > 0, 'item-taken' : item.count < 0}"
+							ng-repeat="item in row.items"
+							ng-hide="getItemById(item.id).isSilent">
+							<div class="received" ng-if="item.count > 0">
+								<img class="item-icon" ng-src="{{getItemUrl(item.id)}}" />
+								{{ getItemById(item.id).name }}
+								<span class="quantity">({{ item.count }})</span>
+							</div>
+							<div class="taken" ng-if="item.count < 0">
+								<img class="item-icon" ng-src="{{getItemUrl(item.id)}}" />
+								{{ getItemById(item.id).name }}
+								<span class="quantity">({{ item.count }})</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
 		</div>
 
 		<!-- MAIN WIDGET SCRIPT -->

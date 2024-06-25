@@ -155,66 +155,86 @@ angular.module "Adventure"
 		if (! requiredItems)
 			return []
 		angular.forEach requiredItems, (item) ->
-			hasItemInInventory = false
-			playerItem = inventory.get(item.id)
-			if playerItem
-				hasItemInInventory = true
+			meetsMin = false
+			meetsMax = false
+			playerItemCount = inventory.get(item.id)
+			if playerItemCount
 				# Check if player has more than the min
-				if playerItem.count >= item.minCount
+				if playerItemCount >= item.minCount || item.minCount is 0
+					meetsMin = true
 					# Check if player has less than the max
-					if playerItem.count <= item.maxCount or item.uncappedMax
-						return true
-				return false
-			# Check if player doesn't have item but there is no minimum
-			if ! hasItemInInventory and item.minCount is 0
-				hasRequiredItem = true
-			if ! hasRequiredItem
+					if playerItemCount <= item.maxCount or item.uncappedMax
+						meetsMax = true
+			if !meetsMin or !meetsMax
 				missingItems.push(item.id)
 		return missingItems
 
+	# Returns all nodes that can be reached from a given node using breadth-first search
+	findUnreachableDestinations = (tree, startNode) ->
+		visitedNodes = new Map()
+		unvisitedNodes = new Map()
+		node = {
+			...startNode,
+			parent: "Start", # parent node's name
+			inventory: new Map(), # inventory up to this node
+			visitedNodes: new Map() # chain of nodes visited to get to this node
+		}
+		queue = [node]
 
-	# Returns all nodes that can be reached from a given node
-	findUnreachableDestinations = (tree, node, visitedNodes, unvisitedNodes, inventory) ->
-		# If the node has already been visited some number of times, return to parent
-		# This is to prevent infinite loops
-		if visitedNodes.get(node.id) > Math.max(50, node.answerLinks.length)
-			return unvisitedNodes
+		while queue.length > 0
+			node = queue.shift()
 
-		# Increment the number of times the node has been visited
-		visitedNodes.set(node.id, (visitedNodes.get(node.id) || 0) + 1)
+			# If the node has already been visited some number of times, skip it
+			if visitedNodes.get(node.id) && visitedNodes.get(node.id) > Math.max(50, node.answerLinks.length)
+				continue
 
-		# If the node is an end node, return to parent
-		if node.type is "end"
-			return unvisitedNodes
+			# If the node is an end node, skip it
+			if node.type is "end"
+				continue
 
-		# Add items to inventory
-		if node.items
-			for item in node.items
-				# Check if item is first visit only and player has visited this node before
-				if (visitedNodes.get(node.id) >= 1 and item.firstVisitOnly)
-					# Move to next item
-					continue
-				else
-					if item.takeAll
-						inventory.set(item.id, 0)
+			# Increment the number of times the node has been visited
+			visitedNodes.set(node.id, (visitedNodes.get(node.id) or 0) + 1)
+
+
+			# Add items to inventory
+			if node.items
+				for item in node.items
+					# Check if item is first visit only and player has visited this node before
+					if (node.visitedNodes.get(node.id) >= 1 and item.firstVisitOnly)
+						# Move to next item
+						continue
 					else
-						inventory.set(item.id, (inventory.get(item.id) || 0) + item.count)
+						if item.takeAll
+							node.inventory.set(item.id, 0)
+						else
+							node.inventory.set(item.id, (node.inventory.get(item.id) || 0) + item.count)
 
-		# Search answers
-		if node.answers
-			for answer in node.answers
-				targetNode = findNode(tree, answer.target)
-				if checkInventory(answer.requiredItems, inventory).length > 0
-					# If the player doesn't have the required items, add it to unvisitedNodes
-					unvisitedNodes.set(targetNode.id, targetNode)
-				else
-					# If the player has the required items, add it to visitedNodes
-					if (unvisitedNodes.get(targetNode.id))
-						unvisitedNodes.remove(targetNode.id)
-					visitedNodes.set(targetNode.id, (visitedNodes.get(targetNode.id) || 0) + 1)
-					unvisitedNodes = new Map([...unvisitedNodes, ...findUnreachableDestinations(tree, targetNode, visitedNodes, unvisitedNodes, inventory)])
+			node.visitedNodes.set(node.id, (node.visitedNodes.get(node.id) || 0) + 1)
 
-		return unvisitedNodes
+			if node.answers
+				for answer in node.answers
+					targetNode = findNode(tree, answer.target)
+
+					if checkInventory(answer.requiredItems, node.inventory).length > 0 && visitedNodes.get(targetNode.id) is undefined
+						# if the player doesn't have the required items and this node hasn't been visited on a different path, add it to unvisitedNodes
+						unvisitedNodes.set(targetNode.id, targetNode)
+					else
+						# if the player has the required items, add it to visitedNodes
+						if (unvisitedNodes.get(targetNode.id)) then unvisitedNodes.delete(targetNode.id)
+
+						# increment the number of times the node has been visited
+						visitedNodes.set(targetNode.id, (visitedNodes.get(targetNode.id) || 0) + 1)
+
+						# add the node to the queue with new inventory and visited node stores
+						addInventory = {
+							...targetNode,
+							parent: node.name,
+							inventory: new Map(node.inventory),
+							visitedNodes: new Map(node.visitedNodes)
+						}
+						queue.push(addInventory)
+
+		unvisitedNodes
 
 
 	# Recursive function for adding a node in between a given parent and child, essentially splitting an existing link
@@ -519,6 +539,14 @@ angular.module "Adventure"
 							answer.requiredItems.splice index, 1
 							break
 
+		if tree.questions
+			for question in tree.questions
+				if question.requiredItems
+					for item, index in question.requiredItems
+						if item.id is deletedItem.id
+							question.requiredItems.splice index, 1
+							break
+
 		if !tree.contents then return
 
 		i = 0
@@ -592,13 +620,63 @@ angular.module "Adventure"
 					parentId: tree.parentId
 					type: tree.type
 					redirectId: tree.redirectId
-					items: questionItemData
+					items: questionItemData,
+					additionalQuestions: []
 				answers: []
 
-			question =
-				text: if tree.question then tree.question else ""
+			# Load default question
+			if tree.questions and tree.questions[0]
+				itemData.questions.push tree.questions[0]
+			else
+				itemData.questions.push
+					text: ""
 
-			itemData.questions.push question
+			# Load conditional questions
+			angular.forEach tree.questions, (question, index) ->
+				if (index < 1) then return
+				requiredItemsData = []
+
+				if question.requiredItems
+					for i in question.requiredItems
+						do (i) ->
+							# Format properties for pre-existing items without said properties
+
+							if i.minCount > -1
+								minCount = i.minCount
+							else if i.tempMinCount > -1
+								minCount = i.tempMinCount
+							else if i.count
+								minCount = i.count
+							else
+								# If minCount isn't set, set it to 1
+								minCount = 1
+
+							if i.maxCount > -1
+								maxCount = i.maxCount
+							else if i.tempMaxCount > -1
+								maxCount = i.tempMaxCount
+							else if i.count
+								maxCount = i.count
+							else
+								# If maxCount isn't set, set it to minCount
+								maxCount = minCount
+
+							uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
+
+							formattedItem =
+								id: i.id
+								range: ""
+								minCount: minCount
+								maxCount: maxCount
+								uncappedMax: uncappedMax
+
+							requiredItemsData.push formattedItem
+				itemQuestionData =
+					text: question.text
+					requiredItems: requiredItemsData
+					requiredVisits: question.requiredVisits || 0
+
+				itemData.options.additionalQuestions.push itemQuestionData
 
 			if tree.media
 				itemData.options.asset =
@@ -674,13 +752,14 @@ angular.module "Adventure"
 						feedback: answer.feedback
 						requiredItems: requiredItemsData
 						hideAnswer: answer.hideAnswer or false
-						# hideRequiredItems: answer.hideRequiredItems or false
+						hideRequiredItems: answer.hideRequiredItems or false
 
 				switch tree.type
 					when "shortanswer"
 						itemAnswerData.options.matches = answer.matches
 						itemAnswerData.options.caseSensitive = answer.caseSensitive
 						itemAnswerData.options.characterSensitive = answer.characterSensitive
+						itemAnswerData.options.partialMatches = answer.partialMatches or false
 						if answer.isDefault then itemAnswerData.options.isDefault = true
 
 					when "hotspot"
@@ -724,8 +803,6 @@ angular.module "Adventure"
 				type: item.options.type
 				contents: []
 
-			if item.questions[0].text then node.question = item.questions[0].text
-
 			if item.options.asset
 				if item.options.asset.type is 'image'
 					node.media =
@@ -753,6 +830,61 @@ angular.module "Adventure"
 			if item.options.hasLinkToOther then node.hasLinkToOther = true
 			if item.options.hasLinkToSelf then node.hasLinkToSelf = true
 			if item.options.pendingTarget then node.pendingTarget = item.options.pendingTarget
+
+			if item.questions
+				node.questions = item.questions
+			else
+				node.questions = []
+
+			if item.options.additionalQuestions
+				angular.forEach item.options.additionalQuestions, (question, index) ->
+					unless node.questions then node.questions = []
+
+					requiredItemsData = []
+					if question.requiredItems
+						for i in question.requiredItems
+							do (i) ->
+								# Format properties for pre-existing items without said properties
+
+								if i.minCount > -1
+									minCount = i.minCount
+								else if i.tempMinCount > -1
+									minCount = i.tempMinCount
+								else if i.count
+									minCount = i.count
+								else
+									# If minCount isn't set, set it to 1
+									minCount = 1
+
+								if i.maxCount > -1
+									maxCount = i.maxCount
+								else if i.tempMaxCount > -1
+									maxCount = i.tempMaxCount
+								else if i.count
+									maxCount = i.count
+								else
+									# If maxCount isn't set, set it to minCount
+									maxCount = minCount
+
+								uncappedMax = if (i.uncappedMax isnt null) then i.uncappedMax else false
+
+								formattedItem =
+									id: i.id
+									range: ""
+									minCount: minCount
+									maxCount: maxCount
+									uncappedMax: uncappedMax
+
+
+								requiredItemsData.push formattedItem
+
+					nodeQuestion =
+						text: question.text
+						id: generateAnswerHash()
+						requiredItems: requiredItemsData
+						requiredVisits: question.requiredVisits || 0
+
+					node.questions.push nodeQuestion
 
 			if item.options.customLabel then node.customLabel = item.options.customLabel
 
@@ -808,13 +940,14 @@ angular.module "Adventure"
 					id: generateAnswerHash()
 					requiredItems: requiredItemsData
 					hideAnswer: answer.options.hideAnswer or false
-					# hideRequiredItems: answer.options.hideRequiredItems or false
+					hideRequiredItems: answer.options.hideRequiredItems or false
 
 				switch item.options.type
 					when "shortanswer"
 						nodeAnswer.matches = answer.options.matches
 						nodeAnswer.caseSensitive = answer.options.caseSensitive
 						nodeAnswer.characterSensitive = answer.options.characterSensitive
+						nodeAnswer.partialMatches = answer.options.partialMatches or false
 
 						if answer.options.isDefault then nodeAnswer.isDefault = true
 

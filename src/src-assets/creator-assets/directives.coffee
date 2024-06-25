@@ -117,6 +117,22 @@ angular.module "Adventure"
 			$scope.previewNodeMode = false
 			$scope.render treeSrv.get()
 
+		
+		# helper function to determine the closest pixel distance between one node and the set of all other nodes in the tree
+		# used with bridge nodes (in-between nodes) to determine whether the "add an in-between node" option is too close to another one
+		_getDistanceToClosestAdjacentNode = (nodes, target) ->
+			closestNode = null
+			closestDistance = Infinity
+
+			for node in nodes
+				if node != target
+					distance = Math.sqrt(Math.pow(node.x - target.x, 2) + Math.pow(node.y - target.y, 2))
+					if distance < closestDistance
+						closestNode = node
+						closestDistance = distance
+
+			closestDistance
+
 		$scope.render = (data) ->
 
 			unless data? then return false
@@ -242,6 +258,9 @@ angular.module "Adventure"
 
 				source = link.source
 				target = link.target
+
+				# don't create bridge nodes if either the source or target is blank
+				if source.type is "blank" or target.type is "blank" then return
 
 				# Disable bridge nodes on loopbacks
 				if link.specialCase is "loopBack" then return
@@ -390,18 +409,35 @@ angular.module "Adventure"
 					midpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/2)
 					midX = midpoint.x
 					midY = midpoint.y
+
+					if links[index].lock
+						# compute the position of the lock icon along the path
+						quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
+						links[index].lock.x = quarterpoint.x
+						links[index].lock.y = quarterpoint.y
 					
-					# compute the position of the lock icon along the path
-					quarterpoint = pathNode.getPointAtLength(pathNode.getTotalLength()/4)
-					links[index].lock.x = quarterpoint.x
-					links[index].lock.y = quarterpoint.y
+					# don't perform any midpoint computations if the bridgeNodeIndex isn't present in the link: links with a blank source or target no longer include them
+					unless links[index].bridgeNodeIndex then return
 
 					# Now find the associated bridge node using the bridgeNodeIndex flag on the given link
 					# And update its X,Y coordinates for the new midpoint location
 					nodeIndex = links[index].bridgeNodeIndex
+
 					nodes[nodeIndex].x = midX
 					nodes[nodeIndex].y = midY
 
+					# compute distance to the closest node
+					distance = _getDistanceToClosestAdjacentNode nodes, nodes[nodeIndex]
+
+					# if the distance is too close, nudge the bridge node along the link path
+					while distance < 36
+						midpointOffset = pathNode.getPointAtLength((pathNode.getTotalLength()/2) + distance * 2)
+
+						nodes[nodeIndex].x = midpointOffset.x
+						nodes[nodeIndex].y = midpointOffset.y
+						
+						# re-compute distance in case nudging the bridge node moved it too close to a different node
+						distance = _getDistanceToClosestAdjacentNode nodes, nodes[nodeIndex]
 
 				else if links[index].specialCase and links[index].specialCase is "loopBack"
 
@@ -531,9 +567,15 @@ angular.module "Adventure"
 					$scope.onHover {data: d}
 
 					#  Animation effects on node mouseover
-					d3.select(this).select("circle")
-					.transition()
-					.attr("r", 30)
+					# expansion radius dependent on node type (bridge or regular node)
+					if d.type is 'bridge'
+						d3.select(this).select("circle")
+						.transition()
+						.attr("r", 16)
+					else
+						d3.select(this).select("circle")
+						.transition()
+						.attr("r", 30)
 				)
 				.on("mouseout", (d, i) ->
 
@@ -541,10 +583,15 @@ angular.module "Adventure"
 
 					$scope.onHoverOut {data: d}
 
-					# Animation effects on node mouseout
-					d3.select(this).select("circle")
-					.transition()
-					.attr("r", 20)
+					#  Animation effects on node mouseover
+					if d.type is 'bridge'
+						d3.select(this).select("circle")
+						.transition()
+						.attr("r", 3)
+					else
+						d3.select(this).select("circle")
+						.transition()
+						.attr("r", 20)
 				)
 				.on("click", (d, i) ->
 					$scope.nodeClick {data: d} # when clicked, we return all of the node's data
@@ -585,9 +632,13 @@ angular.module "Adventure"
 			nodeGroup.append("svg:circle")
 				.attr("class", "node-dot")
 				.attr("r", (d) ->
-					return 20 # sets size of node bubbles
+					# sets initial node radius. normal nodes are 20px; bridge nodes are 3
+					if d.type is 'bridge' then return 3
+					else return 20
 				)
-				.attr("filter", "url(#dropshadow)")
+				.attr("filter", (d) ->
+					if d.type isnt 'bridge' then return "url(#dropshadow)"
+				)
 
 			# Icons displayed inside the node circles
 			nodeGroup.append("svg:image")
@@ -728,7 +779,7 @@ angular.module "Adventure"
 
 			# The "+" symbol displayed on bridge nodes (the pseudo-nodes between nodes you can click to add an in-between node)
 			nodeGroup.append("path")
-				.attr("d", "M -3,12 L -3,3 L -12,3 L -12,-3 L -3,-3 L -3,-12 L 3,-12 L 3,-3 L 12,-3 L 12,3 L 3,3 L 3,12 Z")
+				.attr("d", "M -0.5,3 L -0.5,0.5 L -3,0.5 L -3,-0.5 L -0.5,-0.5 L -0.5,-3 L 0.5,-3 L 0.5,-0.5 L 3,-0.5 L 3,0.5 L 0.5,0.5 L 0.5,3 Z")
 				.attr("visibility", (d) ->
 					if d.type isnt "bridge" then return "hidden"
 				)
@@ -996,6 +1047,7 @@ angular.module "Adventure"
 				$scope.showItemIconSelector = true
 				# Make sure Item Editor is open too
 				$scope.editingIndex = index
+				$scope.currentItem = $scope.inventoryItems[index]
 
 
 		$scope.handleIconClick = (icon) ->
@@ -1557,6 +1609,7 @@ angular.module "Adventure"
 					answer.matches = []
 					answer.caseSensitive = false
 					answer.characterSensitive = false
+					answer.partialMatches = false
 
 				# Create the new node associated with the [Unmatched Response] answer
 				newDefaultId = $scope.addNode $scope.nodeTools.target, $scope.BLANK
@@ -1573,6 +1626,7 @@ angular.module "Adventure"
 					isDefault: true
 					caseSensitive: false
 					characterSensitive: false
+					partialMatches: false
 
 				# The new answer has to take the 0 index spot in the answers array
 				node.answers.splice 0, 0, newDefault
@@ -1980,6 +2034,8 @@ angular.module "Adventure"
 				# Initialize the node edit screen with the node's info. If info doesn't exist yet, init properties
 				if $scope.editedNode.question then $scope.question = $scope.editedNode.question
 				else $scope.question = null
+				if $scope.editedNode.questions then $scope.questions = $scope.editedNode.questions
+				else $scope.questions = []
 
 				# Reset size of question box
 				document.querySelector(".question-box").style.width = null;
@@ -2063,9 +2119,9 @@ angular.module "Adventure"
 				$scope.questionPlaceholder = "Enter a conclusion here for this decision tree or path."
 
 		# Update the node's properties when the associated input models change
-		$scope.$watch "question", (newVal, oldVal) ->
+		$scope.$watch "questions", (newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
-				$scope.editedNode.question = newVal
+				$scope.editedNode.questions = $scope.questions
 
 		$scope.$watch "answers", ((newVal, oldVal) ->
 			if newVal isnt null and $scope.editedNode
@@ -2131,16 +2187,100 @@ angular.module "Adventure"
 				if(hotspot)
 					hotspot.style.zIndex = 100;
 
+		$scope.closeModals = () ->
+			$scope.showItemSelection = false
+			$scope.showRequiredItems = false
+			$scope.showQuestionRequiredItems = false
+			$scope.showQuestions = false
+
+		$scope.toggleQuestionsEditor = () ->
+			if $scope.showQuestions
+				$scope.showQuestions = false
+				return
+			# Close all modals
+			$scope.closeModals()
+			# Reopen this modal
+			$scope.showQuestions = true
+			if $scope.editedNode.questions.length <= 0
+				$scope.newQuestion()
+
+		$scope.toggleQuestionRequiredItemsModal = (question) ->
+			$scope.showDropdown = false
+			# Same question, close the modal
+			if $scope.currentQuestion is question and $scope.showQuestionRequiredItems
+				$scope.currentQuestion = null
+			# Different question
+			else
+				$scope.currentQuestion = question
+
+			# If current question is not null, open modal
+			if $scope.currentQuestion
+				$scope.showQuestionRequiredItems = true
+			# Else close the modal
+			else
+				$scope.showQuestionRequiredItems = false
+
+			if $scope.showQuestionRequiredItems
+				# Close node items modal
+				$scope.showItemSelection = false
+
+				# Remove error message
+				$scope.invalidQuantity = null
+				# Save the original item count in case of invalid input
+				if question.requiredItems
+					for item in question.requiredItems
+						item.tempMinCount = item.minCount
+						item.tempMaxCount = item.maxCount
+
+						if !$scope.showAdvancedOptions
+							# Show advanced options on start only if advanced options are enabled
+							if !item.uncappedMax
+								$scope.showAdvancedOptions = true
+							else
+								$scope.showAdvancedOptions = false
+
+				# Add items not already being used to the items available for selection
+				$scope.availableItems = []
+				for item in $scope.inventoryItems
+					do (item) ->
+						used = false
+						if question.requiredItems
+							for i in question.requiredItems
+								if item.id is i.id
+									used = true
+						if ! used
+							$scope.availableItems.push(item)
+
+				$scope.selectedItem = $scope.availableItems[0]
+
+		$scope.newQuestion = () ->
+			# Create new question
+			newQuestion =
+				id: treeSrv.generateAnswerHash()
+				text: ""
+				requiredItems: []
+				requiredVisits: if $scope.editedNode.questions.length > 0 then $scope.editedNode.questions[$scope.editedNode.questions.length - 1].requiredVisits + 1 else 0
+
+			# Add new answer to questions array
+			$scope.editedNode.questions.push newQuestion
+
+			# Inform the auto-scroll-and-focus directive that a new question is added
+			$rootScope.$broadcast "editedNode.questions.added"
+
+		$scope.removeQuestion = (index) ->
+			# Remove question from questions array
+			$scope.editedNode.questions.splice(index, 1)
+
 		$scope.toggleNodeItemsModal = () ->
 			$scope.showDropdown = false
 			# Close node items modal
 			if $scope.showItemSelection is true
 				$scope.showItemSelection = false
 				return
+			# Close modals
+			$scope.closeModals()
 			# Open node items modal
 			$scope.showItemSelection = true
-			# Close required items modal
-			$scope.toggleRequiredItemsModal(null)
 
 			# Show advanced options on start only if advanced options are enabled
 			if !$scope.showAdvancedOptions
@@ -2176,7 +2316,7 @@ angular.module "Adventure"
 		$scope.toggleRequiredItemsModal = (answer = null) ->
 			$scope.showDropdown = false
 			# Same answer, close the modal
-			if $scope.currentAnswer is answer
+			if $scope.currentAnswer is answer and $scope.showRequiredItems
 				$scope.currentAnswer = null
 			# Different answer
 			else
@@ -2190,8 +2330,10 @@ angular.module "Adventure"
 				$scope.showRequiredItems = false
 
 			if $scope.showRequiredItems
-				# Close node items modal
-				$scope.showItemSelection = false
+				# Close all modals
+				$scope.closeModals()
+				# Reopen modal
+				$scope.showRequiredItems = true
 
 				if document.querySelector('hotspot-answer-manager')
 					document.querySelector('hotspot-answer-manager').style.zIndex = 100;
@@ -2342,12 +2484,12 @@ angular.module "Adventure"
 			$scope.selectedItem = item
 			$scope.showItemManagerDialog = false
 
-		# Add a required item to answer
-		$scope.addRequiredItemToAnswer = (item, answer) ->
+		# Add a required item to object
+		$scope.addRequiredItemToObject = (item, object) ->
 			if item
-				answer.requiredItems = answer.requiredItems || []
+				object.requiredItems = object.requiredItems || []
 
-				# for i in answer.requiredItems when i.id is item.id
+				# for i in object.requiredItems when i.id is item.id
 				# 	i.count += 1
 				# 	return
 
@@ -2362,7 +2504,7 @@ angular.module "Adventure"
 					uncappedMax: true
 					range: ""
 				}
-				answer.requiredItems.push(newItem)
+				object.requiredItems.push(newItem)
 
 				# Remove item from the available items dropdown
 				index = $scope.availableItems.indexOf(item)
@@ -2372,8 +2514,8 @@ angular.module "Adventure"
 				# Hide Dropdown
 				$scope.showDropdown = false
 
-		$scope.removeRequiredItemFromAnswer = (item, answer) ->
-			answer.requiredItems.splice answer.requiredItems.indexOf(item), 1
+		$scope.removeRequiredItemFromObject = (item, object) ->
+			object.requiredItems.splice object.requiredItems.indexOf(item), 1
 
 			# Add item to the available items dropdown
 			item.count = 1
@@ -2411,13 +2553,15 @@ angular.module "Adventure"
 				id: treeSrv.generateAnswerHash()
 				requiredItems: []
 				hideAnswer: false
-				# hideRequiredItems: false
+				hideRequiredItems: false # only used for MC nodes!
 
 			# Add a matches and case sensitivity property to the answer object if it's a short answer question.
 			if $scope.editedNode.type is $scope.SHORTANS
 				newAnswer.matches = []
 				newAnswer.caseSensitive = false
 				newAnswer.characterSensitive = false
+				newAnswer.partialMatches = false
+
 			$scope.answers.push newAnswer
 
 			# Refresh all answerLinks references as some have changed
@@ -2561,18 +2705,15 @@ angular.module "Adventure"
 				while j < $scope.answers[i].matches.length
 
 					# Remove whitespace
-					matchTo = $scope.answers[i].matches[j].trim()
-					matchTo = matchTo.split('').filter((letter) -> ! letter.match(/\W/g)).join()
-
-					matchFrom = $scope.newMatch.trim()
-					matchFrom = matchFrom.split('').filter((letter) -> ! letter.match(/\W/)).join()
+					matchTo = $scope.answers[i].matches[j].replace(/\s/g, '')
+					matchFrom = $scope.newMatch.replace(/\s/g, '')
 
 					matchErrorMessage = "This match already exists!"
 
 					if (! $scope.answers[i].characterSensitive)
 						# If matches DO NOT have same special characters, customize toast message
 						if ! (matchTo.toLowerCase().localeCompare(matchFrom.toLowerCase()) is 0)
-							matchErrorMessage += " Make whitespace and character sensitive to add match."
+							matchErrorMessage += " Make character sensitive to add match."
 
 						matchTo = matchTo.split('').filter((letter) -> letter.match(/\w/)).join()
 
@@ -3176,6 +3317,26 @@ angular.module "Adventure"
 						# children()[1] references the answer text input box
 						row.children()[1].focus()
 				), 100
+]
+
+.directive "autoScrollAndSelectQuestion", ['$timeout', ($timeout) ->
+	restrict: "A",
+	link: ($scope,$element, $attrs) ->
+
+		# Listen for when a new question is added
+		$scope.$on "editedNode.questions.added", (evt) ->
+			$timeout (() ->
+				# Auto-scroll to the bottom
+				$element[0].scrollTop = $element[0].scrollHeight
+
+
+				# Find the answer input box and focus it
+				list = angular.element($element.children()[0]).children()
+				if list.length > 0
+					row = angular.element list[list.length - 1]
+					# children()[1] references the answer text input box
+					row.children()[1].focus()
+			), 100
 ]
 
 # The validation dialog is linked to two validation events:
