@@ -426,11 +426,15 @@ angular.module "Adventure"
 					nodes[nodeIndex].x = midX
 					nodes[nodeIndex].y = midY
 
+					# limit number of distance recomputations to prevent infinite loops
+					# adventure is wacky, any number of edge cases can potentially cause the distance check to continually fail
+					recomputes = 5
+
 					# compute distance to the closest node
 					distance = _getDistanceToClosestAdjacentNode nodes, nodes[nodeIndex]
 
 					# if the distance is too close, nudge the bridge node along the link path
-					while distance < 36
+					while distance < 36 && recomputes > 0
 						midpointOffset = pathNode.getPointAtLength((pathNode.getTotalLength()/2) + distance * 2)
 
 						nodes[nodeIndex].x = midpointOffset.x
@@ -438,6 +442,7 @@ angular.module "Adventure"
 						
 						# re-compute distance in case nudging the bridge node moved it too close to a different node
 						distance = _getDistanceToClosestAdjacentNode nodes, nodes[nodeIndex]
+						recomputes -= 1
 
 				else if links[index].specialCase and links[index].specialCase is "loopBack"
 
