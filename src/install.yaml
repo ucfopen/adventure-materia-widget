@@ -10,6 +10,7 @@ general:
   is_answer_encrypted: Yes
   is_storage_enabled: No
   api_version: 2
+  uses_prompt_generation: Yes
 files:
   creator: creator.html
   player: player.html
