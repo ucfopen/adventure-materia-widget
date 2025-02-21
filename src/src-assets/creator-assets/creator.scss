@@ -857,7 +857,7 @@ button.temp-qset-gen-button {
 	margin-right: 25px;
 }
 
-debug-qset-loader, debug-qset-generator {
+debug-qset-loader, debug-qset-generator, prompt-mode-scenario-dialog {
 	position: absolute;
 	width: 450px;
 
@@ -2662,6 +2662,18 @@ node-creation-selection-dialog {
 
 	#advanced-question-btn {
 		margin-right: 20px;
+
+		span {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.5em;
+			height: 1.5em;
+			margin-right: 0.5em;
+			border-radius: 25%;
+			background: $red;
+			color: $white;
+		}
 	}
 
 	#big-upload-button {
@@ -4252,5 +4264,34 @@ import-type-selection {
 		top: -10px;
 		height: 35px;
 		width: 35px;
+	}
+}
+
+.ai-toolbar {
+	position: absolute;
+	bottom:0;
+	left: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	
+	// width: 500px;
+	// height: 2em;
+	padding: 0.5em 1em 0.5em 0.5em;
+
+	border-top-right-radius: 5px;
+	
+	color: #fff;
+	background: #327996;
+
+	.prompt-mode-toggle {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding: 0 1em;
+
+		input[type="checkbox"] {
+			visibility: hidden;
+		}
 	}
 }

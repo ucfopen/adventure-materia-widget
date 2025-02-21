@@ -3414,7 +3414,11 @@ angular.module "Adventure"
 			$scope.hideCoverAndModals()
 ]
 
-
+.directive "promptModeScenarioDialog", ['$rootScope', ($rootScope) ->
+	restrict: "E",
+	link: ($scope, $element, $attrs) ->
+		return
+]
 
 # MEANT FOR DEBUG PURPOSES ONLY
 .directive "debugQsetLoader", ['treeSrv', 'treeHistorySrv', 'legacyQsetSrv','$rootScope', (treeSrv, treeHistorySrv, legacyQsetSrv, $rootScope) ->

@@ -16,9 +16,9 @@
 		<script src="materia.creatorcore.js"></script>
 
 		<!-- YOUR PREREQUISITES -->
-		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular.min.js'></script>
-		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-animate.min.js'></script>
-		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular-sanitize.min.js'></script>
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js'></script>
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular-animate/1.8.3/angular-animate.min.js'></script>
+		<script src='//cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.8.3/angular-sanitize.min.js'></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
 		<script src="//cdn.skypack.dev/d3-drag@3" charset="utf-8"></script>
 
@@ -58,6 +58,18 @@
 			</section>
 		</header>
 		<div id="adventure-container">
+			<div class="ai-toolbar" ng-if="allowPromptMode">
+				<div class="prompt-mode-toggle">
+					Prompt Mode
+					<div class="options-check-slide fancy-toggle">
+						<input type="checkbox" ng-model="promptMode" id="prompt-mode-options-check-slide-input"/>
+						<label for="prompt-mode-options-check-slide-input"></label>
+					</div>
+				</div>
+				<button ng-disabled="promptMode == false" ng-click="showScenarioDialog = true">
+					Scenario Description
+				</button>
+			</div>
 			<div class="inert-on-dialog" aria-hidden="showBackgroundCover || showInventoryBackgroundCover">
 				<div class="zoom-buttons" zoom-buttons>
 					<div class="zoom-status">{{(treeOffset.scale * 100).toFixed(0)}}%</div>
@@ -195,6 +207,13 @@
 						ng-click="saveAndCloseInventory()">Done</button>
 				</div>
 			</item-manager>
+			<prompt-mode-scenario-dialog ng-show="showScenarioDialog">
+				<h4>Scenario Description</h4>
+				<textarea
+					ng-model="promptModeScenario"
+					placeholder="Enter a brief description of the scenario. This will provide an overall context to the AI for roleplay purposes."></textarea>
+				<button type="button" ng-click="showScenarioDialog = false">Close</button>
+			</prompt-mode-scenario-dialog>
 			<debug-qset-generator ng-show="showQsetGenerator">
 				<h4>Generated QSet</h4>
 				<textarea ng-model="generatedQset" auto-select></textarea>
@@ -1337,6 +1356,7 @@
 						</div>
 
 						<button ng-click="toggleQuestionsEditor()" id="advanced-question-btn">
+							<span ng-if="editedNode.questions.length > 1">{{editedNode.questions.length - 1}}</span>
 							Advanced Question Editor
 						</button>
 						<button type="button"
