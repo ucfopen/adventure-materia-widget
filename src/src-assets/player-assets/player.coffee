@@ -192,10 +192,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		# ****************************** prompt mode ****************************
 
 		if $scope.promptMode and parsedQuestion.length > 0 and parsedQuestion != "No question text provided."
-			console.log('submitting prompt: ' + parsedQuestion)
 			generationPrompt = _createPromptForQuestion(parsedQuestion)
-
-			console.log generationPrompt
 
 			Materia.Engine.submitPrompt(generationPrompt)
 
