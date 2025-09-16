@@ -7,7 +7,7 @@ angular.module('Adventure', ['ngSanitize'])
 	$scope.customTable = false
 	$scope.showOlderQsetWarning = false
 
-	console.log "AdventureScoreCtrl"
+	# console.log "AdventureScoreCtrl"
 
 	_qsetItems = []
 	_currentInventory = []
@@ -29,7 +29,7 @@ angular.module('Adventure', ['ngSanitize'])
 	# simply using the options.items value for each question would not accurately report items taken and received
 	# if certain factors are at play, like the takeAll and firstVisitOnly flags
 	_manageItemDelta = (question) ->
-		console.log "manageItemDelta start"
+		# console.log "manageItemDelta start"
 		items = []
 
 		if !question.options.items then return items
@@ -99,7 +99,7 @@ angular.module('Adventure', ['ngSanitize'])
 
 	_getQuestion = (qset, id) ->
 		wanted = _normalizeId id
-		console.log "getQuestion"
+		# console.log "getQuestion"
 		for i in qset.items
 			if _normalizeId(i?.id) is wanted then return i
 			if _normalizeId(i?.options?.id) is wanted then return i
@@ -108,7 +108,7 @@ angular.module('Adventure', ['ngSanitize'])
 
 
 	_getQuestionByNodeId = (qset, nodeId) ->
-		console.log "getQuestionByNodeId, nodeId is", nodeId
+		# console.log "getQuestionByNodeId, nodeId is", nodeId
 		# wanted = parseInt(nodeId, 10)
 		wanted = _normalizeId nodeId
 
@@ -117,7 +117,7 @@ angular.module('Adventure', ['ngSanitize'])
 			qOptId = _normalizeId i?.options?.id
 			# qNodeId = if i?.nodeId?       then parseInt(i.nodeId, 10)    else null
 			qNodeId = _normalizeId i?.nodeId
-			console.log "candidate qOptId:", qOptId, "qNodeId:", qNodeId
+			# console.log "candidate qOptId:", qOptId, "qNodeId:", qNodeId
 
 			if qOptId?  and qOptId  == wanted then return i
 			if qNodeId? and qNodeId == wanted then return i
@@ -126,27 +126,27 @@ angular.module('Adventure', ['ngSanitize'])
 
 
 	$scope.getItemById = (id) ->
-		console.log "getItemById"
+		# console.log "getItemById"
 		for item in _qsetItems
 			if item.id == id then return item
 		null
 
 	$scope.getItemUrl = (id) ->
-		console.log "getItemUrl"
+		# console.log "getItemUrl"
 		for item in _qsetItems
 			if item.id == id && item.icon then return item.icon.url
 
 	$scope.createTable = (qset, scoreTable) ->
-		console.log "createTable"
+		# console.log "createTable"
 		table = []
 		for response in scoreTable
 			if response.type == 'SCORE_FINAL_FROM_CLIENT'
-				console.log "final score from client ", response.node_id or response.nodeId
+				# console.log "final score from client ", response.node_id or response.nodeId
 				nid = response.node_id or response.nodeId
 				question = _getQuestionByNodeId qset, nid
 				rowQuestion = response.data[0]
 
-				console.log 'our question is', question, ' in createTable'
+				# console.log 'our question is', question, ' in createTable'
 				if !question
 					console.warn "question is null, not good"
 					# return
@@ -165,7 +165,7 @@ angular.module('Adventure', ['ngSanitize'])
 				$scope.showOlderQsetWarning = response.older_qset
 			else
 				question = _getQuestion qset, response.id
-				console.log "question after doing _getQuestion is: ", question
+				# console.log "question after doing _getQuestion is: ", question
 				if !question then return
 				items = if question.options.items then question.options.items else []
 				rowQuestion = response.data[0]
@@ -203,11 +203,11 @@ angular.module('Adventure', ['ngSanitize'])
 
 
 	$scope.start = (instance, qset, scoreTable, isPreview, qsetVersion) ->
-		console.log "scope.start func"
+		# console.log "scope.start func"
 		$scope.update(qset, scoreTable)
 
 	$scope.update = (qset, scoreTable) ->
-		console.log "scope.update func"
+		# console.log "scope.update func"
 		if qset.items[0].items then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
 		$scope.$apply ->
