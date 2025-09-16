@@ -10,6 +10,7 @@ angular.module "Adventure"
 	# Because the requirements of the player & creator are nearly identical, the QSet conversion code is located in its own independent service that's imported by both
 	convertOldQset = (qset) ->
 
+		console.log "nice to have the hour, qset is ", qset
 		items = qset.items[0].items
 
 		parentNodeRefs = []
@@ -17,13 +18,19 @@ angular.module "Adventure"
 		itemCount = 0
 		inventoryItems = []
 
+		iter = 0
 		angular.forEach items, (item, index) ->
 
+			iter += 1
+			console.log "iter is ", iter
 			item.type = "Adventure"
 			item.nodeId = item.options.id
 			# extreme edge-case detection to ensure a mwdk mock id isn't being passed around
 			# this would generally only affect a v1 qset when viewed in the context of the mwdk
-			if typeof(item.options.id) is "string" and item.options.id.match(/^(mwdk-mock-id-[A-Za-z0-9\-]+)$/)[0] then item.options.id = 0
+			console.log "item.options.id is ", item.options.id
+			# item.options.id = String(item?.options?.id ? "")
+			console.log "item.options.id's type is ", typeof(item.options.id)
+			# if typeof(item.options.id) is "string" and item.options.id.match(/^(mwdk-mock-id-[A-Za-z0-9\-]+)$/)[0] then item.options.id = 0
 
 			delete item.assets
 

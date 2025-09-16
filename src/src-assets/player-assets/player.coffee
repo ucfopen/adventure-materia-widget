@@ -2,6 +2,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 ## CONTROLLER ##
 .controller 'AdventureController', ['$scope','$rootScope', 'inventoryService', 'legacyQsetSrv','$sanitize', '$sce', '$timeout', ($scope, $rootScope, inventoryService, legacyQsetSrv, $sanitize, $sce, $timeout) ->
+	console.log "Adventure controller"
 
 	$scope.BLANK = "blank"
 	$scope.MC = "mc"
@@ -40,13 +41,18 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 	materiaCallbacks =
 		start: (instance, qset, version = '1') ->
+			console.log "materiaCallbacks.start"
 			#Convert an old qset prior to running the widget
+			console.log "our version is ", version, "and our qset is ", qset, "and our instance is ", instance
 			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
+			console.log "3did we fail here"
+
 
 			$scope.$apply ->
 				$scope.title = instance.name
 				$scope.qset = qset
 				$scope.itemSelection = qset.options.inventoryItems
+				console.log "in materiaCallbacks.start, qset.items is ", qset.items
 				$scope.startID = qset.items[0].options.id
 
 				if qset.options.startID isnt 0 and qset.options.startID
@@ -99,11 +105,16 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 	# Update the screen depending on the question type (narrative, mc, short answer, hotspot, etc)
 	manageQuestionScreen = (questionId) ->
+		console.log "manageQuestionScreen called with questionId", questionId
 
+		#ID IS UNDEFINED HERE?
 		# Acquire question data based on question id
+		console.log " in manageQuestionScreen, scope.qset.items is", $scope.qset.items
 		for n in [0...$scope.qset.items.length]
+			console.log "1do we fail here?"
 			if $scope.qset.items[n].options.id is questionId
 				q_data = $scope.qset.items[n]
+				console.log "we did not fail here"
 		# MWDK changes id of first item
 		if questionId is 0
 			q_data = $scope.qset.items[0]
@@ -153,6 +164,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		# ******************************************* inventory item management **************************************
 
+		console.log "In invetory item management, scope Inventory is", $scope.inventory
 		# Remove new item alerts
 		for i in $scope.inventory
 			i.new = false
@@ -167,6 +179,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		# Add items to player's inventory
 		# if q_data.options.items and q_data.options.items[0]
+		console.log "In invetory item management, q_data is", q_data
 		if q_data.options.items and q_data.options.items[0]
 
 			# Format items
@@ -246,6 +259,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 		$scope.answers = []
 
+		console.log "In answer generation, q_data is", q_data
 		if q_data.answers
 			for i in [0..q_data.answers.length-1]
 				continue if not q_data.answers[i]
@@ -309,6 +323,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		if q_data.options.randomize then $scope.answers = _shuffleIndices $scope.answers
 
 		$scope.q_data = q_data
+		console.log "shuffle part we got ", $scope.q_data
 
 		# ************************************ layout formatting ********************************
 
@@ -338,12 +353,14 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		inventoryService.addNodeToVisited(q_data)
 
 	$scope.dismissUpdates = () ->
+		console.log "dismissUpdates start"
 		$scope.inventoryUpdate = false
 		document.getElementById("inventory-update").setAttribute("inert", true)
 		$scope.showNew = false
 
 	$scope.toggleInventory = (item = null) ->
 		$scope.showInventory = ! $scope.showInventory
+		console.log "in toggleInventory, showInventory is now", $scope.showInventory
 		if ! $scope.showInventory
 			document.getElementById("inventory").setAttribute("inert", "true")
 			document.querySelector(".container").removeAttribute("inert")
@@ -415,6 +432,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			$scope.feedback = $scope.q_data.answers[index].options.feedback
 			$scope.next = link
 		else
+			console.log "calling manageQuestionScreen with link", link
 			manageQuestionScreen link
 
 	# Do stuff when the user submits something in the SA answer box
@@ -484,6 +502,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 				$scope.feedback = $scope.q_data.answers[matchIndex].options.feedback
 				$scope.next = link
 			else
+				console.log "calling manageQuestionScreen with link in the if selectedMatch", link
 				manageQuestionScreen link
 
 			return true
@@ -500,6 +519,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					$scope.feedback = answer.options.feedback
 					$scope.next = link
 				else
+					console.log "calling manageQuestionScreen with link in the fallback case", link
 					manageQuestionScreen link
 
 				return false
@@ -508,10 +528,12 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		if $scope.feedback.length > 0 # prevent multiple calls to manageQuestionScreen from firing due to the scope cycle not updating fast enough
 			$scope.feedback = ""
 			if $scope.next
+				console.log "calling manageQuestionScreen with next", $scope.next
 				manageQuestionScreen $scope.next
 
 	$scope.closeTutorial = () ->
 		$scope.showTutorial = false
+		console.log "calling manageQuestionScreen with startID", $scope.startID
 		manageQuestionScreen($scope.startID)
 
 	$scope.closeMissingRequiredItems = () ->
@@ -557,7 +579,9 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		link = null
 		if $scope.question.type is $scope.END
 			link = -1
+			console.log "2do we fail here?"
 			Materia.Score.submitFinalScoreFromClient q_data.options.id, $scope.question.text, q_data.options.finalScore
+			console.log "we did not fail here"
 		else
 			link = q_data.answers[0].options.link
 
