@@ -92,19 +92,15 @@ angular.module('Adventure', ['ngSanitize'])
 		return null unless val?
 		if typeof val is 'number' then return val
 		if typeof val is 'string'
-			# pure number
 			if /^\d+$/.test(val) then return parseInt(val, 10)
-			# GUID-ish fallbacks like "0000...0009" or any trailing digits
 			m = val.match(/(\d+)$/)
 			if m? then return parseInt(m[1], 10)
 		null
 
 	_getQuestion = (qset, id) ->
-		#4fourth
 		wanted = _normalizeId id
 		console.log "getQuestion"
 		for i in qset.items
-			# if String(i.id) == String(id) then return i
 			if _normalizeId(i?.id) is wanted then return i
 			if _normalizeId(i?.options?.id) is wanted then return i
 			if _normalizeId(i?.nodeId) is wanted then return i
@@ -141,7 +137,6 @@ angular.module('Adventure', ['ngSanitize'])
 			if item.id == id && item.icon then return item.icon.url
 
 	$scope.createTable = (qset, scoreTable) ->
-		#3third
 		console.log "createTable"
 		table = []
 		for response in scoreTable
@@ -206,19 +201,13 @@ angular.module('Adventure', ['ngSanitize'])
 
 		return table
 
-	# $scope.mmd_parse = (text) ->
-	# 	console.log 'haha butts'
-	# 	return micromarkdown.parse text
 
 	$scope.start = (instance, qset, scoreTable, isPreview, qsetVersion) ->
-		# 1start
 		console.log "scope.start func"
 		$scope.update(qset, scoreTable)
 
 	$scope.update = (qset, scoreTable) ->
 		console.log "scope.update func"
-		# 2second
-		# if a legacy qset - convert it first
 		if qset.items[0].items then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
 		$scope.$apply ->
