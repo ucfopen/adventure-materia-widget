@@ -1,14 +1,46 @@
+import re
 from core.models import Log
 from scoring.module import ScoreModule
 
 class Adventure(ScoreModule):
 
-    #helpter methods to assist v1 and v2 qset handling
+    #helpers for normalizing qsets and ids and traversing nodes
+    @staticmethod
+    def _is_end_node(self, opts: dict) -> bool:
+        t = opts.get("type")
+        #so v1 qset knows if its number 5, v2 knows if it is "end"
+        return t == 5 or t == "5" or t == "end" or ("finalScore" in opts)
+    @staticmethod
+    def _normalize_id(self, val):
+        if val is None:
+            return None
+        if isinstance(val, int):
+            return val
+        s = str(val)
+        if s.isdigit():
+            return int(s, 10)
+        #check if its hex again and parse
+        m = re.search(r'([0-9a-fA-F]+)$', s)
+        if m:
+            suf = m.group(1)
+            return int(suf, 16) if re.search(r'[a-fA-F]', suf) else int(suf, 10)
+        return None
+
+    #most of the time qsets in materia for django are dicts but older ones may be a list
     def _qset_dict(self):
-        q = getattr(self.qset, "data", self.qset)
+        q = getattr(self.qset, "data", self.qset) or {}
         if isinstance(q, list):
             q = next((x for x in q if isinstance(x, dict)), {})
         return q if isinstance(q, dict) else {}
+
+    def _items_list(self):
+        q = self._qset_dict()
+        items = q.get("items") or []
+        #v1 everything is in items[0].items
+        if (isinstance(items, list) and items and isinstance(items[0], dict)
+            and "items" in items[0] and not any(k in items[0] for k in ("type", "questions", "answers"))):
+            return items[0].get("items") or []
+        return items
 
     def _iter_nodes(self, items):
         stack = list(items or [])
@@ -23,30 +55,33 @@ class Adventure(ScoreModule):
                 continue
             yield it
 
-    def _items_list(self):
-        q = self._qset_dict()
-        if q.get("version") == 1:
-            lst = q.get("items") or []
-            return (lst[0].get("items") or []) if lst and isinstance(lst[0], dict) else []
-        return q.get("items") or []
 
     def _match_end_node(self, log):
+        #we can do the weird logic of the for loop in here instead of check answer the way php does it
+        raw_id = getattr(log, "item_id", None)
+        wanted = self._normalize_id(self, raw_id)
+        target_text = (getattr(log, "text", "") or "").strip()
+
         for item in self._iter_nodes(self._items_list()):
             opts = item.get("options") or {}
             if not isinstance(opts, dict):
                 continue
-            is_end = (opts.get("type") in ("end", "5")) or ("finalScore" in opts)
-            if not is_end:
+            if not self._is_end_node(self, opts):
                 continue
-            if getattr(log, "item_id", None) and log.item_id == opts.get("id"):
+
+            cand = self._normalize_id(self, opts.get("id"))
+
+            if wanted is not None and cand is not None and wanted == cand:
                 return item
-            if not getattr(log, "item_id", None):
-                #for older qsets match with text
+
+            if wanted is None:
                 qs = item.get("questions") or []
                 q0 = qs[0] if qs and isinstance(qs[0], dict) else {}
-                if (getattr(log, "text", "") or "").strip() == (q0.get("text", "") or "").strip():
+                if target_text == (q0.get("text", "") or "").strip():
                     return item
+
         return None
+
 
     def _final_text_for_log(self, log):
         node = self._match_end_node(log)
@@ -56,62 +91,30 @@ class Adventure(ScoreModule):
             return (q0.get("text", "") or "").strip()
         return (getattr(log, "text", "") or "").strip()
 
-
+    #now we ok
     def __init__(self, play):
         super().__init__(play)
-        raw_qset = getattr(self.qset, "data", self.qset)
-
-        if isinstance(raw_qset, list):
-            #sometimes it is not a dict in the demo
-            raw = raw[0] if raw and isinstance(raw[0], dict) else {}
-
-        self.scoreMode = (self.qset.get("options") or {}).get("scoreMode", "Normal")
+        qdict = self._qset_dict()
+        self.scoreMode = (qdict.get("options") or {}).get("scoreMode", "Normal")
 
         self._ss_table_title = "Responses:"
         self._ss_table_headers = ["Question Score", "The Question", "Your Response"]
 
-    #looks complicated, attempts to match php check answer where
-    #it rebuilds the path after getting the end node and assigning -1 to everything else
     def check_answer(self, log):
         if self.scoreMode == "Normal":
             if getattr(log, "log_type", None) != Log.LogType.SCORE_FINAL_FROM_CLIENT:
-                print("not a final score log so we return -1 and early")
+                #php likes to make every log be -1 besides the final one
                 return -1
-
-            qset_data = getattr(self.qset, "data", self.qset)
-            if isinstance(qset_data, list):
-                qset_data = next((x for x in qset_data if isinstance(x, dict)), {})
-            #v1 vs v2
-            if qset_data.get("version") == 1:
-                items_list = qset_data.get('items', [])
-                items = (items_list[0].get('items', []) if items_list and isinstance(items_list[0], dict) else [])
-            else:
-                items = qset_data.get('items', [])
-
-            if (isinstance(items, list) and items and isinstance(items[0], dict)
-                    and "items" in items[0] and not any(k in items[0] for k in ("type", "questions", "answers"))):
-                items = items[0].get("items", [])
-
-            for item in items:
-                if not isinstance(item, dict):
-                    continue
-                opts = item.get("options") or {}
-                if not isinstance(opts, dict):
-                    continue
-                if opts.get('type') not in ('end', '5'):
-                    continue
-
-                if log.item_id:
-                    if log.item_id == opts.get('id'):
-                        return 100 if self.scoreMode == 'Non-Scoring' else int(opts.get('finalScore', 0))
-                else:
-                    qs = item.get('questions') or []
-                    q0 = qs[0] if qs and isinstance(qs[0], dict) else {}
-                    if (log.text or "").strip() == (q0.get('text', "") or "").strip():
-                        return 100 if self.scoreMode == 'Non-Scoring' else int(opts.get('finalScore', 0))
-
-            return int(getattr(log, "value", 0))
-
+            #where the the old for loop logic happens now
+            node = self._match_end_node(log)
+            if node:
+                opts = node.get("options") or {}
+                if self.scoreMode == "Non-Scoring":
+                    return 100
+                return int(opts.get("finalScore", 0))
+            #if nothing matched for whatever reason then php retunrs 0 so
+            return 0
+        return -1
 
     #need to ignore this method
     def handle_log_question_answered(self, log):
@@ -120,19 +123,12 @@ class Adventure(ScoreModule):
     def handle_log_client_final_score(self, log) -> None:
         self.verified_score = 0
         self.total_questions = 0
-        print(f"we are checking answer for log: {log} and log type is {log.log_type}")
         final_val = self.check_answer(log)
         self.global_modifiers.append(final_val)
 
     def calculate_score(self):
-        #php does verified + sum(modifiers) then round and clamp
         points = self.verified_score + sum(self.global_modifiers)
-        self.calculated_percent = round(points)
-        if self.calculated_percent < 0:
-            self.calculated_percent = 0
-        if self.calculated_percent > 100:
-            self.calculated_percent = 100
-
+        self.calculated_percent = max(0, min(100, round(points)))
 
     def get_score_overview(self):
         return {
@@ -144,19 +140,12 @@ class Adventure(ScoreModule):
             "auth": "",
         }
 
-
-
     def details_for_question_answered(self, log):
         question = self.get_question_by_item_id(log.item_id)
         if not isinstance(question, dict):
             return None
-
         answers = question.get("answers") or []
-        if not isinstance(answers, list):
-            answers = []
-
         score = self.check_answer(log)
-
         return {
             "id": log.item_id,
             "data": [
@@ -174,37 +163,24 @@ class Adventure(ScoreModule):
             "display_score": False,
         }
 
-
     def get_score_details(self):
-        details_rows = []
-
+        rows = []
         for log in self.logs:
-            print(f"our log is {log} and the log type is {log.log_type}")
             if log.log_type == Log.LogType.SCORE_QUESTION_ANSWERED:
                 if log is None:
-                    print("dont want to blow up")
                     continue
-                question = self.get_question_by_item_id(log.item_id)
-                # print(f"question is {question}")
-
-                if question is not None:
-                    # print("our question is not none")
-                    row = self.details_for_question_answered(log)
-                    details_rows.append(row)
-                else:
-                    print("our question is none")
-
-            if log.log_type == Log.LogType.SCORE_FINAL_FROM_CLIENT:
+                q = self.get_question_by_item_id(log.item_id)
+                if q is not None:
+                    rows.append(self.details_for_question_answered(log))
+            elif log.log_type == Log.LogType.SCORE_FINAL_FROM_CLIENT:
                 score = self.check_answer(log)
-                log_text = self._final_text_for_log(log)
+                text = self._final_text_for_log(log)
                 item_id = getattr(log, "item_id", 0)
-
-                older_qset = (item_id == 0 and log_text != "Blank Destination! Be sure to edit or remove this node before publishing.")
-                blank_node = (item_id == 0 and log_text == "Blank Destination! Be sure to edit or remove this node before publishing.")
-
-                details_rows.append({
+                older_qset = (item_id == 0 and text != "Blank Destination! Be sure to edit or remove this node before publishing.")
+                blank_node = (item_id == 0 and text == "Blank Destination! Be sure to edit or remove this node before publishing.")
+                rows.append({
                     "node_id": item_id,
-                    "data": [log_text, score],
+                    "data": [text, score],
                     "data_style": ["text", "score"],
                     "score": score,
                     "type": log.log_type,
@@ -215,38 +191,25 @@ class Adventure(ScoreModule):
                     "older_qset": older_qset,
                     "blank_node": blank_node,
                 })
-
-                # print(f"[DETAILS] built {len(details_rows)} rows")
-                # print(f"[OVERVIEW] table rows = {len(self.get_overview_items())} (should be 2)")
-
         headers = self._ss_table_headers
+        return [{
+            "title": self._ss_table_title,
+            "headers": headers,
+            "header": headers,
+            "headers": headers, # usually we go by headers in base score module
+            "header": headers, # adventure goes by headers for some reason?? legacy compatibility, harmless
+            "table": rows,
+        }]
 
-        return [
-            {
-                "title": self._ss_table_title,
-                "headers": headers, # usually we go by headers in base score module
-                "header": headers, # adventure goes by headers for some reason?? legacy compatibility, harmless
-                "table": details_rows,
-            }
-        ]
-
+    #overrided: in some cases item_id can be an object but still null so it would crash
     def get_question_by_item_id(self, item_id):
         if item_id is None:
             return None
         target = str(item_id)
         for node in self._iter_nodes(self._items_list()):
             opts = node.get("options") or {}
-            cand_ids = [opts.get("id"), node.get("id")]  # v1 vs v2
+            cand_ids = [opts.get("id"), node.get("id")]
             if any(str(cid) == target for cid in cand_ids if cid is not None):
                 return node
         return None
-
-
-
-
-
-
-
-
-
 
