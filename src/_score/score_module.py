@@ -81,9 +81,6 @@ class Adventure(ScoreModule):
             qset_data = getattr(self.qset, "data", self.qset)
             if isinstance(qset_data, list):
                 qset_data = next((x for x in qset_data if isinstance(x, dict)), {})
-            if not isinstance(qset_data, dict):
-                qset_data = {}
-
             #v1 vs v2
             if qset_data.get("version") == 1:
                 items_list = qset_data.get('items', [])
@@ -182,9 +179,11 @@ class Adventure(ScoreModule):
         details_rows = []
 
         for log in self.logs:
-            # print(f"our log is {log} and the log type is {log.log_type}")
-
+            print(f"our log is {log} and the log type is {log.log_type}")
             if log.log_type == Log.LogType.SCORE_QUESTION_ANSWERED:
+                if log is None:
+                    print("dont want to blow up")
+                    continue
                 question = self.get_question_by_item_id(log.item_id)
                 # print(f"question is {question}")
 
@@ -231,6 +230,16 @@ class Adventure(ScoreModule):
             }
         ]
 
+    def get_question_by_item_id(self, item_id):
+        if item_id is None:
+            return None
+        target = str(item_id)
+        for node in self._iter_nodes(self._items_list()):
+            opts = node.get("options") or {}
+            cand_ids = [opts.get("id"), node.get("id")]  # v1 vs v2
+            if any(str(cid) == target for cid in cand_ids if cid is not None):
+                return node
+        return None
 
 
 
