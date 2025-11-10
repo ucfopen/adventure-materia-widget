@@ -34,3 +34,5 @@ meta_data:
     An advanced flexible scenario-building tool.
   accessibility_keyboard: Full
   accessibility_reader: Full
+  update_method: github
+  repo: ucfopen/adventure-materia-widget
