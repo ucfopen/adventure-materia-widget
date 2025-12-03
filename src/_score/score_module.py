@@ -47,11 +47,9 @@ class Adventure(ScoreModule):
                             question.data.get("options")
                             .get("finalScore")
                         )
-
+            return 0
         else:
             return -1
-        
-        return 0
 
     def handle_log_question_answered(self, log):
         pass
