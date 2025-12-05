@@ -22,7 +22,7 @@ class Adventure(ScoreModule):
 
                 if (
                     question.data.get("options").get("type") != "end" and
-                    int(question.data.get("options").get("type")) != 5
+                    question.data.get("options").get("type") != "5"
                 ):
                     continue
 
@@ -47,7 +47,7 @@ class Adventure(ScoreModule):
                             question.data.get("options")
                             .get("finalScore")
                         )
-
+            return 0
         else:
             return -1
 
@@ -117,10 +117,10 @@ class Adventure(ScoreModule):
                     "graphic": "score",
                     "display_score": False,
                     "older_qset": (
-                        log.item_id == 0 and log.text != blank_node_str
+                        log.item_id == "0" and log.text != blank_node_str
                     ),
                     "blank_node": (
-                        log.item_id == 0 and log.text == blank_node_str
+                        log.item_id == "0" and log.text == blank_node_str
                     ),
                 })
 
