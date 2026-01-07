@@ -507,7 +507,7 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.closeFeedback = () ->
 		if $scope.feedback.length > 0 # prevent multiple calls to manageQuestionScreen from firing due to the scope cycle not updating fast enough
 			$scope.feedback = ""
-			if $scope.next
+			if $scope.next || $scope.next == 0
 				manageQuestionScreen $scope.next
 
 	$scope.closeTutorial = () ->
