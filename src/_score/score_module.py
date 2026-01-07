@@ -22,7 +22,7 @@ class Adventure(ScoreModule):
 
                 if (
                     question.data.get("options").get("type") != "end" and
-                    question.data.get("options").get("type") != "5"
+                    str(question.data.get("options").get("type")) != "5"
                 ):
                     continue
 
