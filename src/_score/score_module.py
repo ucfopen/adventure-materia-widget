@@ -1,6 +1,5 @@
-from core.models import Log
+from core.models import Log, Question
 from scoring.module import ScoreModule
-
 
 class Adventure(ScoreModule):
 
@@ -32,10 +31,15 @@ class Adventure(ScoreModule):
                         question.data.get("options")
                         .get("id")
                     ):
-                        return int(
-                            question.data.get("options")
-                            .get("finalScore", 0)
-                        )
+                        if "finalScore" in question.data.get("options"):
+                            return int(
+                                question.data.get("options")
+                                .get("finalScore", 0)
+                            )
+                        # a matching node was found but it does not have the property we expect
+                        # use the log's score value as a fallback
+                        else:
+                            return int(log.value)
 
                 else:
                     if (
@@ -47,6 +51,21 @@ class Adventure(ScoreModule):
                             question.data.get("options")
                             .get("finalScore")
                         )
+            # if we got this far we didn't find a corresponding Question model instance
+            # check the qset for a matching node
+            if log.item_id is not None:
+                question = self.find_item_with_id(log.item_id, True)
+                if question is not None:
+                    if "finalScore" in question.get("options"):
+                        return int(
+                            question.get("options")
+                            .get("finalScore", 0)
+                        )
+                    # a matching node was found but it does not have the property we expect
+                    # use the log's score value as a fallback
+                    else:
+                        return int(log.value)
+
             return 0
         else:
             return -1
@@ -131,3 +150,38 @@ class Adventure(ScoreModule):
                 "table": details,
             }
         ]
+
+    def get_question_by_item_id(self, item_id):
+        question = next((q for q in self.questions if q.item_id == item_id), None)
+        # see if we can find this question in the qset itself
+        if question is None:
+            return self.find_item_with_id(item_id)
+        return question.data
+
+    def find_item_with_id(self, item_id, isNodeId=False):
+        import copy
+
+        def _process_item(item):
+            if isinstance(item, list):
+                for element in item:
+                    result = _process_item(element)
+                    if result is not None:
+                        return result
+
+            elif isinstance(item, dict):
+                copied_item = copy.deepcopy(item)
+
+                if Question.is_question(copied_item):
+                    if isNodeId:
+                        if "options" in copied_item and int(copied_item.get("options").get("id")) == int(item_id):
+                            return copied_item
+                    elif copied_item.get("id") == item_id:
+                        return copied_item
+
+                for value in copied_item.values():
+                    if isinstance(value, (dict, list)):
+                        result = _process_item(value)
+                        if result is not None:
+                            return result
+            return None
+        return _process_item(self.qset)
