@@ -68,7 +68,7 @@ body {
 }
 
 .aria-live-region {
-	padding: 5px;
+	padding: 0;
 	box-sizing: border-box;
 	border: 2px solid transparent;
 	border-radius: 5px;
@@ -434,6 +434,17 @@ h1 {
 
 		b {
 			font-weight: bold;
+		}
+
+		&.is-loading-ai-response {
+			text-align: center;
+			animation: fade-in-out 2s infinite;
+
+			@keyframes fade-in-out {
+				0% { opacity: 0.25; }
+				50% { opacity: 1; }
+				100% { opacity: 0.25; }
+			}
 		}
 
 		// &.left {

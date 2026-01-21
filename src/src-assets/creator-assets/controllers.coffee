@@ -25,6 +25,10 @@ angular.module "Adventure"
 	$scope.showImage = true
 	$scope.urlError = '　'
 
+	$scope.allowPromptMode = false
+	$scope.promptMode = false
+	$scope.promptModeScenario = ""
+
 	# Characters that need to be pre-sanitize before being run through angular's $sanitize directive
 	PRESANITIZE_CHARACTERS =
 		'>' : '&gt;',
@@ -244,6 +248,7 @@ angular.module "Adventure"
 				$scope.icons.push(custom_icon)
 
 	materiaCallbacks.initNewWidget = (widget, baseUrl) ->
+
 		$scope.$apply ->
 			$scope.title = "My Adventure Widget"
 
@@ -257,6 +262,13 @@ angular.module "Adventure"
 
 			treeHistorySrv.addToHistory $scope.treeData, historyActions.WIDGET_INIT, "Widget Initialized"
 
+			if widget.general # mwdk
+				if widget.general.uses_prompt_generation == "Yes"
+					$scope.allowPromptMode = true
+			else # materia itself maps these values differently
+				if widget.uses_prompt_generation == "1"
+					$scope.allowPromptMode = true
+
 	materiaCallbacks.initExistingWidget = (title,widget,qset,version,baseUrl) ->
 		showIntroDialog = false
 
@@ -269,6 +281,8 @@ angular.module "Adventure"
 				$scope.treeData = treeSrv.createTreeDataFromQset qset
 
 				if qset.options.hidePlayerTitle then $scope.hidePlayerTitle = qset.options.hidePlayerTitle
+				if qset.options.promptMode then $scope.promptMode = qset.options.promptMode
+				if qset.options.promptModeScenario then $scope.promptModeScenario = qset.options.promptModeScenario
 
 				treeSrv.setInventoryItems qset.options.inventoryItems || []
 
@@ -341,6 +355,8 @@ angular.module "Adventure"
 			qset.options.internalScoreMessage = $scope.internalScoreMessage
 			qset.options.inventoryItems = treeSrv.getInventoryItems()
 			qset.options.customIcons = treeSrv.getCustomIcons()
+			qset.options.promptMode = $scope.promptMode
+			qset.options.promptModeScenario = $scope.promptModeScenario
 			Materia.CreatorCore.save $scope.title, qset, 2
 
 	materiaCallbacks.onSaveComplete = (title, widget, qset, version) -> true

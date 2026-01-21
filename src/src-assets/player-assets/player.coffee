@@ -38,8 +38,14 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 	$scope.missingRequiredItems = []
 	$scope.missingRequiredItemsAltText = ""
 
+	$scope.promptMode = false
+	$scope.promptModePreContext = ""
+
+	_roleplaySummary = ""
+	_lastResponseText = "The player has not yet made any decisions."
+
 	materiaCallbacks =
-		start: (instance, qset, version = '1') ->
+		start: (instance, qset, version = '1') -> (
 			#Convert an old qset prior to running the widget
 			if parseInt(version) is 1 then qset = JSON.parse legacyQsetSrv.convertOldQset qset
 
@@ -61,7 +67,46 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 
 				$scope.qsetHasInventoryItems = _qsetHasInventoryItems $scope.qset
 
+				if qset.options.promptMode
+					$scope.promptMode = qset.options.promptMode
+					$scope.promptModePreContext = qset.options.promptModeScenario
+
+					console.log 'prompt mode is ' + $scope.promptMode
+
 			$scope.showTutorial = true
+
+		),
+		promptResponse: (res) -> (
+
+			newQuestion = $scope.question
+			newQuestionText = $scope.question.text
+
+			try
+				responseJson = JSON.parse res[0]
+				if !!responseJson.roleplay
+					newQuestionText = micromarkdown.parse responseJson.roleplay
+					
+					if !!responseJson.summary then _roleplaySummary += " " + responseJson.summary
+				else newQuestionText = "There was an issue creating the roleplay for this question :("
+
+			catch e
+				newQuestion = "There was an issue decoding the roleplay for this question :("
+
+			$scope.$apply ->
+				$scope.question = {
+					...$scope.question,
+					text: newQuestionText,
+					is_loading_ai_response: false
+				}
+		
+		),
+		promptRejection: () ->
+			$scope.$apply ->
+				$scope.question = {
+					...$scope.question,
+					text: "Prompt rejected, there was an issue creating the roleplay for this question :(",
+					is_loading_ai_response: false
+				}
 
 		manualResize: true
 
@@ -143,13 +188,32 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		# hyperlinks are automatically converted into <a href> tags, except it loads content within the iframe. To circumvent this, need to dynamically add target="_blank" attribute to all generated URLs
 		parsedQuestion = addTargetToHrefs parsedQuestion
 
-		$scope.question =
-			text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
-			layout: $scope.layout,
-			type : q_data.options.type,
-			id : q_data.options.id
-			materiaId: q_data.id
-			options: q_data.options
+
+		# ****************************** prompt mode ****************************
+
+		if $scope.promptMode and parsedQuestion.length > 0 and parsedQuestion != "No question text provided."
+			generationPrompt = _createPromptForQuestion(parsedQuestion)
+
+			Materia.Engine.submitPrompt(generationPrompt)
+
+			parsedQuestion = "Loading..."
+
+			$scope.question =
+				text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
+				layout: $scope.layout,
+				type : q_data.options.type,
+				id : q_data.options.id
+				materiaId: q_data.id
+				options: q_data.options
+				is_loading_ai_response: true
+		else
+			$scope.question =
+				text : parsedQuestion, # questions MUST be an array, always 1 index w/ single text property. MMD converts markdown formatting into proper markdown syntax
+				layout: $scope.layout,
+				type : q_data.options.type,
+				id : q_data.options.id
+				materiaId: q_data.id
+				options: q_data.options
 
 		# ******************************************* inventory item management **************************************
 
@@ -301,7 +365,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 					hideRequiredItems: q_data.answers[i].options.hideRequiredItems || false
 
 				if answer.requiredItems[0]
-					$scope.showInventoryBtn = true
+					for item in answer.requiredItems[0]
+						if !item.isSilent then $scope.showInventoryBtn = true
 
 				$scope.answers.push answer
 
@@ -410,6 +475,8 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 		else
 			# record the answer
 			_logProgress()
+
+		_lastResponseText = $scope.selectedAnswer
 
 		if $scope.q_data.answers[index].options.feedback
 			$scope.feedback = $scope.q_data.answers[index].options.feedback
@@ -656,6 +723,10 @@ angular.module('Adventure', ['ngAria', 'ngSanitize'])
 			a[j] = a[i]
 			a[i] = t
 		a
+
+	_createPromptForQuestion = (questionPrompt) ->
+		summary = if _roleplaySummary.length then _roleplaySummary else "No summary available yet."
+		return "You will receive a prompt describing a branching roleplay scenerio, where the player makes choices to determine the scenerio outcome. Based on the scenerio context and summaries of each decision, address the player in the second-person: generate a few sentences to roleplay the current interaction. The overall description is: " + $scope.promptModePreContext + ". Building on the summary - " + summary + " - incorporating the user's last choice - " + _lastResponseText + " - continue the narrative: " + questionPrompt + ". Output ONLY a JSON object with two properties: 'roleplay' and 'summary', using the following structure: { roleplay: '', summary: '' }. 'roleplay' contains the actual roleplay content as requested as a string; 'summary' is a brief, one-sentence summary of the generated roleplay content. Do NOT include a code block, or any hidden characters that may otherwise make your response unreadable by a JSON parser."
 
 	# light this candle
 	Materia.Engine.start(materiaCallbacks)
